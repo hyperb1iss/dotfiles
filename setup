@@ -1,0 +1,8 @@
+DOTFILES=~/dev/dotfiles
+
+ln -sf $DOTFILES/vimrc ~/.vimrc
+ln -sf $DOTFILES/vim ~/.vim
+ln -sf $DOTFILES/bashrc ~/.bashrc
+ln -sf $DOTFILES/gitconfig ~/.gitconfig
+
+sudo ln -sf $DOTFILES/60-android.rules /etc/udev/rules.d/60-android.rules

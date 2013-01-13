@@ -1,0 +1,10 @@
+[color]
+	ui = auto
+[user]
+	name = Steve Kondik
+	email = shade@chemlab.org
+[review "review.cyanogenmod.com"]
+	username = cyanogen
+[review "review.cyanogenmod.org"]
+	username = cyanogen
+
