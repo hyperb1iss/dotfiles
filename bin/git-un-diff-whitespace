@@ -1,0 +1,54 @@
+#!/usr/bin/python
+
+import os,sys,re,subprocess
+
+hunk_re = re.compile(r'^@@ -\d+,\d+ \+(\d+),(\d+) @@')
+ws_re = re.compile(r'^(.*?)[ \t]+$')
+file_re = re.compile(r'^\+\+\+ b/(.+)')
+
+def strip_whitespace_regions(filename, hunks):
+  if len(hunks) == 0:
+    return
+  filename_t = filename + '.tmp'
+  tmpf = open(filename_t, 'w')
+  f = open(filename)
+  i = 0
+  hunk = hunks[0]
+  for line in f:
+    if (hunk is None) or (i < hunk[0]):
+      tmpf.write(line)
+    elif i < (hunk[0] + hunk[1]):
+      nline = ws_re.sub(r'\1', line) 
+      tmpf.write(nline) 
+    else:
+      hunks = hunks[1:]
+      if len(hunks) == 0:
+        hunk = None
+      else:
+        hunk = hunks[0] 
+      tmpf.write(line)
+    i = i+1
+  tmpf.close()
+  f.close()
+  os.rename(filename_t, filename)
+  print "wrote " + filename
+
+def main():
+  diffproc = subprocess.Popen(['git', 'diff'], stdout=subprocess.PIPE)
+  curfile = None
+  hunks = []
+  for line in diffproc.stdout:
+    match = hunk_re.match(line) 
+    if match:
+      hunks.append((int(match.group(1)),int(match.group(2))))
+    else:
+      match = file_re.match(line)
+      if match:
+        strip_whitespace_regions(curfile, hunks)
+        curfile = match.group(1)
+        hunks = []
+  if curfile:
+    strip_whitespace_regions(curfile, hunks)
+
+if __name__ == '__main__':
+  main()

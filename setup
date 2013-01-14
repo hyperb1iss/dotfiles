@@ -6,6 +6,8 @@ ln -sfv $DOTFILES/vim/ ~/.vim
 ln -sfv $DOTFILES/bashrc ~/.bashrc
 ln -sfv $DOTFILES/gitconfig ~/.gitconfig
 
+cp -av $DOTFILES/bin ~/bin
+
 cp -av $DOTFILES/fonts ~/.fonts
 fc-cache -f
 
