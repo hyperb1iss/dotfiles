@@ -21,7 +21,7 @@ export ANDROID_NO_PROMPT_COMMAND=1
 function _update_ps1() {
     case "$TERM" in
     xterm*|rxvt*)
-        export PS1="\[\033]0;${ANDROID_PROMPT_PREFIX:+$ANDROID_PROMPT_PREFIX }${debian_chroot:+($debian_chroot)}\u@\h: \w\a\]$(~/dev/powerline-bash/powerline-bash.py $?)"
+        export PS1="\[\033]0;${ANDROID_PROMPT_PREFIX:+$ANDROID_PROMPT_PREFIX }${debian_chroot:+($debian_chroot)}\u@\h: \w\a\]$(~/dev/dotfiles/powerline-bash/powerline-bash.py $?)"
         ;;
     *)
         export PS1='${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ '
