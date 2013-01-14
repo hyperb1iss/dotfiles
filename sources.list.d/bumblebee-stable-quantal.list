@@ -1,0 +1,3 @@
+deb http://ppa.launchpad.net/bumblebee/stable/ubuntu/ quantal main
+deb-src http://ppa.launchpad.net/bumblebee/stable/ubuntu/ quantal main
+
