@@ -5,4 +5,8 @@ ln -sf $DOTFILES/vim ~/.vim
 ln -sf $DOTFILES/bashrc ~/.bashrc
 ln -sf $DOTFILES/gitconfig ~/.gitconfig
 
-sudo ln -sf $DOTFILES/60-android.rules /etc/udev/rules.d/60-android.rules
+cp -av $DOTFILES/fonts ~/.fonts
+fc-cache -f
+
+sudo ln -sf $DOTFILES/rules.d/60-android.rules /etc/udev/rules.d/60-android.rules
+sudo ln -sf $DOTFILES/xorg.conf.d/51-samsung-laptop.conf /usr/share/X11/xorg.conf.d/51-samsung-laptop.conf
