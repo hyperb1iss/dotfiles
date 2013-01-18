@@ -113,3 +113,19 @@ export USE_CCACHE=1
 alias gc='git cherry-pick'
 alias cm='cd /home/shade/dev/cm/10.1'
 alias gerrit='ssh -p 29418 cyanogen@r.cyanogenmod.org gerrit'
+
+function apush() {
+    if [ -z "$OUT" ]; then
+        echo "Android environment not configured."
+        return 0;
+    fi
+    for i in $@; do
+        XPATH=`readlink -e $i`
+        DIR=`dirname $XPATH | sed -e "s#$OUT##g"`
+        BASE=`basename $XPATH`
+        echo "$i -> $DIR/$BASE"
+        adb push $XPATH $DIR/$BASE
+    done
+}
+
+export apush

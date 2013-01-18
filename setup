@@ -5,6 +5,8 @@ rm ~/.vim
 ln -sfv $DOTFILES/vim/ ~/.vim
 ln -sfv $DOTFILES/bashrc ~/.bashrc
 ln -sfv $DOTFILES/gitconfig ~/.gitconfig
+ln -sfv $DOTFILES/screenrc ~/.screenrc
+ln -sfv $DOTFILES/tmux.conf ~/.tmux.conf
 
 cp -av $DOTFILES/bin ~/bin
 
