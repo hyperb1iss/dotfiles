@@ -7,4 +7,9 @@
 	username = cyanogen
 [review "review.cyanogenmod.org"]
 	username = cyanogen
-
+[review "review.lineageos.org"]
+	username = cyanogen
+[credential]
+	helper = cache
+[http]
+	cookiefile = /home/shade/.gitcookies

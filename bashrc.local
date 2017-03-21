@@ -1,0 +1,104 @@
+export ANDROID_NO_PROMPT_COMMAND=1
+
+function _update_ps1() {
+    echo -ne "\033]0;${ANDROID_PROMPT_PREFIX:+$ANDROID_PROMPT_PREFIX }${debian_chroot:+($debian_chroot)}${USER}@${HOSTNAME}\a"
+}
+
+export PROMPT_COMMAND="_update_ps1"
+
+# unstated (*) stated (+)
+export GIT_PS1_SHOWDIRTYSTATE=1
+# stashed ($)
+export GIT_PS1_SHOWSTASHSTATE=1
+# untracked (%)
+export GIT_PS1_SHOWUNTRACKEDFILES=1
+# upstream (<=>)
+export GIT_PS1_SHOWUPSTREAM="verbose"
+
+. /usr/share/powerline/bindings/bash/powerline.sh
+
+for i in autocd cdable_vars cdspell checkwinsize cmdhist dirspell expand_aliases extglob extquote force_fignore globstar hostcomplete interactive_comments progcomp promptvars sourcepath
+do
+    shopt -s $i
+done
+
+# Add tab completion for SSH hostnames based on ~/.ssh/config, ignoring wildcards
+[ -e "$HOME/.ssh/config" ] && complete -o "default" -o "nospace" -W "$(grep "^Host" ~/.ssh/config | grep -v "[?*]" | cut -d " " -f2)" scp sftp ssh
+
+export USE_CCACHE=1
+
+alias gc='git cherry-pick'
+alias cm='cd /home/shade/dev/laos/14'
+alias gerrit='ssh -p 29418 cyanogen@r.cyanogenmod.org gerrit'
+
+function apush() {
+    if [ -z "$OUT" ]; then
+        echo "Android environment not configured."
+        return 0;
+    fi
+    for i in $@; do
+        REALFILE=`readlink -e $i`
+        REALOUT=`readlink -e $OUT`
+        OUTDIR=`dirname $REALFILE | sed -e "s#$REALOUT##g"`
+        if [ -z "$OUTDIR" ]; then
+            echo "Unable to resolve destination, are you in \$OUT?"
+            return 0;
+        fi
+        FILE=`basename $REALFILE`
+        echo "$i -> $OUTDIR/$FILE"
+        adb push $REALFILE $OUTDIR/$FILE
+    done
+}
+
+export apush
+
+adbd () {
+    adb -s $(get_device) "$@"
+}
+
+function get_device() {
+    local devices=$(adb devices | grep device$)
+    if [ $(wc -l <<< "$devices") -eq 1 ]; then
+        awk {'print $1'} <<< "$devices"
+    else
+        IFS=$'\n' devices=($devices)
+        unset IFS
+        local device
+        PS3="Select a device # "
+        select device in "${devices[@]}"; do
+            if [ -n "$device" ]; then
+                awk {'print $1'} <<< "$device"
+            fi
+            break
+        done
+    fi
+}
+
+function logcat(){
+    local device
+    device=$(get_device)
+    if [ -z "$1" ]
+    then
+        adb -s $device logcat -C
+    else
+            local filters=""
+            for f in $@
+            do
+            export filters="$filters $f:*"
+            done
+            echo "filters $filters"
+        adb -s $device logcat $filters *:S
+     fi
+}
+
+function rmd() {
+    pandoc $1 | lynx -stdin
+}
+
+#export SDCLANG=true
+#export SDCLANG_PATH=/home/shade/dev/sd/toolchains/llvm-Snapdragon_LLVM_for_Android_3.8/prebuilt/linux-x86_64/bin
+#export SDCLANG_LTO_DEFS=device/qcom/common/sdllvm-lto-defs.mk
+#export WITH_GMS=true
+
+export QT_SCALE_FACTOR=2
+
