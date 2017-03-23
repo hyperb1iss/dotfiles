@@ -1,7 +1,14 @@
-export ANDROID_NO_PROMPT_COMMAND=1
+# Don't let Android mess with the prompt
+export STAY_OFF_MY_LAWN=1
 
 function _update_ps1() {
-    echo -ne "\033]0;${ANDROID_PROMPT_PREFIX:+$ANDROID_PROMPT_PREFIX }${debian_chroot:+($debian_chroot)}${USER}@${HOSTNAME}\a"
+    if [ ! -z "$TARGET_PRODUCT" ]; then
+        local arch=$(gettargetarch)
+        local product=$TARGET_PRODUCT
+        local variant=$TARGET_BUILD_VARIANT
+        ANDROID_PREFIX="[${arch}-${product}-${variant}]"
+    fi
+    echo -ne "\033]0;${ANDROID_PREFIX:+$ANDROID_PREFIX }${debian_chroot:+($debian_chroot)}${USER}@${HOSTNAME}: ${PWD}\a"
 }
 
 export PROMPT_COMMAND="_update_ps1"
@@ -15,6 +22,8 @@ export GIT_PS1_SHOWUNTRACKEDFILES=1
 # upstream (<=>)
 export GIT_PS1_SHOWUPSTREAM="verbose"
 
+export POWERLINE_BASH_CONTINUATION=1
+export POWERLINE_BASH_SELECT=1
 . /usr/share/powerline/bindings/bash/powerline.sh
 
 for i in autocd cdable_vars cdspell checkwinsize cmdhist dirspell expand_aliases extglob extquote force_fignore globstar hostcomplete interactive_comments progcomp promptvars sourcepath
@@ -102,3 +111,4 @@ function rmd() {
 
 export QT_SCALE_FACTOR=2
 
+export PATH=$PATH:~/Android/Sdk/platform-tools
