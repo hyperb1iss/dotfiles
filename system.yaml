@@ -11,5 +11,5 @@
 
 - shell:
     - apt update
-    - apt install python3-powerline powerline
+    - apt install python3-powerline powerline vim-addon-manager
     - systemctl --global enable powerline-daemon
