@@ -1,0 +1,24 @@
+- defaults:
+    link:
+      relink: true
+
+- clean: ['~']
+
+- shell:
+    - curl http://storage.googleapis.com/git-repo-downloads/repo > bin/repo
+    - chmod +x bin/repo
+    - systemctl --user start powerline-daemon
+
+- link:
+    ~/.bashrc.local:
+    ~/.fonts:
+    ~/.gitconfig:
+    ~/.screenrc:
+    ~/.tmux.conf:
+    ~/.vim:
+    ~/.vimrc:
+    ~/.Xmodmap:
+    ~/bin: bin
+
+- shell:
+    - fc-cache -f

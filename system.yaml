@@ -1,0 +1,15 @@
+- defaults:
+    link:
+      relink: true
+
+- clean: ['~']
+
+- link:
+    /lib/udev/rules.d/60-android.rules: rules.d/60-android.rules
+    /usr/share/X11/xorg.conf.d/51-synaptics.conf: xorg.conf.d/51-synaptics.conf
+    /etc/sysctl.d/50-inotify.conf: sysctl.d/50-inotify.conf
+
+- shell:
+    - apt update
+    - apt install python3-powerline powerline
+    - systemctl --global enable powerline-daemon

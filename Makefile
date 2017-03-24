@@ -1,39 +1,16 @@
-D=~/dev/dotfiles
+BASEDIR=$(shell cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+DOTBOT=$(BASEDIR)/dotbot/bin/dotbot
 
-install_bash:
-	ln -sf $D/bashrc.local ~/.bashrc.local
+default: all
 
-install_vim:
-	ln -sf $D/vimrc ~/.vimrc
-	rm ~/.vim
-	ln -sf $D/vim ~/.vim
+update:
+	cd $(BASEDIR)
+	git submodule update --init --recursive dotbot
 
-install_misc:
-	ln -sf $D/gitconfig ~/.gitconfig
-	ln -sf $D/screenrc ~/.screenrc
-	ln -sf $D/tmux.conf ~/.tmux.conf
+install_system:
+	sudo $(DOTBOT) -d $(BASEDIR) -c system.yaml
 
-install_bin:
-	cp -av bin ~/bin
-	curl http://storage.googleapis.com/git-repo-downloads/repo > ~/bin/repo
-	chmod +x ~/bin/repo
+install_local:
+	$(DOTBOT) -d $(BASEDIR) -c local.yaml
 
-install_fonts:
-	cp -av fonts ~/.fonts
-	fc-cache -f
-
-install_udev:
-	sudo cp -av rules.d /lib/udev/rules.d/
-
-install_xorg:
-	sudo cp -av xorg.conf.d /usr/share/X11/xorg.conf.d/
-
-install_sysctl:
-	sudo cp -av sysctl.d /etc/sysctl.d/
-
-install_powerline:
-	sudo apt install python3-powerline powerline
-	systemctl --user enable powerline-daemon
-	systemctl --user start powerline-daemon
-
-install: install_bash install_vim install_misc install_bin install_fonts install_udev install_xorg install_sysctl install_powerline
+all: update install_system install_local
