@@ -7,3 +7,6 @@
 [submodule "oh-my-zsh-powerline-theme"]
 	path = oh-my-zsh-powerline-theme
 	url = git://github.com/jeremyFreeAgent/oh-my-zsh-powerline-theme.git
+[submodule "dotbot"]
+	path = dotbot
+	url = https://github.com/anishathalye/dotbot
