@@ -10,9 +10,11 @@
     - vim-addons install powerline
     - systemctl --user start powerline-daemon
     - vam install youcompleteme
+    - mkdir -p ~/.config/nvim
 
 - link:
     ~/.bashrc.local:
+    ~/.config/nvim/init.vim: nvim/init.vim
     ~/.fonts:
     ~/.gitconfig:
     ~/.screenrc:
