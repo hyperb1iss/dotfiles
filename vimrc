@@ -10,6 +10,8 @@
 " properly set to work with the Vim-related packages available in Debian.
 runtime! debian.vim
 
+let g:powerline_pycmd="py3"
+
 " Uncomment the next line to make Vim more Vi-compatible
 " NOTE: debian.vim sets 'nocompatible'.  Setting 'compatible' changes numerous
 " options, so any other options should be set AFTER setting 'compatible'.
@@ -20,10 +22,6 @@ runtime! debian.vim
 if has("syntax")
   syntax on
 endif
-
-" If using a dark background within the editing area and syntax highlighting
-" turn on this option as well
-"set background=dark
 
 " Uncomment the following to have Vim jump to the last position when
 " reopening a file
@@ -58,7 +56,14 @@ set encoding=utf-8
 set fillchars+=stl:\ ,stlnc:\
 set laststatus=2
 
-color molokai
+let g:rehash256=1
+let g:molokai_original = 1
+set background=dark
+colorscheme molokai
+
+hi Normal guibg=NONE ctermbg=NONE
+hi NonText ctermbg=NONE
+
 
 " Return indent (all whitespace at start of a line), converted from
 " tabs to spaces if what = 1, or from spaces to tabs otherwise.
