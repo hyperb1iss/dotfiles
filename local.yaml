@@ -9,6 +9,7 @@
     - chmod +x bin/repo
     - vim-addons install powerline
     - systemctl --user start powerline-daemon
+    - vam install youcompleteme
 
 - link:
     ~/.bashrc.local:
