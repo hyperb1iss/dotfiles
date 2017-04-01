@@ -1,12 +1,6 @@
-[submodule "powerline"]
-	path = powerline
-	url = git://github.com/Lokaltog/powerline.git
-[submodule "powerline-bash"]
-	path = powerline-bash
-	url = git://github.com/milkbikis/powerline-bash.git
-[submodule "oh-my-zsh-powerline-theme"]
-	path = oh-my-zsh-powerline-theme
-	url = git://github.com/jeremyFreeAgent/oh-my-zsh-powerline-theme.git
 [submodule "dotbot"]
 	path = dotbot
 	url = https://github.com/anishathalye/dotbot
+[submodule "fzf"]
+	path = fzf
+	url = https://github.com/junegunn/fzf

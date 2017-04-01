@@ -44,6 +44,8 @@ Plug 'rizzatti/dash.vim'
 Plug 'Valloric/YouCompleteMe', { 'do': './install.sh --clang-completer' }
 Plug 'reewr/vim-monokai-phoenix'
 Plug 'zcodes/vim-colors-basic'
+Plug 'junegunn/fzf', { 'dir': '~/dev/dotfiles/fzf', 'do': './install --all' }
+
 
 call plug#end()
 
@@ -63,6 +65,7 @@ colorscheme basic-dark
 
 set fillchars+=vert:│
 
+"
 " ---
 " Nerdtree
 " ---
