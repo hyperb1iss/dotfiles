@@ -26,3 +26,4 @@
 
 - shell:
     - fc-cache -f
+    - fzf/install --no-update-rc --key-bindings --completion

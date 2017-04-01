@@ -1,3 +1,6 @@
+# FZF integration
+[ -f ~/.fzf.bash ] && source ~/.fzf.bash
+
 # Don't let Android mess with the prompt
 export STAY_OFF_MY_LAWN=1
 
