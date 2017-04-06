@@ -1,3 +1,7 @@
+# History
+export HISTSIZE=10000
+export HISTFILESIZE=10000
+
 # FZF integration
 [ -f ~/.fzf.bash ] && source ~/.fzf.bash
 
@@ -26,7 +30,7 @@ export POWERLINE_BASH_CONTINUATION=1
 export POWERLINE_BASH_SELECT=1
 . /usr/share/powerline/bindings/bash/powerline.sh
 
-for i in autocd cdable_vars cdspell checkwinsize cmdhist dirspell expand_aliases extglob extquote force_fignore globstar hostcomplete interactive_comments progcomp promptvars sourcepath
+for i in autocd cdable_vars cdspell checkwinsize cmdhist dirspell expand_aliases extglob extquote force_fignore globstar histappend hostcomplete interactive_comments progcomp promptvars sourcepath
 do
     shopt -s $i
 done
