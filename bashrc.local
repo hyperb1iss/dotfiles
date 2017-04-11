@@ -44,6 +44,15 @@ alias gc='git cherry-pick'
 alias cm='cd /home/shade/dev/laos/14'
 alias gerrit='ssh -p 29418 cyanogen@r.cyanogenmod.org gerrit'
 
+function apull() {
+    for ARG in $@; do
+        for FILE in "$(adb shell ls $ARG)"; do
+            echo $FILE
+            adb pull "$FILE"
+        done
+    done
+}
+
 function apush() {
     if [ -z "$OUT" ]; then
         echo "Android environment not configured."
@@ -159,3 +168,45 @@ function mka() {
     mk_timer schedtool -B -n 10 -e ionice -n 7 make -j$(grep "^processor" /proc/cpuinfo | wc -l) "$@"
 }
 
+function aospremote()
+{
+    if ! git rev-parse --git-dir &> /dev/null
+    then
+        echo ".git directory not found. Please run this from the root directory of the Android repository you wish to set up."
+        return 1
+    fi
+    git remote rm aosp 2> /dev/null
+    PROJECT=$(pwd -P | sed -e "s#$ANDROID_BUILD_TOP\/##; s#-caf.*##; s#\/default##")
+    if (echo $PROJECT | grep -qv "^device")
+    then
+        PFX="platform/"
+    fi
+    git remote add aosp https://android.googlesource.com/$PFX$PROJECT
+    echo "Remote 'aosp' created"
+}
+
+function cafremote()
+{
+    if ! git rev-parse --git-dir &> /dev/null
+    then
+        echo ".git directory not found. Please run this from the root directory of the Android repository you wish to set up."
+        return 1
+    fi
+    git remote rm caf 2> /dev/null
+    PROJECT=$(pwd -P | sed -e "s#$ANDROID_BUILD_TOP\/##; s#-caf.*##; s#\/default##")
+    if (echo $PROJECT | grep -qv "^device")
+    then
+        PFX="platform/"
+    fi
+    git remote add caf https://source.codeaurora.org/quic/la/$PFX$PROJECT
+    echo "Remote 'caf' created"
+}
+
+
+export GOPATH=~/dev/go
+export GO15VENDOREXPERIMENT=1
+
+export PATH=$PATH:$GOPATH/bin
+
+export SDCLANG_PATH=~/dev/sdllvm
+export SDCLANG=1

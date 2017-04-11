@@ -32,7 +32,7 @@ Plug 'Chiel92/vim-autoformat'
 Plug 'SirVer/ultisnips'
 Plug 'honza/vim-snippets'
 Plug 'scrooloose/syntastic'
-"Plug 'gilligan/vim-lldb'
+Plug 'gilligan/vim-lldb'
 Plug 'critiqjo/lldb.nvim'
 Plug 'ryanoasis/vim-devicons'
 Plug 'vim-scripts/c.vim'
@@ -129,6 +129,8 @@ let g:ycm_semantic_triggers =  {
     \ }
 
 nnoremap <F11> :YcmForceCompileAndDiagnostics <CR>
+"let g:ycm_server_keep_logfiles = 1
+"let g:ycm_server_log_level = 'debug'
 
 " ---
 " GitGutter Symbols
