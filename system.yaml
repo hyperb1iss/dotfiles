@@ -11,5 +11,5 @@
 
 - shell:
     - apt update
-    - apt install python3-powerline powerline vim-addon-manager vim-youcompleteme neovim
+    - apt install neovim python3-powerline powerline vim-addon-manager vim-youcompleteme python3-neovim
     - systemctl --global enable powerline-daemon
