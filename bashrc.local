@@ -202,6 +202,10 @@ function cafremote()
     echo "Remote 'caf' created"
 }
 
+# systemd
+alias sctl='systemctl'
+alias uctl='systemctl --user'
+alias jctl='journalctl'
 
 export GOPATH=~/dev/go
 export GO15VENDOREXPERIMENT=1
