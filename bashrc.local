@@ -117,9 +117,9 @@ function rmd() {
     pandoc $1 | lynx -stdin
 }
 
-#export SDCLANG=true
-#export SDCLANG_PATH=/home/shade/dev/sd/toolchains/llvm-Snapdragon_LLVM_for_Android_3.8/prebuilt/linux-x86_64/bin
-#export SDCLANG_LTO_DEFS=device/qcom/common/sdllvm-lto-defs.mk
+export SDCLANG=true
+export SDCLANG_PATH=/home/shade/dev/laos/14/prebuilts/snapdragon-llvm/bin
+export SDCLANG_LTO_DEFS=device/qcom/common/sdllvm-lto-defs.mk
 #export WITH_GMS=true
 
 export QT_SCALE_FACTOR=2
@@ -211,6 +211,3 @@ export GOPATH=~/dev/go
 export GO15VENDOREXPERIMENT=1
 
 export PATH=$PATH:$GOPATH/bin
-
-export SDCLANG_PATH=~/dev/sdllvm
-export SDCLANG=1

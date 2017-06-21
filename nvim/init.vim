@@ -45,7 +45,7 @@ Plug 'Valloric/YouCompleteMe', { 'do': './install.sh --clang-completer' }
 Plug 'reewr/vim-monokai-phoenix'
 Plug 'zcodes/vim-colors-basic'
 Plug 'junegunn/fzf', { 'dir': '~/dev/dotfiles/fzf', 'do': './install --all' }
-
+Plug 'rhysd/vim-clang-format'
 
 call plug#end()
 
