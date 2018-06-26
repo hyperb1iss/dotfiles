@@ -243,3 +243,16 @@ nnoremap <leader>f :YcmCompleter FixIt<CR>
 
 nmap <silent> <leader>d <Plug>DashSearch
 
+" Destroy all trailing whitespace
+function TrimWhiteSpace()
+  %s/\s*$//
+  ''
+endfunction
+
+" autocmd FileWritePre * call TrimWhiteSpace()
+" autocmd FileAppendPre * call TrimWhiteSpace()
+" autocmd FilterWritePre * call TrimWhiteSpace()
+" autocmd BufWritePre * call TrimWhiteSpace()
+
+map <F2> :call TrimWhiteSpace()<CR>
+map! <F2> :call TrimWhiteSpace()<CR>

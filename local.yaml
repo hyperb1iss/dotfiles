@@ -9,6 +9,7 @@
 
 - link:
     ~/.bashrc.local:
+    ~/.rc.local:
     ~/.config/nvim/init.vim: nvim/init.vim
     ~/.fonts:
     ~/.gitconfig:

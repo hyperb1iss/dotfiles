@@ -1,3 +1,4 @@
 ATTR{idVendor}=="04e8", MODE="664", GROUP="adm"
 ATTR{idVendor}=="18d1", MODE="664", GROUP="adm"
 ATTR{idVendor}=="05c6", MODE="664", GROUP="adm"
+ATTR{idVendor}=="2833", MODE="664", GROUP="adm"
