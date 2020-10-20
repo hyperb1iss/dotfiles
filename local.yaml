@@ -23,8 +23,8 @@
 - shell:
     - fc-cache -f
     - fzf/install --no-update-rc --key-bindings --completion
-    - curl http://storage.googleapis.com/git-repo-downloads/repo > bin/repo
-    - chmod +x bin/repo
+    - curl http://storage.googleapis.com/git-repo-downloads/repo > ~/bin/repo
+    - chmod +x ~/bin/repo
     - vim-addons install powerline
     - systemctl --user start powerline-daemon
     - vam install youcompleteme

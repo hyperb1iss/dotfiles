@@ -3,7 +3,8 @@ export HISTSIZE=10000
 export HISTFILESIZE=10000
 
 # FZF integration
-[ -f ~/.fzf.bash ] && source ~/.fzf.bash
+. /usr/share/doc/fzf/examples/key-bindings.bash
+. /usr/share/doc/fzf/examples/completion.bash
 
 # Don't let Android mess with the prompt
 export STAY_OFF_MY_LAWN=1

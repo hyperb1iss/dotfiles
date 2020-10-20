@@ -29,7 +29,6 @@ Plug 'Xuyuanp/nerdtree-git-plugin'
 Plug 'WolfgangMehner/lua-support'
 Plug 'tpope/vim-dispatch'
 Plug 'Chiel92/vim-autoformat'
-Plug 'SirVer/ultisnips'
 Plug 'honza/vim-snippets'
 Plug 'scrooloose/syntastic'
 "Plug 'gilligan/vim-lldb'
@@ -41,7 +40,7 @@ Plug 'mileszs/ack.vim'
 Plug 'powerman/vim-plugin-viewdoc'
 Plug 'rizzatti/dash.vim'
 "Plug 'rdnetto/YCM-Generator'
-Plug 'Valloric/YouCompleteMe', { 'do': './install.sh --clang-completer' }
+Plug 'valloric/youcompleteme', { 'do': './install.py --clang-completer' }
 Plug 'reewr/vim-monokai-phoenix'
 Plug 'zcodes/vim-colors-basic'
 Plug 'junegunn/fzf', { 'dir': '~/dev/dotfiles/fzf', 'do': './install --all' }
