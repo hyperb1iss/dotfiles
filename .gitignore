@@ -2,3 +2,5 @@ vim/autoload
 vim/bundle
 vim/doc
 vim/plugin
+.uuid
+bin/repo
