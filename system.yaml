@@ -9,5 +9,15 @@
     /etc/sysctl.d/50-inotify.conf: sysctl.d/50-inotify.conf
 
 - shell:
-    - apt update
-    - apt install fzf neovim python3-powerline powerline vim-addon-manager vim-youcompleteme python3-neovim cmake python3-dev
+    -
+      command: apt update
+      stderr: true
+      stdout: true
+    -
+      command: apt install -y fzf neovim python3-powerline powerline vim-addon-manager vim-youcompleteme python3-neovim cmake python3-dev
+      stderr: true
+      stdout: true
+    -
+      command: update-alternatives --set editor /usr/bin/nvim
+      stderr: true
+      stdout: true

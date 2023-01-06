@@ -95,3 +95,4 @@ command! -nargs=? -range=% Tab2Space call IndentConvert(<line1>,<line2>,1,<q-arg
 command! -nargs=? -range=% RetabIndent call IndentConvert(<line1>,<line2>,&et,<q-args>)
 
 source $VIMRUNTIME/macros/matchit.vim
+source /usr/share/doc/fzf/examples/fzf.vim

@@ -6,7 +6,6 @@ default: all
 update:
 	cd $(BASEDIR)
 	git submodule update --init --recursive dotbot
-	git submodule update --init --recursive fzf
 
 system:
 	sudo $(DOTBOT) -d $(BASEDIR) -c system.yaml
