@@ -18,6 +18,6 @@
       stderr: true
       stdout: true
     -
-      command: update-alternatives --set editor /usr/bin/nvim
+      command: update-alternatives --set editor /usr/bin/vim.basic
       stderr: true
       stdout: true

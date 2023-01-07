@@ -11,39 +11,10 @@ endif
 
 call plug#begin('~/.config/nvim/plugged')
 
-Plug 'christoomey/vim-tmux-navigator'
-Plug 'Shougo/unite.vim'
-Plug 'Shougo/vimfiler.vim'
-Plug 'sheerun/vim-polyglot'
-Plug 'tpope/vim-fugitive'
-Plug 'ctrlpvim/ctrlp.vim'
 Plug 'vim-airline/vim-airline'
 Plug 'vim-airline/vim-airline-themes'
-Plug 'easymotion/vim-easymotion'
-Plug 'mhinz/vim-startify'
-Plug 'kshenoy/vim-signature'
-Plug 'majutsushi/tagbar'
-Plug 'airblade/vim-gitgutter'
-Plug 'scrooloose/nerdtree'
-Plug 'Xuyuanp/nerdtree-git-plugin'
-Plug 'WolfgangMehner/lua-support'
-Plug 'tpope/vim-dispatch'
-Plug 'Chiel92/vim-autoformat'
 Plug 'honza/vim-snippets'
 Plug 'scrooloose/syntastic'
-"Plug 'gilligan/vim-lldb'
-Plug 'critiqjo/lldb.nvim'
-Plug 'ryanoasis/vim-devicons'
-Plug 'vim-scripts/c.vim'
-Plug 'tikhomirov/vim-glsl'
-Plug 'mileszs/ack.vim'
-Plug 'powerman/vim-plugin-viewdoc'
-Plug 'rizzatti/dash.vim'
-"Plug 'rdnetto/YCM-Generator'
-Plug 'valloric/youcompleteme', { 'do': './install.py --clang-completer' }
-Plug 'reewr/vim-monokai-phoenix'
-Plug 'zcodes/vim-colors-basic'
-Plug 'junegunn/fzf', { 'dir': '~/dev/dotfiles/fzf', 'do': './install --all' }
 Plug 'rhysd/vim-clang-format'
 
 call plug#end()
@@ -60,7 +31,9 @@ syntax enable
 "let g:rehash256 = 1
 set t_Co=256
 set t_ut=
-colorscheme basic-dark
+
+let g:molokai_original = 1
+colorscheme molokai
 
 set fillchars+=vert:│
 
@@ -84,67 +57,11 @@ let g:tagbar_compact = 1
 let g:ycm_register_as_syntastic_checker = 1 "default 1
 let g:Show_diagnostics_ui = 1 "default 1
 
-"will put icons in Vim's gutter on lines that have a diagnostic set.
-"Turning this off will also turn off the YcmErrorLine and YcmWarningLine
-"highlighting
-let g:ycm_auto_trigger = 1
-let g:ycm_enable_diagnostic_signs = 1
-let g:ycm_enable_diagnostic_highlighting = 1
-let g:ycm_always_populate_location_list = 1 "default 0
-let g:ycm_open_loclist_on_ycm_diags = 1 "default 1
-
-"let g:ycm_autoclose_preview_window_after_completion = 1
-"let g:ycm_autoclose_preview_window_after_insertion = 1
-
-let g:ycm_complete_in_strings = 1 "default 1
-let g:ycm_collect_identifiers_from_tags_files = 1 "default 0
-"let g:ycm_path_to_python_interpreter = '' "default ''
-
-let g:ycm_server_use_vim_stdout = 0 "default 0 (logging to console)
-let g:ycm_server_log_level = 'info' "default info
-
-let g:ycm_global_ycm_extra_conf = '~/.ycm_extra_conf.py'  "where to search for .ycm_extra_conf.py if not found
-let g:ycm_confirm_extra_conf = 0
-
-let g:ycm_goto_buffer_command = 'same-buffer' "[ 'same-buffer', 'horizontal-split', 'vertical-split', 'new-tab' ]
-let g:ycm_filetype_whitelist = { '*': 1 }
-let g:ycm_key_invoke_completion = '<C-Space>'
-
-let g:ycm_warning_symbol = '?'
-let g:ycm_error_symbol = '!'
-
-let g:ycm_semantic_triggers =  {
-    \   'c' : ['->', '.'],
-    \   'objc' : ['->', '.', 're!\[[_a-zA-Z]+\w*\s', 're!^\s*[^\W\d]\w*\s',
-    \             're!\[.*\]\s'],
-    \   'ocaml' : ['.', '#'],
-    \   'cpp,objcpp' : ['->', '.', '::'],
-    \   'perl' : ['->'],
-    \   'php' : ['->', '::'],
-    \   'cs,java,javascript,typescript,d,python,perl6,scala,vb,elixir,go' : ['.'],
-    \   'ruby' : ['.', '::'],
-    \   'lua' : ['.', ':'],
-    \   'erlang' : [':'],
-    \ }
-
-nnoremap <F11> :YcmForceCompileAndDiagnostics <CR>
-"let g:ycm_server_keep_logfiles = 1
-"let g:ycm_server_log_level = 'debug'
-
-" ---
-" GitGutter Symbols
-" ---
-let g:gitgutter_sign_added = '+'
-let g:gitgutter_sign_modified = '±'
-let g:gitgutter_sign_removed = '-'
-let g:gitgutter_sign_removed_first_line = '^'
-let g:gitgutter_sign_modified_removed = '='
-
 " ---
 " AirLine
 " ---
 " Set theme
-"let g:airline_theme = 'powerlineish'
+let g:airline_theme = 'powerlineish'
 
 " Show airline with single file
 set laststatus=2
