@@ -18,7 +18,6 @@
     ~/.tmux.conf:
     ~/.vim:
     ~/.vimrc:
-    ~/.Xmodmap:
     ~/bin: bin
 
 - shell:

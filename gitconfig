@@ -1,9 +1,9 @@
 [color]
 	ui = auto
 [user]
-	name = Stefanie Kondik
-	email = shade@chemlab.org
+	name = Stefanie Jane
+	email = stef@hyperbliss.tech
 [credential]
 	helper = cache
 [http]
-	cookiefile = /home/shade/.gitcookies
+	cookiefile = ~/.gitcookies
