@@ -4,6 +4,10 @@
 	name = Stefanie Jane
 	email = stef@hyperbliss.tech
 [credential]
-	helper = cache
+	helper = store
 [http]
 	cookiefile = ~/.gitcookies
+[core]
+	autocrlf = false
+[init]
+	defaultBranch = main
