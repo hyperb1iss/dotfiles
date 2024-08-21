@@ -14,7 +14,7 @@
       stderr: true
       stdout: true
     -
-      command: apt install -y fzf neovim python3-powerline powerline vim-addon-manager vim-youcompleteme python3-neovim cmake python3-dev
+      command: apt install -y fzf neovim exa python3-powerline powerline vim-addon-manager vim-youcompleteme python3-neovim cmake python3-dev
       stderr: true
       stdout: true
     -
