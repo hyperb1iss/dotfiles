@@ -10,6 +10,7 @@
 - link:
     ~/.bashrc.local:
     ~/.rc.local:
+    ~/.config/lsd: lsd
     ~/.config/nvim/init.vim: nvim/init.vim
     ~/.config/nvim/colors: vim/colors
     ~/.fonts:
@@ -27,3 +28,6 @@
     - vim-addons install powerline
     - vam install youcompleteme
     - grep -qxF 'source ~/.bashrc.local' ~/.bashrc || echo 'source ~/.bashrc.local' >> ~/.bashrc
+
+- shell:
+    - cargo install lsd
