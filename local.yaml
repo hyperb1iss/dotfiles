@@ -17,8 +17,10 @@
     ~/.gitconfig:
     ~/.screenrc:
     ~/.tmux.conf:
+    ~/.dircolors:
     ~/.vim:
     ~/.vimrc:
+    ~/.zshrc: zsh/zshrc
     ~/bin: bin
 
 - shell:

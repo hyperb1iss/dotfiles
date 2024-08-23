@@ -14,7 +14,7 @@
       stderr: true
       stdout: true
     -
-      command: apt install -y fzf neovim python3-powerline powerline vim-addon-manager vim-youcompleteme python3-neovim cmake python3-dev cargo
+      command: apt install -y fzf neovim python3-powerline powerline vim-addon-manager vim-youcompleteme python3-neovim cmake python3-dev cargo zsh zsh-autosuggestions  zsh-syntax-highlighting
       stderr: true
       stdout: true
     -

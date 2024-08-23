@@ -1,0 +1,29 @@
+# Zsh Configuration
+
+# History settings
+setopt share_history
+setopt hist_ignore_all_dups
+setopt inc_append_history
+
+HISTSIZE=50000
+SAVEHIST=50000
+HISTFILE=~/.zsh_history
+
+# Set the terminal title to user@host: current directory
+precmd() {
+    echo -ne "\033]0;${USER}@${HOSTNAME}: ${PWD}\007"
+}
+
+# Initialize Starship prompt
+eval "$(starship init zsh)"
+
+# Source custom configurations
+source ~/dev/dotfiles/zsh/aliases.zsh
+source ~/dev/dotfiles/zsh/functions.zsh
+source ~/dev/dotfiles/zsh/env.zsh
+source ~/dev/dotfiles/zsh/completion.zsh
+source ~/dev/dotfiles/zsh/z.sh
+
+source /usr/share/doc/fzf/examples/key-bindings.zsh
+source /usr/share/zsh-autosuggestions/zsh-autosuggestions.zsh
+source /usr/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
