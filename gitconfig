@@ -8,6 +8,6 @@
 [http]
 	cookiefile = ~/.gitcookies
 [core]
-	autocrlf = false
+	autocrlf = input
 [init]
 	defaultBranch = main
