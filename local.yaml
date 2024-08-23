@@ -11,7 +11,6 @@
     ~/.bashrc.local:
     ~/.rc.local:
     ~/.config/lsd: lsd
-    ~/.config/nvim/init.lua: nvim/init.lua
     ~/.fonts:
     ~/.gitconfig:
     ~/.screenrc:
@@ -20,15 +19,15 @@
     ~/.vim:
     ~/.vimrc:
     ~/.zshrc: zsh/zshrc
+    ~/.config/nvim: nvim
     ~/bin: bin
 
 - shell:
     - fc-cache -f
+
+- shell:
     - curl http://storage.googleapis.com/git-repo-downloads/repo > ~/bin/repo
     - chmod +x ~/bin/repo
-    - vim-addons install powerline
-    - vam install youcompleteme
-    - grep -qxF 'source ~/.bashrc.local' ~/.bashrc || echo 'source ~/.bashrc.local' >> ~/.bashrc
 
 - shell:
     - cargo install lsd
