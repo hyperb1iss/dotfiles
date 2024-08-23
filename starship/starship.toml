@@ -1,13 +1,28 @@
+# Pastel Powerline modified with Dracula colors
+#
+# Background: #282a36
+# Current Line: #44475a
+# Selection: #44475a
+# Foreground: #f8f8f2
+# Comment: #6272a4
+# Cyan (Darkened): #5fb7c2
+# Green (Darkened): #3ac165
+# Orange (Darkened): #d99a5e
+# Pink (Darkened): #d664a6
+# Purple (Darkened): #9d7cd6
+# Red: #ff5555
+# Yellow: #f1fa8c
+
 format = """
-[](#9A348E)\
+[](#9d7cd6)\
 $os\
 $username\
-[](bg:#DA627D fg:#9A348E)\
+[](bg:#ff79c6 fg:#9d7cd6)\
 $directory\
-[](fg:#DA627D bg:#FCA17D)\
+[](fg:#ff79c6 bg:#d99a5e)\
 $git_branch\
 $git_status\
-[](fg:#FCA17D bg:#86BBD8)\
+[](fg:#d99a5e bg:#5fb7c2)\
 $c\
 $elixir\
 $elm\
@@ -20,33 +35,33 @@ $nodejs\
 $nim\
 $rust\
 $scala\
-[](fg:#86BBD8 bg:#06969A)\
+[](fg:#5fb7c2 bg:#3ac165)\
 $docker_context\
-[](fg:#06969A bg:#33658A)\
+[](fg:#3ac165 bg:#44475a)\
 $time\
-[ ](fg:#33658A)\
+[ ](fg:#44475a)\
 """
 
 # Disable the blank line at the start of the prompt
-# add_newline = false
+add_newline = false
 
 # You can also replace your username with a neat symbol like   or disable this
 # and use the os module below
 [username]
 show_always = true
-style_user = "bg:#9A348E"
-style_root = "bg:#9A348E"
+style_user = "bg:#9d7cd6 fg:#282a36"
+style_root = "bg:#9d7cd6 fg:#282a36"
 format = '[$user ]($style)'
 disabled = false
 
 # An alternative to the username module which displays a symbol that
 # represents the current operating system
 [os]
-style = "bg:#9A348E"
+style = "bg:#9d7cd6 fg:#282a36"
 disabled = true # Disabled by default
 
 [directory]
-style = "bg:#DA627D"
+style = "bg:#ff79c6 fg:#282a36"
 format = "[ $path ]($style)"
 truncation_length = 3
 truncation_symbol = "…/"
@@ -66,80 +81,80 @@ truncation_symbol = "…/"
 
 [c]
 symbol = " "
-style = "bg:#86BBD8"
+style = "bg:#5fb7c2 fg:#282a36"
 format = '[ $symbol ($version) ]($style)'
 
 [docker_context]
 symbol = " "
-style = "bg:#06969A"
+style = "bg:#3ac165 fg:#282a36"
 format = '[ $symbol $context ]($style)'
 
 [elixir]
 symbol = " "
-style = "bg:#86BBD8"
+style = "bg:#5fb7c2 fg:#282a36"
 format = '[ $symbol ($version) ]($style)'
 
 [elm]
 symbol = " "
-style = "bg:#86BBD8"
+style = "bg:#5fb7c2 fg:#282a36"
 format = '[ $symbol ($version) ]($style)'
 
 [git_branch]
 symbol = ""
-style = "bg:#FCA17D"
+style = "bg:#d99a5e fg:#282a36"
 format = '[ $symbol $branch ]($style)'
 
 [git_status]
-style = "bg:#FCA17D"
+style = "bg:#d99a5e fg:#282a36"
 format = '[$all_status$ahead_behind ]($style)'
 
 [golang]
 symbol = " "
-style = "bg:#86BBD8"
+style = "bg:#5fb7c2 fg:#282a36"
 format = '[ $symbol ($version) ]($style)'
 
 [gradle]
-style = "bg:#86BBD8"
+style = "bg:#5fb7c2 fg:#282a36"
 format = '[ $symbol ($version) ]($style)'
 
 [haskell]
 symbol = " "
-style = "bg:#86BBD8"
+style = "bg:#5fb7c2 fg:#282a36"
 format = '[ $symbol ($version) ]($style)'
 
 [java]
 symbol = " "
-style = "bg:#86BBD8"
+style = "bg:#5fb7c2 fg:#282a36"
 format = '[ $symbol ($version) ]($style)'
 
 [julia]
 symbol = " "
-style = "bg:#86BBD8"
+style = "bg:#5fb7c2 fg:#282a36"
 format = '[ $symbol ($version) ]($style)'
 
 [nodejs]
 symbol = ""
-style = "bg:#86BBD8"
+style = "bg:#5fb7c2 fg:#282a36"
 format = '[ $symbol ($version) ]($style)'
 
 [nim]
 symbol = "󰆥 "
-style = "bg:#86BBD8"
+style = "bg:#5fb7c2 fg:#282a36"
 format = '[ $symbol ($version) ]($style)'
 
 [rust]
 symbol = ""
-style = "bg:#86BBD8"
+style = "bg:#5fb7c2 fg:#282a36"
 format = '[ $symbol ($version) ]($style)'
 
 [scala]
 symbol = " "
-style = "bg:#86BBD8"
+style = "bg:#5fb7c2 fg:#282a36"
 format = '[ $symbol ($version) ]($style)'
 
 [time]
 disabled = false
 time_format = "%R" # Hour:Minute Format
-style = "bg:#33658A"
+style = "bg:#44475a fg:#f8f8f2"
 format = '[ ♥ $time ]($style)'
 
