@@ -18,6 +18,7 @@
       stderr: true
       stdout: true
     -
-      command: update-alternatives --set editor /usr/bin/vim.basic
-      stderr: true
-      stdout: true
+      command: update-alternatives --install /usr/bin/editor editor /usr/bin/nvim 60
+    -
+      command: update-alternatives --install /usr/bin/vim vim /usr/bin/nvim 60
+

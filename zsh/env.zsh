@@ -26,3 +26,6 @@ export HOSTNAME=$(hostname)
 # PATH
 export PATH=~/.cargo/bin:$PATH:$GOPATH/bin
 
+# Editor
+export VISUAL=nvim
+export EDITOR="$VISUAL"

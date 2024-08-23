@@ -11,8 +11,7 @@
     ~/.bashrc.local:
     ~/.rc.local:
     ~/.config/lsd: lsd
-    ~/.config/nvim/init.vim: nvim/init.vim
-    ~/.config/nvim/colors: vim/colors
+    ~/.config/nvim/init.lua: nvim/init.lua
     ~/.fonts:
     ~/.gitconfig:
     ~/.screenrc:
