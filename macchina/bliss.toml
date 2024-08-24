@@ -1,0 +1,52 @@
+# bliss for macchina 
+spacing = 1
+padding = 0
+hide_ascii = false
+separator = "»"
+key_color = "#583ba3"
+separator_color = "#FF79C6" # Pink
+
+[palette]
+type = "Dark"
+visible = false
+
+[bar]
+hide_delimiters = true
+visible = true
+
+[box]
+border = "rounded"
+visible = false
+
+[custom_ascii]
+path = "~/dev/dotfiles/macchina/ubuntu-ascii.txt"
+
+[box.inner_margin]
+x = 2
+y = 1
+
+[randomize]
+key_color = false
+separator_color = false
+
+[keys]
+host = "  host"
+kernel = "󰌽  kernel"
+battery = "󰁹  battery"
+os = "  os"
+de = "  de"
+wm = "  wm"
+distro = "  distro"
+terminal = "  terminal"
+shell = "  shell"
+packages = "  packages"
+uptime = "󰥔  uptime"
+memory = "  memory"
+machine = "󰇅  machine"
+local_ip = "󰱓  ip"
+backlight = "󰃞  brightness"
+resolution = "󰍺  resolution"
+cpu_load = "󰊚  cpu load"
+cpu = "  cpu"
+gpu = "󰈐  gpu"
+disk_space = "  disk space"

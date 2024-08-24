@@ -31,3 +31,9 @@
 
 - shell:
     - cargo install lsd
+
+- shell:
+    - cargo install macchina
+    - mkdir -p ~/.config/macchina/themes
+- link:
+    - ~/.config/macchina/themes/bliss.toml macchina/bliss.toml
