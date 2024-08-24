@@ -4,3 +4,4 @@ vim/doc
 vim/plugin
 .uuid
 bin/repo
+nvim/lazy-lock.json
