@@ -24,8 +24,11 @@ eval "$(pyenv init -)"
 export HOSTNAME=$(hostname)
 
 # PATH
-export PATH=~/.cargo/bin:$PATH:$GOPATH/bin
+export PATH=~/.cargo/bin:$GOPATH/bin:~/.local/bin:~/bin:$PATH
 
 # Editor
 export VISUAL=nvim
 export EDITOR="$VISUAL"
+
+# Secret stuff
+source ~/dev/dotfiles-private/env/private.zsh 2> /dev/null

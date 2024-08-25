@@ -6,6 +6,7 @@
 
 - shell:
     - mkdir -p ~/.config/nvim
+    - if [ -d ~/dev/dotfiles-private ]; then ln -sf ~/dev/dotfiles-private/fonts/Pragmata\ Pro fonts/;fi
 
 - link:
     ~/.bashrc.local:
