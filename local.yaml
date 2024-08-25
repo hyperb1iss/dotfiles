@@ -14,7 +14,6 @@
     ~/.config/lsd: lsd
     ~/.fonts:
     ~/.gitconfig:
-    ~/.screenrc:
     ~/.tmux.conf:
     ~/.dircolors:
     ~/.vim:
@@ -39,3 +38,8 @@
 - link:
     ~/.config/macchina/themes/elektra.toml: elektra/elektra.toml
     ~/.config/macchina/ubuntu-ascii.txt: elektra/ubuntu-ascii.txt
+
+- shell:
+    - mkdir -p ~/.tmux/plugins
+- link:
+    ~/.tmux/plugins/tpm: tpm

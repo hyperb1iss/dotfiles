@@ -4,3 +4,6 @@
 [submodule "elektra"]
 	path = elektra
 	url = https://github.com/hyperb1iss/elektra
+[submodule "tpm"]
+	path = tpm
+	url = https://github.com/tmux-plugins/tpm
