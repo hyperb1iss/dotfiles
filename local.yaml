@@ -36,4 +36,5 @@
     - cargo install macchina
     - mkdir -p ~/.config/macchina/themes
 - link:
-    - ~/.config/macchina/themes/bliss.toml macchina/bliss.toml
+    ~/.config/macchina/themes/elektra.toml: elektra/elektra.toml
+    ~/.config/macchina/ubuntu-ascii.txt: elektra/ubuntu-ascii.txt
