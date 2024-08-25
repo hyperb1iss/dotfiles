@@ -49,18 +49,6 @@ function Set-LocationWithTitleUpdate {
 }
 Set-Alias -Name cd -Value Set-LocationWithTitleUpdate -Option AllScope -Force
 
-# Update title before executing a command
-$ExecutionContext.InvokeCommand.PreCommandHook = {
-    param($command)
-    $cmdName = $command.CommandOrigin
-    Update-Title "HyperShell - $cmdName - $(Get-CurrentDirectoryName)"
-}
-
-# Update title after executing a command
-$ExecutionContext.InvokeCommand.PostCommandHook = {
-    Update-Title "HyperShell - $(Get-CurrentDirectoryName)"
-}
-
 # Initial title update
 Update-Title "HyperShell - $(Get-CurrentDirectoryName)"
 
