@@ -6,3 +6,4 @@ vim/plugin
 bin/repo
 nvim/lazy-lock.json
 fonts/Pragmata\ Pro
+vim/.netrwhist

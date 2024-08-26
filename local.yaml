@@ -5,7 +5,6 @@
 - clean: ['~']
 
 - shell:
-    - mkdir -p ~/.config/nvim
     - if [ -d ~/dev/dotfiles-private ]; then ln -sf ~/dev/dotfiles-private/fonts/Pragmata\ Pro fonts/;fi
 
 - link:
@@ -43,3 +42,11 @@
     - mkdir -p ~/.tmux/plugins
 - link:
     ~/.tmux/plugins/tpm: tpm
+
+- shell:
+    - cargo install starship
+    - mkdir -p ~/.config/starship
+- link:
+    ~/.config/starship.toml: starship/starship.toml
+
+

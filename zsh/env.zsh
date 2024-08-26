@@ -16,9 +16,6 @@ export KUBECONFIG=$HOME/.kube/eksctl/clusters/mason-devops
 export GOPATH=~/dev/go
 export GO15VENDOREXPERIMENT=1
 export ANDROID_NDK_HOME=~/Android/android-ndk-r21e
-export PYENV_ROOT="$HOME/.pyenv"
-[[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"
-eval "$(pyenv init -)"
 
 # HOSTNAME
 export HOSTNAME=$(hostname)
