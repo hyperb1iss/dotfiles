@@ -14,19 +14,25 @@ Hey there! Welcome to my personal dotfiles repository! I'm **Stefanie Jane**, ak
   <img src="https://github.com/hyperb1iss/elektra/blob/main/screenshot.png" alt="Starship + Elektra" width="600" />
 </p>
 
+<p align="center">
+  <img src="images/terminal-bliss.png" alt="Terminal Bliss" width="600" />
+</p>
+
 ## 🌟 Features
 
 | Feature | Description |
 |---------|-------------|
-| 🐚 Zsh | Customized Zsh setup with aliases, functions, and environment variables |
-| 📝 AstroNVim | Powerful Neovim configuration for an IDE-like experience |
-| 🖥️ Tmux | Enhanced terminal multiplexer setup |
-| 🌳 Git | Personalized Git settings and aliases |
-| 🚀 Starship | Beautiful and informative command prompt with a custom Dracula-inspired theme |
-| 📂 LSDeluxe (lsd) | Modern replacement for `ls` with color-coding and icons |
-| 🔍 FZF | Fuzzy finder for enhanced file and history searching |
-| 💾 WSL2 Backup | Automated backup script for Windows Subsystem for Linux |
-| 🔷 HyperShell | A Linux-like PowerShell experience for Windows |
+| 🐚 [Zsh](https://www.zsh.org/) | Customized Zsh setup with aliases, functions, and environment variables |
+| 📝 [AstroNVim](https://astronvim.com/) | Powerful Neovim configuration for an IDE-like experience |
+| 🖥️ [Tmux](https://github.com/tmux/tmux) | Enhanced terminal multiplexer setup with custom theme and plugins |
+| 🌳 [Git](https://git-scm.com/) | Personalized Git settings and aliases |
+| 🚀 [Starship](https://starship.rs/) | Beautiful and informative command prompt with a custom Dracula-inspired theme |
+| 📂 [LSDeluxe (lsd)](https://github.com/Peltoche/lsd) | Modern replacement for `ls` with color-coding and icons |
+| 🔍 [FZF](https://github.com/junegunn/fzf) | Fuzzy finder for enhanced file and history searching |
+| 💾 [WSL2 Backup](https://github.com/hyperb1iss/dotfiles/blob/main/wsl_backup.sh) | Automated backup script for Windows Subsystem for Linux |
+| 🔷 [HyperShell](https://github.com/hyperb1iss/dotfiles/tree/main/hypershell) | A Linux-like PowerShell experience for Windows |
+| 🖼️ [Macchina](https://github.com/Macchina-CLI/macchina) | System information display with custom Elektra theme |
+| 🤖 [Dotbot](https://github.com/anishathalye/dotbot) | Automated dotfiles installation and management |
 
 ## 🛠 Installation
 
@@ -55,6 +61,7 @@ dotfiles/
 ├── lsd/                  # LSDeluxe configuration
 ├── wsl_backup.sh         # WSL2 backup script
 ├── hypershell/           # HyperShell environment for PowerShell
+├── elektra/              # Elektra theme for Macchina
 └── README.md             # You are here!
 ```
 
@@ -67,6 +74,25 @@ Feel free to explore and modify any of the configuration files to suit your need
 The Starship prompt uses a custom theme based on the pastel-powerline theme, with colors inspired by the Dracula theme. You can find the configuration in `starship.toml`. 
 
 For more information on customizing Starship, visit the [Starship documentation](https://starship.rs/).
+
+### 🖼️ Macchina and Elektra Theme
+
+[Macchina](https://github.com/Macchina-CLI/macchina) is a system information fetcher, and Elektra is a custom theme I've created for it. The Elektra theme provides a visually appealing display of system information, as seen in the screenshot above. Macchina and the Elektra theme are automatically set up during installation.
+
+### 🖥️ Tmux Configuration
+
+My tmux setup enhances productivity with custom keybindings, mouse support, and a sleek status bar. Key features include:
+
+- Mouse support for easy pane resizing and scrolling
+- Custom split pane shortcuts (| for vertical, - for horizontal)
+- Easy config reload with `prefix + r`
+- Alt+arrow keys for pane navigation without prefix
+- Increased scrollback buffer (5000 lines)
+- Window and pane indices start at 1 for easier switching
+- Catppuccin theme via the Tmux2K plugin
+- Custom status bar with git, CPU, network, and time information
+
+The full configuration can be found in `tmux.conf`.
 
 ## 🔧 Dependencies
 
@@ -160,6 +186,7 @@ If you like these dotfiles, you might be interested in some of my other projects
 - [signalrgb-python](https://github.com/hyperb1iss/signalrgb-python): Python API client for SignalRGB Pro
 - [hyper-light-card](https://github.com/hyperb1iss/hyper-light-card): Custom card for controlling SignalRGB through Home Assistant
 - [contexter](https://github.com/hyperb1iss/contexter): Chrome extension and CLI for quickly copying code into LLMs
+- [elektra](https://github.com/hyperb1iss/elektra): A custom Macchina theme for system information display
 
 ## 🤝 Contributing
 
