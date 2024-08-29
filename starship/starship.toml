@@ -37,9 +37,7 @@ $rust\
 $scala\
 [](fg:#5fb7c2 bg:#3ac165)\
 $docker_context\
-[](fg:#3ac165 bg:#44475a)\
-$time\
-[ ](fg:#44475a)\
+[ ](fg:#3ac165)\
 """
 
 # Disable the blank line at the start of the prompt
@@ -58,7 +56,7 @@ disabled = false
 # represents the current operating system
 [os]
 style = "bg:#9d7cd6 fg:#282a36"
-disabled = true # Disabled by default
+disabled = false                # Enabled to show OS icon
 
 [directory]
 style = "bg:#ff79c6 fg:#282a36"
@@ -153,8 +151,4 @@ style = "bg:#5fb7c2 fg:#282a36"
 format = '[ $symbol ($version) ]($style)'
 
 [time]
-disabled = false
-time_format = "%R" # Hour:Minute Format
-style = "bg:#44475a fg:#f8f8f2"
-format = '[ ♥ $time ]($style)'
-
+disabled = true # Disabled to remove time from prompt
