@@ -49,6 +49,22 @@ Hey there! Welcome to my personal dotfiles repository! I'm **Stefanie Jane**, ak
 
    This will set up everything and install the necessary dependencies.
 
+## 🔤 Installing Nerd Fonts
+
+Nerd Fonts are required for proper icon display in the terminal. These are not
+automatically installed by dotbot. Follow these steps to install them:
+
+1. Visit the [Nerd Fonts website](https://www.nerdfonts.com/).
+2. Download your preferred font.
+3. Extract the downloaded zip file.
+4. Install the fonts:
+   - On Windows: Right-click on each `.ttf` file and select "Install".
+   - On macOS: Double-click each `.ttf` file and click "Install Font".
+   - On Linux: Copy the `.ttf` files to `~/.local/share/fonts/` and run `fc-cache -fv`.
+5. Configure your terminal to use the installed Nerd Font.
+
+For WSL2 users, make sure to set the Nerd Font in your Windows Terminal settings as well.
+
 ## 📁 What's Inside
 
 ```
