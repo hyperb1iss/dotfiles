@@ -1,7 +1,7 @@
 # HyperShell PowerShell Profile
 
-# Load oh-my-posh
-oh-my-posh init pwsh --config '$env:USERPROFILE\oh-my-posh-dracula\dracula.omp.json' | Invoke-Expression
+# Load Starship
+Invoke-Expression (&starship init powershell)
 
 # Import modules
 Import-Module PSReadLine

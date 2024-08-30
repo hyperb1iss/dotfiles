@@ -106,7 +106,7 @@ Most dependencies will be installed automatically when you run `make`. However, 
 HyperShell provides a Linux-like experience in PowerShell, enhancing productivity and ease of use for developers familiar with Unix-like environments. The `hypershell/` directory contains the configuration for HyperShell.
 
 ### Features:
-- Customized prompt using oh-my-posh with a Dracula-inspired theme
+- Customized prompt using Starship with a Dracula-inspired theme
 - Linux-style command aliases (e.g., `ls`, `grep`, `cat`)
 - Enhanced directory navigation with `cd -` support
 - Fuzzy finding for files, directories, and command history using fzf
@@ -120,7 +120,7 @@ HyperShell provides a Linux-like experience in PowerShell, enhancing productivit
 
 2. Install required tools using Chocolatey:
    ```powershell
-   choco install lsd fzf -y
+   choco install lsd fzf starship -y
    ```
 
 3. Install required PowerShell modules:
@@ -129,33 +129,28 @@ HyperShell provides a Linux-like experience in PowerShell, enhancing productivit
    Install-Module -Name posh-git -Force
    ```
 
-4. Install oh-my-posh:
-   ```powershell
-   winget install JanDeDobbeleer.OhMyPosh -s winget
-   ```
-
-5. Copy the contents of `hypershell/Microsoft.PowerShell_profile.ps1` to your PowerShell profile:
+4. Copy the contents of `hypershell/Microsoft.PowerShell_profile.ps1` to your PowerShell profile:
    ```powershell
    code $PROFILE
    ```
    Paste the contents and save the file.
 
-6. Create a new directory for the oh-my-posh theme:
+5. Create the Starship configuration directory:
    ```powershell
-   mkdir "$env:USERPROFILE\oh-my-posh-dracula"
+   mkdir -Force "$env:USERPROFILE\.config"
    ```
 
-7. Download the Dracula theme for oh-my-posh:
+6. Copy the Starship configuration file:
    ```powershell
-   Invoke-WebRequest -Uri "https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/dracula.omp.json" -OutFile "$env:USERPROFILE\oh-my-posh-dracula\dracula.omp.json"
+   Copy-Item "path\to\your\starship.toml" "$env:USERPROFILE\.config\starship.toml"
    ```
 
-8. Restart your PowerShell session or run:
+7. Restart your PowerShell session or run:
    ```powershell
    . $PROFILE
    ```
 
-You should now have a fully configured HyperShell environment with enhanced functionality and a beautiful Dracula-inspired theme.
+You should now have a fully configured HyperShell environment with enhanced functionality and a beautiful Dracula-inspired theme powered by Starship.
 
 ## 🔄 Updating
 
