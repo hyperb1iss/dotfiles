@@ -37,6 +37,7 @@ $rust\
 $scala\
 [](fg:#5fb7c2 bg:#3ac165)\
 $docker_context\
+$python\
 [ ](fg:#3ac165)\
 """
 
@@ -149,6 +150,11 @@ format = '[ $symbol ($version) ]($style)'
 symbol = " "
 style = "bg:#5fb7c2 fg:#282a36"
 format = '[ $symbol ($version) ]($style)'
+
+[python]
+symbol = "𓆙 "
+style = "bg:#3ac165 fg:#282a36"
+format = '[ $symbol ($version)( \($virtualenv\)) ]($style)'
 
 [time]
 disabled = true # Disabled to remove time from prompt
