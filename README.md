@@ -20,34 +20,55 @@ Hey there! Welcome to my personal dotfiles repository! I'm **Stefanie Jane**, ak
 
 ## 🌟 Features
 
-| Feature | Description |
-|---------|-------------|
-| 🐚 [Zsh](https://www.zsh.org/) | Customized Zsh setup with aliases, functions, and environment variables |
-| 📝 [AstroNVim](https://astronvim.com/) | Powerful Neovim configuration for an IDE-like experience |
-| 🖥️ [Tmux](https://github.com/tmux/tmux) | Enhanced terminal multiplexer setup with custom theme and plugins |
-| 🌳 [Git](https://git-scm.com/) | Personalized Git settings and aliases |
-| 🚀 [Starship](https://starship.rs/) | Beautiful and informative command prompt with a custom Dracula-inspired theme |
-| 📂 [LSDeluxe (lsd)](https://github.com/Peltoche/lsd) | Modern replacement for `ls` with color-coding and icons |
-| 🔍 [FZF](https://github.com/junegunn/fzf) | Fuzzy finder for enhanced file and history searching |
-| 💾 [WSL2 Backup](https://github.com/hyperb1iss/dotfiles/blob/main/wsl_backup.sh) | Automated backup script for Windows Subsystem for Linux |
-| 🔷 [HyperShell](https://github.com/hyperb1iss/dotfiles/tree/main/hypershell) | A Linux-like PowerShell experience for Windows |
-| 🖼️ [Macchina](https://github.com/Macchina-CLI/macchina) | System information display with custom Elektra theme |
-| 🤖 [Dotbot](https://github.com/anishathalye/dotbot) | Automated dotfiles installation and management |
+| Feature                                                                          | Description                                                                   |
+| -------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
+| 🐚 [Zsh](https://www.zsh.org/)                                                   | Customized Zsh setup with aliases, functions, and environment variables       |
+| 📝 [AstroNVim](https://astronvim.com/)                                           | Powerful Neovim configuration for an IDE-like experience                      |
+| 🖥️ [Tmux](https://github.com/tmux/tmux)                                          | Enhanced terminal multiplexer setup with custom theme and plugins             |
+| 🌳 [Git](https://git-scm.com/)                                                   | Personalized Git settings and aliases                                         |
+| 🚀 [Starship](https://starship.rs/)                                              | Beautiful and informative command prompt with a custom Dracula-inspired theme |
+| 📂 [LSDeluxe (lsd)](https://github.com/Peltoche/lsd)                             | Modern replacement for `ls` with color-coding and icons                       |
+| 🔍 [FZF](https://github.com/junegunn/fzf)                                        | Fuzzy finder for enhanced file and history searching                          |
+| 💾 [WSL2 Backup](https://github.com/hyperb1iss/dotfiles/blob/main/wsl_backup.sh) | Automated backup script for Windows Subsystem for Linux                       |
+| 🔷 [HyperShell](https://github.com/hyperb1iss/dotfiles/tree/main/hypershell)     | A Linux-like PowerShell experience for Windows                                |
+| 🖼️ [Macchina](https://github.com/Macchina-CLI/macchina)                          | System information display with custom Elektra theme                          |
+| 🤖 [Dotbot](https://github.com/anishathalye/dotbot)                              | Automated dotfiles installation and management                                |
 
 ## 🛠 Installation
 
+### Linux/WSL2
+
 1. Clone this repository:
+
    ```bash
    git clone https://github.com/hyperb1iss/dotfiles.git ~/dev/dotfiles
    ```
 
 2. Run the installation script:
+
    ```bash
    cd ~/dev/dotfiles
    make
    ```
 
    This will set up everything and install the necessary dependencies.
+
+### Windows
+
+1. Clone this repository:
+
+   ```powershell
+   git clone https://github.com/hyperb1iss/dotfiles.git $env:USERPROFILE\dev\dotfiles
+   ```
+
+2. Run the installation script as administrator:
+
+   ```powershell
+   cd $env:USERPROFILE\dev\dotfiles
+   .\install.ps1
+   ```
+
+   This will set up the Windows environment and install HyperShell.
 
 ## 🔤 Installing Nerd Fonts
 
@@ -78,8 +99,61 @@ dotfiles/
 ├── wsl_backup.sh         # WSL2 backup script
 ├── hypershell/           # HyperShell environment for PowerShell
 ├── elektra/              # Elektra theme for Macchina
+├── install.bat           # Windows installation script
+├── windows.yaml          # Dotbot configuration for Windows
+├── setup-windows.ps1     # PowerShell script for Windows setup
 └── README.md             # You are here!
 ```
+
+## 🔷 Windows Setup (HyperShell)
+
+HyperShell provides a Linux-like experience in PowerShell, enhancing productivity and ease of use for developers familiar with Unix-like environments.
+
+### Features:
+
+- Customized prompt using Starship with a Dracula-inspired theme
+- Linux-style command aliases (e.g., `ls`, `grep`, `cat`)
+- Enhanced directory navigation with `cd -` support
+- Fuzzy finding for files, directories, and command history using fzf
+- Improved tab completion and syntax highlighting
+- WSL integration for seamless interaction between Windows and Linux environments
+- Git and Docker shortcuts for quick operations
+
+### What's Included:
+
+- PowerShell Core
+- Windows Terminal
+- Git
+- Visual Studio Code (with extensions)
+- Node.js
+- Python
+- Rust
+- FZF
+- Ripgrep
+- Bat
+- LSD
+- Starship
+- Neovim
+- GNU CoreUtils
+- Grep, Find, Sed, Awk
+- Curl, Wget
+- 7-Zip
+- WSL2 support
+
+### Setup Process:
+
+1. The `install.bat` script initiates the Dotbot installation process for Windows.
+2. `windows.yaml` defines the Dotbot configuration for Windows, including symlinks and shell commands.
+3. `setup-windows.ps1` is executed to:
+   - Install Chocolatey (if not present)
+   - Install/upgrade necessary tools and applications
+   - Set up PowerShell modules
+   - Configure Git
+   - Install VS Code extensions
+   - Add directories to PATH
+   - Enable Developer Mode
+
+After installation, restart your PowerShell session to ensure all changes take effect.
 
 ## 🎨 Customization
 
@@ -87,7 +161,7 @@ Feel free to explore and modify any of the configuration files to suit your need
 
 ### 🌈 Starship Theme
 
-The Starship prompt uses a custom theme based on the pastel-powerline theme, with colors inspired by the Dracula theme. You can find the configuration in `starship.toml`. 
+The Starship prompt uses a custom theme based on the pastel-powerline theme, with colors inspired by the Dracula theme. You can find the configuration in `starship.toml`.
 
 For more information on customizing Starship, visit the [Starship documentation](https://starship.rs/).
 
@@ -112,61 +186,11 @@ The full configuration can be found in `tmux.conf`.
 
 ## 🔧 Dependencies
 
-Most dependencies will be installed automatically when you run `make`. However, ensure you have the following core tools installed:
+Most dependencies will be installed automatically when you run `make` (for Linux/WSL2) or `install.bat` (for Windows). However, ensure you have the following core tools installed:
 
-- Make
+- Make (for Linux/WSL2)
 - Git
-
-## 🔷 Windows PowerShell Setup (HyperShell)
-
-HyperShell provides a Linux-like experience in PowerShell, enhancing productivity and ease of use for developers familiar with Unix-like environments. The `hypershell/` directory contains the configuration for HyperShell.
-
-### Features:
-- Customized prompt using Starship with a Dracula-inspired theme
-- Linux-style command aliases (e.g., `ls`, `grep`, `cat`)
-- Enhanced directory navigation with `cd -` support
-- Fuzzy finding for files, directories, and command history using fzf
-- Improved tab completion and syntax highlighting
-- WSL integration for seamless interaction between Windows and Linux environments
-- Git and Docker shortcuts for quick operations
-
-### Setup Instructions:
-
-1. Ensure you have PowerShell 7+ installed.
-
-2. Install required tools using Chocolatey:
-   ```powershell
-   choco install lsd fzf starship -y
-   ```
-
-3. Install required PowerShell modules:
-   ```powershell
-   Install-Module -Name PSReadLine -Force -SkipPublishCheck
-   Install-Module -Name posh-git -Force
-   ```
-
-4. Copy the contents of `hypershell/Microsoft.PowerShell_profile.ps1` to your PowerShell profile:
-   ```powershell
-   code $PROFILE
-   ```
-   Paste the contents and save the file.
-
-5. Create the Starship configuration directory:
-   ```powershell
-   mkdir -Force "$env:USERPROFILE\.config"
-   ```
-
-6. Copy the Starship configuration file:
-   ```powershell
-   Copy-Item "path\to\your\starship.toml" "$env:USERPROFILE\.config\starship.toml"
-   ```
-
-7. Restart your PowerShell session or run:
-   ```powershell
-   . $PROFILE
-   ```
-
-You should now have a fully configured HyperShell environment with enhanced functionality and a beautiful Dracula-inspired theme powered by Starship.
+- PowerShell 7+ (for Windows)
 
 ## 🔄 Updating
 
@@ -175,7 +199,9 @@ To update the dotfiles repository:
 ```bash
 cd ~/dev/dotfiles
 git pull
-make
+make  # For Linux/WSL2
+# Or
+.\install.bat  # For Windows (run as administrator)
 ```
 
 ## 🐧 WSL2 Backup
