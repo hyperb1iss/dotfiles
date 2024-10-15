@@ -1,0 +1,50 @@
+# windows.yaml
+# Dotbot configuration file for Windows setup
+
+- defaults:
+    link:
+      create: true
+      relink: true
+
+- clean: ["~"]
+
+- link:
+    # Starship prompt configuration
+    ~/.config/starship.toml: starship/starship.toml
+    # Neovim configuration
+    ~/AppData/Local/nvim: nvim
+    # PowerShell profile
+    ~/Documents/PowerShell/Microsoft.PowerShell_profile.ps1:
+      path: hypershell/Microsoft.PowerShell_profile.ps1
+      force: true
+    # Git configuration
+    ~/.gitconfig: gitconfig
+
+- shell:
+    # Run the Windows setup script
+    - command: powershell.exe -ExecutionPolicy Bypass -File ./hypershell/setup-windows.ps1
+      stdin: true
+      stdout: true
+      stderr: true
+      description: Running Windows setup script
+
+    # Install Rust components
+    - command: rustup component add rls rust-analysis rust-src
+      stdin: true
+      stdout: true
+      stderr: true
+      description: Installing Rust components
+
+    # Install pynvim for Neovim Python support
+    - command: pip install pynvim
+      stdin: true
+      stdout: true
+      stderr: true
+      description: Installing pynvim
+
+    # Set WSL 2 as the default version
+    - command: wsl --set-default-version 2
+      stdin: true
+      stdout: true
+      stderr: true
+      description: Setting WSL 2 as the default version

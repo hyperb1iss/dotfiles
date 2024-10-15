@@ -1,38 +1,49 @@
-# HyperShell PowerShell Profile
+# Microsoft.PowerShell_profile.ps1
+# HyperShell: A high-tech, Linux-inspired environment for Windows PowerShell
+# https://github.com/hyperbliss/dotfiles/hypershell
 
-# Load Starship
+
+
+function Show-HyperShellStartup {
+    $esc = [char]27
+    $version = "1.0.0"
+    
+    Write-Host "$esc[38;5;213m⟨$esc[38;5;207m⟨$esc[38;5;201m⟨ $esc[1m$esc[38;5;219m☆ $esc[38;5;159mHYPER$esc[38;5;213mSHELL$esc[38;5;219m::$esc[38;5;123m$version $esc[22m$esc[38;5;201m⟩$esc[38;5;207m⟩$esc[38;5;213m⟩$esc[0m"
+    Write-Host ""
+}
+
+# Load Starship prompt
 Invoke-Expression (&starship init powershell)
 
 # Import modules
 Import-Module PSReadLine
 Import-Module posh-git
+Import-Module Terminal-Icons
 
 # Configure PSReadLine for Linux-style keybindings
 Set-PSReadLineOption -EditMode Emacs
 Set-PSReadLineKeyHandler -Key UpArrow -Function HistorySearchBackward
 Set-PSReadLineKeyHandler -Key DownArrow -Function HistorySearchForward
-Set-PSReadLineKeyHandler -Key Tab -Function Complete
+Set-PSReadLineKeyHandler -Key Tab -Function MenuComplete
 
 # Enable syntax highlighting
 Set-PSReadLineOption -Colors @{
-    Command = 'Cyan'
-    Parameter = 'DarkCyan'
-    Operator = 'DarkGray'
-    Variable = 'Green'
-    String = 'Yellow'
-    Number = 'Magenta'
-    Type = 'DarkYellow'
-    Comment = 'DarkGreen'
+    Command   = [ConsoleColor]::Cyan
+    Parameter = [ConsoleColor]::DarkCyan
+    Operator  = [ConsoleColor]::DarkGray
+    Variable  = [ConsoleColor]::Green
+    String    = [ConsoleColor]::Yellow
+    Number    = [ConsoleColor]::Magenta
+    Type      = [ConsoleColor]::DarkYellow
+    Comment   = [ConsoleColor]::DarkGreen
 }
 
 # FZF Configuration
-$env:FZF_DEFAULT_OPTS = "--height 40% --layout=reverse --border"
+$env:FZF_DEFAULT_OPTS = "--height 40% --layout=reverse --border --preview 'bat --color=always --style=numbers --line-range=:500 {}'"
 
 # Function to update the terminal title
 function Update-Title {
-    param(
-        [string]$Title
-    )
+    param([string]$Title)
     $host.UI.RawUI.WindowTitle = $Title
 }
 
@@ -53,52 +64,52 @@ Set-Alias -Name cd -Value Set-LocationWithTitleUpdate -Option AllScope -Force
 Update-Title "HyperShell - $(Get-CurrentDirectoryName)"
 
 # LSD aliases
-function Invoke-LSD {
-    lsd $args
-}
-Set-Alias -Name ls -Value Invoke-LSD -Option AllScope -Force
+function Invoke-LSD { lsd $args }
+Remove-Item Alias:ls -Force -ErrorAction SilentlyContinue
+New-Alias -Name ls -Value Invoke-LSD -Force
 
-function Invoke-LSDLong {
-    lsd -l $args
-}
-Set-Alias -Name ll -Value Invoke-LSDLong -Option AllScope -Force
+function Invoke-LSDLong { lsd -l $args }
+New-Alias -Name ll -Value Invoke-LSDLong -Force
 
-function Invoke-LSDAll {
-    lsd -la $args
-}
-Set-Alias -Name la -Value Invoke-LSDAll -Option AllScope -Force
+function Invoke-LSDAll { lsd -la $args }
+New-Alias -Name la -Value Invoke-LSDAll -Force
 
-function Invoke-LSDTree {
-    lsd --tree $args
-}
-Set-Alias -Name lt -Value Invoke-LSDTree -Option AllScope -Force
+function Invoke-LSDTree { lsd --tree $args }
+New-Alias -Name lt -Value Invoke-LSDTree -Force
 
-# Linux-like aliases
-Set-Alias -Name grep -Value Select-String
-Set-Alias -Name cat -Value Get-Content
-Set-Alias -Name less -Value more
-Set-Alias -Name which -Value Get-Command
-Set-Alias -Name wget -Value Invoke-WebRequest
-Set-Alias -Name pkill -Value Stop-Process
-Set-Alias -Name ifconfig -Value ipconfig
+# Use real GNU tools when available
+if (Get-Command grep.exe -ErrorAction SilentlyContinue) { New-Alias -Name grep -Value grep.exe -Force }
+if (Get-Command find.exe -ErrorAction SilentlyContinue) { New-Alias -Name find -Value find.exe -Force }
+if (Get-Command sed.exe -ErrorAction SilentlyContinue) { New-Alias -Name sed -Value sed.exe -Force }
+if (Get-Command awk.exe -ErrorAction SilentlyContinue) { New-Alias -Name awk -Value awk.exe -Force }
+
+# Other Linux-like aliases
+Remove-Item Alias:cat -Force -ErrorAction SilentlyContinue
+New-Alias -Name cat -Value bat -Force
+New-Alias -Name less -Value bat -Force
+New-Alias -Name which -Value Get-Command -Force
+New-Alias -Name wget -Value Invoke-WebRequest -Force
+New-Alias -Name pkill -Value Stop-Process -Force
+New-Alias -Name ifconfig -Value ipconfig -Force
 
 # Touch command
 function New-File {
     param([string]$file)
-    if($file) {
+    if ($file) {
         New-Item -ItemType File -Name $file
-    } else {
+    }
+    else {
         Write-Host "Usage: touch <filename>"
     }
 }
-Set-Alias -Name touch -Value New-File
+New-Alias -Name touch -Value New-File -Force
 
 # Mkdir command (creates full path)
-function Make-Directory {
+function New-Directory {
     param([string]$path)
     New-Item -ItemType Directory -Force -Path $path
 }
-Set-Alias -Name mkdir -Value Make-Directory
+New-Alias -Name mkdir -Value New-Directory -Force
 
 # Function to create directory and change into it
 function mkcd {
@@ -115,7 +126,8 @@ function Set-LocationWithHistory {
         $tmp = $PWD
         Set-Location $global:__LastLocation
         $global:__LastLocation = $tmp
-    } else {
+    }
+    else {
         $global:__LastLocation = $PWD
         Set-Location $path
     }
@@ -126,7 +138,7 @@ Set-Alias -Name cd -Value Set-LocationWithHistory -Option AllScope -Force
 # Clear screen
 function Clear-Host-Custom {
     Clear-Host
-    oh-my-posh init pwsh --config 'C:/Users/Stefanie/oh-my-posh-dracula/dracula.omp.json' | Invoke-Expression
+    Show-HyperShellStartup
 }
 Set-Alias -Name clear -Value Clear-Host-Custom
 
@@ -139,7 +151,7 @@ Set-Alias -Name history -Value Get-History-Custom
 # Tail command
 function Get-Tail {
     param(
-        [Parameter(Mandatory=$true)][string]$file,
+        [Parameter(Mandatory = $true)][string]$file,
         [int]$lines = 10
     )
     Get-Content -Tail $lines -Wait $file
@@ -149,7 +161,7 @@ Set-Alias -Name tail -Value Get-Tail
 # Find command
 function Find-Files {
     param(
-        [Parameter(Mandatory=$true)][string]$pattern
+        [Parameter(Mandatory = $true)][string]$pattern
     )
     Get-ChildItem -Recurse | Where-Object { $_.Name -match $pattern }
 }
@@ -158,32 +170,32 @@ Set-Alias -Name find -Value Find-Files
 # FZF Functions
 
 # FZF Find File
-function fzf-find-file {
+function Find-FzfFile {
     $file = Get-ChildItem -Recurse | Where-Object { -not $_.PSIsContainer } | Select-Object -ExpandProperty FullName | fzf
     if ($file) {
         Invoke-Item $file
     }
 }
-Set-PSReadLineKeyHandler -Chord Ctrl+f -ScriptBlock { fzf-find-file }
+Set-PSReadLineKeyHandler -Chord Ctrl+f -ScriptBlock { Find-FzfFile }
 
 # FZF Change Directory
-function fzf-cd {
+function Set-FzfLocation {
     $dir = Get-ChildItem -Directory -Recurse | Select-Object -ExpandProperty FullName | fzf
     if ($dir) {
         Set-Location $dir
     }
 }
-Set-PSReadLineKeyHandler -Chord Alt+c -ScriptBlock { fzf-cd }
+Set-PSReadLineKeyHandler -Chord Alt+c -ScriptBlock { Set-FzfLocation }
 
 # FZF History Search
-function fzf-history {
+function Get-FzfHistory {
     $command = Get-Content (Get-PSReadLineOption).HistorySavePath | fzf
     if ($command) {
         [Microsoft.PowerShell.PSConsoleReadLine]::InvokePrompt()
         [Microsoft.PowerShell.PSConsoleReadLine]::Insert($command)
     }
 }
-Set-PSReadLineKeyHandler -Chord Ctrl+r -ScriptBlock { fzf-history }
+Set-PSReadLineKeyHandler -Chord Ctrl+r -ScriptBlock { Get-FzfHistory }
 
 # WSL Integration
 
@@ -226,6 +238,27 @@ function Open-WSLFolder {
 }
 Set-Alias -Name wslopen -Value Open-WSLFolder
 
+# WSL command function
+function Invoke-WslCommand {
+    param (
+        [Parameter(Mandatory = $true)]
+        [string]$Command
+    )
+    wsl $Command
+}
+
+# WSL command functions
+function Invoke-WslGrep { wsl grep $args }
+function Invoke-WslFind { wsl find $args }
+function Invoke-WslSed { wsl sed $args }
+function Invoke-WslAwk { wsl awk $args }
+
+# WSL command aliases
+New-Alias -Name wgrep -Value Invoke-WslGrep
+New-Alias -Name wfind -Value Invoke-WslFind
+New-Alias -Name wsed -Value Invoke-WslSed
+New-Alias -Name wawk -Value Invoke-WslAwk
+
 # Git Integration Improvements
 
 # Git status shorthand
@@ -237,16 +270,16 @@ function Add-GitChanges { git add $args }
 Set-Alias -Name ga -Value Add-GitChanges
 
 # Git commit shorthand
-function Commit-GitChanges { git commit -m $args }
-Set-Alias -Name gco -Value Commit-GitChanges
+function Invoke-GitChanges { git commit -m $args }
+Set-Alias -Name gco -Value Invoke-GitChanges
 
 # Git push shorthand
 function Push-GitChanges { git push $args }
 Set-Alias -Name gpp -Value Push-GitChanges
 
 # Git cherry-pick shorthand
-function Cherry-Pick-GitChanges { git cherry-pick $args }
-Set-Alias -Name gcp -Value Cherry-Pick-GitChanges
+function Invoke-GitCherryPick { git cherry-pick $args }
+Set-Alias -Name gcp -Value Invoke-GitCherryPick
 
 # Docker Integration (if installed)
 if (Get-Command docker -ErrorAction SilentlyContinue) {
@@ -264,9 +297,57 @@ Set-PSReadLineKeyHandler -Key Tab -Function MenuComplete
 $PSStyle.Formatting.Error = "$([char]0x1b)[91m"
 $PSStyle.Formatting.ErrorAccent = "$([char]0x1b)[91;1m"
 
+# Function to update system PATH
+function Update-SystemPath {
+    $env:Path = [System.Environment]::GetEnvironmentVariable("Path", "Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path", "User")
+}
+
+# Function to add a directory to system PATH
+function Add-ToPath {
+    param (
+        [string]$Directory
+    )
+    $currentPath = [Environment]::GetEnvironmentVariable("Path", "User")
+    if ($currentPath -notlike "*$Directory*") {
+        [Environment]::SetEnvironmentVariable("Path", $currentPath + ";$Directory", "User")
+        Update-SystemPath
+        Write-Host "Added $Directory to PATH." -ForegroundColor Green
+    }
+    else {
+        Write-Host "$Directory is already in PATH." -ForegroundColor Yellow
+    }
+}
+
+# Function to remove a directory from system PATH
+function Remove-FromPath {
+    param (
+        [string]$Directory
+    )
+    $currentPath = [Environment]::GetEnvironmentVariable("Path", "User")
+    if ($currentPath -like "*$Directory*") {
+        $newPath = ($currentPath.Split(';') | Where-Object { $_ -ne $Directory }) -join ';'
+        [Environment]::SetEnvironmentVariable("Path", $newPath, "User")
+        Update-SystemPath
+        Write-Host "Removed $Directory from PATH." -ForegroundColor Green
+    }
+    else {
+        Write-Host "$Directory is not in PATH." -ForegroundColor Yellow
+    }
+}
+
 # Load any additional configuration files
 if (Test-Path "$env:USERPROFILE\Documents\PowerShell\user_profile.ps1") {
     . "$env:USERPROFILE\Documents\PowerShell\user_profile.ps1"
 }
 
-Write-Host "HyperShell loaded successfully!" -ForegroundColor Green
+# Function to reload the profile
+function Update-Profile {
+    . $PROFILE
+    Show-HyperShellStartup
+}
+Set-Alias -Name reload -Value Update-Profile
+
+# Run the startup sequence
+Show-HyperShellStartup
+
+# End of HyperShell PowerShell Profile
