@@ -15,8 +15,6 @@
     ~/.gitconfig:
     ~/.tmux.conf:
     ~/.dircolors:
-    ~/.vim:
-    ~/.vimrc:
     ~/.zshrc: zsh/zshrc
     ~/.config/nvim: nvim
     ~/bin: bin
