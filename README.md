@@ -28,8 +28,7 @@ Hey there! Welcome to my personal dotfiles repository! I'm **Stefanie Jane**, ak
 | 🌳 [Git](https://git-scm.com/)                                                   | Personalized Git settings and aliases                                         |
 | 🚀 [Starship](https://starship.rs/)                                              | Beautiful and informative command prompt with a custom Dracula-inspired theme |
 | 📂 [LSDeluxe (lsd)](https://github.com/Peltoche/lsd)                             | Modern replacement for `ls` with color-coding and icons                       |
-| 🔍 [FZF](https://github.com/junegunn/fzf)                                        | Fuzzy finder for enhanced file and history searching                          |
-| 💾 [WSL2 Backup](https://github.com/hyperb1iss/dotfiles/blob/main/wsl_backup.sh) | Automated backup script for Windows Subsystem for Linux                       |
+| 🔍 [FZF](https://github.com/junegunn/fzf)                                        | Fuzzy finder for enhanced file and history searching                          |                     |
 | 🔷 [HyperShell](https://github.com/hyperb1iss/dotfiles/tree/main/hypershell)     | A Linux-like PowerShell experience for Windows                                |
 | 🖼️ [Macchina](https://github.com/Macchina-CLI/macchina)                          | System information display with custom Elektra theme                          |
 | 🤖 [Dotbot](https://github.com/anishathalye/dotbot)                              | Automated dotfiles installation and management                                |
@@ -96,7 +95,6 @@ dotfiles/
 ├── gitconfig             # Git configuration
 ├── starship.toml         # Starship prompt configuration
 ├── lsd/                  # LSDeluxe configuration
-├── wsl_backup.sh         # WSL2 backup script
 ├── hypershell/           # HyperShell environment for PowerShell
 ├── elektra/              # Elektra theme for Macchina
 ├── install.bat           # Windows installation script
@@ -204,16 +202,6 @@ make  # For Linux/WSL2
 .\install.bat  # For Windows (run as administrator)
 ```
 
-## 🐧 WSL2 Backup
-
-The `wsl_backup.sh` script provides an easy way to create incremental backups of your WSL2 environment. To use it:
-
-1. Ensure you have a backup directory set up (default is `/mnt/d/WSL2_Backups`)
-2. Run the script:
-   ```bash
-   ~/dev/dotfiles/wsl_backup.sh
-   ```
-
 ## 🚀 Other Projects
 
 If you like these dotfiles, you might be interested in some of my other projects:
@@ -223,7 +211,7 @@ If you like these dotfiles, you might be interested in some of my other projects
 - [signalrgb-python](https://github.com/hyperb1iss/signalrgb-python): Python API client for SignalRGB Pro
 - [hyper-light-card](https://github.com/hyperb1iss/hyper-light-card): Custom card for controlling SignalRGB through Home Assistant
 - [contexter](https://github.com/hyperb1iss/contexter): Chrome extension and CLI for quickly copying code into LLMs
-- [elektra](https://github.com/hyperb1iss/elektra): A custom Macchina theme for system information display
+- [aeonsync](https://github.com/hyperb1iss/aeonsync): An easy, multi-source rsync backup tool for developers
 
 ## 🤝 Contributing
 
