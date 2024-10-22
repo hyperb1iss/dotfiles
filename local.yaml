@@ -8,8 +8,8 @@
     - if [ -d ~/dev/dotfiles-private ]; then ln -sf ~/dev/dotfiles-private/fonts/Pragmata\ Pro fonts/;fi
 
 - link:
-    ~/.bashrc.local:
-    ~/.rc.local:
+    ~/.bashrc.local: bash/bashrc.local
+    ~/.rc.local: bash/rc.local
     ~/.config/lsd: lsd
     ~/.fonts:
     ~/.gitconfig:
@@ -25,6 +25,9 @@
 - shell:
     - curl http://storage.googleapis.com/git-repo-downloads/repo > ~/bin/repo
     - chmod +x ~/bin/repo
+
+- shell:
+    - rustup toolchain install stable
 
 - shell:
     - cargo install lsd

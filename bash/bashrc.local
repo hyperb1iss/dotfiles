@@ -1,0 +1,96 @@
+# Enhanced bashrc.local configuration
+# Implements modern shell features, Starship prompt, and Android development tools
+
+# History Configuration
+HISTSIZE=50000
+HISTFILESIZE=50000
+HISTCONTROL=ignoreboth:erasedups
+HISTTIMEFORMAT="%F %T "
+HISTIGNORE="ls:ll:cd:pwd:clear:history:fg:bg:jobs"
+
+# Shell Options
+shell_options=(
+    autocd
+    cdable_vars
+    cdspell
+    checkwinsize
+    cmdhist
+    direxpand
+    dirspell
+    expand_aliases
+    extglob
+    extquote
+    force_fignore
+    globstar
+    histappend
+    hostcomplete
+    interactive_comments
+    progcomp
+    promptvars
+    sourcepath
+)
+
+for option in "${shell_options[@]}"; do
+    shopt -s "$option" 2>/dev/null
+done
+
+# Environment Variables
+export EDITOR=nvim
+export VISUAL=$EDITOR
+export PAGER=less
+export LESS="-R"
+
+# FZF Configuration
+export FZF_DEFAULT_OPTS="--height 40% --layout=reverse --border --preview 'bat --color=always --style=numbers --line-range=:500 {}'"
+[ -f /usr/share/doc/fzf/examples/key-bindings.bash ] && source /usr/share/doc/fzf/examples/key-bindings.bash
+[ -f /usr/share/bash-completion/completions/fzf ] && source /usr/share/bash-completion/completions/fzf
+
+# Modern CLI Tool Aliases
+alias ls='lsd'
+alias ll='ls -l'
+alias la='ls -la'
+alias lt='ls --tree'
+alias bat='batcat --theme=Dracula'
+alias grep='grep --color=auto'
+alias diff='diff --color=auto'
+alias ip='ip --color=auto'
+
+# Terminal Title
+function _update_terminal_title() {
+    local title_prefix=""
+    [ ! -z "$TARGET_PRODUCT" ] && title_prefix="[${TARGET_PRODUCT}-${TARGET_BUILD_VARIANT}] "
+    echo -ne "\033]0;${title_prefix}${debian_chroot:+($debian_chroot)}${USER}@${HOSTNAME}: ${PWD}\007"
+}
+
+# Enhanced Prompt Command
+PROMPT_COMMAND="_update_terminal_title"
+
+# Git Configuration
+export GIT_PS1_SHOWDIRTYSTATE=1      # unstated (*) stated (+)
+export GIT_PS1_SHOWSTASHSTATE=1      # stashed ($)
+export GIT_PS1_SHOWUNTRACKEDFILES=1  # untracked (%)
+export GIT_PS1_SHOWUPSTREAM="verbose"  # upstream (<=>)
+
+# Initialize Starship Prompt
+eval "$(starship init bash)"
+
+# Development Environment
+export PATH=$PATH:$HOME/.local/bin:$HOME/bin:$HOME/.cargo/bin
+
+# Python Development
+if command -v pyenv 1>/dev/null 2>&1; then
+    eval "$(pyenv init -)"
+fi
+
+# Source Utility Functions
+if [ -f "$HOME/dev/dotfiles/sh/shell-utils.sh" ]; then
+    source "$HOME/dev/dotfiles/sh/shell-utils.sh"
+fi
+
+# Source Android Development Environment
+if [ -f "$HOME/dev/dotfiles/sh/android.sh" ]; then
+    source "$HOME/dev/dotfiles/sh/android.sh"
+fi
+
+# Load private configurations if they exist
+[ -f ~/.rc.local ] && source ~/.rc.local

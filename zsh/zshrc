@@ -32,3 +32,6 @@ eval "$(starship init zsh)"
 
 # Load Android extension
 source ~/dev/dotfiles/sh/android.sh
+
+# Load shell-utils
+source ~/dev/dotfiles/sh/shell-utils.sh
