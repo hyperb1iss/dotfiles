@@ -30,3 +30,5 @@ source /etc/zsh_command_not_found
 # Initialize Starship prompt
 eval "$(starship init zsh)"
 
+# Load Android extension
+source ~/dev/dotfiles/sh/android.sh
