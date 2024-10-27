@@ -56,13 +56,21 @@ alias diff='diff --color=auto'
 alias ip='ip --color=auto'
 
 # Terminal Title
-function _update_terminal_title() {
-    local title_prefix=""
-    [ ! -z "$TARGET_PRODUCT" ] && title_prefix="[${TARGET_PRODUCT}-${TARGET_BUILD_VARIANT}] "
-    echo -ne "\033]0;${title_prefix}${debian_chroot:+($debian_chroot)}${USER}@${HOSTNAME}: ${PWD}\007"
+functionnormalize_path() {
+    echo "${PWD/#$HOME/\~}"
 }
 
-# Enhanced Prompt Command
+function_update_terminal_title() {
+    local title_prefix=""
+    local normalized_path=$(normalize_path)
+    
+    # Add target product prefix for Android development if applicable
+    [ ! -z "$TARGET_PRODUCT" ] && title_prefix="[${TARGET_PRODUCT}-${TARGET_BUILD_VARIANT}] "
+    
+    # Set the terminal title with normalized path
+    echo -ne "\033]0;${title_prefix}${debian_chroot:+($debian_chroot)}${USER}@${HOSTNAME}: ${normalized_path}\007"
+}
+
 PROMPT_COMMAND="_update_terminal_title"
 
 # Git Configuration

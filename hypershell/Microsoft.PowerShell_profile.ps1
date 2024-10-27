@@ -41,27 +41,48 @@ Set-PSReadLineOption -Colors @{
 # FZF Configuration
 $env:FZF_DEFAULT_OPTS = "--height 40% --layout=reverse --border --preview 'bat --color=always --style=numbers --line-range=:500 {}'"
 
+# Function to normalize a path for display
+function Get-NormalizedPath {
+    param([string]$Path)
+    
+    # Get the user's home directory path
+    $homePath = $HOME
+    
+    # Check if the path starts with the home directory
+    if ($Path.StartsWith($homePath)) {
+        # Replace the home path with ~
+        return $Path.Replace($homePath, "~")
+    }
+    
+    return $Path
+}
+
+# Function to get the current directory name with proper normalization
+function Get-CurrentDirectoryName {
+    $normalizedPath = Get-NormalizedPath -Path $PWD.Path
+    return (Split-Path -Leaf $normalizedPath)
+}
+
 # Function to update the terminal title
 function Update-Title {
     param([string]$Title)
     $host.UI.RawUI.WindowTitle = $Title
 }
 
-# Function to get the current directory name
-function Get-CurrentDirectoryName {
-    return (Get-Item -Path $PWD).Name
-}
-
-# Update title on directory change
+# Function to update location with title update
 function Set-LocationWithTitleUpdate {
     param([string]$path)
     Set-Location $path
-    Update-Title "HyperShell - $(Get-CurrentDirectoryName)"
+    $normalizedPath = Get-NormalizedPath -Path $PWD.Path
+    Update-Title "HyperShell - $normalizedPath"
 }
+
+# Set up the location change hook
 Set-Alias -Name cd -Value Set-LocationWithTitleUpdate -Option AllScope -Force
 
 # Initial title update
-Update-Title "HyperShell - $(Get-CurrentDirectoryName)"
+$initialPath = Get-NormalizedPath -Path $PWD.Path
+Update-Title "HyperShell - $initialPath"
 
 # LSD aliases
 function Invoke-LSD { lsd $args }
