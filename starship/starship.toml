@@ -1,160 +1,221 @@
-# Pastel Powerline modified with Dracula colors
-#
-# Background: #282a36
-# Current Line: #44475a
-# Selection: #44475a
-# Foreground: #f8f8f2
-# Comment: #6272a4
-# Cyan (Darkened): #5fb7c2
-# Green (Darkened): #3ac165
-# Orange (Darkened): #d99a5e
-# Pink (Darkened): #d664a6
-# Purple (Darkened): #9d7cd6
-# Red: #ff5555
-# Yellow: #f1fa8c
+# Violet Circuit theme for Starship
+
+# Background:       #1a1a2e
+# Foreground:       #e0e0e0
+# Dark Purple:      #1f1428
+# Purple:           #392a56
+# Pink:             #663062
+# Magenta:          #7f3c75
+# Red:              #a73d65
+# Orange:           #cc513b
 
 format = """
-[](#9d7cd6)\
+[](bg:#1a1a2e fg:#392a56)\
 $os\
 $username\
-[](bg:#ff79c6 fg:#9d7cd6)\
+[](bg:#663062 fg:#392a56)\
 $directory\
-[](fg:#ff79c6 bg:#d99a5e)\
+[](bg:#7f3c75 fg:#663062)\
 $git_branch\
 $git_status\
-[](fg:#d99a5e bg:#5fb7c2)\
-$c\
-$elixir\
-$elm\
-$golang\
-$gradle\
-$haskell\
-$java\
-$julia\
+[](bg:#a73d65 fg:#7f3c75)\
 $nodejs\
-$nim\
-$rust\
-$scala\
-[](fg:#5fb7c2 bg:#3ac165)\
-$docker_context\
 $python\
-[ ](fg:#3ac165)\
+$rust\
+$golang\
+$java\
+$kotlin\
+$gradle\
+$c\
+$lua\
+$docker_context\
+[](bg:#cc513b fg:#a73d65)\
+[](bg:#1a1a2e fg:#cc513b)\
+[➤](bold fg:#cc513b)
 """
 
 # Disable the blank line at the start of the prompt
 add_newline = false
 
-# You can also replace your username with a neat symbol like   or disable this
-# and use the os module below
-[username]
-show_always = true
-style_user = "bg:#9d7cd6 fg:#282a36"
-style_root = "bg:#9d7cd6 fg:#282a36"
-format = '[$user ]($style)'
+# OS module with enhanced foreground color
+[os]
+format = '[ $symbol]($style)'
+style = "bold fg:#FF99FF bg:#392a56"
 disabled = false
 
-# An alternative to the username module which displays a symbol that
-# represents the current operating system
-[os]
-style = "bg:#9d7cd6 fg:#282a36"
-disabled = false                # Enabled to show OS icon
+[os.symbols]
+Alpine = ""
+Amazon = ""
+Android = ""
+Arch = ""
+CentOS = ""
+Debian = ""
+DragonFly = "🐉"
+Emscripten = "🔗"
+EndeavourOS = ""
+Fedora = ""
+FreeBSD = ""
+Garuda = ""
+Gentoo = ""
+HardenedBSD = "聯"
+Illumos = "🐦"
+Linux = ""
+Macos = ""
+Manjaro = ""
+Mariner = ""
+MidnightBSD = "🌘"
+Mint = ""
+NetBSD = ""
+NixOS = ""
+OpenBSD = ""
+OpenCloudOS = "☁️"
+openEuler = ""
+openSUSE = ""
+OracleLinux = "⊂⊃"
+Pop = ""
+Raspbian = ""
+Redhat = ""
+RedHatEnterprise = ""
+Redox = "🧪"
+Solus = ""
+SUSE = ""
+Ubuntu = ""
+Unknown = ""
+Windows = ""
 
+# Username module with enhanced foreground color
+[username]
+style_user = "bold fg:#FF99FF bg:#392a56"
+style_root = "bold fg:#FF4444 bg:#392a56"
+format = '[ $user ]($style)'
+disabled = false
+show_always = true
+
+# Directory module with enhanced foreground color
 [directory]
-style = "bg:#ff79c6 fg:#282a36"
-format = "[ $path ]($style)"
 truncation_length = 3
 truncation_symbol = "…/"
+style = "bold fg:#FF99CC bg:#663062"
+format = "[ $path ]($style)"
 
-# Here is how you can shorten some long paths by text replacement
-# similar to mapped_locations in Oh My Posh:
-[directory.substitutions]
-"Documents" = "󰈙 "
-"Downloads" = " "
-"Music" = " "
-"Pictures" = " "
-# Keep in mind that the order matters. For example:
-# "Important Documents" = " 󰈙 "
-# will not be replaced, because "Documents" was already substituted before.
-# So either put "Important Documents" before "Documents" or use the substituted version:
-# "Important 󰈙 " = " 󰈙 "
-
-[c]
-symbol = " "
-style = "bg:#5fb7c2 fg:#282a36"
-format = '[ $symbol ($version) ]($style)'
-
-[docker_context]
-symbol = " "
-style = "bg:#3ac165 fg:#282a36"
-format = '[ $symbol $context ]($style)'
-
-[elixir]
-symbol = " "
-style = "bg:#5fb7c2 fg:#282a36"
-format = '[ $symbol ($version) ]($style)'
-
-[elm]
-symbol = " "
-style = "bg:#5fb7c2 fg:#282a36"
-format = '[ $symbol ($version) ]($style)'
-
+# Git branch module with enhanced foreground color
 [git_branch]
-symbol = ""
-style = "bg:#d99a5e fg:#282a36"
-format = '[ $symbol $branch ]($style)'
+symbol = " "
+style = "bold fg:#FF66CC bg:#7f3c75"
+format = "[ $symbol$branch ]($style)"
 
+# Git status module with enhanced foreground color
 [git_status]
-style = "bg:#d99a5e fg:#282a36"
-format = '[$all_status$ahead_behind ]($style)'
+style = "bold fg:#FF66CC bg:#7f3c75"
+format = "[$all_status]($style)"
 
-[golang]
-symbol = " "
-style = "bg:#5fb7c2 fg:#282a36"
-format = '[ $symbol ($version) ]($style)'
-
-[gradle]
-style = "bg:#5fb7c2 fg:#282a36"
-format = '[ $symbol ($version) ]($style)'
-
-[haskell]
-symbol = " "
-style = "bg:#5fb7c2 fg:#282a36"
-format = '[ $symbol ($version) ]($style)'
-
-[java]
-symbol = " "
-style = "bg:#5fb7c2 fg:#282a36"
-format = '[ $symbol ($version) ]($style)'
-
-[julia]
-symbol = " "
-style = "bg:#5fb7c2 fg:#282a36"
-format = '[ $symbol ($version) ]($style)'
-
+# Node.js module with enhanced foreground color
 [nodejs]
-symbol = ""
-style = "bg:#5fb7c2 fg:#282a36"
-format = '[ $symbol ($version) ]($style)'
+symbol = " "
+style = "bold fg:#FF6666 bg:#a73d65"
+format = "[ $symbol($version) ]($style)"
+disabled = false
 
-[nim]
-symbol = "󰆥 "
-style = "bg:#5fb7c2 fg:#282a36"
-format = '[ $symbol ($version) ]($style)'
-
-[rust]
-symbol = ""
-style = "bg:#5fb7c2 fg:#282a36"
-format = '[ $symbol ($version) ]($style)'
-
-[scala]
-symbol = " "
-style = "bg:#5fb7c2 fg:#282a36"
-format = '[ $symbol ($version) ]($style)'
-
+# Python module with enhanced foreground color
 [python]
-symbol = "𓆙 "
-style = "bg:#3ac165 fg:#282a36"
-format = '[ $symbol ($version)( \($virtualenv\)) ]($style)'
+symbol = " "
+style = "bold fg:#FF6666 bg:#a73d65"
+format = "[ $symbol($version) ]($style)"
+disabled = false
 
+# Rust module
+[rust]
+symbol = "󱘗 "
+style = "bold fg:#FF6666 bg:#a73d65"
+format = "[ $symbol($version) ]($style)"
+disabled = false
+
+# Go module
+[golang]
+symbol = "󰟓 "
+style = "bold fg:#FF6666 bg:#a73d65"
+format = "[ $symbol($version) ]($style)"
+disabled = false
+
+# Java module
+[java]
+symbol = "󰬷 "
+style = "bold fg:#FF6666 bg:#a73d65"
+format = "[ $symbol($version) ]($style)"
+disabled = false
+
+# Kotlin module
+[kotlin]
+symbol = "󱈙 "
+style = "bold fg:#FF6666 bg:#a73d65"
+format = "[ $symbol($version) ]($style)"
+disabled = false
+
+# Gradle module
+[gradle]
+symbol = "󱎐 "
+style = "bold fg:#FF6666 bg:#a73d65"
+format = "[ $symbol($version) ]($style)"
+disabled = false
+
+# C module
+[c]
+symbol = "󰙱 "
+style = "bold fg:#FF6666 bg:#a73d65"
+format = "[ $symbol($version) ]($style)"
+disabled = false
+
+# Lua module
+[lua]
+symbol = "󰢱 "
+style = "bold fg:#FF6666 bg:#a73d65"
+format = "[ $symbol($version) ]($style)"
+disabled = false
+
+# Docker context
+[docker_context]
+symbol = "󰡨 "
+style = "bold fg:#FF6666 bg:#a73d65"
+format = "[ $symbol$context ]($style)"
+disabled = false
+
+# Time
 [time]
-disabled = true # Disabled to remove time from prompt
+disabled = true
+format = '󱑍 [\[ $time \]]($style) '
+time_format = "%T"
+
+# Command duration
+[cmd_duration]
+min_time = 500
+format = "took [$duration]($style) "
+style = "bold fg:#FF6666"
+
+# Battery
+[battery]
+full_symbol = "󰁹 "
+charging_symbol = "󰂄 "
+discharging_symbol = "󰂃 "
+unknown_symbol = "󰁽 "
+empty_symbol = "󰂎 "
+disabled = false
+
+[[battery.display]]
+threshold = 10
+style = "bold red"
+
+# Package version
+[package]
+symbol = "󰏗 "
+style = "bold fg:#FF6666"
+disabled = false
+
+# Shell indicator
+[shell]
+fish_indicator = "󰈺 "
+powershell_indicator = "󰨊 "
+bash_indicator = "󱆃 "
+zsh_indicator = "󱐋 "
+unknown_indicator = "󰀣 "
+style = "cyan bold"
+disabled = true
