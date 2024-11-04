@@ -33,11 +33,8 @@ source /usr/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 
 source /etc/zsh_command_not_found
 
-# Initialize Starship prompt
+# Initialize Starship promp
 eval "$(starship init zsh)"
 
-# Load Android extension
-source ~/dev/dotfiles/sh/android.sh
-
-# Load shell-utils
-source ~/dev/dotfiles/sh/shell-utils.sh
+# Load extensions
+for i in ~/dev/dotfiles/sh/*.sh;do source $i; done

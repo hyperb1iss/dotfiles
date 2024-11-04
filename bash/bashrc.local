@@ -91,14 +91,7 @@ if command -v pyenv 1>/dev/null 2>&1; then
 fi
 
 # Source Utility Functions
-if [ -f "$HOME/dev/dotfiles/sh/shell-utils.sh" ]; then
-    source "$HOME/dev/dotfiles/sh/shell-utils.sh"
-fi
-
-# Source Android Development Environment
-if [ -f "$HOME/dev/dotfiles/sh/android.sh" ]; then
-    source "$HOME/dev/dotfiles/sh/android.sh"
-fi
+for i in ~/dev/dotfiles/sh/*.sh; do source $i; done
 
 # Load private configurations if they exist
 [ -f ~/.rc.local ] && source ~/.rc.local
