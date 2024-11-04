@@ -31,7 +31,7 @@ $lua\
 $docker_context\
 [](bg:#cc513b fg:#a73d65)\
 [](bg:#1a1a2e fg:#cc513b)\
-[➤](bold fg:#cc513b)
+[➤](bold fg:#cc513b) \
 """
 
 # Disable the blank line at the start of the prompt
