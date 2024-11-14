@@ -56,7 +56,7 @@ alias diff='diff --color=auto'
 alias ip='ip --color=auto'
 
 # Terminal Title
-functionnormalize_path() {
+function normalize_path() {
     echo "${PWD/#$HOME/\~}"
 }
 
