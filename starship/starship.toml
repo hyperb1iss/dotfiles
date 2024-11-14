@@ -13,6 +13,8 @@ format = """
 [](bg:#1a1a2e fg:#392a56)\
 $os\
 $username\
+$hostname\
+[ ](bold fg:#FF0000 bg:#392a56)\
 [](bg:#663062 fg:#392a56)\
 $directory\
 [](bg:#7f3c75 fg:#663062)\
@@ -87,9 +89,18 @@ Windows = ""
 [username]
 style_user = "bold fg:#FF99FF bg:#392a56"
 style_root = "bold fg:#FF4444 bg:#392a56"
-format = '[ $user ]($style)'
+format = '[ $user]($style)'
 disabled = false
 show_always = true
+
+
+# Hostname configuration for SSH awareness
+[hostname]
+style = "bold fg:#FF66FF bg:#392a56"
+ssh_only = true
+format = '[@$hostname]($style)'
+trim_at = "."
+disabled = false
 
 # Directory module with enhanced foreground color
 [directory]
