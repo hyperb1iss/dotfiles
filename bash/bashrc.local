@@ -60,7 +60,7 @@ functionnormalize_path() {
     echo "${PWD/#$HOME/\~}"
 }
 
-function_update_terminal_title() {
+function _update_terminal_title() {
     local title_prefix=""
     local normalized_path=$(normalize_path)
     
