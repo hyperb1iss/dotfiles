@@ -1,8 +1,5 @@
 # Bash-specific configurations
 
-# Source common shell configurations
-source ~/dev/dotfiles/sh/shell-common.sh
-
 # Bash-specific shell options
 shell_options=(
     autocd
@@ -46,3 +43,6 @@ function _update_terminal_title() {
 }
 
 PROMPT_COMMAND="_update_terminal_title"
+
+# Source common shell configurations
+source ~/dev/dotfiles/sh/shell-common.sh

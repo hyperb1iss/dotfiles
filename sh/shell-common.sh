@@ -15,9 +15,6 @@ elif [ -n "$ZSH_VERSION" ]; then
     [ -f /usr/share/doc/fzf/examples/key-bindings.zsh ] && source /usr/share/doc/fzf/examples/key-bindings.zsh
 fi
 
-# Initialize Starship prompt
-eval "$(starship init ${SHELL_NAME:-bash})"
-
 # Source all utility scripts
 for script in ~/dev/dotfiles/sh/*.sh; do
     if [[ "$script" != *"shell-common.sh" ]]; then
@@ -27,3 +24,6 @@ done
 
 # Load private configurations if they exist
 [ -f ~/.rc.local ] && source ~/.rc.local
+
+# Initialize Starship prompt (moved to the end)
+eval "$(starship init ${SHELL_NAME:-$([[ -n "$ZSH_VERSION" ]] && echo "zsh" || echo "bash")})"
