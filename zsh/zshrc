@@ -24,7 +24,6 @@ precmd() {
 source ~/dev/dotfiles/zsh/aliases.zsh
 source ~/dev/dotfiles/zsh/env.zsh
 source ~/dev/dotfiles/zsh/completion.zsh
-source ~/dev/dotfiles/zsh/z.sh
 
 source /usr/share/doc/fzf/examples/key-bindings.zsh
 source /usr/share/zsh-autosuggestions/zsh-autosuggestions.zsh
