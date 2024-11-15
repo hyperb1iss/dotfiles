@@ -9,6 +9,3 @@ alias lt='ls --tree'
 
 # Enhanced cat commands using batcat with Dracula theme
 alias bat='batcat --theme=Dracula'
-
-# Git shortcuts
-alias gc='git cherry-pick'

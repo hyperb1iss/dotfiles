@@ -74,37 +74,6 @@ function fkill() {
     fi
 }
 
-# Git Functions
-
-# Interactive git add
-function gadd() {
-    local files
-    files=$(git status -s | fzf -m | awk '{print $2}')
-    if [ -n "$files" ]; then
-        echo "$files" | xargs git add
-    fi
-}
-
-# Interactive git checkout branch
-function gco() {
-    local branches branch
-    branches=$(git branch --all | grep -v HEAD) &&
-        branch=$(echo "$branches" | fzf -d $((2 + $(wc -l <<<"$branches"))) +m) &&
-        git checkout "$(echo "$branch" | sed "s/.* //" | sed "s#remotes/[^/]*/##")"
-}
-
-# Interactive git log browser
-function glog() {
-    git log --graph --color=always \
-        --format="%C(auto)%h%d %s %C(black)%C(bold)%cr" "$@" |
-        fzf --ansi --no-sort --reverse --tac --toggle-sort=\` \
-            --bind "ctrl-m:execute:
-                (grep -o '[a-f0-9]\{7\}' | head -1 |
-                xargs -I % sh -c 'git show --color=always % | less -R') << 'FZF-EOF'
-                {}
-FZF-EOF"
-}
-
 # Docker Functions
 
 # Interactive docker container selection
