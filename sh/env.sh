@@ -6,7 +6,7 @@ if command -v dircolors >/dev/null 2>&1; then
     eval "$(dircolors -b ~/.dircolors)"
 fi
 
-# Enable CCACHE and set its directory
+# Development tool configurations
 export USE_CCACHE=1
 export CCACHE_DIR=/b/.ccache
 export CCACHE_EXEC=/usr/bin/ccache
@@ -15,16 +15,21 @@ export CCACHE_EXEC=/usr/bin/ccache
 export AWS_DEFAULT_PROFILE=mason-devops
 export KUBECONFIG=$HOME/.kube/eksctl/clusters/mason-devops
 
-# Python, Go, and other development environment setups
+# Development paths
 export GOPATH=~/dev/go
 export GO15VENDOREXPERIMENT=1
 export ANDROID_NDK_HOME=~/Android/android-ndk-r21e
 
+# Editor configuration
+export VISUAL=nvim
+export EDITOR="$VISUAL"
+export PAGER=less
+export LESS="-R"
+
 # HOSTNAME
 export HOSTNAME=$(hostname)
 
-# PATH additions
-# Using : to join paths for better readability
+# PATH configuration
 export PATH=$(echo -n "\
 $HOME/.cargo/bin:\
 $GOPATH/bin:\
@@ -32,9 +37,8 @@ $HOME/.local/bin:\
 $HOME/bin:\
 $PATH" | tr -s ':')
 
-# Editor
-export VISUAL=nvim
-export EDITOR="$VISUAL"
+# FZF Configuration
+export FZF_DEFAULT_OPTS="--height 40% --layout=reverse --border --preview 'bat --color=always --style=numbers --line-range=:500 {}'"
 
 # Source private environment variables if they exist
 if [ -f ~/dev/dotfiles-private/env/private.sh ]; then

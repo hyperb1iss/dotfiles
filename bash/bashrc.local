@@ -1,14 +1,9 @@
-# Enhanced bashrc.local configuration
-# Implements modern shell features, Starship prompt, and Android development tools
+# Bash-specific configurations
 
-# History Configuration
-HISTSIZE=50000
-HISTFILESIZE=50000
-HISTCONTROL=ignoreboth:erasedups
-HISTTIMEFORMAT="%F %T "
-HISTIGNORE="ls:ll:cd:pwd:clear:history:fg:bg:jobs"
+# Source common shell configurations
+source ~/dev/dotfiles/sh/shell-common.sh
 
-# Shell Options
+# Bash-specific shell options
 shell_options=(
     autocd
     cdable_vars
@@ -34,28 +29,7 @@ for option in "${shell_options[@]}"; do
     shopt -s "$option" 2>/dev/null
 done
 
-# Environment Variables
-export EDITOR=nvim
-export VISUAL=$EDITOR
-export PAGER=less
-export LESS="-R"
-
-# FZF Configuration
-export FZF_DEFAULT_OPTS="--height 40% --layout=reverse --border --preview 'bat --color=always --style=numbers --line-range=:500 {}'"
-[ -f /usr/share/doc/fzf/examples/key-bindings.bash ] && source /usr/share/doc/fzf/examples/key-bindings.bash
-[ -f /usr/share/bash-completion/completions/fzf ] && source /usr/share/bash-completion/completions/fzf
-
-# Modern CLI Tool Aliases
-alias ls='lsd'
-alias ll='ls -l'
-alias la='ls -la'
-alias lt='ls --tree'
-alias bat='batcat --theme=Dracula'
-alias grep='grep --color=auto'
-alias diff='diff --color=auto'
-alias ip='ip --color=auto'
-
-# Terminal Title
+# Terminal title function (bash-specific implementation)
 function normalize_path() {
     echo "${PWD/#$HOME/\~}"
 }
@@ -67,31 +41,8 @@ function _update_terminal_title() {
     # Add target product prefix for Android development if applicable
     [ ! -z "$TARGET_PRODUCT" ] && title_prefix="[${TARGET_PRODUCT}-${TARGET_BUILD_VARIANT}] "
     
-    # Set the terminal title with normalized path
+    # Set the terminal title
     echo -ne "\033]0;${title_prefix}${debian_chroot:+($debian_chroot)}${USER}@${HOSTNAME}: ${normalized_path}\007"
 }
 
 PROMPT_COMMAND="_update_terminal_title"
-
-# Git Configuration
-export GIT_PS1_SHOWDIRTYSTATE=1      # unstated (*) stated (+)
-export GIT_PS1_SHOWSTASHSTATE=1      # stashed ($)
-export GIT_PS1_SHOWUNTRACKEDFILES=1  # untracked (%)
-export GIT_PS1_SHOWUPSTREAM="verbose"  # upstream (<=>)
-
-# Initialize Starship Prompt
-eval "$(starship init bash)"
-
-# Development Environment
-export PATH=$PATH:$HOME/.local/bin:$HOME/bin:$HOME/.cargo/bin
-
-# Python Development
-if command -v pyenv 1>/dev/null 2>&1; then
-    eval "$(pyenv init -)"
-fi
-
-# Source Utility Functions
-for i in ~/dev/dotfiles/sh/*.sh; do source $i; done
-
-# Load private configurations if they exist
-[ -f ~/.rc.local ] && source ~/.rc.local

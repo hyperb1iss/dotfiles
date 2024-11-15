@@ -1,8 +1,0 @@
-export AWS_DEFAULT_PROFILE=mason-devops
-export KUBECONFIG=$HOME/.kube/eksctl/clusters/mason-devops
-
-export W=/mnt/c/Users/Stefanie
-function cdw()
-{
-    cd $W
-}
