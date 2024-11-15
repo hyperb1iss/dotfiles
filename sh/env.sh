@@ -1,7 +1,10 @@
 # Environment variables and path configurations
+# Shell-agnostic environment setup for both bash and zsh
 
-# Ensure LS_COLORS is set
-eval "$(dircolors -b ~/.dircolors)"
+# Ensure LS_COLORS is set if dircolors exists
+if command -v dircolors >/dev/null 2>&1; then
+    eval "$(dircolors -b ~/.dircolors)"
+fi
 
 # Enable CCACHE and set its directory
 export USE_CCACHE=1
@@ -20,12 +23,20 @@ export ANDROID_NDK_HOME=~/Android/android-ndk-r21e
 # HOSTNAME
 export HOSTNAME=$(hostname)
 
-# PATH
-export PATH=~/.cargo/bin:$GOPATH/bin:~/.local/bin:~/bin:$PATH
+# PATH additions
+# Using : to join paths for better readability
+export PATH=$(echo -n "\
+$HOME/.cargo/bin:\
+$GOPATH/bin:\
+$HOME/.local/bin:\
+$HOME/bin:\
+$PATH" | tr -s ':')
 
 # Editor
 export VISUAL=nvim
 export EDITOR="$VISUAL"
 
-# Secret stuff
-source ~/dev/dotfiles-private/env/private.zsh 2> /dev/null
+# Source private environment variables if they exist
+if [ -f ~/dev/dotfiles-private/env/private.sh ]; then
+    source ~/dev/dotfiles-private/env/private.sh
+fi
