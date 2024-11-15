@@ -47,11 +47,6 @@ function extract() {
     fi
 }
 
-# Read markdown files in terminal
-function rmd() {
-    pandoc "$1" | lynx -stdin
-}
-
 # FZF Enhanced Functions
 
 # Interactive directory navigation
@@ -156,22 +151,3 @@ function take() {
 function psg() {
     ps aux | grep -v grep | grep -i "$@"
 }
-
-# WSL-specific utilities (only loaded in WSL environment)
-if grep -qi microsoft /proc/version 2>/dev/null; then
-    # Convert between Windows and WSL paths
-    function wslpath() {
-        if [[ $1 == /* ]]; then
-            # WSL to Windows
-            echo "$(wslpath -w "$1")"
-        else
-            # Windows to WSL
-            echo "$(wslpath -u "$1")"
-        fi
-    }
-
-    # Open Windows Explorer in current directory
-    function explore() {
-        explorer.exe "$(wslpath -w "${1:-.}")"
-    }
-fi
