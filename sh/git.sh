@@ -62,7 +62,7 @@ function glog() {
         fzf --ansi --no-sort --reverse --tac --toggle-sort=\` \
             --bind "ctrl-m:execute:
                 (grep -o '[a-f0-9]\{7\}' | head -1 |
-                xargs -I % sh -c 'git show --color=always % | less -R') << 'FZF-EOF'
+                xargs -I % sh -c 'git show --color=always % | $PAGER') << 'FZF-EOF'
                 {}
 FZF-EOF"
 }
@@ -80,7 +80,7 @@ function gstash() {
         a) git stash apply "$stash_id" ;;
         p) git stash pop "$stash_id" ;;
         d) git stash drop "$stash_id" ;;
-        s) git stash show -p "$stash_id" | less ;;
+        s) git stash show -p "$stash_id" | $PAGER ;;
         b) git stash branch "stash-branch-$(date +%Y%m%d)" "$stash_id" ;;
         *) echo "Invalid action" ;;
         esac

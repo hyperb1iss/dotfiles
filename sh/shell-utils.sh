@@ -12,7 +12,7 @@ fi
 
 # Search file contents
 function ftext() {
-    grep -iIHrn --color=always "$1" . | less -R
+    grep -iIHrn --color=always "$1" . | $PAGER
 }
 
 # Extract common archive formats

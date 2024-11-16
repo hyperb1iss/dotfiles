@@ -21,7 +21,6 @@ precmd() {
 }
 
 # Source custom configurations
-source ~/dev/dotfiles/zsh/aliases.zsh
 source ~/dev/dotfiles/zsh/completion.zsh
 
 # Source system-provided utilities
