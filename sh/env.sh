@@ -23,7 +23,6 @@ export ANDROID_NDK_HOME=~/Android/android-ndk-r21e
 # Editor configuration
 export VISUAL=nvim
 export EDITOR="$VISUAL"
-export PAGER="batcat -p"
 
 # Add bat alias
 alias bat="batcat"
