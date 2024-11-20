@@ -59,11 +59,16 @@ if command -v fzf >/dev/null 2>&1; then
         fi
     }
 
-    # Interactive git add
+    # Interactive git add with multi-select support
     function gadd() {
         local files
-        files=$(git status -s | fzf -m --preview 'git diff --color=always {2}' | awk '{print $2}')
-        [ -n "$files" ] && echo "$files" | xargs git add
+        files=$(git status -s | fzf -m \
+            --header 'Tab to select multiple files, Enter to add' \
+            --preview 'git diff --color=always {2}' \
+            --bind 'tab:toggle-out' \
+            --bind 'shift-tab:toggle-in' \
+            | awk '{print $2}')
+        [ -n "$files" ] && echo "$files" | xargs git add && git status -s
     }
 
     # Interactive git checkout branch
