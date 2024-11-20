@@ -26,6 +26,12 @@ for option in "${shell_options[@]}"; do
     shopt -s "$option" 2>/dev/null
 done
 
+# Enable cycling through completion options with TAB
+bind 'TAB:menu-complete'
+bind '"\e[Z":menu-complete-backward'  # Shift+Tab to cycle backwards
+bind 'set show-all-if-ambiguous on'   # Show options on first TAB
+bind 'set menu-complete-display-prefix on'  # Show the common prefix while cycling
+
 # Terminal title function (bash-specific implementation)
 function normalize_path() {
     echo "${PWD/#$HOME/\~}"
