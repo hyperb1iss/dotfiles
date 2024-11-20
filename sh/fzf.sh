@@ -83,7 +83,7 @@ if command -v fzf >/dev/null 2>&1; then
     function fh() {
         local cmd
         if [ -n "$ZSH_VERSION" ]; then
-            cmd=$(history -n -r 1 | fzf +s --tac --preview 'echo {}')
+            cmd=$(history -n -r 1 | fzf +s --tac)
         else
             cmd=$(history | fzf +s --tac | sed 's/ *[0-9]* *//')
         fi
