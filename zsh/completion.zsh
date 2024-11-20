@@ -35,18 +35,6 @@ zstyle ':completion:*' matcher-list 'm:{a-z}={A-Z}'
 zstyle ':completion:*' expand 'yes'
 zstyle ':completion:*' squeeze-slashes 'yes'
 
-# Integrate fzf with completion
-export FZF_COMPLETION_TRIGGER=''
-export FZF_DEFAULT_OPTS='--height 40% --layout=reverse --border'
-
-# History and directory search using fzf
-# Bind Ctrl+R to search through command history
-bindkey '^R' fzf-history-widget
-# Bind Ctrl+T to search for files
-bindkey '^T' fzf-file-widget
-# Bind Alt+C to search and cd into directories
-bindkey '^[C' fzf-cd-widget
-
 # Use color output for completions
 zstyle ':completion:*:default' list-colors ${(s.:.)LS_COLORS}
 

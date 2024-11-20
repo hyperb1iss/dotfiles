@@ -10,11 +10,15 @@
 
 - shell:
     -
+      command: add-apt-repository -y ppa:longsleep/golang-backports
+      stderr: true
+      stdout: true
+    -
       command: apt update
       stderr: true
       stdout: true
     -
-      command: apt install -y fzf neovim python3-neovim cmake python3-dev cargo zsh zsh-autosuggestions zsh-syntax-highlighting
+      command: apt install -y neovim python3-neovim cmake python3-dev cargo zsh zsh-autosuggestions zsh-syntax-highlighting golang-go fd-find ripgrep tree
       stderr: true
       stdout: true
     -

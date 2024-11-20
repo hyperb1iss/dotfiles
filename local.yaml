@@ -50,4 +50,12 @@
 - link:
     ~/.config/starship.toml: starship/starship.toml
 
+- shell:
+    -
+      command: mkdir -p ~/dev/go && GOPATH=~/dev/go go install github.com/junegunn/fzf@latest
+      stderr: true
+      stdout: true
+      quiet: false
+      description: Installing fzf from source
+
 
