@@ -18,7 +18,7 @@
       stderr: true
       stdout: true
     -
-      command: apt install -y neovim python3-neovim cmake python3-dev cargo zsh zsh-autosuggestions zsh-syntax-highlighting golang-go fd-find ripgrep tree
+      command: grep -v '^#\|^$' packages.txt | xargs apt install -y
       stderr: true
       stdout: true
     -
