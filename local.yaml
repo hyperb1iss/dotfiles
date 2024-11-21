@@ -30,6 +30,7 @@
     - rustup toolchain install stable
 
 - shell:
+    - cargo install git-delta
     - cargo install lsd
 
 - shell:

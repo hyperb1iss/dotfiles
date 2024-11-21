@@ -9,5 +9,19 @@
 	cookiefile = ~/.gitcookies
 [core]
 	autocrlf = input
+	pager = delta
 [init]
 	defaultBranch = main
+
+[interactive]
+	diffFilter = delta --color-only
+
+[delta]
+	navigate = true
+	dark = true
+
+[merge]
+	conflictstyle = zdiff3
+
+[diff]
+	colorMoved = default
