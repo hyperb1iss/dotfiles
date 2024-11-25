@@ -131,7 +131,9 @@ disabled = false
 [python]
 symbol = " "
 style = "bold fg:#FF6666 bg:#a73d65"
-format = "[ $symbol($version) ]($style)"
+format = "[ $symbol(${virtualenv}) ]($style)"
+detect_extensions = ["py"]
+detect_files = ["requirements.txt", "pyproject.toml", "Pipfile", "tox.ini", "setup.py"]
 disabled = false
 
 # Rust module
