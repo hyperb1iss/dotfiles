@@ -34,7 +34,6 @@ device-tree-compiler
 flex
 kmod
 libelf-dev
-liblz4-tool
 libncurses5-dev
 libssl-dev
 u-boot-tools
@@ -43,9 +42,7 @@ u-boot-tools
 adb
 default-jdk
 fastboot
-lib32ncurses5-dev
-lib32stdc++6
-lib32z1-dev
+libncurses5-dev
 libc6-dev-i386
 libgl1-mesa-dev
 libswitch-perl
