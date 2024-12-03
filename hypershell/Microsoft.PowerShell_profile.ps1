@@ -372,3 +372,124 @@ Set-Alias -Name reload -Value Update-Profile
 Show-HyperShellStartup
 
 # End of HyperShell PowerShell Profile
+
+# Enhanced FZF Functions (inspired by fzf.sh)
+
+# Interactive file finder with preview
+function Find-FzfFileWithPreview {
+    $file = Get-ChildItem -Recurse | Where-Object { -not $_.PSIsContainer } |
+    Select-Object -ExpandProperty FullName |
+    fzf --preview 'bat --color=always --style=numbers --line-range=:500 {}'
+    if ($file) {
+        Invoke-Item $file
+    }
+}
+Set-PSReadLineKeyHandler -Chord Ctrl+f -ScriptBlock { Find-FzfFileWithPreview }
+
+# Interactive directory navigation
+function Set-FzfLocationWithPreview {
+    $dir = Get-ChildItem -Directory -Recurse |
+    Select-Object -ExpandProperty FullName |
+    fzf --preview 'tree -C {} | head -200'
+    if ($dir) {
+        Set-Location $dir
+    }
+}
+Set-PSReadLineKeyHandler -Chord Alt+c -ScriptBlock { Set-FzfLocationWithPreview }
+
+# Interactive process kill
+function Stop-FzfProcess {
+    $process = Get-Process |
+    Format-Table -AutoSize |
+    Out-String -Stream |
+    fzf --header-lines=3 --multi --preview 'echo {}' |
+    ForEach-Object { ($_ -split '\s+')[1] }
+
+    if ($process) {
+        $process | ForEach-Object {
+            Stop-Process -Id $_ -Force
+            Write-Host "Killed process with ID: $_"
+        }
+    }
+}
+Set-Alias -Name fkill -Value Stop-FzfProcess
+
+# Enhanced Git Functions (inspired by git.sh)
+
+# Interactive git add
+function Add-FzfGitChanges {
+    $files = git status -s |
+    fzf --multi --preview 'git diff --color=always {2}' |
+    ForEach-Object { ($_ -split '\s+', 2)[1] }
+
+    if ($files) {
+        $files | ForEach-Object { git add $_ }
+        git status -s
+    }
+}
+Set-Alias -Name gadd -Value Add-FzfGitChanges
+
+# Interactive git checkout branch
+function Switch-FzfGitBranch {
+    $branch = git branch --all |
+    Where-Object { $_ -notmatch 'HEAD' } |
+    fzf --preview 'git log --color=always {}' |
+    ForEach-Object { $_.TrimStart('* ').TrimStart().Replace('remotes/origin/', '') }
+
+    if ($branch) {
+        git checkout $branch
+    }
+}
+Set-Alias -Name gco -Value Switch-FzfGitBranch
+
+# Interactive git log browser
+function Show-FzfGitLog {
+    $commit = git log --graph --color=always --format="%C(auto)%h%d %s %C(black)%C(bold)%cr" |
+    fzf --ansi --no-sort --reverse --tiebreak=index |
+    ForEach-Object { ($_ -split '\s+')[0] }
+
+    if ($commit) {
+        git show --color=always $commit | less -R
+    }
+}
+Set-Alias -Name glog -Value Show-FzfGitLog
+
+# Additional Git aliases (from git.sh)
+function Get-GitStatus { git status }
+Set-Alias -Name gst -Value Get-GitStatus
+
+function Add-GitChanges { git add $args }
+Set-Alias -Name ga -Value Add-GitChanges
+
+function Invoke-GitCommit { git commit -m $args }
+Set-Alias -Name gcom -Value Invoke-GitCommit
+
+function Push-GitChanges { git push $args }
+Set-Alias -Name gpsh -Value Push-GitChanges
+
+function Invoke-GitPull { git pull $args }
+Set-Alias -Name gpull -Value Invoke-GitPull
+
+function Invoke-GitFetch { git fetch --all --prune }
+Set-Alias -Name gf -Value Invoke-GitFetch
+
+function Invoke-GitCheckout { git checkout $args }
+Set-Alias -Name gco -Value Invoke-GitCheckout
+
+# Directory navigation functions (from directory.sh)
+function New-DirectoryAndEnter {
+    param([string]$path)
+    New-Item -ItemType Directory -Path $path -Force
+    Set-Location -Path $path
+}
+Set-Alias -Name mkcd -Value New-DirectoryAndEnter
+
+function Set-LocationUp {
+    param([int]$levels = 1)
+    $path = ".."
+    for ($i = 1; $i -lt $levels; $i++) {
+        $path = Join-Path $path ".."
+    }
+    Set-Location $path
+}
+Set-Alias -Name up -Value Set-LocationUp

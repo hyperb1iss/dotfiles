@@ -43,7 +43,8 @@ choco upgrade -y `
     7zip `
     bzip2 `
     openssh `
-    make
+    make `
+    delta
 
 
 # Diagnostic function
