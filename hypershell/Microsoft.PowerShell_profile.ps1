@@ -2,8 +2,6 @@
 # HyperShell: A high-tech, Linux-inspired environment for Windows PowerShell
 # https://github.com/hyperbliss/dotfiles/hypershell
 
-
-
 function Show-HyperShellStartup {
     $esc = [char]27
     $version = "1.0.0"
@@ -189,28 +187,30 @@ function Find-Files {
 Set-Alias -Name find -Value Find-Files
 
 # FZF Functions
-
-# FZF Find File
 function Find-FzfFile {
-    $file = Get-ChildItem -Recurse | Where-Object { -not $_.PSIsContainer } | Select-Object -ExpandProperty FullName | fzf
+    $file = Get-ChildItem -Recurse | 
+        Where-Object { -not $_.PSIsContainer } | 
+        Select-Object -ExpandProperty FullName | 
+        fzf --preview 'bat.exe --color=always --style=numbers --line-range=:500 {}'
     if ($file) {
-        Invoke-Item $file
+        bat $file
     }
 }
 Set-PSReadLineKeyHandler -Chord Ctrl+f -ScriptBlock { Find-FzfFile }
 
-# FZF Change Directory
 function Set-FzfLocation {
-    $dir = Get-ChildItem -Directory -Recurse | Select-Object -ExpandProperty FullName | fzf
+    $dir = Get-ChildItem -Directory | 
+        Select-Object -ExpandProperty FullName | 
+        fzf --preview 'dir /a /w "{}"'
     if ($dir) {
         Set-Location $dir
     }
 }
 Set-PSReadLineKeyHandler -Chord Alt+c -ScriptBlock { Set-FzfLocation }
 
-# FZF History Search
 function Get-FzfHistory {
-    $command = Get-Content (Get-PSReadLineOption).HistorySavePath | fzf
+    $command = Get-Content (Get-PSReadLineOption).HistorySavePath | 
+        fzf --tac --no-sort
     if ($command) {
         [Microsoft.PowerShell.PSConsoleReadLine]::InvokePrompt()
         [Microsoft.PowerShell.PSConsoleReadLine]::Insert($command)
@@ -275,10 +275,10 @@ function Invoke-WslSed { wsl sed $args }
 function Invoke-WslAwk { wsl awk $args }
 
 # WSL command aliases
-New-Alias -Name wgrep -Value Invoke-WslGrep
-New-Alias -Name wfind -Value Invoke-WslFind
-New-Alias -Name wsed -Value Invoke-WslSed
-New-Alias -Name wawk -Value Invoke-WslAwk
+New-Alias -Name wgrep -Value Invoke-WslGrep -Force
+New-Alias -Name wfind -Value Invoke-WslFind -Force
+New-Alias -Name wsed -Value Invoke-WslSed -Force
+New-Alias -Name wawk -Value Invoke-WslAwk -Force
 
 # Git Integration Improvements
 
@@ -364,7 +364,6 @@ if (Test-Path "$env:USERPROFILE\Documents\PowerShell\user_profile.ps1") {
 # Function to reload the profile
 function Update-Profile {
     . $PROFILE
-    Show-HyperShellStartup
 }
 Set-Alias -Name reload -Value Update-Profile
 
@@ -379,18 +378,22 @@ Show-HyperShellStartup
 function Find-FzfFileWithPreview {
     $file = Get-ChildItem -Recurse | Where-Object { -not $_.PSIsContainer } |
     Select-Object -ExpandProperty FullName |
-    fzf --preview 'bat --color=always --style=numbers --line-range=:500 {}'
+    fzf --preview 'bat.exe --color=always --style=numbers --line-range=:500 {}' |
+    ForEach-Object { $_.Trim() }
     if ($file) {
-        Invoke-Item $file
+        bat $file
     }
 }
 Set-PSReadLineKeyHandler -Chord Ctrl+f -ScriptBlock { Find-FzfFileWithPreview }
 
 # Interactive directory navigation
 function Set-FzfLocationWithPreview {
+    $previewCmd = 'powershell.exe -NoProfile -Command "Get-ChildItem -Force \"{}\" | Format-Wide -AutoSize | Out-String"'
+    
     $dir = Get-ChildItem -Directory -Recurse |
     Select-Object -ExpandProperty FullName |
-    fzf --preview 'tree -C {} | head -200'
+    fzf --preview "$previewCmd" |
+    ForEach-Object { $_.Trim() }
     if ($dir) {
         Set-Location $dir
     }
@@ -420,10 +423,18 @@ Set-Alias -Name fkill -Value Stop-FzfProcess
 function Add-FzfGitChanges {
     $files = git status -s |
     fzf --multi --preview 'git diff --color=always {2}' |
-    ForEach-Object { ($_ -split '\s+', 2)[1] }
+    ForEach-Object { 
+        $line = $_
+        if ($line -match '^\s*[MADRCU\?]+ (.+)$') {
+            $matches[1]
+        }
+    }
 
     if ($files) {
-        $files | ForEach-Object { git add $_ }
+        $files | ForEach-Object { 
+            Write-Host "Adding $_"
+            git add $_
+        }
         git status -s
     }
 }
@@ -449,7 +460,7 @@ function Show-FzfGitLog {
     ForEach-Object { ($_ -split '\s+')[0] }
 
     if ($commit) {
-        git show --color=always $commit | less -R
+        git show --color=always $commit | bat --style=numbers --paging=always
     }
 }
 Set-Alias -Name glog -Value Show-FzfGitLog
