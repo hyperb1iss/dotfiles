@@ -59,11 +59,11 @@ Set-Alias -Name gbr -Value Switch-FzfGitBranch
 # Interactive git log browser
 function Show-FzfGitLog {
     $commit = git log --graph --color=always --format="%C(auto)%h%d %s %C(black)%C(bold)%cr" |
-    fzf --ansi --no-sort --reverse --tiebreak=index |
-    ForEach-Object { ($_ -split '\s+')[0] }
+    fzf --ansi --no-sort --reverse --tiebreak=index --preview 'git show --color=always {2}' |
+    ForEach-Object { ($_ -split '\s+')[1] }
 
     if ($commit) {
-        git show --color=always $commit | bat --style=numbers --paging=always
+        git show --color=always $commit | less -R
     }
 }
-Set-Alias -Name glog -Value Show-FzfGitLog 
+Set-Alias -Name glog -Value Show-FzfGitLog

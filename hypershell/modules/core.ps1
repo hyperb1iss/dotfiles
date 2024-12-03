@@ -24,4 +24,11 @@ Set-PSReadLineOption -Colors @{
 }
 
 # Configure environment variables
-$env:FZF_DEFAULT_OPTS = "--height 40% --layout=reverse --border --preview 'bat --color=always --style=numbers --line-range=:500 {}'" 
+$env:FZF_DEFAULT_OPTS = "--height 40% --layout=reverse --border --preview 'bat --color=always --style=numbers --line-range=:500 {}'"
+
+# Function to reload the profile
+function Update-Profile {
+    . $PROFILE
+    Write-Host "PowerShell profile reloaded." -ForegroundColor Green
+}
+Set-Alias -Name reload -Value Update-Profile
