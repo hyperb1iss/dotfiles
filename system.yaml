@@ -14,6 +14,10 @@
       stderr: true
       stdout: true
     -
+      command: add-apt-repository -y ppa:git-core/ppa
+      stderr: true
+      stdout: true
+    -
       command: apt update
       stderr: true
       stdout: true
