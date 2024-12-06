@@ -12,26 +12,7 @@ function setjdk() {
     fi
 
     local version=$1
-    local java_home
-
-    case "$version" in
-        8)
-            java_home="/usr/lib/jvm/java-8-openjdk-amd64"
-            ;;
-        11)
-            java_home="/usr/lib/jvm/java-11-openjdk-amd64"
-            ;;
-        17)
-            java_home="/usr/lib/jvm/java-17-openjdk-amd64"
-            ;;
-        21)
-            java_home="/usr/lib/jvm/java-21-openjdk-amd64"
-            ;;
-        *)
-            echo "Unsupported Java version. Available versions: 8, 11, 17, 21"
-            return 1
-            ;;
-    esac
+    local java_home="/usr/lib/jvm/java-${version}-openjdk-amd64"
 
     if [ ! -d "$java_home" ]; then
         echo "Error: Java $version is not installed at $java_home"
@@ -45,12 +26,49 @@ function setjdk() {
     java -version
 }
 
-# Convenient aliases for different Java versions
-alias java8="setjdk 8"
-alias java11="setjdk 11" 
-alias java17="setjdk 17"
-alias java21="setjdk 21"
+# Function to create dynamic aliases for available Java versions
+function setup_java_aliases() {
+    # Find all installed Java versions
+    ls -1 /usr/lib/jvm/ | grep -E "java-[0-9]+-openjdk-amd64|java-[0-9]+-oracle" | sort -V | while read -r line; do
+        version=$(echo "$line" | sed -E 's/java-([0-9]+).*/\1/')
+        # Only create aliases for Java 8 and newer
+        if [ "$version" -ge 8 ]; then
+            alias "java${version}=setjdk ${version}"
+        fi
+    done
+}
 
-# Add alias to list available versions
-alias javalist="ls -1 /usr/lib/jvm/ | grep -E 'java-[0-9]+-openjdk-amd64|java-[0-9]+-oracle'"
+# Function to list available versions with commands
+function list_java_versions() {
+    echo "╔════════════════════════════════════════════════╗"
+    echo "║           Available Java Versions              ║"
+    echo "╚════════════════════════════════════════════════╝"
 
+    local current_version=$(java -version 2>&1 | grep version | cut -d'"' -f2 | cut -d'.' -f1)
+
+    ls -1 /usr/lib/jvm/ | grep -E "java-[0-9]+-openjdk-amd64|java-[0-9]+-oracle" | sort -V | while read -r line; do
+        version=$(echo "$line" | sed -E 's/java-([0-9]+).*/\1/')
+        # Skip versions less than 8 as they're likely invalid or too old
+        if [ "$version" -lt 8 ]; then
+            continue
+        fi
+
+        if [ "$version" = "$current_version" ]; then
+            echo "* Java $version (current)"
+        else
+            echo "  Java $version"
+        fi
+        echo "    Commands: java$version, setjdk $version"
+        echo
+    done
+
+    echo "Usage:"
+    echo "  - Use 'java<version>' (e.g., java11) for quick switching"
+    echo "  - Use 'setjdk <version>' (e.g., setjdk 11) for explicit switching"
+}
+
+# Replace the javalist alias with the new function
+alias javalist="list_java_versions"
+
+# Setup the Java aliases when the script is sourced
+setup_java_aliases
