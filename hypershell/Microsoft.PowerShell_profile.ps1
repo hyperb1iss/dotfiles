@@ -5,27 +5,19 @@
 # Get the directory containing the modules
 $modulesDir = Join-Path $HOME "dotfiles\hypershell\modules"
 
-# Load all modules
-$moduleFiles = @(
-    "core.ps1",
-    "prompt.ps1",
-    "aliases.ps1",
-    "navigation.ps1",
-    "fzf.ps1",
-    "git.ps1",
-    "wsl.ps1",
-    "utils.ps1",
-    "java.ps1"
-)
-
-foreach ($module in $moduleFiles) {
-    $modulePath = Join-Path $modulesDir $module
-    if (Test-Path $modulePath) {
-        . $modulePath
+# Load all .ps1 files from the modules directory
+if (Test-Path $modulesDir) {
+    Get-ChildItem -Path $modulesDir -Filter "*.ps1" | ForEach-Object {
+        try {
+            . $_.FullName
+        }
+        catch {
+            Write-Warning "Failed to load module: $($_.Name)`nError: $($_.Exception.Message)"
+        }
     }
-    else {
-        Write-Warning "Module not found: $module at $modulePath"
-    }
+}
+else {
+    Write-Warning "Modules directory not found at: $modulesDir"
 }
 
 # Show startup banner
