@@ -14,7 +14,8 @@ $moduleFiles = @(
     "fzf.ps1",
     "git.ps1",
     "wsl.ps1",
-    "utils.ps1"
+    "utils.ps1",
+    "java.ps1"
 )
 
 foreach ($module in $moduleFiles) {
