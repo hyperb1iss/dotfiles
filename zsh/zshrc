@@ -9,17 +9,6 @@ HISTSIZE=50000
 SAVEHIST=50000
 HISTFILE=~/.zsh_history
 
-# Normalize path to use ~ for home directory
-normalize_path() {
-    echo "${PWD/#$HOME/~}"
-}
-
-# Set the terminal title to user@host: normalized_path
-precmd() {
-    local normalized_path=$(normalize_path)
-    echo -ne "\033]0;${USER}@${HOSTNAME}: ${normalized_path}\007"
-}
-
 # Source custom configurations
 source ~/dev/dotfiles/zsh/completion.zsh
 

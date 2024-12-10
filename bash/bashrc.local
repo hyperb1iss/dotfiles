@@ -32,23 +32,5 @@ bind '"\e[Z":menu-complete-backward'  # Shift+Tab to cycle backwards
 bind 'set show-all-if-ambiguous on'   # Show options on first TAB
 bind 'set menu-complete-display-prefix on'  # Show the common prefix while cycling
 
-# Terminal title function (bash-specific implementation)
-function normalize_path() {
-    echo "${PWD/#$HOME/\~}"
-}
-
-function _update_terminal_title() {
-    local title_prefix=""
-    local normalized_path=$(normalize_path)
-    
-    # Add target product prefix for Android development if applicable
-    [ ! -z "$TARGET_PRODUCT" ] && title_prefix="[${TARGET_PRODUCT}-${TARGET_BUILD_VARIANT}] "
-    
-    # Set the terminal title
-    echo -ne "\033]0;${title_prefix}${debian_chroot:+($debian_chroot)}${USER}@${HOSTNAME}: ${normalized_path}\007"
-}
-
-PROMPT_COMMAND="_update_terminal_title"
-
 # Source common shell configurations
 source ~/dev/dotfiles/sh/shell-common.sh

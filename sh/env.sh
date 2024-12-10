@@ -8,7 +8,6 @@ fi
 
 # Development tool configurations
 export USE_CCACHE=1
-export CCACHE_DIR=/b/.ccache
 export CCACHE_EXEC=/usr/bin/ccache
 
 # AWS and Kubernetes configurations
