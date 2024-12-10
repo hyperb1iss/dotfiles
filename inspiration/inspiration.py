@@ -98,10 +98,15 @@ def print_beautiful_quote(quote_data):
     # quote_data is expected to be [quote, attribution, context, emoji]
     quote, attribution, context, emoji = quote_data
 
-    # Get terminal width for wrapping
-    term_width = os.get_terminal_size().columns
-    # Use 80% of terminal width, with minimum 2 spaces on each side
-    text_width = max(int(term_width * 0.8), term_width - 4)
+    # Get terminal width with fallback to minimum of 80
+    try:
+        term_width = max(os.get_terminal_size().columns, 80)
+    except OSError:
+        # Fallback if terminal size detection fails
+        term_width = 80
+
+    # Use 80% of terminal width, with minimum of 80 characters
+    text_width = max(int(term_width * 0.8), 80)
 
     # Format the attribution line with context if it exists
     # Store color codes separately to avoid them being part of the text wrapping calculation
