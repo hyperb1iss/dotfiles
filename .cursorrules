@@ -1,0 +1,69 @@
+# Cursor Rules for Stefanie'sDotfiles Project
+
+# Project Structure
+structure:
+  - dotfiles should be organized by tool/application
+  - configuration files should be placed in their respective tool directories
+  - use symbolic links to map configurations to their system locations
+
+# Package Management
+packages:
+  - prefer official package repositories over manual installations
+  - maintain separate package lists for different distributions
+  - document all package dependencies clearly
+  - specify version constraints only when necessary
+
+# Compatibility 
+compatibility:
+  - ensure compatibility with Arch Linux and Debian based systems
+  - ensure compatibility with Windows 11
+  - we target PowerShell 7 on Windows
+  - ensure compatibility with zsh and bash
+
+# Code Style
+style:
+  - use clear, descriptive names for files and directories
+  - maintain consistent indentation (2 spaces preferred)
+  - include comments for complex configurations
+  - keep configurations modular and well-organized
+
+# Shell Scripts
+shell:
+  - prefer POSIX-compliant shell scripting
+  - use zsh for interactive shell configurations
+  - implement error handling in scripts
+  - make scripts portable across Unix-like systems
+
+# Documentation
+docs:
+  - maintain clear README files
+  - document installation steps
+  - explain configuration options
+  - include usage examples
+  - note system requirements
+
+# Version Control
+git:
+  - use meaningful commit messages
+  - group related changes in single commits
+  - maintain a clean git history
+  - ignore system-specific and sensitive files
+
+# Security
+security:
+  - never commit sensitive information or tokens
+  - use environment variables for secrets
+  - implement proper file permissions
+  - validate external scripts before sourcing
+
+# Testing
+testing:
+  - test configurations in isolated environments
+  - verify compatibility across different systems
+  - validate symbolic links
+  - check for syntax errors in config files 
+
+# Theme
+theme:
+  - use a consistent color scheme for all files and directories
+  - ensure that the theme is beautiful and functional
