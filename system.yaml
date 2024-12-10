@@ -9,28 +9,28 @@
     /etc/sysctl.d/50-inotify.conf: sysctl.d/50-inotify.conf
 
 - shell:
-    -
-      command: add-apt-repository -y ppa:longsleep/golang-backports
+    - 
+      command: |
+        if command -v pacman >/dev/null 2>&1; then
+          # Arch Linux setup
+          sudo pacman -Syu --noconfirm
+          sudo pacman -S --needed --noconfirm $(grep -v '^#\|^$' packages_arch.txt)
+        else
+          # Ubuntu/Debian setup
+          sudo add-apt-repository -y ppa:longsleep/golang-backports
+          sudo add-apt-repository -y ppa:git-core/ppa
+          sudo add-apt-repository -y ppa:openjdk-r/ppa
+          sudo apt update
+          grep -v '^#\|^$' packages.txt | xargs sudo apt install -y
+        fi
       stderr: true
       stdout: true
     -
-      command: add-apt-repository -y ppa:git-core/ppa
+      command: |
+        if command -v update-alternatives >/dev/null 2>&1; then
+          sudo update-alternatives --install /usr/bin/editor editor /usr/bin/nvim 60
+          sudo update-alternatives --install /usr/bin/vim vim /usr/bin/nvim 60
+        fi
       stderr: true
       stdout: true
-    -
-      command: add-apt-repository -y ppa:openjdk-r/ppa
-      stderr: true
-      stdout: true
-    -
-      command: apt update
-      stderr: true
-      stdout: true
-    -
-      command: grep -v '^#\|^$' packages.txt | xargs apt install -y
-      stderr: true
-      stdout: true
-    -
-      command: update-alternatives --install /usr/bin/editor editor /usr/bin/nvim 60
-    -
-      command: update-alternatives --install /usr/bin/vim vim /usr/bin/nvim 60
 

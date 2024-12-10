@@ -23,10 +23,28 @@ precmd() {
 # Source custom configurations
 source ~/dev/dotfiles/zsh/completion.zsh
 
-# Source system-provided utilities
-source /usr/share/zsh-autosuggestions/zsh-autosuggestions.zsh
-source /usr/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
-source /etc/zsh_command_not_found
+# Source system-provided utilities with distribution-specific paths
+# Arch Linux paths
+if [ -f /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh ]; then
+    source /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
+# Ubuntu paths
+elif [ -f /usr/share/zsh-autosuggestions/zsh-autosuggestions.zsh ]; then
+    source /usr/share/zsh-autosuggestions/zsh-autosuggestions.zsh
+fi
+
+# Syntax highlighting
+if [ -f /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh ]; then
+    source /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+elif [ -f /usr/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh ]; then
+    source /usr/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+fi
+
+# Command not found handler
+if [ -f /usr/share/doc/pkgfile/command-not-found.zsh ]; then
+    source /usr/share/doc/pkgfile/command-not-found.zsh
+elif [ -f /etc/zsh_command_not_found ]; then
+    source /etc/zsh_command_not_found
+fi
 
 # Load shell utilities and extensions
 source ~/dev/dotfiles/sh/shell-common.sh

@@ -1,0 +1,61 @@
+# Basic development tools
+base-devel
+cmake
+curl
+fd
+git
+go
+inetutils
+neovim
+ninja
+pkg-config
+python
+python-pip
+python-pynvim
+ripgrep
+rustup
+tree
+wget
+zsh
+zsh-autosuggestions
+zsh-completions
+zsh-syntax-highlighting
+
+# Compiler and toolchain
+ccache
+clang
+lld
+llvm
+
+# Linux kernel build dependencies
+bc
+bison
+cpio
+dtc
+elfutils
+flex
+kmod
+ncurses
+openssl
+uboot-tools
+
+# AOSP build dependencies
+android-tools
+jdk-openjdk
+lib32-gcc-libs
+libxml2
+libxslt
+mesa
+ncurses
+perl-xml-simple
+repo
+unzip
+xorgproto
+zlib
+
+# System utilities
+ca-certificates
+gnupg
+gperf
+pkgfile
+rsync 
