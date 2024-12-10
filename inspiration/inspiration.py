@@ -6,8 +6,9 @@ from a CSV file. Supports colored output, word wrapping, and terminal-aware form
 """
 
 import csv
-import random
 import os
+import random
+import re
 import textwrap
 
 # Colors from starship theme
@@ -22,11 +23,29 @@ FG_ORANGE = "\033[38;2;204;81;59m"  # #cc513b
 
 
 def wrap_text(text, width, initial_indent, subsequent_indent):
-    """Wrap text with proper indentation."""
-    # Account for ANSI color codes in width calculation
+    """
+    Wrap text with proper indentation, accounting for ANSI color codes.
+
+    Args:
+        text (str): The text to wrap
+        width (int): The maximum width of wrapped lines
+        initial_indent (str): Indentation for the first line
+        subsequent_indent (str): Indentation for subsequent lines
+    """
+
+    def strip_ansi(s):
+        # Remove ANSI escape codes when calculating text width
+        return re.compile(r"\x1b[^m]*m").sub("", s)
+
+    # Adjust width calculations by removing ANSI codes
+    effective_init_indent = len(strip_ansi(initial_indent))
+
+    # Adjust the wrapping width to account for the real indent length
+    effective_width = width + (len(initial_indent) - effective_init_indent)
+
     wrapped = textwrap.fill(
         text,
-        width=width,
+        width=effective_width,
         initial_indent=initial_indent,
         subsequent_indent=subsequent_indent,
         break_long_words=True,
@@ -81,13 +100,16 @@ def print_beautiful_quote(quote_data):
 
     # Get terminal width for wrapping
     term_width = os.get_terminal_size().columns
-    # Leave some margin on both sides
-    text_width = term_width - 4  # 2 spaces on each side
+    # Use 80% of terminal width, with minimum 2 spaces on each side
+    text_width = max(int(term_width * 0.8), term_width - 4)
 
     # Format the attribution line with context if it exists
-    attribution_text = f"✧ {attribution}"
+    # Store color codes separately to avoid them being part of the text wrapping calculation
+    attribution_prefix = f"{BOLD}{FG_PINK}✧ {RESET}{FG_ORANGE}"
     if context.strip():
-        attribution_text = f"✧ {attribution} {FG_RED}({context}){FG_ORANGE}"
+        attribution_text = f"{attribution} ({context})"
+    else:
+        attribution_text = attribution
 
     # Add decorative top accent
     print()
@@ -97,12 +119,12 @@ def print_beautiful_quote(quote_data):
     quote_initial_indent = f'  {FG_ORANGE}{emoji}{RESET} {BOLD}{FG_MAGENTA}"'
     quote_subsequent_indent = "     " + f"{BOLD}{FG_MAGENTA}"
     wrapped_quote = wrap_text(
-        quote, text_width - 5, quote_initial_indent, quote_subsequent_indent
+        f"{BOLD}{quote}", text_width - 5, quote_initial_indent, quote_subsequent_indent
     )
     print(f'{wrapped_quote}"{RESET}')
 
     # Wrap and print the attribution
-    attr_initial_indent = "      " + f"{FG_ORANGE}"
+    attr_initial_indent = "      " + attribution_prefix
     attr_subsequent_indent = "      " + f"{FG_ORANGE}"
     wrapped_attr = wrap_text(
         attribution_text, text_width - 5, attr_initial_indent, attr_subsequent_indent
