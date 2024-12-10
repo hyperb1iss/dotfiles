@@ -17,5 +17,13 @@ done
 # Load private configurations if they exist
 [ -f ~/.rc.local ] && source ~/.rc.local
 
-# Initialize Starship prompt (moved to the end)
+# Initialize Starship prompt
 eval "$(starship init ${SHELL_NAME:-$([[ -n "$ZSH_VERSION" ]] && echo "zsh" || echo "bash")})"
+
+# Show inspirational quote for interactive shells
+if [[ $- == *i* ]]; then
+    # Check if Python and the script exist
+    if command -v python3 >/dev/null 2>&1 && [ -f ~/dev/dotfiles/inspiration/inspiration.py ]; then
+        python3 ~/dev/dotfiles/inspiration/inspiration.py
+    fi
+fi
