@@ -20,5 +20,16 @@ else {
     Write-Warning "Modules directory not found at: $modulesDir"
 }
 
-# Show startup banner
+# Show startup banner and inspiration quote
 Show-HyperShellStartup
+
+# Run inspiration script
+$inspirationScript = Join-Path $HOME "dotfiles\inspiration\inspiration.py"
+if (Test-Path $inspirationScript) {
+    try {
+        python $inspirationScript
+    }
+    catch {
+        Write-Warning "Failed to run inspiration script`nError: $($_.Exception.Message)"
+    }
+}
