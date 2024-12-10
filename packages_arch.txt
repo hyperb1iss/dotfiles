@@ -11,9 +11,11 @@ ninja
 pkg-config
 python
 python-pip
+python-pylint
 python-pynvim
 ripgrep
 rustup
+tmux
 tree
 wget
 zsh
@@ -26,6 +28,30 @@ ccache
 clang
 lld
 llvm
+shellcheck
+
+# Development utilities
+docker
+docker-compose
+jq
+yq
+lazygit
+meld
+shellcheck
+tig
+
+# System utilities
+ca-certificates
+gnupg
+gperf
+htop
+iotop
+ncdu
+pkgfile
+plocate
+rsync
+strace
+sysstat
 
 # Linux kernel build dependencies
 bc
@@ -53,9 +79,11 @@ unzip
 xorgproto
 zlib
 
-# System utilities
-ca-certificates
-gnupg
-gperf
-pkgfile
-rsync 
+# Archive utilities
+p7zip
+zip
+unzip
+xz
+lzop
+lrzip
+bzip2
