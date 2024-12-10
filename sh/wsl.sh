@@ -5,41 +5,10 @@
 if grep -qi microsoft /proc/version 2>/dev/null; then
     # Detect Windows username and set $W
     if [ -z "$W" ]; then
-        # Try multiple methods to find Windows username
-        if [ -n "$WSLENV" ] && [ -n "$USERNAME" ]; then
-            # Use WSL-passed username if available
-            export W="/mnt/c/Users/$USERNAME"
+        WIN_USERNAME=$(powershell.exe -Command '[System.Environment]::UserName' | tr -d '\r')
+        if [ -n "$WIN_USERNAME" ] && [ -d "/mnt/c/Users/$WIN_USERNAME" ]; then
+            export W="/mnt/c/Users/$WIN_USERNAME"
         else
-            # Try getting Windows username directly from CMD first (most reliable)
-            win_user=$(cmd.exe /c "echo %USERNAME%" 2>/dev/null | tr -d '\r\n')
-            if [ -n "$win_user" ] && [ -d "/mnt/c/Users/$win_user" ]; then
-                export W="/mnt/c/Users/$win_user"
-            else
-                # Try common locations
-                for user in "$USER" "$(whoami)"; do
-                    if [ -d "/mnt/c/Users/$user" ]; then
-                        export W="/mnt/c/Users/$user"
-                        break
-                    fi
-                done
-            fi
-        fi
-
-        # Fallback to searching Users directory if still not found
-        if [ -z "$W" ] || [ ! -d "$W" ]; then
-            # Find first real user directory, excluding system directories
-            for dir in /mnt/c/Users/*; do
-                # Skip system directories and junction points
-                if [[ -d "$dir" && ! "$dir" =~ (Public|Default|defaultuser0|All Users|Default User|desktop.ini)$ ]] &&
-                    [[ ! -L "$dir" ]]; then
-                    export W="$dir"
-                    break
-                fi
-            done
-        fi
-
-        # Verify and warn if not found
-        if [ -z "$W" ] || [ ! -d "$W" ]; then
             echo "Warning: Could not determine Windows user directory. \$W is not set." >&2
         fi
     fi
