@@ -10,10 +10,6 @@ fi
 export USE_CCACHE=1
 export CCACHE_EXEC=/usr/bin/ccache
 
-# AWS and Kubernetes configurations
-export AWS_DEFAULT_PROFILE=mason-devops
-export KUBECONFIG=$HOME/.kube/eksctl/clusters/mason-devops
-
 # Development paths
 export GOPATH=~/dev/go
 export GO15VENDOREXPERIMENT=1
