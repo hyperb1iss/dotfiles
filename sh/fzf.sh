@@ -1,6 +1,9 @@
 # fzf.sh
 # FZF configuration and custom functions shared between shells
 
+# Skip on minimal installations
+is_minimal && return 0
+
 # Initialize fzf
 if command -v fzf >/dev/null 2>&1; then
     # Set fd command name based on system

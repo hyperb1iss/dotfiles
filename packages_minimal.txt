@@ -1,6 +1,5 @@
 # Essential tools
 curl
-fzf
 git-core
 lsd
 neovim
