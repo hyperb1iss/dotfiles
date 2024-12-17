@@ -7,6 +7,7 @@
 - link:
     ~/.bashrc.local: bash/bashrc.local
     ~/.rc.local: bash/rc.local
+    ~/.dircolors:
     ~/.gitconfig:
     ~/.tmux.conf:
     ~/.zshrc: zsh/zshrc

@@ -43,8 +43,8 @@ done
 # Load private configurations if they exist
 [ -f ~/.rc.local ] && source ~/.rc.local
 
-# Initialize Starship prompt
-eval "$(starship init ${SHELL_NAME:-$([[ -n "$ZSH_VERSION" ]] && echo "zsh" || echo "bash")})"
+# Initialize Starship prompt (suppress error output on older versions)
+eval "$(starship init ${SHELL_NAME:-$([[ -n "$ZSH_VERSION" ]] && echo "zsh" || echo "bash")} 2>/dev/null)"
 
 # Show inspirational quote for interactive shells (only in full installation)
 if [[ $- == *i* ]] && is_full; then
