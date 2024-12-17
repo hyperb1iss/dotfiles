@@ -1,6 +1,9 @@
 # android.sh
 # Android development environment extensions for bash and zsh
 
+# Skip entire module if not in full installation
+is_minimal && return 0
+
 # Ensure script works in both bash and zsh
 if [ -n "$ZSH_VERSION" ]; then
     SHELL_NAME="zsh"

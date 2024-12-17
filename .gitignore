@@ -7,3 +7,4 @@ bin/repo
 nvim/lazy-lock.json
 fonts/Pragmata\ Pro
 vim/.netrwhist
+.install_state

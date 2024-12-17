@@ -2,6 +2,9 @@
 # Assumes JDKs are installed in /usr/lib/jvm/
 # Add to your .bashrc or .zshrc
 
+# Skip entire module if not in full installation
+is_minimal && return 0
+
 # Function to switch Java version
 function setjdk() {
     if [ $# -ne 1 ]; then
