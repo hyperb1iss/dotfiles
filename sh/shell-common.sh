@@ -25,10 +25,13 @@ is_full() {
     [ "$(get_installation_type)" = "full" ]
 }
 
-# Export these functions so they can be used in other scripts
-export -f get_installation_type
-export -f is_minimal
-export -f is_full
+# Make functions available in bash
+# (zsh automatically makes functions available to subshells)
+if [ -z "$ZSH_VERSION" ]; then
+    export -f get_installation_type
+    export -f is_minimal
+    export -f is_full
+fi
 
 # Source all utility scripts
 for script in ~/dev/dotfiles/sh/*.sh; do
