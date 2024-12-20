@@ -12,6 +12,21 @@ packages:
   - maintain separate package lists for different distributions
   - document all package dependencies clearly
   - specify version constraints only when necessary
+  - package lists are maintained in separate files:
+    - `packages.txt`: main package list for Linux systems
+    - `packages_arch.txt`: Arch Linux specific packages
+    - `packages_minimal.txt`: minimal set of essential packages
+  
+# Installation and Configuration
+install:
+  - dotbot yaml files control installation and linking:
+    - `minimal.yaml`: basic configuration for minimal installs
+    - `system.yaml`: system-wide configuration settings
+    - `local.yaml`: user-specific configuration and links
+    - `windows.yaml`: Windows-specific configuration
+  - Windows setup is handled by:
+    - `hypershell/setup-windows.ps1`: main Windows setup script
+    - `install.ps1`: dotbot installation wrapper for Windows
 
 # Compatibility 
 compatibility:
@@ -33,6 +48,19 @@ shell:
   - use zsh for interactive shell configurations
   - implement error handling in scripts
   - make scripts portable across Unix-like systems
+  - shell configurations are organized in three main directories:
+    - `sh/`: contains common shell modules shared between bash and zsh
+    - `bash/` and `zsh/`: Linux shell configurations that source common modules
+    - `hypershell/modules/`: PowerShell modules for Windows environments
+  - Linux shells (bash/zsh) load common functionality from sh/ directory
+  - Windows uses Microsoft.PowerShell_profile.ps1 to load hypershell/modules
+  - common modules in sh/ include configurations for:
+    - environment variables
+    - shell utilities
+    - git operations
+    - directory navigation
+    - development tools (python, java, docker)
+    - system-specific functions (WSL, Arch)
 
 # Documentation
 docs:
