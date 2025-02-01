@@ -341,5 +341,140 @@ alias gosystem='cd ${ANDROID_BUILD_TOP:-.}/system'
 alias gohw='cd ${ANDROID_BUILD_TOP:-.}/hardware'
 alias goout='cd ${OUT:-.}'
 
+# Gradle helper functions
+function gtest() {
+    local module="${1:-.}"
+    local variant="${2:-Debug}"
+    local filter="$3"
+
+    # Build command with proper test output formatting
+    local cmd="./gradlew"
+    cmd+=" ${module}:test${variant}"
+    [ -n "$filter" ] && cmd+=" --tests $filter"
+    cmd+=" -q"              # Quiet Gradle output
+    cmd+=" --console=plain" # Plain console output
+    cmd+=" --stacktrace"    # Full stacktrace for errors
+    cmd+=" -Pandroid.testInstrumentationRunnerArguments.filter=$filter"
+
+    echo "Running tests for ${module} (${variant})"
+    eval "$cmd"
+}
+
+function grun() {
+    local task="$1"
+    shift
+
+    # Build command with clean output
+    local cmd="./gradlew"
+    cmd+=" ${task}"
+    cmd+=" -q"                   # Quiet Gradle output
+    cmd+=" --console=plain"      # Plain console output
+    [ "$#" -gt 0 ] && cmd+=" $*" # Add any additional arguments
+
+    echo "Running Gradle task: ${task}"
+    eval "$cmd"
+}
+
+function gclear() {
+    echo "Cleaning Gradle caches and build files..."
+    rm -rf ~/.gradle/caches/
+    rm -rf .gradle
+    rm -rf */build
+    rm -rf build
+    ./gradlew clean
+    echo "Gradle clean complete"
+}
+
+function gdeps() {
+    local module="${1:-.}"
+    echo "Showing dependencies for ${module}"
+    ./gradlew ${module}:dependencies --configuration implementation
+}
+
+function gbuild() {
+    local variant="${1:-Debug}"
+    local module="${2:-.}"
+
+    echo "Building ${module} (${variant})"
+    ./gradlew "${module}:assemble${variant}" --console=plain
+}
+
+# Quick task to show all tasks for current project or specific module
+function gtasks() {
+    local module="${1:-.}"
+    echo "Available Gradle tasks for ${module}:"
+    ./gradlew ${module}:tasks --all
+}
+
+# Android device management with named aliases
+function adbdev() {
+    local config_file="$HOME/.adbdevs"
+    local usage="Usage:
+    adbdev <alias>            - Set ANDROID_SERIAL to the device with given alias
+    adbdev --add <alias> <serial>    - Add or update device alias
+    adbdev --remove <alias>   - Remove device alias
+    adbdev --list            - List all device aliases"
+
+    # Create config file if it doesn't exist
+    touch "$config_file" 2>/dev/null || {
+        echo "Error: Cannot create/access $config_file" >&2
+        return 1
+    }
+
+    case "${1:-}" in
+    --add)
+        if [ -z "${2:-}" ] || [ -z "${3:-}" ]; then
+            echo "$usage" >&2
+            return 1
+        fi
+        local alias="$2"
+        local serial="$3"
+        # Remove existing entry if any
+        sed -i "/$alias:/d" "$config_file"
+        # Add new entry
+        echo "$alias:$serial" >>"$config_file"
+        echo "Added device alias '$alias' for serial '$serial'"
+        ;;
+    --remove)
+        if [ -z "${2:-}" ]; then
+            echo "$usage" >&2
+            return 1
+        fi
+        local alias="$2"
+        if sed -i "/$alias:/d" "$config_file"; then
+            echo "Removed device alias '$alias'"
+        else
+            echo "Error: Could not remove alias '$alias'" >&2
+            return 1
+        fi
+        ;;
+    --list)
+        if [ ! -s "$config_file" ]; then
+            echo "No device aliases configured"
+            return 0
+        fi
+        echo "Configured device aliases:"
+        while IFS=: read -r alias serial || [ -n "$alias" ]; do
+            printf "  %-20s %s\n" "$alias" "$serial"
+        done <"$config_file"
+        ;;
+    "")
+        echo "$usage" >&2
+        return 1
+        ;;
+    *)
+        local alias="$1"
+        local serial
+        serial=$(grep "^$alias:" "$config_file" | cut -d: -f2)
+        if [ -z "$serial" ]; then
+            echo "Error: No device found with alias '$alias'" >&2
+            return 1
+        fi
+        export ANDROID_SERIAL="$serial"
+        echo "Set ANDROID_SERIAL=$ANDROID_SERIAL"
+        ;;
+    esac
+}
+
 # Ensure proper exit status
 true
