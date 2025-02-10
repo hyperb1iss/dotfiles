@@ -22,7 +22,10 @@ if (Get-Command awk.exe -ErrorAction SilentlyContinue) { New-Alias -Name awk -Va
 
 # Other Linux-like aliases
 Remove-Item Alias:cat -Force -ErrorAction SilentlyContinue
-New-Alias -Name cat -Value bat -Force
+function Invoke-Cat {
+    bat --style=plain --pager=never $args
+}
+New-Alias -Name cat -Value Invoke-Cat -Force
 New-Alias -Name less -Value bat -Force
 New-Alias -Name which -Value Get-Command -Force
 New-Alias -Name wget -Value Invoke-WebRequest -Force

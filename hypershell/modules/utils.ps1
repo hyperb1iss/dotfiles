@@ -15,7 +15,7 @@ Set-Alias -Name touch -Value New-File -Force
 # Mkdir command (creates full path)
 function New-Directory {
     param([string]$path)
-    New-Item -ItemType Directory -Force -Path $path
+    New-Item -ItemType Directory -Force -Path $path | Out-Null
 }
 Set-Alias -Name mkdir -Value New-Directory -Force
 
