@@ -1,56 +1,66 @@
 # 🪟 Windows/HyperShell Environment Documentation
 
-A comprehensive guide to the Windows-specific environment configurations, tools, and features available in HyperShell.
+This guide covers the core configuration and tools that make HyperShell on Windows a productive environment. You’ll find details on essential components, PowerShell tuning, WSL usage, handy shortcuts, Git and Docker commands, directory navigation tricks, and more. By the time you reach the end, you’ll have a Windows setup tailored for smooth development and system administration tasks.
 
 ## 📋 Table of Contents
 
 - [Core Components](#core-components)
-- [PowerShell Configuration](#powershell-configuration)
-- [WSL Integration](#wsl-integration)
-- [Tool Suite](#tool-suite)
-- [Keybindings and Shortcuts](#keybindings-and-shortcuts)
-- [Git Integration](#git-integration)
-- [Docker Integration](#docker-integration)
+- [PowerShell Configuration](#⚙️-powershell-configuration)
+- [WSL Integration](#🌐-wsl-integration)
+- [Tool Suite](#🛠️-tool-suite)
+- [Keybindings and Shortcuts](#⌨️-keybindings-and-shortcuts)
+- [Git Integration](#🔄-git-integration)
+- [Docker Integration](#🐳-docker-integration)
+- [Frequent Directory Navigation (z)](#🧭-frequent-directory-navigation-z)
+- [Android Tools](#🤖-android-tools)
+- [Java Management](#☕-java-management)
+- [Network Commands](#🌐-network-commands)
+- [Profile Management](#👤-profile-management)
+- [Terminal Customization](#🎨-terminal-customization)
+- [Maintenance](#🔧-maintenance)
 
 ## 🌟 Core Components
+
+These are the fundamental building blocks for your Windows + HyperShell setup, automatically installed via **setup-windows.ps1**.
 
 ### Essential Tools
 
 ```powershell
-# These tools are automatically installed by setup-windows.ps1
-powershell-core         # Modern PowerShell
-microsoft-windows-terminal  # Enhanced terminal
-git                    # Version control
-vscode                 # Code editor
-nodejs                 # JavaScript runtime
-python                 # Python interpreter
-rust                   # Rust toolchain
-fzf                    # Fuzzy finder
-ripgrep                # Enhanced grep
-bat                    # Enhanced cat
-lsd                    # Enhanced ls
-starship              # Cross-shell prompt
-neovim                # Text editor
+powershell-core            # Modern PowerShell
+microsoft-windows-terminal # Modern terminal
+git                        # Version control
+vscode                     # Code editor
+nodejs                     # JavaScript runtime
+python                     # Python interpreter
+rust                       # Rust toolchain
+fzf                        # Fuzzy finder
+ripgrep                    # A modern grep alternative
+bat                        # A cat clone with syntax highlighting
+lsd                        # A modern ls alternative
+starship                   # Cross-shell prompt
+neovim                     # Text editor
 ```
 
 ### Environment Variables
 
 ```powershell
 $env:FZF_DEFAULT_OPTS  # FZF configuration
-$env:EDITOR           # Default editor (nvim)
-$env:VISUAL          # Visual editor (nvim)
-$PROFILE            # PowerShell profile location
+$env:EDITOR            # Default editor (nvim)
+$env:VISUAL            # Visual editor (nvim)
+$PROFILE               # PowerShell profile location
 ```
 
-## 🛠️ PowerShell Configuration
+## ⚙️ PowerShell Configuration
+
+Fine-tune PowerShell’s behavior with PSReadLine options, custom syntax highlighting, and other settings.
 
 ### PSReadLine Settings
 
-| Setting       | Description         | Configuration                                                           |
-| ------------- | ------------------- | ----------------------------------------------------------------------- |
-| EditMode      | Emacs-style editing | `Set-PSReadLineOption -EditMode Emacs`                                  |
-| HistorySearch | Search as you type  | `Set-PSReadLineKeyHandler -Key UpArrow -Function HistorySearchBackward` |
-| MenuComplete  | Enhanced completion | `Set-PSReadLineKeyHandler -Key Tab -Function MenuComplete`              |
+| Setting       | Description           | Configuration                                                           |
+| ------------- | --------------------- | ----------------------------------------------------------------------- |
+| EditMode      | Emacs-style editing   | `Set-PSReadLineOption -EditMode Emacs`                                  |
+| HistorySearch | Search as you type    | `Set-PSReadLineKeyHandler -Key UpArrow -Function HistorySearchBackward` |
+| MenuComplete  | Menu-based completion | `Set-PSReadLineKeyHandler -Key Tab -Function MenuComplete`              |
 
 ### Syntax Highlighting
 
@@ -67,7 +77,9 @@ Set-PSReadLineOption -Colors @{
 }
 ```
 
-## 🔄 WSL Integration
+## 🌐 WSL Integration
+
+HyperShell provides commands to bridge Windows and WSL, making path conversions and cross-environment tooling straightforward.
 
 ### Path Operations
 
@@ -89,27 +101,29 @@ Set-PSReadLineOption -Colors @{
 | `wsed`  | Use WSL sed           | `wsed 's/old/new/' file` |
 | `wawk`  | Use WSL awk           | `wawk '{print $1}' file` |
 
-## 🔧 Tool Suite
+## 🛠️ Tool Suite
+
+A collection of commands to streamline file management, navigation, and system paths.
 
 ### File Operations
 
-| Command | Description                | Usage Example       |
-| ------- | -------------------------- | ------------------- |
-| `ls`    | Enhanced directory listing | `ls`                |
-| `ll`    | Long format listing        | `ll`                |
-| `la`    | Show hidden files          | `la`                |
-| `lt`    | Tree view                  | `lt`                |
-| `cat`   | Enhanced file viewing      | `cat file.txt`      |
-| `grep`  | Enhanced text search       | `grep pattern file` |
+| Command | Description              | Usage Example       |
+| ------- | ------------------------ | ------------------- |
+| `ls`    | Modern directory listing | `ls`                |
+| `ll`    | Long format listing      | `ll`                |
+| `la`    | Show hidden files        | `la`                |
+| `lt`    | Tree view                | `lt`                |
+| `cat`   | Modern file viewer       | `cat file.txt`      |
+| `grep`  | Modern text search       | `grep pattern file` |
 
 ### Navigation
 
-| Command                   | Description                | Usage Example     |
-| ------------------------- | -------------------------- | ----------------- |
-| `Set-LocationWithHistory` | Enhanced cd with history   | `cd -`            |
-| `mkcd`                    | Create and enter directory | `mkcd new-folder` |
-| `up`                      | Go up directories          | `up 2`            |
-| `fcd`                     | Fuzzy directory navigation | `fcd`             |
+| Command                   | Description                              | Usage Example     |
+| ------------------------- | ---------------------------------------- | ----------------- |
+| `Set-LocationWithHistory` | Change directories with history tracking | `cd -`            |
+| `mkcd`                    | Create and enter directory               | `mkcd new-folder` |
+| `up`                      | Go up directories                        | `up 2`            |
+| `fcd`                     | Fuzzy directory navigation               | `fcd`             |
 
 ### Path Management
 
@@ -120,6 +134,8 @@ Set-PSReadLineOption -Colors @{
 | `Update-SystemPath` | Refresh PATH       | `Update-SystemPath`          |
 
 ## ⌨️ Keybindings and Shortcuts
+
+HyperShell maps many commands to keyboard shortcuts that save time and keep your fingers on the home row.
 
 ### FZF Integration
 
@@ -138,6 +154,8 @@ Set-PSReadLineOption -Colors @{
 | `Ctrl+LeftArrow`  | Backward word | Move cursor backward one word |
 
 ## 🔄 Git Integration
+
+Simplify Git commands with these aliases and interactive helpers.
 
 ### Basic Git Commands
 
@@ -160,63 +178,110 @@ Set-PSReadLineOption -Colors @{
 
 ## 🐳 Docker Integration
 
+Manage containers and images with short aliases.
+
 ### Basic Commands
 
-| Command | Description     | Usage Example          |
-| ------- | --------------- | ---------------------- |
-| `dps`   | List containers | `dps`                  |
-| `di`    | List images     | `di`                   |
-| `dlog`  | Container logs  | `dlog container-name`  |
-| `dstop` | Stop container  | `dstop container-name` |
+| Command | Description      | Usage Example          |
+| ------- | ---------------- | ---------------------- |
+| `dps`   | List containers  | `dps`                  |
+| `di`    | List images      | `di`                   |
+| `dlog`  | Container logs   | `dlog container-name`  |
+| `dstop` | Stop a container | `dstop container-name` |
 
-## 🔄 Profile Management
+## 🧭 Frequent Directory Navigation (z)
+
+HyperShell includes a port of the **z** directory jumper (`z.ps1`). It tracks how often and how recently you visit directories, then helps you jump to them quickly:
+
+- **`z [options] <query>`**: Jump to the directory matching `<query>` (using a frecency algorithm).
+- **`-l, --list`**: List matching directories.
+- **`-r, --rank`**: Use rank (frequency) only.
+- **`-t, --recent`**: Use recent (time-based) only.
+- **`-c, --current`**: Restrict matches to subdirectories of the current directory.
+- **`-e, --echo`**: Echo the best match without switching directories.
+- **`-x, --remove`**: Remove a directory from tracking.
+- **`--add`**: Manually add a directory to the database.
+
+## 🤖 Android Tools
+
+For anyone working with multiple Android devices, **android.ps1** provides `Set-AndroidDevice` (aliased as `adbdev`):
+
+- **`adbdev --list`**: Lists all configured device aliases.
+- **`adbdev --add <alias> <serial>`**: Creates or updates an alias for a device by serial number.
+- **`adbdev --remove <alias>`**: Removes a device alias.
+- **`adbdev <alias>`**: Sets `$env:ANDROID_SERIAL` to the chosen alias.
+
+## ☕ Java Management
+
+Use **java.ps1** to handle multiple JDK installations. Switch versions and automatically update environment variables:
+
+- **`setjdk <version>`**: Switches the default Java version (e.g., `setjdk 11`).
+- **`javalist`**: Shows all available Java installations and highlights the active one.
+- **`java<version>`**: A quick alias to set a particular version (e.g., `java17`).
+
+When you switch, `$JAVA_HOME` and your `PATH` are updated so that the correct tools are always in use.
+
+## 🌐 Network Commands
+
+The **network.ps1** module gives you convenient shortcuts for common network diagnostics:
+
+- **`testport <host> <port>`**: Checks whether a port is open on a given host.
+- **`flushdns`**: Clears the DNS resolver cache.
+- **`pubip`**: Shows your public IP address.
+- **`port <port>`**: Identifies which process is bound to a given port.
+- **`nics`**: Lists interface details (status, speed, MAC, etc.).
+- **`netcons`**: Displays active TCP connections and the processes that own them.
+
+## 👤 Profile Management
+
+Keep your customizations separate and easily reloaded.
 
 ### Profile Operations
 
 | Command                  | Description          | Usage Example            |
 | ------------------------ | -------------------- | ------------------------ |
-| `reload`                 | Reload profile       | `reload`                 |
-| `$PROFILE`               | Edit profile         | `nvim $PROFILE`          |
+| `reload`                 | Reloads your profile | `reload`                 |
+| `$PROFILE`               | Edit main profile    | `nvim $PROFILE`          |
 | `Show-HyperShellStartup` | Show welcome message | `Show-HyperShellStartup` |
 
 ### Customization
 
-The PowerShell profile is located at:
-
-```powershell
-~/Documents/PowerShell/Microsoft.PowerShell_profile.ps1
-```
-
-To add custom configurations:
-
-1. Create `user_profile.ps1` in the same directory
-2. Add your customizations
-3. They will be automatically loaded
+- The main PowerShell profile is stored at:
+  ```powershell
+  ~/Documents/PowerShell/Microsoft.PowerShell_profile.ps1
+  ```
+- To add your own configuration:
+  1. Create `user_profile.ps1` in the same folder.
+  2. Place your customizations in `user_profile.ps1`.
+  3. They’ll be automatically loaded whenever you start PowerShell.
 
 ## 🎨 Terminal Customization
 
+Make your terminal your own by tweaking settings and applying custom themes.
+
 ### Windows Terminal Settings
 
-- Location: `%LOCALAPPDATA%\Packages\Microsoft.WindowsTerminal_<hash>\LocalState\settings.json`
-- Key settings:
-  - Font: Pragmata Pro (or other Nerd Font)
+- **Location:**  
+  `%LOCALAPPDATA%\Packages\Microsoft.WindowsTerminal_<hash>\LocalState\settings.json`
+- **Key settings:**
+  - Font: Pragmata Pro (or another Nerd Font)
   - Color scheme: Dracula
   - Cursor shape: Underscore
   - Background opacity: 95%
 
 ### Starship Prompt
 
-- Configuration: `~/.config/starship.toml`
-- Customizable segments:
+- **Configuration file:** `~/.config/starship.toml`
+- **Customizable segments:**
   - Directory
   - Git status
-  - Python version
-  - Node.js version
-  - Rust version
+  - Python/Node.js/Rust version
   - Command duration
   - Exit status
 
 ## 🔧 Maintenance
+
+Regular updates keep your environment stable.
 
 ### Updates
 
@@ -238,21 +303,21 @@ git pull
 
 ### Troubleshooting
 
-1. Profile not loading:
+1. **Profile not loading**:
 
    ```powershell
    Test-Path $PROFILE  # Check if profile exists
-   . $PROFILE         # Manually load profile
+   . $PROFILE          # Manually load profile
    ```
 
-2. Path issues:
+2. **Path issues**:
 
    ```powershell
-   Update-SystemPath  # Refresh PATH
+   Update-SystemPath   # Refresh PATH
    ```
 
-3. WSL connectivity:
+3. **WSL connectivity**:
    ```powershell
-   wsl --shutdown     # Restart WSL
-   wsl --status      # Check WSL status
+   wsl --shutdown      # Restart WSL
+   wsl --status        # Check WSL status
    ```
