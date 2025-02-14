@@ -22,6 +22,9 @@ Set-Alias -Name gf -Value Invoke-GitFetch
 function Invoke-GitCheckout { git checkout $args }
 Set-Alias -Name gco -Value Invoke-GitCheckout
 
+function Invoke-GitCherryPick { git cherry-pick $args }
+Set-Alias -Name gcp -Value Invoke-GitCherryPick
+
 # Interactive git add with FZF
 function Add-FzfGitChanges {
     $files = git status -s |
