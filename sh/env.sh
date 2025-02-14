@@ -20,8 +20,12 @@ export ANDROID_NDK_HOME=~/Android/android-ndk-r21e
 export VISUAL=nvim
 export EDITOR="$VISUAL"
 
-# Add bat alias
-alias bat="batcat"
+# Set up bat/batcat aliases based on what's available
+if command -v batcat >/dev/null 2>&1; then
+    alias bat="batcat"
+elif command -v bat >/dev/null 2>&1; then
+    alias batcat="bat"
+fi
 
 # HOSTNAME
 export HOSTNAME=$(hostname)

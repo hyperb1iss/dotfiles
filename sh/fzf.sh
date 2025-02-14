@@ -16,8 +16,15 @@ if command -v fzf >/dev/null 2>&1; then
     # Default options
     export FZF_DEFAULT_OPTS="--height 40% --layout=reverse --border"
     
+    # Determine which bat command to use
+    if command -v batcat >/dev/null 2>&1; then
+        BAT_COMMAND="batcat"
+    else
+        BAT_COMMAND="bat"
+    fi
+    
     # Preview options for file operations
-    FZF_FILE_PREVIEW="--preview 'batcat --color=always --style=numbers --line-range=:500 {}'"
+    FZF_FILE_PREVIEW="--preview '$BAT_COMMAND --color=always --style=numbers --line-range=:500 {}'"
     
     export FZF_DEFAULT_COMMAND="$FD_COMMAND --type f --hidden --follow --exclude .git"
     export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
