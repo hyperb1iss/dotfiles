@@ -2,7 +2,7 @@
 
 # Function to run Linux commands from PowerShell
 function Invoke-WSLCommand {
-    wsl.exe $args
+    wsl.exe -e $args
 }
 Set-Alias -Name wsl -Value Invoke-WSLCommand
 
