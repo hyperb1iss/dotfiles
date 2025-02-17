@@ -35,3 +35,21 @@ function Update-Title {
 # Initial title update
 $initialPath = Get-NormalizedPath -Path $PWD.Path
 Update-Title "HyperShell - $initialPath" 
+
+# Capture and wrap the original prompt function to update the title on every prompt
+
+if ($function:prompt) {
+    # Save the original Starship prompt function in a global variable
+    $global:__OriginalStarshipPrompt = $function:prompt
+  
+    function prompt {
+        # Check if directory has changed since the last prompt
+        if (-not $global:__LastPromptPath -or $global:__LastPromptPath -ne $PWD) {
+            $global:__LastPromptPath = $PWD
+            $currentPath = Get-NormalizedPath -Path $PWD.Path
+            Update-Title "HyperShell - $currentPath"
+        }
+        # Call the original Starship prompt to render the usual prompt
+        & $global:__OriginalStarshipPrompt
+    }
+}
