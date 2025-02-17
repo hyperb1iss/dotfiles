@@ -1,6 +1,12 @@
 # Microsoft.PowerShell_profile.ps1
+#
 # HyperShell: A high-tech, Linux-inspired environment for Windows PowerShell
+#
+# Copyright (c) 2024 Stefanie Jane
+# Licensed under the MIT License. See LICENSE file for more info.
+#
 # https://github.com/hyperbliss/dotfiles/hypershell
+#
 
 # Get the directory containing the modules
 $modulesDir = Join-Path $HOME "dotfiles\hypershell\modules"

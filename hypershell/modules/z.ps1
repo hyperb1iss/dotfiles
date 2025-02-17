@@ -1,7 +1,8 @@
 # z.ps1 - Hypershell Directory Tracker and Jumper
-
-# Copyright (c) 2025 Stefanie Jane. Licensed under the WTFPL license, Version 2
-# Original z.sh Copyright (c) 2009 rupa deadwyler. Licensed under the WTFPL license, Version 2
+#
+# Copyright (c) 2025 Stefanie Jane
+# Original z.sh Copyright (c) 2009 rupa deadwyler
+# Licensed under the WTFPL license, Version 2
 #
 # Description:
 #   This PowerShell script is a port of z.sh, providing functionality to track frequently used directories
@@ -433,7 +434,6 @@ function z {
         Write-Host "  -e, --echo      Echo the best match without changing directory"
         Write-Host "  -x, --remove    Remove current directory from tracking"
         Write-Host "  --add           Add a directory to the database"
-        Write-Host "  --complete      (Not implemented) Tab completion"
         return
     }
 
