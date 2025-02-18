@@ -54,9 +54,9 @@ function Invoke-AndroidTest {
     }
 
     if (-not $TestName) {
-        # Run all tests when no specific test is provided
-        Write-Host "Running all tests..."
-        Invoke-GradleWrapper "test" $GradleArgs
+        # Run testDebug when no specific test is provided
+        Write-Host "Running debug tests..."
+        Invoke-GradleWrapper "testDebug" $GradleArgs
         return
     }
 
