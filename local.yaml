@@ -46,6 +46,11 @@
     ~/.tmux/plugins/tpm: tpm
 
 - shell:
+    - mkdir -p ~/.config/procs
+- link:
+    ~/.config/procs/config.toml: procs/config.toml
+
+- shell:
     - cargo install starship
     - mkdir -p ~/.config/starship
 - link:

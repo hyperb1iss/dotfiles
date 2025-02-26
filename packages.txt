@@ -62,4 +62,5 @@ ca-certificates
 gnupg
 gperf
 rsync
-software-properties-common 
+procs 
+software-properties-common

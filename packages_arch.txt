@@ -50,6 +50,7 @@ iotop
 ncdu
 pkgfile
 plocate
+procs
 rsync
 strace
 sysstat
