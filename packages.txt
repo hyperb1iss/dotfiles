@@ -15,6 +15,7 @@ python3-neovim
 python3-pip
 ripgrep
 tree
+zoxide
 zsh
 zsh-autosuggestions
 zsh-syntax-highlighting

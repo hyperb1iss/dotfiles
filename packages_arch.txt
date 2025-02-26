@@ -18,6 +18,7 @@ rustup
 tmux
 tree
 wget
+zoxide
 zsh
 zsh-autosuggestions
 zsh-completions

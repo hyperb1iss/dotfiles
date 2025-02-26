@@ -44,7 +44,8 @@ choco upgrade -y `
     bzip2 `
     openssh `
     make `
-    delta
+    delta `
+    zoxide
 
 
 # Diagnostic function
@@ -194,6 +195,22 @@ if ($nvimPath) {
 else {
     Write-Host "Neovim (nvim) not found in PATH. Please ensure it's installed correctly." -ForegroundColor Red
 }
+
+# Install zoxide via cargo if not already installed
+if (!(Get-Command zoxide -ErrorAction SilentlyContinue)) {
+    Write-Host "Installing zoxide via cargo..." -ForegroundColor Yellow
+    if (Get-Command cargo -ErrorAction SilentlyContinue) {
+        cargo install zoxide
+        Write-Host "zoxide installed successfully." -ForegroundColor Green
+    }
+    else {
+        Write-Host "Cargo not found. Please install Rust and Cargo first." -ForegroundColor Red
+    }
+}
+else {
+    Write-Host "zoxide is already installed." -ForegroundColor Green
+}
+
 # Enable Developer Mode
 Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModelUnlock" -Name "AllowDevelopmentWithoutDevLicense" -Value 1
 
