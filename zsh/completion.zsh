@@ -50,3 +50,20 @@ zstyle ':completion:*:descriptions' format '%B%F{blue}%d%b%f'
 zstyle ':completion:*:messages' format '%B%F{yellow}%d%b%f'
 zstyle ':completion:*:warnings' format '%B%F{red}%d%b%f'
 
+# Enable automatic correction of commands (but not arguments)
+setopt correct
+# setopt correctall  # Disabled: too aggressive for arguments
+
+# Customize the correction prompt
+SPROMPT="Correct '%R' to '%r'? [Yes/No/Edit/Abort] "
+
+# Make correction more precise for commands
+zstyle ':completion:*:correct:*' original true
+zstyle ':completion:*:correct:*' insert-unambiguous true
+zstyle ':completion:*:approximate:*' max-errors 1 numeric  # Less aggressive correction
+
+# Enhance filename correction
+zstyle ':completion:*' completer _complete _match _approximate
+zstyle ':completion:*:match:*' original only
+zstyle ':completion:*:approximate:*' max-errors 1 numeric
+
