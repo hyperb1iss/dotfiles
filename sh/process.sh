@@ -26,10 +26,10 @@ if command -v procs >/dev/null 2>&1; then
         procs "$@"
     }
 
-    # Kill processes matching pattern (with confirmation)
-    pkill() {
+    # Kill processes matching pattern
+    pk() {
         if [ $# -eq 0 ]; then
-            echo "Usage: pkill <pattern>"
+            echo "Usage: pk <pattern>"
             return 1
         fi
 
@@ -44,16 +44,7 @@ if command -v procs >/dev/null 2>&1; then
         echo "The following processes will be terminated:"
         procs "$pattern"
 
-        echo -n "Proceed? [y/N] "
-        read confirm
-
-        if [ "$confirm" = "y" ] || [ "$confirm" = "Y" ]; then
-            echo "Terminating processes..."
-            kill $pids
-            echo "Done."
-        else
-            echo "Operation cancelled."
-        fi
+        kill $pids
     }
 fi
 
