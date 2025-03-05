@@ -169,20 +169,245 @@ function get_device() {
     fi
 }
 
-# Enhanced logcat with device selection
+# Enhanced logcat with device selection and colorization
 function logcat() {
-    local device filters
+    local device colorize
+
+    # Default to colorized output
+    colorize=true
+
+    # Check if the first argument is --no-color
+    if [ "${1:-}" = "--no-color" ]; then
+        colorize=false
+        shift
+    fi
+
     device=$(get_device)
     [ $? -ne 0 ] && return 1
 
-    if [ $# -eq 0 ]; then
-        adb -s "$device" logcat -C
-    else
-        filters=""
+    # Handle zsh globbing
+    if [ "$SHELL_NAME" = "zsh" ]; then
+        # Disable glob pattern expansion for this function
+        setopt local_options no_nomatch
+    fi
+
+    # Build the adb command using arrays to avoid shell expansion issues
+    local adb_cmd=("adb" "-s" "$device" "logcat")
+
+    if [ $# -gt 0 ]; then
+        # Build tag filters
+        local tag_filters=()
         for arg in "$@"; do
-            filters="$filters $arg:*"
+            adb_cmd+=("$arg:*")
         done
-        adb -s "$device" logcat $filters *:S
+
+        # Add silence filter for other tags
+        adb_cmd+=("*:S")
+
+        # Log command for user info
+        echo "🚀 Running: ${adb_cmd[*]}"
+    fi
+
+    # Execute command with or without colorization
+    if [ "$colorize" = true ]; then
+        "${adb_cmd[@]}" | colorize_logcat
+    else
+        "${adb_cmd[@]}"
+    fi
+}
+
+# Logcat colorizer function
+function colorize_logcat() {
+    # violet circuit color codes
+    local RED='\033[38;5;197m'     # Hot pink-red for errors
+    local ORANGE='\033[38;5;203m'  # Vibrant orange for warnings
+    local MAGENTA='\033[38;5;171m' # Bright magenta for info
+    local PURPLE='\033[38;5;141m'  # Lavender purple for debug
+    local BLUE='\033[38;5;75m'     # Soft blue for verbose
+    local CYAN='\033[38;5;123m'    # Cyan for markers
+    local PINK='\033[38;5;219m'    # Pink for special highlights
+    local YELLOW='\033[38;5;227m'  # Bright yellow for emphasis
+    local RESET='\033[0m'
+    local BOLD='\033[1m'
+
+    # Read logcat output line by line
+    while IFS= read -r line; do
+        # Check for beginning markers first to avoid grep errors
+        if [[ "$line" == *"--------- beginning of"* ]]; then
+            # Log markers - bright cyan
+            echo -e "${BOLD}${CYAN}${line}${RESET}"
+            continue
+        fi
+
+        # Color based on log level using safer pattern matching
+        if [[ "$line" == *" E "* ]]; then
+            # Error - hot pink-red with bold
+            echo -e "${BOLD}${RED}${line}${RESET}"
+        elif [[ "$line" == *" W "* ]]; then
+            # Warning - vibrant orange
+            echo -e "${ORANGE}${line}${RESET}"
+        elif [[ "$line" == *" I "* ]]; then
+            # Info - bright magenta
+            echo -e "${MAGENTA}${line}${RESET}"
+        elif [[ "$line" == *" D "* ]]; then
+            # Debug - lavender purple
+            echo -e "${PURPLE}${line}${RESET}"
+        elif [[ "$line" == *" V "* ]]; then
+            # Verbose - soft blue
+            echo -e "${BLUE}${line}${RESET}"
+        # Check for special patterns without using grep
+        elif [[ "$line" == *"Exception"* ]] ||
+            [[ "$line" == *"Error:"* ]] ||
+            [[ "$line" == *"FATAL"* ]] ||
+            [[ "$line" == *"ANR"* ]]; then
+            # Exception and error keywords - bold hot pink
+            echo -e "${BOLD}${RED}${line}${RESET}"
+        elif [[ "$line" == *"success"* ]] ||
+            [[ "$line" == *"Success"* ]] ||
+            [[ "$line" == *"CONNECTED"* ]] ||
+            [[ "$line" == *"ready"* ]]; then
+            # Success indicators - bold pink
+            echo -e "${BOLD}${PINK}${line}${RESET}"
+        else
+            # Other lines - plain but still visible
+            echo -e "${line}"
+        fi
+    done
+}
+
+# Dynamic app-specific logging with process ID detection
+function applog() {
+    local device app_name pid_list colorize usage
+    usage="Usage: applog [options] <app_name_or_package>
+    
+Options:
+    -n, --no-color   Disable colorized output
+    -h, --help       Show this help message"
+
+    # Default values
+    colorize=true
+
+    # Parse options
+    while [ $# -gt 0 ]; do
+        case "$1" in
+        -n | --no-color)
+            colorize=false
+            shift
+            ;;
+        -h | --help)
+            echo "$usage"
+            return 0
+            ;;
+        -*)
+            echo "Unknown option: $1" >&2
+            echo "$usage" >&2
+            return 1
+            ;;
+        *)
+            app_name="$1"
+            shift
+            break
+            ;;
+        esac
+    done
+
+    # Check if app name is provided
+    if [ -z "${app_name:-}" ]; then
+        echo "Error: No app name or package specified" >&2
+        echo "$usage" >&2
+        return 1
+    fi
+
+    # Handle zsh globbing
+    if [ "$SHELL_NAME" = "zsh" ]; then
+        # Disable glob pattern expansion for this function
+        setopt local_options no_nomatch
+    fi
+
+    # Get connected device
+    device=$(get_device)
+    [ $? -ne 0 ] && return 1
+
+    # First try exact package match
+    if adb -s "$device" shell pm list packages | grep -q "package:$app_name"; then
+        echo "✨ Found exact package match: $app_name"
+    else
+        # Try partial package match
+        local package_matches
+        package_matches=$(adb -s "$device" shell pm list packages | grep "$app_name" | sed 's/package://')
+
+        if [ -n "$package_matches" ]; then
+            # Count matches
+            local match_count
+            match_count=$(echo "$package_matches" | wc -l)
+
+            if [ "$match_count" -eq 1 ]; then
+                # Single match found
+                app_name=$(echo "$package_matches" | tr -d '\r')
+                echo "✨ Found package: $app_name"
+            else
+                # Multiple matches, let user choose
+                echo "Multiple matching packages found:"
+                local i=1
+                echo "$package_matches" | while IFS= read -r pkg; do
+                    printf "[%d] %s\n" "$i" "$pkg"
+                    i=$((i + 1))
+                done
+
+                printf "Select package number (or Ctrl+C to cancel): "
+                read -r choice
+                app_name=$(echo "$package_matches" | sed -n "${choice}p" | tr -d '\r')
+                [ -z "$app_name" ] && return 1
+                echo "✨ Selected package: $app_name"
+            fi
+        fi
+    fi
+
+    # Get process IDs for the app
+    echo "🔍 Looking for processes matching '$app_name'..."
+    pid_list=$(adb -s "$device" shell ps | grep -i "$app_name" | awk '{print $2}')
+
+    if [ -z "$pid_list" ]; then
+        echo "⚠️ No running processes found for '$app_name'"
+        echo "💡 Is the app running? Try starting it first."
+        return 1
+    fi
+
+    # Count processes
+    local process_count
+    process_count=$(echo "$pid_list" | wc -l)
+    echo "📱 Found $process_count running process(es) for '$app_name'"
+
+    # Extract process IDs into an array for reliable handling
+    local pids=()
+    while IFS= read -r pid; do
+        pid=$(echo "$pid" | tr -d '\r')
+        if [ -n "$pid" ]; then
+            pids+=("$pid")
+        fi
+    done <<<"$pid_list"
+
+    # Execute the logcat command directly with proper arguments
+    echo "📊 Streaming logs for '$app_name'..."
+    echo "💡 Press Ctrl+C to stop"
+
+    # Build the adb command properly to avoid shell expansion issues
+    local adb_cmd=("adb" "-s" "$device" "logcat")
+
+    # Add pid filters if available
+    for pid in "${pids[@]}"; do
+        adb_cmd+=("--pid=$pid")
+    done
+
+    # Show the command being run
+    echo "🚀 Running: ${adb_cmd[*]}"
+    echo "-------------------------------------------"
+
+    # Execute based on colorization
+    if [ "$colorize" = true ]; then
+        "${adb_cmd[@]}" | colorize_logcat
+    else
+        "${adb_cmd[@]}"
     fi
 }
 
