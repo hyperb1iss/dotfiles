@@ -14,7 +14,7 @@ export CCACHE_EXEC=/usr/bin/ccache
 export GOPATH=~/dev/go
 export GO15VENDOREXPERIMENT=1
 export ANDROID_HOME=~/Android/Sdk
-export ANDROID_NDK_HOME=~/Android/android-ndk-r21e
+export ANDROID_NDK_HOME=~/Android/android-ndk
 
 # Editor configuration
 export VISUAL=nvim
@@ -36,6 +36,7 @@ $HOME/.cargo/bin:\
 $GOPATH/bin:\
 $HOME/.local/bin:\
 $HOME/bin:\
+$([ -d /snap/bin ] && echo "/snap/bin:")\
 $PATH" | tr -s ':')
 
 # FZF Configuration
