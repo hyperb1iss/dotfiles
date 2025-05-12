@@ -101,6 +101,21 @@ cd ~/dev/dotfiles
 make
 ```
 
+### macOS
+
+```bash
+# Option 1: Using the installer script
+bash -c "$(curl -fsSL https://raw.githubusercontent.com/hyperb1iss/dotfiles/main/install_macos.sh)"
+
+# Option 2: Manual installation
+# Clone the repository
+git clone https://github.com/hyperb1iss/dotfiles.git ~/dev/dotfiles
+
+# Install everything
+cd ~/dev/dotfiles
+make macos
+```
+
 ### Windows
 
 ```powershell

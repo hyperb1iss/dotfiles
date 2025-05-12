@@ -1,0 +1,71 @@
+# Brewfile for macOS dotfiles setup
+
+# Taps
+tap "homebrew/bundle"
+tap "homebrew/cask"
+tap "homebrew/cask-fonts"
+tap "homebrew/core"
+tap "homebrew/services"
+
+# CLI Tools
+brew "bat"                   # Cat clone with syntax highlighting
+brew "ccache"                # Compiler cache
+brew "cmake"                 # Cross-platform make
+brew "coreutils"             # GNU core utilities
+brew "curl"                  # Get a file from an HTTP, HTTPS or FTP server
+brew "fd"                    # Simple, fast and user-friendly alternative to find
+brew "findutils"             # Collection of GNU find, xargs, and locate
+brew "fzf"                   # Command-line fuzzy finder
+brew "gh"                    # GitHub CLI
+brew "git"                   # Distributed revision control system
+brew "git-delta"             # Syntax-highlighting pager for git
+brew "gnu-sed"               # GNU implementation of the famous stream editor
+brew "go"                    # Open source programming language
+brew "grep"                  # GNU grep, egrep and fgrep
+brew "htop"                  # Improved top (interactive process viewer)
+brew "jq"                    # Lightweight and flexible command-line JSON processor
+brew "lazygit"               # Simple terminal UI for git commands
+brew "llvm"                  # Next-gen compiler infrastructure
+brew "lsd"                   # Enhanced ls command
+brew "macchina"              # System information fetcher with a focus on performance
+brew "ncdu"                  # NCurses Disk Usage
+brew "neovim"                # Ambitious Vim-fork focused on extensibility and agility
+brew "ninja"                 # Small build system for use with gyp or CMake
+brew "node"                  # Platform for Node.js development
+brew "openjdk@17"            # Java Development Kit
+brew "p7zip"                 # 7-Zip (high compression file archiver) implementation
+brew "procs"                 # Modern replacement for ps
+brew "python@3.10"           # Python programming language
+brew "ripgrep"               # Search tool like grep and The Silver Searcher
+brew "rsync"                 # Utility that provides fast incremental file transfer
+brew "shellcheck"            # Static analysis and lint tool, for (ba)sh scripts
+brew "starship"              # Cross-shell prompt
+brew "tmux"                  # Terminal multiplexer
+brew "tree"                  # Display directories as trees
+brew "unzip"                 # Extraction utility for .zip compressed archives
+brew "wget"                  # Internet file retriever
+brew "yq"                    # Process YAML documents from the CLI
+brew "zoxide"                # Smarter cd command
+brew "zsh"                   # UNIX shell
+brew "zsh-autosuggestions"   # Fish-like fast/unobtrusive autosuggestions for zsh
+brew "zsh-completions"       # Additional completion definitions for zsh
+brew "zsh-syntax-highlighting" # Fish shell like syntax highlighting for zsh
+
+# Development
+cask "docker"                # App to build and share containerized applications
+cask "iterm2"                # Terminal emulator
+cask "visual-studio-code"    # Code editor
+
+# Fonts
+cask "font-fira-code-nerd-font"
+cask "font-jetbrains-mono-nerd-font"
+
+# Utility Applications
+cask "alfred"                # Application launcher and productivity software
+cask "rectangle"             # Move and resize windows using keyboard shortcuts or snap areas
+
+# Optional Applications (uncomment if needed)
+# cask "github"              # Desktop client for GitHub repositories
+# cask "postman"             # API platform for building and using APIs
+# cask "slack"               # Team communication and collaboration software
+# cask "spotify"             # Music streaming service 

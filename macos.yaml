@@ -1,0 +1,73 @@
+- defaults:
+    link:
+      relink: true
+
+- clean: ['~']
+
+- link:
+    ~/.bashrc.local: bash/bashrc.local
+    ~/.rc.local: bash/rc.local
+    ~/.config/lsd: lsd
+    ~/.fonts: fonts
+    ~/.gitconfig: gitconfig
+    ~/.tmux.conf: tmux.conf
+    ~/.dircolors: dircolors
+    ~/.zshrc: zsh/zshrc
+    ~/.config/nvim: nvim
+    ~/bin: bin
+
+- shell:
+    - command: |
+        # Run macOS-specific setup script
+        ./macos/brew.sh
+      stderr: true
+      stdout: true
+      description: Installing Homebrew packages
+
+    - command: |
+        # Set up macOS-specific configurations
+        ./macos/macos_config.sh
+      stderr: true
+      stdout: true
+      description: Configuring macOS settings
+
+- shell:
+    - command: |
+        # Try installing starship through cargo first
+        if ! command -v starship >/dev/null 2>&1; then
+          curl -sS https://starship.rs/install.sh | sh
+        fi
+        mkdir -p ~/.config/starship
+      stderr: true
+      stdout: true
+
+- shell:
+    - mkdir -p ~/.tmux/plugins
+- link:
+    ~/.tmux/plugins/tpm: tpm
+
+- shell:
+    - cargo install git-delta
+    - cargo install lsd
+
+- shell:
+    - cargo install macchina
+    - mkdir -p ~/.config/macchina/themes
+- link:
+    ~/.config/macchina/themes/elektra.toml: elektra/elektra.toml
+
+- shell:
+    - mkdir -p ~/.config/procs
+- link:
+    ~/.config/procs/config.toml: procs/config.toml
+
+- link:
+    ~/.config/starship.toml: starship/starship.toml
+
+- shell:
+    -
+      command: mkdir -p ~/dev/go && GOPATH=~/dev/go go install github.com/junegunn/fzf@latest
+      stderr: true
+      stdout: true
+      quiet: false
+      description: Installing fzf from source 

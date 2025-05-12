@@ -6,6 +6,7 @@ default:
 	@echo "Available installation options:"
 	@echo "  make full   - Full desktop environment installation"
 	@echo "  make minimal - Minimal server installation"
+	@echo "  make macos  - macOS environment installation"
 	@echo ""
 	@echo "Other commands:"
 	@echo "  make update - Update submodules"
@@ -39,4 +40,9 @@ full: check-state update
 	sudo $(DOTBOT) -d $(BASEDIR) -c system.yaml
 	$(DOTBOT) -d $(BASEDIR) -c local.yaml
 
-.PHONY: default update check-state minimal full
+macos: TYPE=macos
+macos: check-state update
+	@echo "macos" > $(INSTALL_STATE_FILE)
+	$(DOTBOT) -d $(BASEDIR) -c macos.yaml
+
+.PHONY: default update check-state minimal full macos
