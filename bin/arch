@@ -5,7 +5,7 @@
 # Unified Arch command for AUR, package queries, and system maintenance.
 # This script is intended to run only on Arch Linux.
 
-if [ ! -f /etc/arch-release ]; then
+if [[ ! -f /etc/arch-release ]]; then
   echo "This script is only intended for Arch Linux."
   exit 1
 fi
@@ -65,7 +65,7 @@ ensure_paru() {
 }
 
 aur_search() {
-  if [ -z "$1" ]; then
+  if [[ -z "$1" ]]; then
     echo "Usage: arch aur search package_name"
     return 1
   fi
@@ -74,7 +74,7 @@ aur_search() {
 }
 
 aur_install() {
-  if [ -z "$1" ]; then
+  if [[ -z "$1" ]]; then
     echo "Usage: arch aur add package_name"
     return 1
   fi
@@ -88,7 +88,7 @@ aur_update() {
 }
 
 aur_info() {
-  if [ -z "$1" ]; then
+  if [[ -z "$1" ]]; then
     echo "Usage: arch aur info package_name"
     return 1
   fi
@@ -111,7 +111,7 @@ clean_aur_cache() {
 # Official Package Helper Functions
 # ---------------------------------
 search_pkg() {
-  if [ -z "$1" ]; then
+  if [[ -z "$1" ]]; then
     echo "Usage: arch pkg search package_name"
     return 1
   fi
@@ -119,7 +119,7 @@ search_pkg() {
 }
 
 pkg_info() {
-  if [ -z "$1" ]; then
+  if [[ -z "$1" ]]; then
     echo "Usage: arch pkg info package_name"
     return 1
   fi
@@ -132,7 +132,7 @@ list_installed() {
 }
 
 owns_file() {
-  if [ -z "$1" ]; then
+  if [[ -z "$1" ]]; then
     echo "Usage: arch pkg owns /path/to/file"
     return 1
   fi
@@ -140,7 +140,7 @@ owns_file() {
 }
 
 list_pkg_files() {
-  if [ -z "$1" ]; then
+  if [[ -z "$1" ]]; then
     echo "Usage: arch pkg files package_name"
     return 1
   fi
@@ -148,7 +148,7 @@ list_pkg_files() {
 }
 
 show_deps() {
-  if [ -z "$1" ]; then
+  if [[ -z "$1" ]]; then
     echo "Usage: arch pkg deps package_name"
     return 1
   fi
@@ -156,7 +156,7 @@ show_deps() {
 }
 
 show_rdeps() {
-  if [ -z "$1" ]; then
+  if [[ -z "$1" ]]; then
     echo "Usage: arch pkg rdeps package_name"
     return 1
   fi
@@ -190,7 +190,7 @@ update_system() {
 remove_orphans() {
   echo "🗑️ Removing orphaned packages..."
   readarray -t orphans < <(pacman -Qtdq)
-  if [ ${#orphans[@]} -gt 0 ]; then
+  if [[ ${#orphans[@]} -gt 0 ]]; then
     sudo pacman -Rns "${orphans[@]}"
   else
     echo "No orphaned packages found."
@@ -229,7 +229,7 @@ aur_add() {
 }
 
 aur_rm() {
-  if [ -z "$1" ]; then
+  if [[ -z "$1" ]]; then
     echo "Usage: arch aur rm package_name"
     return 1
   fi
@@ -240,7 +240,7 @@ aur_rm() {
 # New Functions for Official Packages
 # ---------------------------------
 pkg_add() {
-  if [ -z "$1" ]; then
+  if [[ -z "$1" ]]; then
     echo "Usage: arch pkg add package_name"
     return 1
   fi
@@ -248,7 +248,7 @@ pkg_add() {
 }
 
 pkg_rm() {
-  if [ -z "$1" ]; then
+  if [[ -z "$1" ]]; then
     echo "Usage: arch pkg rm package_name"
     return 1
   fi
@@ -258,7 +258,7 @@ pkg_rm() {
 # ---------------------------------
 # Main Command Dispatcher
 # ---------------------------------
-if [ $# -eq 0 ]; then
+if [[ $# -eq 0 ]]; then
   usage
 fi
 
