@@ -14,7 +14,11 @@ osascript -e 'tell application "System Preferences" to quit'
 sudo -v
 
 # Keep-alive: update existing `sudo` time stamp until script has finished
-while true; do sudo -n true; sleep 60; kill -0 "$$" || exit; done 2>/dev/null &
+while true; do
+	sudo -n true
+	sleep 60
+	kill -0 "$$" || exit
+done 2> /dev/null &
 
 ###############################################################################
 # General UI/UX                                                               #
@@ -179,9 +183,9 @@ defaults write com.apple.terminal FocusFollowsMouse -bool true
 defaults write org.x.X11 wm_ffm -bool true
 
 # Install custom profile for iTerm2 if available
-if [ -d ~/Library/Application\ Support/iTerm2/DynamicProfiles ]; then
-    mkdir -p ~/Library/Application\ Support/iTerm2/DynamicProfiles
-    cp -f ~/dev/dotfiles/macos/iterm2_profile.json ~/Library/Application\ Support/iTerm2/DynamicProfiles/
+if [[ -d ~/Library/Application\ Support/iTerm2/DynamicProfiles ]]; then
+	mkdir -p ~/Library/Application\ Support/iTerm2/DynamicProfiles
+	cp -f ~/dev/dotfiles/macos/iterm2_profile.json ~/Library/Application\ Support/iTerm2/DynamicProfiles/
 fi
 
 ###############################################################################
@@ -251,4 +255,4 @@ for app in "Activity Monitor" \
 	killall "${app}" &> /dev/null
 done
 
-echo "✅ macOS settings configured successfully! Some changes require a restart to take effect." 
+echo "✅ macOS settings configured successfully! Some changes require a restart to take effect."

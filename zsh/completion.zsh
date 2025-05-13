@@ -18,10 +18,10 @@ zstyle ':completion:*' matcher-list 'm:{a-z}={A-Z}' 'm:{a-zA-Z}={A-Za-z}' 'r:|[.
 zstyle ':completion:*' menu select=long
 zstyle ':completion:*' select-prompt %SScrolling active: current selection at %p%s
 zstyle ':completion:*:*:kill:*:processes' list-colors '=(#b) #([0-9]#)*=0=01;31'
-zstyle ':completion:*:kill:*' command 'ps -u $USER -o pid,%cpu,tty,cputime,cmd'
+zstyle ':completion:*:kill:*' command "ps -u ${USER} -o pid,%cpu,tty,cputime,cmd"
 
 # SSH Hostname completion based on ~/.ssh/config
-if [[ -e "$HOME/.ssh/config" ]]; then
+if [[ -e "${HOME}/.ssh/config" ]]; then
     zstyle ':completion:*:*:ssh:*' hosts "$(awk '/^Host / {print $2}' ~/.ssh/config | grep -v '[*?]')"
 fi
 
@@ -36,9 +36,11 @@ zstyle ':completion:*' expand 'yes'
 zstyle ':completion:*' squeeze-slashes 'yes'
 
 # Use color output for completions
+# shellcheck disable=SC2296,SC2086
 zstyle ':completion:*:default' list-colors ${(s.:.)LS_COLORS}
 
 # Additional color customization for different types of completions
+# shellcheck disable=SC2296,SC2086
 zstyle ':completion:*' list-colors ${(s.:.)LS_COLORS}: \
   'fi=00' 'di=01;34' 'ln=01;36' 'pi=33' 'so=01;35' \
   'bd=33;01' 'cd=33;01' 'or=01;31' 'mi=05;37;41' \
@@ -55,6 +57,7 @@ setopt correct
 # setopt correctall  # Disabled: too aggressive for arguments
 
 # Customize the correction prompt
+# shellcheck disable=SC2034
 SPROMPT="Correct '%R' to '%r'? [Yes/No/Edit/Abort] "
 
 # Make correction more precise for commands
