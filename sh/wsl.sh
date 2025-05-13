@@ -1,12 +1,13 @@
+#!/bin/bash
 # wsl.sh
 # WSL (Windows Subsystem for Linux) specific utilities and configurations
 
 # Only load these functions if running in WSL
 if grep -qi microsoft /proc/version 2>/dev/null; then
     # Detect Windows username and set $W
-    if [ -z "$W" ]; then
+    if [[ -z "$W" ]]; then
         WIN_USERNAME=$(powershell.exe -Command '[System.Environment]::UserName' | tr -d '\r')
-        if [ -n "$WIN_USERNAME" ] && [ -d "/mnt/c/Users/$WIN_USERNAME" ]; then
+        if [[ -n "$WIN_USERNAME" ]] && [[ -d "/mnt/c/Users/$WIN_USERNAME" ]]; then
             export W="/mnt/c/Users/$WIN_USERNAME"
         else
             echo "Warning: Could not determine Windows user directory. \$W is not set." >&2
@@ -18,10 +19,10 @@ if grep -qi microsoft /proc/version 2>/dev/null; then
     function wslpath() {
         if [[ $1 == /* ]]; then
             # WSL to Windows path
-            wslpath -w "$1"
+            command wslpath -w "$1"
         elif [[ $1 =~ ^[A-Za-z]: ]]; then
             # Windows to WSL path
-            wslpath -u "$1"
+            command wslpath -u "$1"
         else
             echo "Error: Invalid path format. Please provide a full path." >&2
             return 1
@@ -33,7 +34,7 @@ if grep -qi microsoft /proc/version 2>/dev/null; then
     function explore() {
         local path="${1:-.}"
         if [[ -d "$path" ]]; then
-            explorer.exe "$(wslpath -w "$path")"
+            explorer.exe "$(command wslpath -w "$path")"
         else
             echo "Error: Directory does not exist: $path" >&2
             return 1
@@ -71,12 +72,13 @@ if grep -qi microsoft /proc/version 2>/dev/null; then
 
         if [[ "$1" =~ ^https?:// ]]; then
             # Handle URLs
+            # shellcheck disable=SC2086
             cmd.exe /c "start $1" 2>/dev/null
         else
             # Handle files
             local path="$1"
             if [[ -e "$path" ]]; then
-                cmd.exe /c "start $(wslpath -w "$path")" 2>/dev/null
+                cmd.exe /c "start $(command wslpath -w "$path")" 2>/dev/null
             else
                 echo "Error: File does not exist: $path" >&2
                 return 1
@@ -89,7 +91,7 @@ if grep -qi microsoft /proc/version 2>/dev/null; then
     function clip-path() {
         local path="${1:-.}"
         if [[ -e "$path" ]]; then
-            wslpath -w "$(realpath "$path")" | clip.exe
+            command wslpath -w "$(realpath "$path")" | clip.exe
             echo "Path copied to clipboard"
         else
             echo "Error: Path does not exist: $path" >&2
@@ -104,6 +106,7 @@ if grep -qi microsoft /proc/version 2>/dev/null; then
             echo "Usage: win <command> [arguments]" >&2
             return 1
         fi
+        # shellcheck disable=SC2086
         cmd.exe /c "$*" 2>/dev/null
     }
 

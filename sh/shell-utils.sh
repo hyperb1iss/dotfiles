@@ -2,9 +2,9 @@
 # Cross-compatible utility functions for bash and zsh
 
 # Detect current shell
-if [ -n "$ZSH_VERSION" ]; then
+if [[ -n "$ZSH_VERSION" ]]; then
     CURRENT_SHELL="zsh"
-elif [ -n "$BASH_VERSION" ]; then
+elif [[ -n "$BASH_VERSION" ]]; then
     CURRENT_SHELL="bash"
 else
     CURRENT_SHELL="unknown"
@@ -12,12 +12,12 @@ fi
 
 # Search file contents
 function ftext() {
-    grep -iIHrn --color=always "$1" . | $PAGER
+    grep -iIHrn --color=always "$1" . | ${PAGER:-less}
 }
 
 # Extract common archive formats
 function extract() {
-    if [ -f "$1" ]; then
+    if [[ -f "$1" ]]; then
         case "$1" in
         *.tar.bz2) tar xjf "$1" ;;
         *.tar.gz) tar xzf "$1" ;;
@@ -39,9 +39,11 @@ function extract() {
 
 # Interactive history search
 function fh() {
-    if [ "$CURRENT_SHELL" = "zsh" ]; then
+    if [[ "$CURRENT_SHELL" = "zsh" ]]; then
+        # shellcheck disable=SC1090,SC2046,SC2086
         eval "$(fc -l 1 | fzf +s --tac | sed 's/ *[0-9]* *//')"
     else
+        # shellcheck disable=SC1090,SC2046,SC2086
         eval "$(history | fzf +s --tac | sed 's/ *[0-9]* *//')"
     fi
 }

@@ -1,3 +1,4 @@
+#!/bin/bash
 # rust.sh
 #
 # Rust development helper functions for both bash and zsh
@@ -37,8 +38,9 @@ function rswitch() {
     if command -v rustup >/dev/null 2>&1 && command -v fzf >/dev/null 2>&1; then
         local toolchain
         toolchain=$(rustup toolchain list | fzf --height 40% --reverse --prompt="Select Rust toolchain: ")
-        if [ -n "$toolchain" ]; then
+        if [[ -n "$toolchain" ]]; then
             # Extract the toolchain name (the first word)
+            # shellcheck disable=SC2086
             toolchain=$(echo "$toolchain" | awk '{print $1}')
             rustup override set "$toolchain" && echo "Switched to $toolchain"
         fi

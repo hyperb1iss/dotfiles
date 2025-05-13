@@ -1,0 +1,12 @@
+# Shellcheck configuration file
+
+# Specify default shell for scripts without shebang
+shell=bash
+
+# Disable warnings for scripts without shebangs (SC2148)
+disable=SC2148
+
+# Other helpful settings
+enable=all
+source-path=SCRIPTDIR
+external-sources=true 

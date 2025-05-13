@@ -1,24 +1,25 @@
-#!/bin/bash
 # python.sh
 # Helper functions for Python and Django development
 
 # Create and activate Python virtual environment
 function venv() {
-    if [ -z "$1" ]; then
+    if [[ -z "$1" ]]; then
         DIR="venv"
     else
         DIR="$1"
     fi
     python -m venv "$DIR"
+    # shellcheck disable=SC1090
     source "$DIR/bin/activate"
 }
 
 # Activate virtual environment, searching up directory tree
 function va() {
     local dir="$PWD"
-    while [ "$dir" != "/" ]; do
+    while [[ "$dir" != "/" ]]; do
         for venv in "$dir"/{venv,.venv,env,.env}; do
-            if [ -f "$venv/bin/activate" ]; then
+            if [[ -f "$venv/bin/activate" ]]; then
+                # shellcheck disable=SC1090
                 source "$venv/bin/activate"
                 echo "Activated virtualenv: $venv"
                 return 0
@@ -67,7 +68,7 @@ function dsu() {
 
 # Django test with optional path
 function dt() {
-    if [ -z "$1" ]; then
+    if [[ -z "$1" ]]; then
         python manage.py test
     else
         python manage.py test "$@"
@@ -86,7 +87,7 @@ function ptd() {
 
 # Run black formatter on directory or file
 function black() {
-    if [ -z "$1" ]; then
+    if [[ -z "$1" ]]; then
         command black .
     else
         command black "$@"
@@ -95,7 +96,7 @@ function black() {
 
 # Run isort on directory or file
 function isort() {
-    if [ -z "$1" ]; then
+    if [[ -z "$1" ]]; then
         command isort .
     else
         command isort "$@"
@@ -104,7 +105,7 @@ function isort() {
 
 # Run flake8 on directory or file
 function flake() {
-    if [ -z "$1" ]; then
+    if [[ -z "$1" ]]; then
         flake8 .
     else
         flake8 "$@"
@@ -113,7 +114,7 @@ function flake() {
 
 # Format code with black and isort
 function format() {
-    if [ -z "$1" ]; then
+    if [[ -z "$1" ]]; then
         black .
         isort .
     else
