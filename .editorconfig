@@ -1,0 +1,29 @@
+# EditorConfig is awesome: https://EditorConfig.org
+
+# top-most EditorConfig file
+root = true
+
+# General settings for all matched shell-like files
+# (for the editor's general behavior, not shfmt-specific formatting rules)
+[*.{sh,bash,zsh,ps1},*bashrc*,*zshrc*,*profile*,zshenv,zlogin,zlogout,zprofile,bin/*]
+end_of_line = lf
+insert_final_newline = true
+charset = utf-8
+trim_trailing_whitespace = true
+# Keep indent_style and indent_size here for the editor's generic indentation behavior
+indent_style = space
+indent_size = 2
+
+# Settings specifically for shfmt, applied to ANY file it identifies as a shell script
+# This is shfmt's special section that it prioritizes for its formatting.
+[[shell]]
+indent_style = space
+indent_size = 2
+# shfmt specific options from Google Style
+switch_case_indent = true
+binary_next_line = true
+space_redirects = true
+
+# Markdown files
+[*.md]
+trim_trailing_whitespace = false
