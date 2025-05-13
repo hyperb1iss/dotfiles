@@ -89,3 +89,13 @@ xz
 lzop
 lrzip
 bzip2
+
+# Kubernetes tools
+kubectl
+kubectx
+kubernetes-tools
+k9s
+helm
+kustomize
+kind
+minikube
