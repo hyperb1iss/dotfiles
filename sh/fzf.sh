@@ -35,10 +35,8 @@ if command -v fzf >/dev/null 2>&1; then
 
 	# Initialize shell completion and key bindings
 	if [[ -n "${BASH_VERSION}" ]]; then
-		# shellcheck disable=SC1090
 		eval "$(fzf --bash)" || true
 	elif [[ -n "${ZSH_VERSION}" ]]; then
-		# shellcheck disable=SC1090
 		eval "$(fzf --zsh)" || true
 	fi
 

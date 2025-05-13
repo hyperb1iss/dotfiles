@@ -38,20 +38,17 @@ fi
 for script in "${HOME}/dev/dotfiles/sh/"*.sh; do
 	if [[ "${script}" != *"shell-common.sh" ]]; then
 		# shellcheck source=/home/bliss/dev/dotfiles/sh
-		# shellcheck disable=SC1090
 		source "${script}" || echo "Failed to load ${script}"
 	fi
 done
 
 # Load private configurations if they exist
-# shellcheck disable=SC1090
 [[ -f ~/.rc.local ]] && source ~/.rc.local
 
 # Determine shell name
 SHELL_NAME=$(if [[ -n "${ZSH_VERSION}" ]]; then echo "zsh"; else echo "bash"; fi)
 
 # Initialize Starship prompt (suppress error output on older versions)
-# shellcheck disable=SC1090
 eval "$(starship init "${SHELL_NAME}" 2>/dev/null)" || true
 
 # Show inspirational quote for interactive shells (only in full installation)

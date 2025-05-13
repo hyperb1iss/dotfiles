@@ -24,9 +24,9 @@ if [[ "${SHELL_NAME}" = "zsh" ]]; then
 	setopt INTERACTIVE_COMMENTS
 elif [[ "${SHELL_NAME}" = "bash" ]]; then
 	# Enable extended pattern matching
-	shopt -s extglob 2> /dev/null
+	shopt -s extglob 2>/dev/null
 	# Enable recursive globbing
-	shopt -s globstar 2> /dev/null
+	shopt -s globstar 2>/dev/null
 fi
 
 # Android build environment setup
@@ -39,12 +39,10 @@ function set_android_env() {
 		fi
 
 		# Source build environment
-		# shellcheck disable=SC1091
 		source build/envsetup.sh
 
 		# Restore options for zsh
 		if [[ "${SHELL_NAME}" = "zsh" ]]; then
-			# shellcheck disable=SC1090
 			eval "${old_opts}"
 			setopt SH_WORD_SPLIT
 		fi
@@ -68,7 +66,7 @@ function mka() {
 	make_args="$*"
 
 	# Use command substitution safely
-	if command -v schedtool > /dev/null 2>&1; then
+	if command -v schedtool >/dev/null 2>&1; then
 		# shellcheck disable=SC2086
 		schedtool -B -n 10 -e ionice -n 7 make -j"${cores}" ${make_args}
 	else
@@ -107,7 +105,7 @@ function reposync() {
 	local sync_success=false
 	local cores
 
-	cores=$(nproc 2> /dev/null || echo "4")
+	cores=$(nproc 2>/dev/null || echo "4")
 
 	while [[ ${retry_count} -lt ${max_retries} ]] && [[ "${sync_success}" = false ]]; do
 		echo "Attempt $((retry_count + 1)) of ${max_retries}"
@@ -132,7 +130,11 @@ function reposync() {
 
 # Enhanced repo status with portable sort
 function rstat() {
-	repo status | grep -v "^$" | grep -v "project " | LC_ALL=C sort
+	local repo_status
+	repo_status=$(repo status) || true
+
+	# Use consecutive pipes with || true to handle errors
+	echo "${repo_status}" | grep -v "^$" | grep -v "project " | LC_ALL=C sort
 }
 
 # Quick device setup with shell-agnostic variable handling
@@ -148,9 +150,11 @@ alias ld='lunch_device'
 # Smart device selector for multiple devices
 function get_device() {
 	local devices device_count choice
+	local adb_output
 
-	# Use process substitution in a shell-agnostic way
-	devices=$(adb devices | grep -v "List" | grep "device$" | cut -f1)
+	# Get devices and handle errors
+	adb_output=$(adb devices) || true
+	devices=$(echo "${adb_output}" | grep -v "List" | grep "device$" | cut -f1)
 	device_count=$(echo "${devices}" | grep -c "^" || echo "0")
 
 	if [[ "${device_count}" -eq 0 ]]; then
@@ -164,7 +168,7 @@ function get_device() {
 		# shellcheck disable=SC2162
 		echo "${devices}" | while read -r device; do
 			local name
-			name=$(adb -s "${device}" shell getprop ro.product.model 2> /dev/null)
+			name=$(adb -s "${device}" shell getprop ro.product.model 2>/dev/null)
 			printf "[%d] %s (%s)\n" "${i}" "${device}" "${name}" >&2
 			i=$((i + 1))
 		done
@@ -188,8 +192,9 @@ function logcat() {
 		shift
 	fi
 
-	device=$(get_device)
-	[[ $? -ne 0 ]] && return 1
+	if ! device=$(get_device); then
+		return 1
+	fi
 
 	# Handle zsh globbing
 	if [[ "${SHELL_NAME}" = "zsh" ]]; then
@@ -261,18 +266,21 @@ function colorize_logcat() {
 			# Verbose - soft blue
 			echo -e "${BLUE}${line}${RESET}"
 		# Check for special patterns without using grep
-		elif [[ "${line}" == *"Exception"* ]] \
-			|| [[ "${line}" == *"Error:"* ]] \
-			|| [[ "${line}" == *"FATAL"* ]] \
-			|| [[ "${line}" == *"ANR"* ]]; then
+		elif [[ "${line}" == *"Exception"* ]] ||
+			[[ "${line}" == *"Error:"* ]] ||
+			[[ "${line}" == *"FATAL"* ]] ||
+			[[ "${line}" == *"ANR"* ]]; then
 			# Exception and error keywords - bold hot pink
 			echo -e "${BOLD}${RED}${line}${RESET}"
-		elif [[ "${line}" == *"success"* ]] \
-			|| [[ "${line}" == *"Success"* ]] \
-			|| [[ "${line}" == *"CONNECTED"* ]] \
-			|| [[ "${line}" == *"ready"* ]]; then
+		elif [[ "${line}" == *"success"* ]] ||
+			[[ "${line}" == *"Success"* ]] ||
+			[[ "${line}" == *"CONNECTED"* ]] ||
+			[[ "${line}" == *"ready"* ]]; then
 			# Success indicators - bold pink
 			echo -e "${BOLD}${PINK}${line}${RESET}"
+		elif [[ "${line}" == *"WARNING"* ]] || [[ "${line}" == *"deprecated"* ]]; then
+			# Add warning matches to use YELLOW
+			echo -e "${YELLOW}${line}${RESET}"
 		else
 			# Other lines - plain but still visible
 			echo -e "${line}"
@@ -295,24 +303,24 @@ Options:
 	# Parse options
 	while [[ $# -gt 0 ]]; do
 		case "$1" in
-			-n | --no-color)
-				colorize=false
-				shift
-				;;
-			-h | --help)
-				echo "${usage}"
-				return 0
-				;;
-			-*)
-				echo "Unknown option: $1" >&2
-				echo "${usage}" >&2
-				return 1
-				;;
-			*)
-				app_name="$1"
-				shift
-				break
-				;;
+		-n | --no-color)
+			colorize=false
+			shift
+			;;
+		-h | --help)
+			echo "${usage}"
+			return 0
+			;;
+		-*)
+			echo "Unknown option: $1" >&2
+			echo "${usage}" >&2
+			return 1
+			;;
+		*)
+			app_name="$1"
+			shift
+			break
+			;;
 		esac
 	done
 
@@ -330,16 +338,19 @@ Options:
 	fi
 
 	# Get connected device
-	device=$(get_device)
-	[[ $? -ne 0 ]] && return 1
+	if ! device=$(get_device); then
+		return 1
+	fi
 
 	# First try exact package match
-	if adb -s "${device}" shell pm list packages | grep -q "package:${app_name}"; then
+	local pm_packages
+	pm_packages=$(adb -s "${device}" shell pm list packages) || true
+	if echo "${pm_packages}" | grep -q "package:${app_name}"; then
 		echo "✨ Found exact package match: ${app_name}"
 	else
 		# Try partial package match
 		local package_matches
-		package_matches=$(adb -s "${device}" shell pm list packages | grep "${app_name}" | sed 's/package://')
+		package_matches=$(echo "${pm_packages}" | grep "${app_name}" | sed 's/package://') || true
 
 		if [[ -n "${package_matches}" ]]; then
 			# Count matches
@@ -363,7 +374,9 @@ Options:
 				printf "Select package number (or Ctrl+C to cancel): "
 				local choice
 				read -r choice
-				app_name=$(echo "${package_matches}" | sed -n "${choice}p" | tr -d '\r')
+				local selected_app
+				selected_app=$(echo "${package_matches}" | sed -n "${choice}p") || true
+				app_name=$(echo "${selected_app}" | tr -d '\r')
 				[[ -z "${app_name}" ]] && return 1
 				echo "✨ Selected package: ${app_name}"
 			fi
@@ -372,7 +385,9 @@ Options:
 
 	# Get process IDs for the app
 	echo "🔍 Looking for processes matching '${app_name}'..."
-	pid_list=$(adb -s "${device}" shell ps | grep -i "${app_name}" | awk '{print $2}')
+	local process_info
+	process_info=$(adb -s "${device}" shell ps) || true
+	pid_list=$(echo "${process_info}" | grep -i "${app_name}" | awk '{print $2}')
 
 	if [[ -z "${pid_list}" ]]; then
 		echo "⚠️ No running processes found for '${app_name}'"
@@ -392,7 +407,7 @@ Options:
 		if [[ -n "${pid}" ]]; then
 			pids+=("${pid}")
 		fi
-	done <<< "${pid_list}"
+	done <<<"${pid_list}"
 
 	# Execute the logcat command directly with proper arguments
 	echo "📊 Streaming logs for '${app_name}'..."
@@ -430,17 +445,21 @@ function installboot() {
 	fi
 
 	local device PARTITION
-	device=$(get_device)
-	[[ $? -ne 0 ]] && return 1
+	if ! device=$(get_device); then
+		return 1
+	fi
 
 	PARTITION="/dev/block/bootdevice/by-name/boot"
 	adb -s "${device}" root
 	sleep 1
 	adb -s "${device}" wait-for-device
-	adb -s "${device}" shell mount /system 2> /dev/null
+	adb -s "${device}" shell mount /system 2>/dev/null
 	adb -s "${device}" remount
 
-	if adb -s "${device}" shell getprop ro.product.name | grep -q "${TARGET_PRODUCT}"; then
+	local product_name
+	product_name=$(adb -s "${device}" shell getprop ro.product.name) || true
+
+	if echo "${product_name}" | grep -q "${TARGET_PRODUCT}"; then
 		adb -s "${device}" push "${OUT}/boot.img" /data/local/tmp/
 		for module in "${OUT}"/system/lib/modules/*; do
 			[[ -f "${module}" ]] && adb -s "${device}" push "${module}" /system/lib/modules/
@@ -455,14 +474,16 @@ function installboot() {
 
 # Remote management functions with proper error handling
 function aospremote() {
-	if ! git rev-parse --git-dir > /dev/null 2>&1; then
+	if ! git rev-parse --git-dir >/dev/null 2>&1; then
 		echo ".git directory not found. Please run this from the root directory of the Android repository you wish to set up."
 		return 1
 	fi
 
-	git remote rm aosp 2> /dev/null
+	git remote rm aosp 2>/dev/null
 	local PROJECT PFX
-	PROJECT=$(pwd -P | sed -e "s#${ANDROID_BUILD_TOP:-}/##; s#-caf.*##; s#/default##")
+	local current_dir
+	current_dir=$(pwd -P) || true
+	PROJECT=$(echo "${current_dir}" | sed -e "s#${ANDROID_BUILD_TOP:-}/##; s#-caf.*##; s#/default##")
 	if echo "${PROJECT}" | grep -qv "^device"; then
 		PFX="platform/"
 	fi
@@ -471,14 +492,16 @@ function aospremote() {
 }
 
 function cafremote() {
-	if ! git rev-parse --git-dir > /dev/null 2>&1; then
+	if ! git rev-parse --git-dir >/dev/null 2>&1; then
 		echo ".git directory not found. Please run this from the root directory of the Android repository you wish to set up."
 		return 1
 	fi
 
-	git remote rm caf 2> /dev/null
+	git remote rm caf 2>/dev/null
 	local PROJECT PFX
-	PROJECT=$(pwd -P | sed -e "s#${ANDROID_BUILD_TOP:-}/##; s#-caf.*##; s#/default##")
+	local current_dir
+	current_dir=$(pwd -P) || true
+	PROJECT=$(echo "${current_dir}" | sed -e "s#${ANDROID_BUILD_TOP:-}/##; s#-caf.*##; s#/default##")
 	if echo "${PROJECT}" | grep -qv "^device"; then
 		PFX="platform/"
 	fi
@@ -494,8 +517,9 @@ function apush() {
 	fi
 
 	local device
-	device=$(get_device)
-	[[ $? -ne 0 ]] && return 1
+	if ! device=$(get_device); then
+		return 1
+	fi
 
 	local status=0
 	for file in "$@"; do
@@ -506,8 +530,8 @@ function apush() {
 		fi
 
 		local realfile relpath
-		realfile=$(readlink -f "${file}" 2> /dev/null || realpath "${file}" 2> /dev/null || echo "${file}")
-		relpath=$(echo "${realfile}" | sed "s|${OUT}/||")
+		realfile=$(readlink -f "${file}" 2>/dev/null || realpath "${file}" 2>/dev/null || echo "${file}")
+		relpath=${realfile#"${OUT}/"}
 
 		echo "Pushing ${file} to /${relpath}"
 		if ! adb -s "${device}" push "${realfile}" "/${relpath}"; then
@@ -520,8 +544,9 @@ function apush() {
 
 function apull() {
 	local device
-	device=$(get_device)
-	[[ $? -ne 0 ]] && return 1
+	if ! device=$(get_device); then
+		return 1
+	fi
 
 	local status=0
 	for path in "$@"; do
@@ -543,7 +568,7 @@ export ANDROID_JACK_VM_ARGS="-Dfile.encoding=UTF-8 -XX:+TieredCompilation -Xmx4g
 
 # Initialize ccache if directory exists
 if [[ -d "/b/.ccache" ]] && [[ -x "${CCACHE_EXEC}" ]]; then
-	"${CCACHE_EXEC}" -M "${CCACHE_SIZE}" > /dev/null 2>&1
+	"${CCACHE_EXEC}" -M "${CCACHE_SIZE}" >/dev/null 2>&1
 fi
 
 # Add Android SDK platform tools to PATH if directory exists
@@ -553,13 +578,13 @@ fi
 
 # Initialize repo completion for both shells
 if [[ -f ~/bin/repo ]]; then
+	repo_completion=$(~/bin/repo --help | grep -A 1 "Shell completion" | tail -1) || true
+
 	if [[ "${SHELL_NAME}" = "zsh" ]]; then
 		autoload -Uz compinit && compinit
-		# shellcheck disable=SC1090
-		eval "$(~/bin/repo --help | grep -A 1 "Shell completion" | tail -1)"
+		eval "${repo_completion}"
 	else
-		# shellcheck disable=SC1090
-		eval "$(~/bin/repo --help | grep -A 1 "Shell completion" | tail -1)"
+		eval "${repo_completion}"
 	fi
 fi
 
@@ -615,7 +640,7 @@ function gclear() {
 	echo "Cleaning Gradle caches and build files..."
 	rm -rf ~/.gradle/caches/
 	rm -rf .gradle
-	rm -rf */build
+	rm -rf ./*build
 	rm -rf build
 	./gradlew clean
 	echo "Gradle clean complete"
@@ -652,64 +677,66 @@ function adbdev() {
     adbdev --list            - List all device aliases"
 
 	# Create config file if it doesn't exist
-	touch "${config_file}" 2> /dev/null || {
+	touch "${config_file}" 2>/dev/null || {
 		echo "Error: Cannot create/access ${config_file}" >&2
 		return 1
 	}
 
 	case "${1:-}" in
-		--add)
-			if [[ -z "${2:-}" ]] || [[ -z "${3:-}" ]]; then
-				echo "${usage}" >&2
-				return 1
-			fi
-			local alias="$2"
-			local serial="$3"
-			# Remove existing entry if any
-			sed -i "/${alias}:/d" "${config_file}"
-			# Add new entry
-			echo "${alias}:${serial}" >> "${config_file}"
-			echo "Added device alias '${alias}' for serial '${serial}'"
-			;;
-		--remove)
-			if [[ -z "${2:-}" ]]; then
-				echo "${usage}" >&2
-				return 1
-			fi
-			local alias="$2"
-			if sed -i "/${alias}:/d" "${config_file}"; then
-				echo "Removed device alias '${alias}'"
-			else
-				echo "Error: Could not remove alias '${alias}'" >&2
-				return 1
-			fi
-			;;
-		--list)
-			if [[ ! -s "${config_file}" ]]; then
-				echo "No device aliases configured"
-				return 0
-			fi
-			echo "Configured device aliases:"
-			# shellcheck disable=SC2162
-			while IFS=: read -r alias serial || [[ -n "${alias}" ]]; do
-				printf "  %-20s %s\n" "${alias}" "${serial}"
-			done < "${config_file}"
-			;;
-		"")
+	--add)
+		if [[ -z "${2:-}" ]] || [[ -z "${3:-}" ]]; then
 			echo "${usage}" >&2
 			return 1
-			;;
-		*)
-			local alias="$1"
-			local serial
-			serial=$(grep "^${alias}:" "${config_file}" | cut -d: -f2)
-			if [[ -z "${serial}" ]]; then
-				echo "Error: No device found with alias '${alias}'" >&2
-				return 1
-			fi
-			export ANDROID_SERIAL="${serial}"
-			echo "Set ANDROID_SERIAL=${ANDROID_SERIAL}"
-			;;
+		fi
+		local alias="$2"
+		local serial="$3"
+		# Remove existing entry if any
+		sed -i "/${alias}:/d" "${config_file}"
+		# Add new entry
+		echo "${alias}:${serial}" >>"${config_file}"
+		echo "Added device alias '${alias}' for serial '${serial}'"
+		;;
+	--remove)
+		if [[ -z "${2:-}" ]]; then
+			echo "${usage}" >&2
+			return 1
+		fi
+		local alias="$2"
+		if sed -i "/${alias}:/d" "${config_file}"; then
+			echo "Removed device alias '${alias}'"
+		else
+			echo "Error: Could not remove alias '${alias}'" >&2
+			return 1
+		fi
+		;;
+	--list)
+		if [[ ! -s "${config_file}" ]]; then
+			echo "No device aliases configured"
+			return 0
+		fi
+		echo "Configured device aliases:"
+		# shellcheck disable=SC2162
+		while IFS=: read -r alias serial || [[ -n "${alias}" ]]; do
+			printf "  %-20s %s\n" "${alias}" "${serial}"
+		done <"${config_file}"
+		;;
+	"")
+		echo "${usage}" >&2
+		return 1
+		;;
+	*)
+		local alias="$1"
+		local serial
+		local grep_result
+		grep_result=$(grep "^${alias}:" "${config_file}") || true
+		serial=$(echo "${grep_result}" | cut -d: -f2)
+		if [[ -z "${serial}" ]]; then
+			echo "Error: No device found with alias '${alias}'" >&2
+			return 1
+		fi
+		export ANDROID_SERIAL="${serial}"
+		echo "Set ANDROID_SERIAL=${ANDROID_SERIAL}"
+		;;
 	esac
 }
 

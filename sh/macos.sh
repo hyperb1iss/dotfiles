@@ -63,13 +63,17 @@ if [[ "${OSTYPE}" == "darwin"* ]]; then
 	# Enhanced clipboard utilities
 	function copy-path() {
 		local path="${1:-.}"
-		realpath "${path}" | tr -d '\n' | pbcopy
+		local resolved_path
+		resolved_path=$(realpath "${path}") || true
+		echo -n "${resolved_path}" | pbcopy
 		echo "Path copied to clipboard"
 	}
 
 	# Show current wifi network
 	function wifi-name() {
-		/System/Library/PrivateFrameworks/Apple80211.framework/Versions/Current/Resources/airport -I | awk '/ SSID/ {print $2}'
+		local airport_info
+		airport_info=$(/System/Library/PrivateFrameworks/Apple80211.framework/Versions/Current/Resources/airport -I) || true
+		echo "${airport_info}" | awk '/ SSID/ {print $2}'
 	}
 
 	# List all connected devices (USB, Thunderbolt, etc)
@@ -79,7 +83,9 @@ if [[ "${OSTYPE}" == "darwin"* ]]; then
 
 	# Get battery status
 	function battery() {
-		pmset -g batt | grep -o "[0-9]*%"
+		local batt_info
+		batt_info=$(pmset -g batt) || true
+		echo "${batt_info}" | grep -o "[0-9]*%"
 	}
 
 	# Easy way to extract disk images
@@ -162,12 +168,14 @@ if [[ "${OSTYPE}" == "darwin"* ]]; then
 	# Interactive service management with fzf
 	function brew-services() {
 		local selected
-		selected=$(brew services list | fzf --header-lines=1 --preview="echo {}" --preview-window=up:1)
+		local services_list
+		services_list=$(brew services list) || true
+		selected=$(echo "${services_list}" | fzf --header-lines=1 --preview="echo {}" --preview-window=up:1)
 
 		if [[ -n "${selected}" ]]; then
 			local service
-			service=$(echo "${selected}" | awk '{print $1}')
 			local status
+			service=$(echo "${selected}" | awk '{print $1}')
 			status=$(echo "${selected}" | awk '{print $2}')
 
 			echo "Service: ${service} (Status: ${status})"
@@ -222,7 +230,9 @@ if [[ "${OSTYPE}" == "darwin"* ]]; then
 
 	# Take a screenshot of a selected area and save to desktop
 	function screenshot-area() {
-		screencapture -i ~/Desktop/screenshot-"$(date +%Y%m%d-%H%M%S)".png
+		local timestamp
+		timestamp=$(date +%Y%m%d-%H%M%S) || true
+		screencapture -i ~/Desktop/screenshot-"${timestamp}".png
 		echo "Screenshot saved to Desktop"
 	}
 
@@ -234,20 +244,26 @@ if [[ "${OSTYPE}" == "darwin"* ]]; then
 
 	# Take a screenshot of the entire screen
 	function screenshot-screen() {
-		screencapture ~/Desktop/screenshot-"$(date +%Y%m%d-%H%M%S)".png
+		local timestamp
+		timestamp=$(date +%Y%m%d-%H%M%S) || true
+		screencapture ~/Desktop/screenshot-"${timestamp}".png
 		echo "Screenshot saved to Desktop"
 	}
 
 	# Take a screenshot of a specific window (click to select)
 	function screenshot-window() {
-		screencapture -iW ~/Desktop/screenshot-"$(date +%Y%m%d-%H%M%S)".png
+		local timestamp
+		timestamp=$(date +%Y%m%d-%H%M%S) || true
+		screencapture -iW ~/Desktop/screenshot-"${timestamp}".png
 		echo "Screenshot saved to Desktop"
 	}
 
 	# Start screen recording (press Ctrl+C to stop)
 	function screen-record() {
 		local output_file
-		output_file=~/Desktop/screen-recording-"$(date +%Y%m%d-%H%M%S)".mov
+		local timestamp
+		timestamp=$(date +%Y%m%d-%H%M%S) || true
+		output_file=~/Desktop/screen-recording-"${timestamp}".mov
 		echo "Recording screen to ${output_file}..."
 		echo "Press Control+C to stop recording..."
 		screencapture -V 60 -v "${output_file}"
@@ -299,7 +315,8 @@ if [[ "${OSTYPE}" == "darwin"* ]]; then
 	}
 
 	# Modified PATH for macOS to include Homebrew
-	if [[ $(uname -m) == "arm64" ]]; then
+	arch=$(uname -m) || true
+	if [[ "${arch}" == "arm64" ]]; then
 		# M1/M2 Mac
 		export PATH="/opt/homebrew/bin:/opt/homebrew/sbin:${PATH}"
 	else
@@ -329,17 +346,19 @@ if [[ "${OSTYPE}" == "darwin"* ]]; then
 		if [[ -n "${ZSH_VERSION}" ]]; then
 			# ZSH completions
 			FPATH="$(brew --prefix)/share/zsh-completions:${FPATH}"
-			if [[ -d $(brew --prefix)/share/zsh/site-functions ]]; then
-				FPATH="$(brew --prefix)/share/zsh/site-functions:${FPATH}"
+			brew_prefix=$(brew --prefix) || true
+			if [[ -d "${brew_prefix}/share/zsh/site-functions" ]]; then
+				FPATH="${brew_prefix}/share/zsh/site-functions:${FPATH}"
 			fi
 			autoload -Uz compinit
 			compinit
 		elif [[ -n "${BASH_VERSION}" ]]; then
 			# Bash completions
-			if [[ -r "$(brew --prefix)/etc/profile.d/bash_completion.sh" ]]; then
-				source "$(brew --prefix)/etc/profile.d/bash_completion.sh"
+			brew_prefix=$(brew --prefix) || true
+			if [[ -r "${brew_prefix}/etc/profile.d/bash_completion.sh" ]]; then
+				source "${brew_prefix}/etc/profile.d/bash_completion.sh"
 			else
-				for COMPLETION in "$(brew --prefix)/etc/bash_completion.d/"*; do
+				for COMPLETION in "${brew_prefix}/etc/bash_completion.d/"*; do
 					[[ -r "${COMPLETION}" ]] && source "${COMPLETION}"
 				done
 			fi
@@ -348,13 +367,14 @@ if [[ "${OSTYPE}" == "darwin"* ]]; then
 
 	# Initialize zsh-autosuggestions if installed through Homebrew
 	if [[ -n "${ZSH_VERSION}" ]]; then
-		if [[ -f "$(brew --prefix)/share/zsh-autosuggestions/zsh-autosuggestions.zsh" ]]; then
-			source "$(brew --prefix)/share/zsh-autosuggestions/zsh-autosuggestions.zsh"
+		brew_prefix=$(brew --prefix) || true
+		if [[ -f "${brew_prefix}/share/zsh-autosuggestions/zsh-autosuggestions.zsh" ]]; then
+			source "${brew_prefix}/share/zsh-autosuggestions/zsh-autosuggestions.zsh"
 		fi
 
 		# Initialize syntax highlighting if installed through Homebrew
-		if [[ -f "$(brew --prefix)/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh" ]]; then
-			source "$(brew --prefix)/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
+		if [[ -f "${brew_prefix}/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh" ]]; then
+			source "${brew_prefix}/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
 		fi
 	fi
 fi
