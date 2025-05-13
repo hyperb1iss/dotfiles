@@ -90,10 +90,11 @@ if has_command kubectl; then
   # shellcheck disable=SC1090
   if is_zsh; then
     source <(kubectl completion zsh) 2> /dev/null || true
+    compdef k=kubectl
   elif is_bash; then
     source <(kubectl completion bash) 2> /dev/null || true
+    complete -o default -F __start_kubectl k
   fi
-  complete -o default -F __start_kubectl k
 fi
 
 # Initialize krew path if installed
