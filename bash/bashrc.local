@@ -23,7 +23,7 @@ shell_options=(
 )
 
 for option in "${shell_options[@]}"; do
-  shopt -s "$option" 2> /dev/null
+  shopt -s "${option}" 2> /dev/null
 done
 
 # Enable cycling through completion options with TAB

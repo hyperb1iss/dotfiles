@@ -6,7 +6,8 @@ shell=bash
 # Disable warnings for scripts without shebangs (SC2148)
 # Disable warnings for command substitution masking return values (SC2312)
 # Disable non-following source warnings (SC1090, SC1091)
-disable=SC2148,SC2312,SC1090,SC1091
+# Disable warnings about source files that can't be parsed (SC1094)
+disable=SC2148,SC2312,SC1090,SC1091,SC1094
 
 # Other helpful settings
 enable=all
