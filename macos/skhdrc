@@ -3,8 +3,8 @@
 
 # Reload yabai and skhd
 ctrl + alt + cmd - r : \
-    launchctl kickstart -k "gui/${UID}/homebrew.mxcl.yabai"; \
-    skhd --reload
+  launchctl kickstart -k "gui/${UID}/homebrew.mxcl.yabai"
+skhd --reload
 
 # Change focus
 alt - h : yabai -m window --focus west
@@ -43,15 +43,24 @@ shift + cmd - n : yabai -m space --create
 shift + cmd - d : yabai -m space --destroy
 
 # Send window to desktop and follow focus
-shift + cmd - 1 : yabai -m window --space  1; yabai -m space --focus 1
-shift + cmd - 2 : yabai -m window --space  2; yabai -m space --focus 2
-shift + cmd - 3 : yabai -m window --space  3; yabai -m space --focus 3
-shift + cmd - 4 : yabai -m window --space  4; yabai -m space --focus 4
-shift + cmd - 5 : yabai -m window --space  5; yabai -m space --focus 5
-shift + cmd - 6 : yabai -m window --space  6; yabai -m space --focus 6
-shift + cmd - 7 : yabai -m window --space  7; yabai -m space --focus 7
-shift + cmd - 8 : yabai -m window --space  8; yabai -m space --focus 8
-shift + cmd - 9 : yabai -m window --space  9; yabai -m space --focus 9
+shift + cmd - 1 : yabai -m window --space 1
+yabai -m space --focus 1
+shift + cmd - 2 : yabai -m window --space 2
+yabai -m space --focus 2
+shift + cmd - 3 : yabai -m window --space 3
+yabai -m space --focus 3
+shift + cmd - 4 : yabai -m window --space 4
+yabai -m space --focus 4
+shift + cmd - 5 : yabai -m window --space 5
+yabai -m space --focus 5
+shift + cmd - 6 : yabai -m window --space 6
+yabai -m space --focus 6
+shift + cmd - 7 : yabai -m window --space 7
+yabai -m space --focus 7
+shift + cmd - 8 : yabai -m window --space 8
+yabai -m space --focus 8
+shift + cmd - 9 : yabai -m window --space 9
+yabai -m space --focus 9
 
 # Resize windows
 ctrl + alt - h : yabai -m window --resize left:-20:0
@@ -61,8 +70,8 @@ ctrl + alt - l : yabai -m window --resize right:20:0
 
 # Float / Unfloat window
 shift + alt - space : \
-    yabai -m window --toggle float; \
-    yabai -m window --toggle border
+  yabai -m window --toggle float
+yabai -m window --toggle border
 
 # Toggle window fullscreen
 alt - f : yabai -m window --toggle zoom-fullscreen
@@ -79,4 +88,4 @@ ctrl + alt - f : yabai -m space --layout float
 ctrl + alt - s : yabai -m space --layout stack
 
 # Open terminal quickly
-cmd - return : open -a iTerm 
+cmd - return : open -a iTerm

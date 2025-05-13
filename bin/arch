@@ -6,15 +6,15 @@
 # This script is intended to run only on Arch Linux.
 
 if [ ! -f /etc/arch-release ]; then
-    echo "This script is only intended for Arch Linux."
-    exit 1
+  echo "This script is only intended for Arch Linux."
+  exit 1
 fi
 
 # ---------------------------------
 # Usage/Help Function
 # ---------------------------------
 usage() {
-    cat <<EOF
+  cat << EOF
 Usage: arch <command> [subcommand] [options]
 
 Commands:
@@ -48,7 +48,7 @@ Example:
   arch pkg deps git
   arch maintain
 EOF
-    exit 1
+  exit 1
 }
 
 # ---------------------------------
@@ -56,301 +56,301 @@ EOF
 # ---------------------------------
 # Ensure that the AUR helper 'paru' is installed.
 ensure_paru() {
-    if ! command -v paru &>/dev/null; then
-        echo "🔧 Installing paru AUR helper..."
-        git clone https://aur.archlinux.org/paru.git /tmp/paru
-        (cd /tmp/paru && makepkg -si --noconfirm)
-        rm -rf /tmp/paru
-    fi
+  if ! command -v paru &> /dev/null; then
+    echo "🔧 Installing paru AUR helper..."
+    git clone https://aur.archlinux.org/paru.git /tmp/paru
+    (cd /tmp/paru && makepkg -si --noconfirm)
+    rm -rf /tmp/paru
+  fi
 }
 
 aur_search() {
-    if [ -z "$1" ]; then
-        echo "Usage: arch aur search package_name"
-        return 1
-    fi
-    ensure_paru
-    paru -Ss "^$1"
+  if [ -z "$1" ]; then
+    echo "Usage: arch aur search package_name"
+    return 1
+  fi
+  ensure_paru
+  paru -Ss "^$1"
 }
 
 aur_install() {
-    if [ -z "$1" ]; then
-        echo "Usage: arch aur add package_name"
-        return 1
-    fi
-    ensure_paru
-    paru -S "$1"
+  if [ -z "$1" ]; then
+    echo "Usage: arch aur add package_name"
+    return 1
+  fi
+  ensure_paru
+  paru -S "$1"
 }
 
 aur_update() {
-    ensure_paru
-    paru -Sua
+  ensure_paru
+  paru -Sua
 }
 
 aur_info() {
-    if [ -z "$1" ]; then
-        echo "Usage: arch aur info package_name"
-        return 1
-    fi
-    ensure_paru
-    paru -Si "$1"
+  if [ -z "$1" ]; then
+    echo "Usage: arch aur info package_name"
+    return 1
+  fi
+  ensure_paru
+  paru -Si "$1"
 }
 
 list_aur_packages() {
-    echo "📦 Installed AUR packages:"
-    pacman -Qm
+  echo "📦 Installed AUR packages:"
+  pacman -Qm
 }
 
 clean_aur_cache() {
-    echo "🧹 Cleaning AUR cache..."
-    rm -rf ~/.cache/paru/clone/*
-    paru -Sc --noconfirm
+  echo "🧹 Cleaning AUR cache..."
+  rm -rf ~/.cache/paru/clone/*
+  paru -Sc --noconfirm
 }
 
 # ---------------------------------
 # Official Package Helper Functions
 # ---------------------------------
 search_pkg() {
-    if [ -z "$1" ]; then
-        echo "Usage: arch pkg search package_name"
-        return 1
-    fi
-    pacman -Ss "$1"
+  if [ -z "$1" ]; then
+    echo "Usage: arch pkg search package_name"
+    return 1
+  fi
+  pacman -Ss "$1"
 }
 
 pkg_info() {
-    if [ -z "$1" ]; then
-        echo "Usage: arch pkg info package_name"
-        return 1
-    fi
-    pacman -Si "$1"
+  if [ -z "$1" ]; then
+    echo "Usage: arch pkg info package_name"
+    return 1
+  fi
+  pacman -Si "$1"
 }
 
 list_installed() {
-    echo "📋 Explicitly installed packages:"
-    pacman -Qe
+  echo "📋 Explicitly installed packages:"
+  pacman -Qe
 }
 
 owns_file() {
-    if [ -z "$1" ]; then
-        echo "Usage: arch pkg owns /path/to/file"
-        return 1
-    fi
-    pacman -Qo "$1"
+  if [ -z "$1" ]; then
+    echo "Usage: arch pkg owns /path/to/file"
+    return 1
+  fi
+  pacman -Qo "$1"
 }
 
 list_pkg_files() {
-    if [ -z "$1" ]; then
-        echo "Usage: arch pkg files package_name"
-        return 1
-    fi
-    pacman -Ql "$1"
+  if [ -z "$1" ]; then
+    echo "Usage: arch pkg files package_name"
+    return 1
+  fi
+  pacman -Ql "$1"
 }
 
 show_deps() {
-    if [ -z "$1" ]; then
-        echo "Usage: arch pkg deps package_name"
-        return 1
-    fi
-    pactree "$1"
+  if [ -z "$1" ]; then
+    echo "Usage: arch pkg deps package_name"
+    return 1
+  fi
+  pactree "$1"
 }
 
 show_rdeps() {
-    if [ -z "$1" ]; then
-        echo "Usage: arch pkg rdeps package_name"
-        return 1
-    fi
-    pactree -r "$1"
+  if [ -z "$1" ]; then
+    echo "Usage: arch pkg rdeps package_name"
+    return 1
+  fi
+  pactree -r "$1"
 }
 
 # ---------------------------------
 # New Official Package Update Function
 # ---------------------------------
 update_pkg() {
-    echo "📦 Updating official repository packages..."
-    sudo pacman -Syu
+  echo "📦 Updating official repository packages..."
+  sudo pacman -Syu
 }
 
 # ---------------------------------
 # System Maintenance Functions
 # ---------------------------------
 update_system() {
-    echo "📦 Updating system packages..."
-    sudo pacman -Syu
+  echo "📦 Updating system packages..."
+  sudo pacman -Syu
 
-    echo "🧹 Cleaning package cache..."
-    sudo pacman -Sc --noconfirm
+  echo "🧹 Cleaning package cache..."
+  sudo pacman -Sc --noconfirm
 
-    if command -v paru &>/dev/null; then
-        echo "🔄 Updating AUR packages..."
-        paru -Sua
-    fi
+  if command -v paru &> /dev/null; then
+    echo "🔄 Updating AUR packages..."
+    paru -Sua
+  fi
 }
 
 remove_orphans() {
-    echo "🗑️ Removing orphaned packages..."
-    readarray -t orphans < <(pacman -Qtdq)
-    if [ ${#orphans[@]} -gt 0 ]; then
-      sudo pacman -Rns "${orphans[@]}"
-    else
-      echo "No orphaned packages found."
-    fi
+  echo "🗑️ Removing orphaned packages..."
+  readarray -t orphans < <(pacman -Qtdq)
+  if [ ${#orphans[@]} -gt 0 ]; then
+    sudo pacman -Rns "${orphans[@]}"
+  else
+    echo "No orphaned packages found."
+  fi
 }
 
 check_failed_services() {
-    echo "🔍 Checking failed systemd services..."
-    systemctl --failed
+  echo "🔍 Checking failed systemd services..."
+  systemctl --failed
 }
 
 clean_journals() {
-    echo "📝 Cleaning old journal logs..."
-    sudo journalctl --vacuum-time=2weeks
+  echo "📝 Cleaning old journal logs..."
+  sudo journalctl --vacuum-time=2weeks
 }
 
 check_pacnew() {
-    echo "📄 Checking for .pacnew/.pacsave configuration files..."
-    find /etc -name "*.pacnew" -o -name "*.pacsave"
+  echo "📄 Checking for .pacnew/.pacsave configuration files..."
+  find /etc -name "*.pacnew" -o -name "*.pacsave"
 }
 
 arch_maintenance() {
-    update_system
-    remove_orphans
-    check_failed_services
-    clean_journals
-    check_pacnew
-    echo "✅ System maintenance completed!"
+  update_system
+  remove_orphans
+  check_failed_services
+  clean_journals
+  check_pacnew
+  echo "✅ System maintenance completed!"
 }
 
 # ---------------------------------
 # New AUR Functions
 # ---------------------------------
 aur_add() {
-    aur_install "$@"
+  aur_install "$@"
 }
 
 aur_rm() {
-    if [ -z "$1" ]; then
-        echo "Usage: arch aur rm package_name"
-        return 1
-    fi
-    sudo pacman -Rns "$1"
+  if [ -z "$1" ]; then
+    echo "Usage: arch aur rm package_name"
+    return 1
+  fi
+  sudo pacman -Rns "$1"
 }
 
 # ---------------------------------
 # New Functions for Official Packages
 # ---------------------------------
 pkg_add() {
-    if [ -z "$1" ]; then
-        echo "Usage: arch pkg add package_name"
-        return 1
-    fi
-    sudo pacman -S "$1"
+  if [ -z "$1" ]; then
+    echo "Usage: arch pkg add package_name"
+    return 1
+  fi
+  sudo pacman -S "$1"
 }
 
 pkg_rm() {
-    if [ -z "$1" ]; then
-        echo "Usage: arch pkg rm package_name"
-        return 1
-    fi
-    sudo pacman -Rns "$1"
+  if [ -z "$1" ]; then
+    echo "Usage: arch pkg rm package_name"
+    return 1
+  fi
+  sudo pacman -Rns "$1"
 }
 
 # ---------------------------------
 # Main Command Dispatcher
 # ---------------------------------
 if [ $# -eq 0 ]; then
-    usage
+  usage
 fi
 
 case "$1" in
-help | -h | --help)
+  help | -h | --help)
     usage
     ;;
-aur)
+  aur)
     shift
     case "$1" in
-    search)
+      search)
         shift
         aur_search "$@"
         ;;
-    add)
+      add)
         shift
         aur_add "$@"
         ;;
-    rm)
+      rm)
         shift
         aur_rm "$@"
         ;;
-    update)
+      update)
         aur_update
         ;;
-    info)
+      info)
         shift
         aur_info "$@"
         ;;
-    list)
+      list)
         list_aur_packages
         ;;
-    clean)
+      clean)
         clean_aur_cache
         ;;
-    *)
+      *)
         echo "Unknown subcommand for 'aur': $1"
         usage
         ;;
     esac
     ;;
-pkg)
+  pkg)
     shift
     case "$1" in
-    search)
+      search)
         shift
         search_pkg "$@"
         ;;
-    update)
+      update)
         update_pkg
         ;;
-    add)
+      add)
         shift
         pkg_add "$@"
         ;;
-    rm)
+      rm)
         shift
         pkg_rm "$@"
         ;;
-    info)
+      info)
         shift
         pkg_info "$@"
         ;;
-    list)
+      list)
         list_installed
         ;;
-    owns)
+      owns)
         shift
         owns_file "$@"
         ;;
-    files)
+      files)
         shift
         list_pkg_files "$@"
         ;;
-    deps)
+      deps)
         shift
         show_deps "$@"
         ;;
-    rdeps)
+      rdeps)
         shift
         show_rdeps "$@"
         ;;
-    *)
+      *)
         echo "Unknown subcommand for 'pkg': $1"
         usage
         ;;
     esac
     ;;
-maintain | maint)
+  maintain | maint)
     arch_maintenance
     ;;
-*)
+  *)
     echo "Unknown command: $1"
     usage
     ;;

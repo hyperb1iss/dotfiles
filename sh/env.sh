@@ -4,7 +4,7 @@
 
 # Ensure LS_COLORS is set if dircolors exists
 if has_command dircolors; then
-	eval "$(dircolors -b ~/.dircolors)" || true
+  eval "$(dircolors -b ~/.dircolors)" || true
 fi
 
 # Development tool configurations
@@ -23,9 +23,9 @@ export EDITOR="${VISUAL}"
 
 # Set up bat/batcat aliases based on what's available
 if has_command batcat; then
-	alias bat="batcat"
+  alias bat="batcat"
 elif has_command bat; then
-	alias batcat="bat"
+  alias batcat="bat"
 fi
 
 # HOSTNAME
