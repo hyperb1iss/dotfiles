@@ -23,7 +23,3 @@ indent_size = 2
 switch_case_indent = true
 binary_next_line = true
 space_redirects = true
-
-# Markdown files
-[*.md]
-trim_trailing_whitespace = false

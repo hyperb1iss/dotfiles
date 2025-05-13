@@ -2,35 +2,35 @@
 
 # Bash-specific shell options
 shell_options=(
-    autocd
-    cdable_vars
-    cdspell
-    checkwinsize
-    cmdhist
-    direxpand
-    dirspell
-    expand_aliases
-    extglob
-    extquote
-    force_fignore
-    globstar
-    histappend
-    hostcomplete
-    interactive_comments
-    progcomp
-    promptvars
-    sourcepath
+  autocd
+  cdable_vars
+  cdspell
+  checkwinsize
+  cmdhist
+  direxpand
+  dirspell
+  expand_aliases
+  extglob
+  extquote
+  force_fignore
+  globstar
+  histappend
+  hostcomplete
+  interactive_comments
+  progcomp
+  promptvars
+  sourcepath
 )
 
 for option in "${shell_options[@]}"; do
-    shopt -s "$option" 2>/dev/null
+  shopt -s "$option" 2> /dev/null
 done
 
 # Enable cycling through completion options with TAB
 bind 'TAB:menu-complete'
-bind '"\e[Z":menu-complete-backward'  # Shift+Tab to cycle backwards
-bind 'set show-all-if-ambiguous on'   # Show options on first TAB
-bind 'set menu-complete-display-prefix on'  # Show the common prefix while cycling
+bind '"\e[Z":menu-complete-backward'       # Shift+Tab to cycle backwards
+bind 'set show-all-if-ambiguous on'        # Show options on first TAB
+bind 'set menu-complete-display-prefix on' # Show the common prefix while cycling
 
 # Source common shell configurations
 source ~/dev/dotfiles/sh/shell-common.sh
