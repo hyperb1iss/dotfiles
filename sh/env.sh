@@ -3,7 +3,7 @@
 
 # Ensure LS_COLORS is set if dircolors exists
 if command -v dircolors >/dev/null 2>&1; then
-    eval "$(dircolors -b ~/.dircolors)" || true
+	eval "$(dircolors -b ~/.dircolors)" || true
 fi
 
 # Development tool configurations
@@ -22,9 +22,9 @@ export EDITOR="${VISUAL}"
 
 # Set up bat/batcat aliases based on what's available
 if command -v batcat >/dev/null 2>&1; then
-    alias bat="batcat"
+	alias bat="batcat"
 elif command -v bat >/dev/null 2>&1; then
-    alias batcat="bat"
+	alias batcat="bat"
 fi
 
 # HOSTNAME
@@ -51,5 +51,5 @@ export FZF_DEFAULT_OPTS="--height 40% --layout=reverse --border --preview 'bat -
 # Source private environment variables if they exist
 # shellcheck source=/home/bliss/dev/dotfiles-private/env/private.sh
 if [[ -f ~/dev/dotfiles-private/env/private.sh ]]; then
-    source ~/dev/dotfiles-private/env/private.sh
+	source ~/dev/dotfiles-private/env/private.sh
 fi
