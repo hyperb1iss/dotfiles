@@ -2,7 +2,7 @@
 
 # Get the last component of the current directory
 function normalize_path() {
-	local path=${PWD/#$HOME/\~}
+	local path=${PWD/#${HOME}/\~}
 	echo "${path##*/}"
 }
 
@@ -17,7 +17,7 @@ function set_terminal_title() {
 
 	# Set the terminal title, including debian chroot if present
 	# shellcheck disable=SC1090
-	echo -ne "\033]0;${title_prefix}${debian_chroot:+($debian_chroot)}${USER}@${HOSTNAME}: ${normalized_path}\007"
+	echo -ne "\033]0;${title_prefix}${debian_chroot:+(${debian_chroot})}${USER}@${HOSTNAME}: ${normalized_path}\007"
 }
 
 # Setup terminal title updating based on shell

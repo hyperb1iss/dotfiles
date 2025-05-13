@@ -8,24 +8,24 @@ function venv() {
 	else
 		DIR="$1"
 	fi
-	python -m venv "$DIR"
+	python -m venv "${DIR}"
 	# shellcheck disable=SC1090
-	source "$DIR/bin/activate"
+	source "${DIR}/bin/activate"
 }
 
 # Activate virtual environment, searching up directory tree
 function va() {
-	local dir="$PWD"
-	while [[ "$dir" != "/" ]]; do
-		for venv in "$dir"/{venv,.venv,env,.env}; do
-			if [[ -f "$venv/bin/activate" ]]; then
+	local dir="${PWD}"
+	while [[ "${dir}" != "/" ]]; do
+		for venv in "${dir}"/{venv,.venv,env,.env}; do
+			if [[ -f "${venv}/bin/activate" ]]; then
 				# shellcheck disable=SC1090
-				source "$venv/bin/activate"
-				echo "Activated virtualenv: $venv"
+				source "${venv}/bin/activate"
+				echo "Activated virtualenv: ${venv}"
 				return 0
 			fi
 		done
-		dir="$(dirname "$dir")"
+		dir="$(dirname "${dir}")"
 	done
 	echo "No virtualenv found"
 	return 1
@@ -39,7 +39,7 @@ function vd() {
 # Run Django development server on specified port (default 8000)
 function drs() {
 	local port=${1:-8000}
-	python manage.py runserver "0.0.0.0:$port"
+	python manage.py runserver "0.0.0.0:${port}"
 }
 
 # Django shell plus (if installed) or regular shell

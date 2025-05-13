@@ -35,18 +35,18 @@ if command -v procs >/dev/null 2>&1; then
 
 		local pattern="$1"
 		local pids
-		pids=$(procs "$pattern" --only pid --no-header | tr -d '\n')
+		pids=$(procs "${pattern}" --only pid --no-header | tr -d '\n')
 
-		if [[ -z "$pids" ]]; then
-			echo "No processes matching '$pattern' found."
+		if [[ -z "${pids}" ]]; then
+			echo "No processes matching '${pattern}' found."
 			return 0
 		fi
 
 		echo "The following processes will be terminated:"
-		procs "$pattern"
+		procs "${pattern}"
 
 		# shellcheck disable=SC2086
-		kill $pids
+		kill ${pids}
 	}
 fi
 

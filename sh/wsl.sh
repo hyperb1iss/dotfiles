@@ -5,10 +5,10 @@
 # Only load these functions if running in WSL
 if grep -qi microsoft /proc/version 2>/dev/null; then
 	# Detect Windows username and set $W
-	if [[ -z "$W" ]]; then
+	if [[ -z "${W}" ]]; then
 		WIN_USERNAME=$(powershell.exe -Command '[System.Environment]::UserName' | tr -d '\r')
-		if [[ -n "$WIN_USERNAME" ]] && [[ -d "/mnt/c/Users/$WIN_USERNAME" ]]; then
-			export W="/mnt/c/Users/$WIN_USERNAME"
+		if [[ -n "${WIN_USERNAME}" ]] && [[ -d "/mnt/c/Users/${WIN_USERNAME}" ]]; then
+			export W="/mnt/c/Users/${WIN_USERNAME}"
 		else
 			echo "Warning: Could not determine Windows user directory. \$W is not set." >&2
 		fi
@@ -33,10 +33,10 @@ if grep -qi microsoft /proc/version 2>/dev/null; then
 	# Usage: explore [path]
 	function explore() {
 		local path="${1:-.}"
-		if [[ -d "$path" ]]; then
-			explorer.exe "$(command wslpath -w "$path")"
+		if [[ -d "${path}" ]]; then
+			explorer.exe "$(command wslpath -w "${path}")"
 		else
-			echo "Error: Directory does not exist: $path" >&2
+			echo "Error: Directory does not exist: ${path}" >&2
 			return 1
 		fi
 	}
@@ -44,21 +44,21 @@ if grep -qi microsoft /proc/version 2>/dev/null; then
 	# Quick access to Windows User directory
 	# Usage: cdw [subdirectory]
 	function cdw() {
-		local win_home="/mnt/c/Users/$USER"
-		if [[ ! -d "$win_home" ]]; then
+		local win_home="/mnt/c/Users/${USER}"
+		if [[ ! -d "${win_home}" ]]; then
 			# Try common Windows username if Linux username doesn't match
 			win_home="/mnt/c/Users/$(whoami)"
 		fi
 
-		if [[ ! -d "$win_home" ]]; then
+		if [[ ! -d "${win_home}" ]]; then
 			echo "Error: Could not find Windows user directory" >&2
 			return 1
 		fi
 
 		if [[ -n "$1" ]]; then
-			cd "$win_home/$1" || return 1
+			cd "${win_home}/$1" || return 1
 		else
-			cd "$win_home" || return 1
+			cd "${win_home}" || return 1
 		fi
 	}
 
@@ -77,10 +77,10 @@ if grep -qi microsoft /proc/version 2>/dev/null; then
 		else
 			# Handle files
 			local path="$1"
-			if [[ -e "$path" ]]; then
-				cmd.exe /c "start $(command wslpath -w "$path")" 2>/dev/null
+			if [[ -e "${path}" ]]; then
+				cmd.exe /c "start $(command wslpath -w "${path}")" 2>/dev/null
 			else
-				echo "Error: File does not exist: $path" >&2
+				echo "Error: File does not exist: ${path}" >&2
 				return 1
 			fi
 		fi
@@ -90,11 +90,11 @@ if grep -qi microsoft /proc/version 2>/dev/null; then
 	# Usage: clip-path [path]
 	function clip-path() {
 		local path="${1:-.}"
-		if [[ -e "$path" ]]; then
-			command wslpath -w "$(realpath "$path")" | clip.exe
+		if [[ -e "${path}" ]]; then
+			command wslpath -w "$(realpath "${path}")" | clip.exe
 			echo "Path copied to clipboard"
 		else
-			echo "Error: Path does not exist: $path" >&2
+			echo "Error: Path does not exist: ${path}" >&2
 			return 1
 		fi
 	}

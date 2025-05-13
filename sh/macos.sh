@@ -3,7 +3,7 @@
 # macOS specific utilities and configurations
 
 # Only load these functions if running on macOS
-if [[ "$OSTYPE" == "darwin"* ]]; then
+if [[ "${OSTYPE}" == "darwin"* ]]; then
 	# macOS application shortcuts
 	alias code='open -a "Visual Studio Code"'
 	alias subl='open -a "Sublime Text"'
@@ -16,7 +16,7 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
 
 	# Open file/directory in Finder
 	function finder() {
-		if [ $# -eq 0 ]; then
+		if [[ $# -eq 0 ]]; then
 			open .
 		else
 			open "$@"
@@ -25,10 +25,10 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
 
 	# Copy to clipboard
 	function clip() {
-		if [ -p /dev/stdin ]; then
+		if [[ -p /dev/stdin ]]; then
 			# If input is from a pipe, process it
 			pbcopy
-		elif [ $# -eq 0 ]; then
+		elif [[ $# -eq 0 ]]; then
 			# If no args, show usage
 			echo "Usage: clip <text> or command | clip"
 		else
@@ -63,7 +63,7 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
 	# Enhanced clipboard utilities
 	function copy-path() {
 		local path="${1:-.}"
-		realpath "$path" | tr -d '\n' | pbcopy
+		realpath "${path}" | tr -d '\n' | pbcopy
 		echo "Path copied to clipboard"
 	}
 
@@ -85,25 +85,26 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
 	# Easy way to extract disk images
 	function extract-dmg() {
 		local dmg_file="$1"
-		local mount_point="/Volumes/$(basename "$dmg_file" .dmg)"
-		local extract_dir="${2:-./$(basename "$dmg_file" .dmg)_extracted}"
+		local mount_point
+		mount_point="/Volumes/$(basename "${dmg_file}" .dmg)"
+		local extract_dir="${2:-./$(basename "${dmg_file}" .dmg)_extracted}"
 
-		if [[ ! -f "$dmg_file" ]]; then
-			echo "File not found: $dmg_file"
+		if [[ ! -f "${dmg_file}" ]]; then
+			echo "File not found: ${dmg_file}"
 			return 1
 		fi
 
-		mkdir -p "$extract_dir"
-		hdiutil attach "$dmg_file"
-		cp -R "$mount_point"/* "$extract_dir"/
-		hdiutil detach "$mount_point"
-		echo "Extracted to $extract_dir"
+		mkdir -p "${extract_dir}"
+		hdiutil attach "${dmg_file}"
+		cp -R "${mount_point}"/* "${extract_dir}"/
+		hdiutil detach "${mount_point}"
+		echo "Extracted to ${extract_dir}"
 	}
 
 	# Manage quarantine attributes (for downloaded files)
 	function unquarantine() {
 		xattr -d com.apple.quarantine "$@"
-		echo "Quarantine attribute removed from $@"
+		echo "Quarantine attribute removed from $*"
 	}
 
 	# Toggle dark mode
@@ -133,7 +134,7 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
 
 	# Start a service
 	function brew-start() {
-		if [ -z "$1" ]; then
+		if [[ -z "$1" ]]; then
 			echo "Usage: brew-start <service>"
 			return 1
 		fi
@@ -142,7 +143,7 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
 
 	# Stop a service
 	function brew-stop() {
-		if [ -z "$1" ]; then
+		if [[ -z "$1" ]]; then
 			echo "Usage: brew-stop <service>"
 			return 1
 		fi
@@ -151,7 +152,7 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
 
 	# Restart a service
 	function brew-restart() {
-		if [ -z "$1" ]; then
+		if [[ -z "$1" ]]; then
 			echo "Usage: brew-restart <service>"
 			return 1
 		fi
@@ -160,25 +161,28 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
 
 	# Interactive service management with fzf
 	function brew-services() {
-		local selected=$(brew services list | fzf --header-lines=1 --preview="echo {}" --preview-window=up:1)
+		local selected
+		selected=$(brew services list | fzf --header-lines=1 --preview="echo {}" --preview-window=up:1)
 
-		if [ -n "$selected" ]; then
-			local service=$(echo "$selected" | awk '{print $1}')
-			local status=$(echo "$selected" | awk '{print $2}')
+		if [[ -n "${selected}" ]]; then
+			local service
+			service=$(echo "${selected}" | awk '{print $1}')
+			local status
+			status=$(echo "${selected}" | awk '{print $2}')
 
-			echo "Service: $service (Status: $status)"
+			echo "Service: ${service} (Status: ${status})"
 			echo "Actions:"
 			echo "  1) Start"
 			echo "  2) Stop"
 			echo "  3) Restart"
 			echo "  q) Quit"
 
-			read -p "Select action: " action
+			read -r -p "Select action: " action
 
-			case "$action" in
-			1) brew services start "$service" ;;
-			2) brew services stop "$service" ;;
-			3) brew services restart "$service" ;;
+			case "${action}" in
+			1) brew services start "${service}" ;;
+			2) brew services stop "${service}" ;;
+			3) brew services restart "${service}" ;;
 			q) return 0 ;;
 			*) echo "Invalid action" ;;
 			esac
@@ -188,7 +192,7 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
 	# App Store CLI Functions
 	# Search for an app
 	function app-search() {
-		if [ -z "$1" ]; then
+		if [[ -z "$1" ]]; then
 			echo "Usage: app-search <query>"
 			return 1
 		fi
@@ -197,7 +201,7 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
 
 	# Install an app by ID
 	function app-install() {
-		if [ -z "$1" ]; then
+		if [[ -z "$1" ]]; then
 			echo "Usage: app-install <app_id>"
 			return 1
 		fi
@@ -218,7 +222,7 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
 
 	# Take a screenshot of a selected area and save to desktop
 	function screenshot-area() {
-		screencapture -i ~/Desktop/screenshot-$(date +%Y%m%d-%H%M%S).png
+		screencapture -i ~/Desktop/screenshot-"$(date +%Y%m%d-%H%M%S)".png
 		echo "Screenshot saved to Desktop"
 	}
 
@@ -230,28 +234,29 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
 
 	# Take a screenshot of the entire screen
 	function screenshot-screen() {
-		screencapture ~/Desktop/screenshot-$(date +%Y%m%d-%H%M%S).png
+		screencapture ~/Desktop/screenshot-"$(date +%Y%m%d-%H%M%S)".png
 		echo "Screenshot saved to Desktop"
 	}
 
 	# Take a screenshot of a specific window (click to select)
 	function screenshot-window() {
-		screencapture -iW ~/Desktop/screenshot-$(date +%Y%m%d-%H%M%S).png
+		screencapture -iW ~/Desktop/screenshot-"$(date +%Y%m%d-%H%M%S)".png
 		echo "Screenshot saved to Desktop"
 	}
 
 	# Start screen recording (press Ctrl+C to stop)
 	function screen-record() {
-		local output_file=~/Desktop/screen-recording-$(date +%Y%m%d-%H%M%S).mov
-		echo "Recording screen to $output_file..."
+		local output_file
+		output_file=~/Desktop/screen-recording-"$(date +%Y%m%d-%H%M%S)".mov
+		echo "Recording screen to ${output_file}..."
 		echo "Press Control+C to stop recording..."
-		screencapture -V 60 -v "$output_file"
-		echo "Screen recording saved to $output_file"
+		screencapture -V 60 -v "${output_file}"
+		echo "Screen recording saved to ${output_file}"
 	}
 
 	# Create a GIF from the last screen recording
 	function gif-from-recording() {
-		if [ -z "$1" ]; then
+		if [[ -z "$1" ]]; then
 			echo "Usage: gif-from-recording <recording_file.mov>"
 			return 1
 		fi
@@ -259,8 +264,8 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
 		local input_file="$1"
 		local output_file="${input_file%.*}.gif"
 
-		if ! [ -f "$input_file" ]; then
-			echo "Error: File $input_file does not exist"
+		if ! [[ -f "${input_file}" ]]; then
+			echo "Error: File ${input_file} does not exist"
 			return 1
 		fi
 
@@ -269,21 +274,21 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
 			return 1
 		fi
 
-		echo "Converting $input_file to GIF..."
-		ffmpeg -i "$input_file" -vf "fps=10,scale=1280:-1:flags=lanczos,split[s0][s1];[s0]palettegen[p];[s1][p]paletteuse" -loop 0 "$output_file"
-		echo "GIF saved to $output_file"
+		echo "Converting ${input_file} to GIF..."
+		ffmpeg -i "${input_file}" -vf "fps=10,scale=1280:-1:flags=lanczos,split[s0][s1];[s0]palettegen[p];[s1][p]paletteuse" -loop 0 "${output_file}"
+		echo "GIF saved to ${output_file}"
 	}
 
 	# Change default screenshot location
 	function screenshot-location() {
-		if [ -z "$1" ]; then
+		if [[ -z "$1" ]]; then
 			# Print current location
 			defaults read com.apple.screencapture location
 			return 0
 		fi
 
 		# Set new location
-		if [ -d "$1" ]; then
+		if [[ -d "$1" ]]; then
 			defaults write com.apple.screencapture location "$1"
 			killall SystemUIServer
 			echo "Screenshot location changed to $1"
@@ -296,59 +301,59 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
 	# Modified PATH for macOS to include Homebrew
 	if [[ $(uname -m) == "arm64" ]]; then
 		# M1/M2 Mac
-		export PATH="/opt/homebrew/bin:/opt/homebrew/sbin:$PATH"
+		export PATH="/opt/homebrew/bin:/opt/homebrew/sbin:${PATH}"
 	else
 		# Intel Mac
-		export PATH="/usr/local/bin:/usr/local/sbin:$PATH"
+		export PATH="/usr/local/bin:/usr/local/sbin:${PATH}"
 	fi
 
 	# Add common Homebrew Python locations to PATH
-	if [ -d /opt/homebrew/opt/python@3.10/libexec/bin ]; then
-		export PATH="/opt/homebrew/opt/python@3.10/libexec/bin:$PATH"
-	elif [ -d /usr/local/opt/python@3.10/libexec/bin ]; then
-		export PATH="/usr/local/opt/python@3.10/libexec/bin:$PATH"
+	if [[ -d /opt/homebrew/opt/python@3.10/libexec/bin ]]; then
+		export PATH="/opt/homebrew/opt/python@3.10/libexec/bin:${PATH}"
+	elif [[ -d /usr/local/opt/python@3.10/libexec/bin ]]; then
+		export PATH="/usr/local/opt/python@3.10/libexec/bin:${PATH}"
 	fi
 
 	# Fix for Java on macOS
-	if [ -d /opt/homebrew/opt/openjdk@17 ]; then
+	if [[ -d /opt/homebrew/opt/openjdk@17 ]]; then
 		export JAVA_HOME="/opt/homebrew/opt/openjdk@17"
-	elif [ -d /usr/local/opt/openjdk@17 ]; then
+	elif [[ -d /usr/local/opt/openjdk@17 ]]; then
 		export JAVA_HOME="/usr/local/opt/openjdk@17"
 	fi
-	export PATH="$JAVA_HOME/bin:$PATH"
+	export PATH="${JAVA_HOME}/bin:${PATH}"
 
 	# Configure zsh and bash completions for Homebrew packages
 	if type brew &>/dev/null; then
 		FPATH="$(brew --prefix)/share/zsh/site-functions:${FPATH}"
 
-		if [ -n "$ZSH_VERSION" ]; then
+		if [[ -n "${ZSH_VERSION}" ]]; then
 			# ZSH completions
-			FPATH="$(brew --prefix)/share/zsh-completions:$FPATH"
+			FPATH="$(brew --prefix)/share/zsh-completions:${FPATH}"
 			if [[ -d $(brew --prefix)/share/zsh/site-functions ]]; then
-				FPATH="$(brew --prefix)/share/zsh/site-functions:$FPATH"
+				FPATH="$(brew --prefix)/share/zsh/site-functions:${FPATH}"
 			fi
 			autoload -Uz compinit
 			compinit
-		elif [ -n "$BASH_VERSION" ]; then
+		elif [[ -n "${BASH_VERSION}" ]]; then
 			# Bash completions
 			if [[ -r "$(brew --prefix)/etc/profile.d/bash_completion.sh" ]]; then
 				source "$(brew --prefix)/etc/profile.d/bash_completion.sh"
 			else
 				for COMPLETION in "$(brew --prefix)/etc/bash_completion.d/"*; do
-					[[ -r "$COMPLETION" ]] && source "$COMPLETION"
+					[[ -r "${COMPLETION}" ]] && source "${COMPLETION}"
 				done
 			fi
 		fi
 	fi
 
 	# Initialize zsh-autosuggestions if installed through Homebrew
-	if [ -n "$ZSH_VERSION" ]; then
-		if [ -f "$(brew --prefix)/share/zsh-autosuggestions/zsh-autosuggestions.zsh" ]; then
+	if [[ -n "${ZSH_VERSION}" ]]; then
+		if [[ -f "$(brew --prefix)/share/zsh-autosuggestions/zsh-autosuggestions.zsh" ]]; then
 			source "$(brew --prefix)/share/zsh-autosuggestions/zsh-autosuggestions.zsh"
 		fi
 
 		# Initialize syntax highlighting if installed through Homebrew
-		if [ -f "$(brew --prefix)/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh" ]; then
+		if [[ -f "$(brew --prefix)/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh" ]]; then
 			source "$(brew --prefix)/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
 		fi
 	fi

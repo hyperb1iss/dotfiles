@@ -1,0 +1,371 @@
+#!/usr/bin/env bash
+#
+# shellint - Shell script linter and formatter
+# A powerful tool for checking and fixing shell scripts in your dotfiles
+#
+# Handles:
+# 1. Linting with shellcheck
+# 2. Formatting with shfmt
+# 3. Auto-fixing shellcheck issues
+#
+
+set -eo pipefail
+
+# ANSI color codes for beautiful output 💅
+RESET="\033[0m"
+BOLD="\033[1m"
+RED="\033[38;5;197m"     # Hot pink for errors
+ORANGE="\033[38;5;203m"  # For warnings
+MAGENTA="\033[38;5;171m" # For info
+PURPLE="\033[38;5;141m"  # For debug
+BLUE="\033[38;5;75m"     # For verbose
+CYAN="\033[38;5;123m"    # For success
+PINK="\033[38;5;219m"    # For highlights
+YELLOW="\033[38;5;227m"  # For caution
+
+# Dependency check
+check_deps() {
+  local missing=0
+  for cmd in shellcheck shfmt patch; do
+    if ! command -v "${cmd}" &>/dev/null; then
+      echo -e "${RED}${BOLD}Error:${RESET} ${cmd} is not installed"
+      missing=1
+    fi
+  done
+
+  if [[ ${missing} -eq 1 ]]; then
+    echo -e "\n${YELLOW}Install missing dependencies:${RESET}"
+    echo -e "  ${CYAN}• shellcheck:${RESET} https://github.com/koalaman/shellcheck#installing"
+    echo -e "  ${CYAN}• shfmt:${RESET} https://github.com/mvdan/sh#shfmt"
+    echo -e "  ${CYAN}• patch:${RESET} available in most package managers (apt, brew, etc.)"
+    exit 1
+  fi
+}
+
+# Print usage information
+usage() {
+  echo -e "${BOLD}${PURPLE}shellint${RESET} - Shell script linter and formatter 💖\n"
+  echo -e "${BOLD}Usage:${RESET}"
+  echo -e "  shellint [options] [file(s)/directory]\n"
+  echo -e "${BOLD}Options:${RESET}"
+  echo -e "  -c, --check         Check files without modifying them"
+  echo -e "  -f, --fix           Auto-fix shellcheck issues when possible"
+  echo -e "  -F, --format        Format files with shfmt"
+  echo -e "  -a, --all           Run all checks and fixes (format + fix)"
+  echo -e "  -r, --recursive     Recursively process directories"
+  echo -e "  -q, --quiet         Minimal output"
+  echo -e "  -v, --verbose       Verbose output"
+  echo -e "  -e, --exclude=LIST  Exclude shellcheck codes (comma-separated)"
+  echo -e "  -h, --help          Display this help message\n"
+  echo -e "${BOLD}Examples:${RESET}"
+  echo -e "  shellint --check sh/           # Check all .sh files in sh/ directory"
+  echo -e "  shellint --fix sh/android.sh   # Fix shellcheck issues in android.sh"
+  echo -e "  shellint --format --recursive  # Format all shell files recursively"
+  echo -e "  shellint --all sh/             # Format and fix all scripts in sh/"
+  echo -e "  shellint -e SC2086,SC2046 --fix # Fix issues excluding certain codes\n"
+}
+
+# Find shell scripts in a directory
+find_scripts() {
+  local dir="$1"
+  local recursive="$2"
+
+  if [[ "${recursive}" -eq 1 ]]; then
+    find "${dir}" -type f \( -name "*.sh" -o -name "*.bash" -o -name "*.zsh" \) -not -path "*/\.*" 2>/dev/null
+  else
+    find "${dir}" -maxdepth 1 -type f \( -name "*.sh" -o -name "*.bash" -o -name "*.zsh" \) -not -path "*/\.*" 2>/dev/null
+  fi
+}
+
+# Check if file is a shell script based on content (for files without extensions)
+is_shell_script() {
+  local file="$1"
+
+  # Check shebang
+  head -n1 "${file}" | grep -q '^#!.*\(sh\|bash\|zsh\)'
+}
+
+# Run shellcheck on a file and report issues
+run_shellcheck() {
+  local file="$1"
+  local exclude="$2"
+  local quiet="$3"
+
+  local exclude_arg=""
+  if [[ -n "${exclude}" ]]; then
+    exclude_arg="--exclude=${exclude}"
+  fi
+
+  if [[ "${quiet}" -eq 0 ]]; then
+    echo -e "${MAGENTA}Checking${RESET} ${BOLD}${file}${RESET}..."
+  fi
+
+  # Run shellcheck and capture exit code
+  local issues
+  issues=$(shellcheck "${exclude_arg}" "${file}" 2>&1) || true
+
+  if [[ -n "${issues}" ]]; then
+    if [[ "${quiet}" -eq 0 ]]; then
+      echo -e "${ORANGE}Issues found in ${file}:${RESET}"
+      echo "${issues}"
+      echo
+    fi
+    return 1
+  else
+    if [[ "${quiet}" -eq 0 ]]; then
+      echo -e "${CYAN}✓ No issues in ${file}${RESET}"
+    fi
+    return 0
+  fi
+}
+
+# Fix shellcheck issues using diff format
+fix_shellcheck() {
+  local file="$1"
+  local exclude="$2"
+  local quiet="$3"
+  local verbose="$4"
+
+  local exclude_arg=""
+  if [[ -n "${exclude}" ]]; then
+    exclude_arg="--exclude=${exclude}"
+  fi
+
+  if [[ "${quiet}" -eq 0 ]]; then
+    echo -e "${PINK}Fixing${RESET} ${BOLD}${file}${RESET}..."
+  fi
+
+  local diff
+  diff=$(shellcheck -f diff "${exclude_arg}" "${file}" 2>/dev/null)
+
+  if [[ -n "${diff}" && "${diff}" != "--- a/"* ]]; then
+    #  The diff output doesn't look like a proper patch
+    if [[ "${quiet}" -eq 0 ]]; then
+      echo -e "${YELLOW}No auto-fixable issues in ${file}${RESET}"
+    fi
+    return 0
+  fi
+
+  if [[ -n "${diff}" ]]; then
+    if [[ "${verbose}" -eq 1 && "${quiet}" -eq 0 ]]; then
+      echo -e "${BLUE}Applying fixes to ${file}:${RESET}"
+      echo "${diff}"
+    fi
+
+    # Apply the diff
+    echo "${diff}" | patch -p1 -s
+
+    if [[ "${quiet}" -eq 0 ]]; then
+      echo -e "${CYAN}✓ Fixed issues in ${file}${RESET}"
+    fi
+    return 0
+  else
+    if [[ "${quiet}" -eq 0 ]]; then
+      echo -e "${CYAN}✓ No issues to fix in ${file}${RESET}"
+    fi
+    return 0
+  fi
+}
+
+# Format script with shfmt
+format_script() {
+  local file="$1"
+  local quiet="$2"
+  local verbose="$3"
+
+  if [[ "${quiet}" -eq 0 ]]; then
+    echo -e "${MAGENTA}Formatting${RESET} ${BOLD}${file}${RESET}..."
+  fi
+
+  # Check if formatting is needed first
+  local needs_formatting
+  needs_formatting=$(shfmt -l -i 0 -bn -ci -sr "${file}" 2>/dev/null)
+
+  if [[ -n "${needs_formatting}" ]]; then
+    if [[ "${verbose}" -eq 1 && "${quiet}" -eq 0 ]]; then
+      local diff
+      diff=$(shfmt -d -i 0 -bn -ci -sr "${file}" 2>/dev/null)
+      echo -e "${BLUE}Formatting changes for ${file}:${RESET}"
+      echo "${diff}"
+    fi
+
+    # Apply formatting
+    shfmt -w -i 0 -bn -ci -sr "${file}" 2>/dev/null
+
+    if [[ "${quiet}" -eq 0 ]]; then
+      echo -e "${CYAN}✓ Formatted ${file}${RESET}"
+    fi
+  else
+    if [[ "${quiet}" -eq 0 ]]; then
+      echo -e "${CYAN}✓ ${file} already properly formatted${RESET}"
+    fi
+  fi
+}
+
+# Process a single file
+process_file() {
+  local file="$1"
+  local check="$2"
+  local fix="$3"
+  local format="$4"
+  local exclude="$5"
+  local quiet="$6"
+  local verbose="$7"
+
+  # Skip non-existent files
+  if [[ ! -f "${file}" ]]; then
+    if [[ "${quiet}" -eq 0 ]]; then
+      echo -e "${RED}File not found: ${file}${RESET}"
+    fi
+    return 1
+  fi
+
+  # Check if it's a shell script based on extension
+  if [[ ! "${file}" =~ \.(sh|bash|zsh)$ ]]; then
+    # For files without extension, check content
+    if ! is_shell_script "${file}"; then
+      if [[ "${verbose}" -eq 1 && "${quiet}" -eq 0 ]]; then
+        echo -e "${YELLOW}Skipping non-shell file: ${file}${RESET}"
+      fi
+      return 0
+    fi
+  fi
+
+  local status=0
+
+  # Format file if needed
+  if [[ "${format}" -eq 1 ]]; then
+    format_script "${file}" "${quiet}" "${verbose}"
+  fi
+
+  # Fix shellcheck issues
+  if [[ "${fix}" -eq 1 ]]; then
+    fix_shellcheck "${file}" "${exclude}" "${quiet}" "${verbose}"
+  fi
+
+  # Check for issues
+  if [[ "${check}" -eq 1 ]]; then
+    run_shellcheck "${file}" "${exclude}" "${quiet}" || status=1
+  fi
+
+  return "${status}"
+}
+
+# Main function
+main() {
+  check_deps
+
+  local check=1 # Default to check mode
+  local fix=0
+  local format=0
+  local recursive=0
+  local quiet=0
+  local verbose=0
+  local exclude=""
+  local exit_code=0
+  local targets=()
+
+  # Parse arguments
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+    -c | --check)
+      check=1
+      shift
+      ;;
+    -f | --fix)
+      fix=1
+      shift
+      ;;
+    -F | --format)
+      format=1
+      shift
+      ;;
+    -a | --all)
+      check=1
+      fix=1
+      format=1
+      shift
+      ;;
+    -r | --recursive)
+      recursive=1
+      shift
+      ;;
+    -q | --quiet)
+      quiet=1
+      shift
+      ;;
+    -v | --verbose)
+      verbose=1
+      shift
+      ;;
+    -e | --exclude=*)
+      exclude="${1#*=}"
+      shift
+      ;;
+    -e | --exclude)
+      exclude="$2"
+      shift 2
+      ;;
+    -h | --help)
+      usage
+      exit 0
+      ;;
+    -*)
+      echo -e "${RED}Unknown option: $1${RESET}"
+      usage
+      exit 1
+      ;;
+    *)
+      targets+=("$1")
+      shift
+      ;;
+    esac
+  done
+
+  # If no targets specified, use current directory
+  if [[ ${#targets[@]} -eq 0 ]]; then
+    targets=(".")
+  fi
+
+  # Process all targets
+  local file_count=0
+  local processed=()
+
+  for target in "${targets[@]}"; do
+    if [[ -d "${target}" ]]; then
+      # Process directory
+      while IFS= read -r script; do
+        if [[ -n "${script}" ]]; then
+          process_file "${script}" "${check}" "${fix}" "${format}" "${exclude}" "${quiet}" "${verbose}" || exit_code=1
+          processed+=("${script}")
+          ((file_count++))
+        fi
+      done < <(find_scripts "${target}" "${recursive}")
+    elif [[ -f "${target}" ]]; then
+      # Process single file
+      process_file "${target}" "${check}" "${fix}" "${format}" "${exclude}" "${quiet}" "${verbose}" || exit_code=1
+      processed+=("${target}")
+      ((file_count++))
+    else
+      echo -e "${RED}Target not found: ${target}${RESET}"
+      exit_code=1
+    fi
+  done
+
+  # Summary
+  if [[ "${quiet}" -eq 0 && ${#processed[@]} -gt 0 ]]; then
+    echo
+    echo -e "${BOLD}${CYAN}Summary:${RESET}"
+    echo -e "${MAGENTA}Processed ${BOLD}${file_count}${RESET}${MAGENTA} files${RESET}"
+
+    if [[ "${exit_code}" -eq 0 ]]; then
+      echo -e "${BOLD}${CYAN}All checks passed! 💅${RESET}"
+    else
+      echo -e "${BOLD}${ORANGE}Some checks failed. Review the output above.${RESET}"
+    fi
+  fi
+
+  return "${exit_code}"
+}
+
+main "$@"

@@ -2,9 +2,9 @@
 # Cross-compatible utility functions for bash and zsh
 
 # Detect current shell
-if [[ -n "$ZSH_VERSION" ]]; then
+if [[ -n "${ZSH_VERSION}" ]]; then
 	CURRENT_SHELL="zsh"
-elif [[ -n "$BASH_VERSION" ]]; then
+elif [[ -n "${BASH_VERSION}" ]]; then
 	CURRENT_SHELL="bash"
 else
 	CURRENT_SHELL="unknown"
@@ -39,7 +39,7 @@ function extract() {
 
 # Interactive history search
 function fh() {
-	if [[ "$CURRENT_SHELL" = "zsh" ]]; then
+	if [[ "${CURRENT_SHELL}" = "zsh" ]]; then
 		# shellcheck disable=SC1090,SC2046,SC2086
 		eval "$(fc -l 1 | fzf +s --tac | sed 's/ *[0-9]* *//')"
 	else
