@@ -52,7 +52,9 @@ function dstopi() {
 		# shellcheck disable=SC2086
 		echo "${containers}" | xargs docker stop
 		echo "Stopped containers:"
-		echo "${containers}" | sed 's/^/  /'
+		while IFS= read -r container; do
+			echo "  ${container}"
+		done <<< "${containers}"
 	fi
 }
 
@@ -66,7 +68,9 @@ function drmi() {
 		# shellcheck disable=SC2086
 		echo "${containers}" | xargs docker rm
 		echo "Removed containers:"
-		echo "${containers}" | sed 's/^/  /'
+		while IFS= read -r container; do
+			echo "  ${container}"
+		done <<< "${containers}"
 	fi
 }
 

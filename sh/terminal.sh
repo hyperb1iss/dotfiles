@@ -13,7 +13,11 @@ function set_terminal_title() {
 	normalized_path=$(normalize_path)
 
 	# Add target product prefix for Android development if applicable
-	[[ -n "${TARGET_PRODUCT}" ]] && title_prefix="[${TARGET_PRODUCT}-${TARGET_BUILD_VARIANT}] "
+	# Check both variables and provide defaults
+	if [[ -n "${TARGET_PRODUCT}" ]]; then
+		local build_variant="${TARGET_BUILD_VARIANT:-unknown}"
+		title_prefix="[${TARGET_PRODUCT}-${build_variant}] "
+	fi
 
 	# Set the terminal title, including debian chroot if present
 	# shellcheck disable=SC1090

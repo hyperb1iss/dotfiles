@@ -19,7 +19,7 @@ function kconfig() {
 	if [[ -z "$1" ]]; then
 		echo "Current KUBECONFIG: ${KUBECONFIG:-Not set}"
 		echo "Available configs in ${config_dir}:"
-		if ! ls -1 "${config_dir}" 2>/dev/null; then
+		if ! ls -1 "${config_dir}" 2> /dev/null; then
 			echo "No configs found in ${config_dir}"
 			[[ -d "${config_dir}" ]] || echo "Directory ${config_dir} doesn't exist - will be created on first use"
 		fi
@@ -55,7 +55,7 @@ function klogs() {
 
 # Kubernetes help/cheatsheet function
 function khelp() {
-	cat <<EOF
+	cat << EOF
 🛳️ Kubernetes Quick Reference 
 
 📊 Interactive UI:
@@ -86,9 +86,9 @@ EOF
 mkdir -p "${KUBE_CONFIG_DIR:-${HOME}/.kube/configs}"
 
 # Add kubectl completion
-if command -v kubectl >/dev/null 2>&1; then
+if command -v kubectl > /dev/null 2>&1; then
 	# shellcheck disable=SC1090
-	source <(kubectl completion bash) 2>/dev/null || true
+	source <(kubectl completion bash) 2> /dev/null || true
 	complete -o default -F __start_kubectl k
 fi
 
@@ -98,9 +98,9 @@ if [[ -d "${HOME}/.krew/bin" ]]; then
 fi
 
 # Setup kubectx/kubens completion if available
-if command -v kubectx >/dev/null 2>&1; then
+if command -v kubectx > /dev/null 2>&1; then
 	# Check if fzf is available for enhanced kubectx/kubens
-	if command -v fzf >/dev/null 2>&1; then
+	if command -v fzf > /dev/null 2>&1; then
 		export KUBECTX_IGNORE_FZF=0
 		export KUBENS_IGNORE_FZF=0
 	fi

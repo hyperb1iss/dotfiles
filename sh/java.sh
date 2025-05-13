@@ -10,8 +10,8 @@ function setjdk() {
 	if [[ $# -ne 1 ]]; then
 		echo "Usage: setjdk <version>"
 		echo "Available versions:"
-		find /usr/lib/jvm -maxdepth 1 -name "java-*-openjdk-amd64" -o -name "java-*-oracle" |
-			sed 's/.*\///' | sort -V
+		find /usr/lib/jvm -maxdepth 1 -name "java-*-openjdk-amd64" -o -name "java-*-oracle" \
+			| sed 's/.*\///' | sort -V
 		return 1
 	fi
 
@@ -27,8 +27,23 @@ function setjdk() {
 	export JAVA_HOME="${java_home}"
 
 	# Clean up PATH and add new Java path
-	local new_path
-	new_path=$(echo "${PATH}" | sed "s|/usr/lib/jvm/[^/]*/bin:||g")
+	local new_path=""
+	local current_path="${PATH}"
+	local segments=""
+
+	# Split the PATH by : and rebuild it without Java paths
+	IFS=: read -ra segments <<< "${current_path}"
+	for segment in "${segments[@]}"; do
+		# Skip if it's a Java bin path
+		if [[ ! "${segment}" =~ /usr/lib/jvm/[^/]*/bin ]]; then
+			if [[ -z "${new_path}" ]]; then
+				new_path="${segment}"
+			else
+				new_path="${new_path}:${segment}"
+			fi
+		fi
+	done
+
 	export PATH="${JAVA_HOME}/bin:${new_path}"
 
 	echo "Switched to Java ${version}"
@@ -39,8 +54,8 @@ function setjdk() {
 function setup_java_aliases() {
 	# Find all installed Java versions
 	# shellcheck disable=SC2162
-	find /usr/lib/jvm -maxdepth 1 \( -name "java-*-openjdk-amd64" -o -name "java-*-oracle" \) |
-		sort -V | while read java_path; do
+	find /usr/lib/jvm -maxdepth 1 \( -name "java-*-openjdk-amd64" -o -name "java-*-oracle" \) \
+		| sort -V | while read java_path; do
 		line=$(basename "${java_path}")
 		version=$(echo "${line}" | sed -E 's/java-([0-9]+).*/\1/')
 
@@ -63,8 +78,8 @@ function list_java_versions() {
 	current_version=$(java -version 2>&1 | grep version | cut -d'"' -f2 | cut -d'.' -f1) || current_version=""
 
 	# shellcheck disable=SC2162
-	find /usr/lib/jvm -maxdepth 1 \( -name "java-*-openjdk-amd64" -o -name "java-*-oracle" \) |
-		sort -V | while read java_path; do
+	find /usr/lib/jvm -maxdepth 1 \( -name "java-*-openjdk-amd64" -o -name "java-*-oracle" \) \
+		| sort -V | while read java_path; do
 		line=$(basename "${java_path}")
 		version=$(echo "${line}" | sed -E 's/java-([0-9]+).*/\1/')
 

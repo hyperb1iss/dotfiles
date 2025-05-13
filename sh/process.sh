@@ -1,7 +1,7 @@
 # Process management utilities and enhancements
 
 # Enhanced procs functions - colorful process management
-if command -v procs >/dev/null 2>&1; then
+if command -v procs > /dev/null 2>&1; then
 	# Show processes for current user
 	function pme() {
 		procs "$(whoami)" "$@"
@@ -58,7 +58,7 @@ function pgrep_custom() {
 		return 1
 	fi
 
-	ps aux | grep -i "$1" | grep -v grep
+	pgrep -f -a "$1"
 }
 
 # Memory usage by process (sorted)

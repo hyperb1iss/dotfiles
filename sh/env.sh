@@ -2,7 +2,7 @@
 # Shell-agnostic environment setup for both bash and zsh
 
 # Ensure LS_COLORS is set if dircolors exists
-if command -v dircolors >/dev/null 2>&1; then
+if command -v dircolors > /dev/null 2>&1; then
 	eval "$(dircolors -b ~/.dircolors)" || true
 fi
 
@@ -21,9 +21,9 @@ export VISUAL=nvim
 export EDITOR="${VISUAL}"
 
 # Set up bat/batcat aliases based on what's available
-if command -v batcat >/dev/null 2>&1; then
+if command -v batcat > /dev/null 2>&1; then
 	alias bat="batcat"
-elif command -v bat >/dev/null 2>&1; then
+elif command -v bat > /dev/null 2>&1; then
 	alias batcat="bat"
 fi
 

@@ -49,12 +49,12 @@ done
 SHELL_NAME=$(if [[ -n "${ZSH_VERSION}" ]]; then echo "zsh"; else echo "bash"; fi)
 
 # Initialize Starship prompt (suppress error output on older versions)
-eval "$(starship init "${SHELL_NAME}" 2>/dev/null)" || true
+eval "$(starship init "${SHELL_NAME}" 2> /dev/null)" || true
 
 # Show inspirational quote for interactive shells (only in full installation)
 if [[ $- == *i* ]] && is_full; then
 	# Check if Python and the script exist
-	if command -v python3 >/dev/null 2>&1 && [[ -f ~/dev/dotfiles/inspiration/inspiration.py ]]; then
+	if command -v python3 > /dev/null 2>&1 && [[ -f ~/dev/dotfiles/inspiration/inspiration.py ]]; then
 		python3 ~/dev/dotfiles/inspiration/inspiration.py
 	fi
 fi

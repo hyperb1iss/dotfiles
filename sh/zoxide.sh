@@ -3,7 +3,7 @@
 # https://github.com/ajeetdsouza/zoxide
 
 # Initialize zoxide for the current shell
-if command -v zoxide >/dev/null 2>&1; then
+if command -v zoxide > /dev/null 2>&1; then
 	# Determine shell name if not already set
 	SHELL_NAME=${SHELL_NAME:-$(if [[ -n "${ZSH_VERSION}" ]]; then echo "zsh"; else echo "bash"; fi)}
 

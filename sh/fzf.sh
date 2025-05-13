@@ -5,9 +5,9 @@
 is_minimal && return 0
 
 # Initialize fzf
-if command -v fzf >/dev/null 2>&1; then
+if command -v fzf > /dev/null 2>&1; then
 	# Set fd command name based on system
-	if command -v fdfind >/dev/null 2>&1; then
+	if command -v fdfind > /dev/null 2>&1; then
 		FD_COMMAND="fdfind" # Ubuntu/Debian systems
 	else
 		FD_COMMAND="fd" # Other systems
@@ -17,7 +17,7 @@ if command -v fzf >/dev/null 2>&1; then
 	export FZF_DEFAULT_OPTS="--height 40% --layout=reverse --border"
 
 	# Determine which bat command to use
-	if command -v batcat >/dev/null 2>&1; then
+	if command -v batcat > /dev/null 2>&1; then
 		BAT_COMMAND="batcat"
 	else
 		BAT_COMMAND="bat"
@@ -26,8 +26,8 @@ if command -v fzf >/dev/null 2>&1; then
 	# Preview options for file operations
 	# Using array for proper argument handling
 	FZF_PREVIEW_CMD="${BAT_COMMAND} --color=always --style=numbers --line-range=:500 {}"
-	# shellcheck disable=SC2016
-	FZF_FILE_PREVIEW="--preview '${FZF_PREVIEW_CMD}'"
+	# We'll actually use this variable in the fopen function
+	export FZF_FILE_PREVIEW="${FZF_PREVIEW_CMD}"
 
 	export FZF_DEFAULT_COMMAND="${FD_COMMAND} --type f --hidden --follow --exclude .git"
 	export FZF_CTRL_T_COMMAND="${FZF_DEFAULT_COMMAND}"
@@ -55,8 +55,7 @@ if command -v fzf >/dev/null 2>&1; then
 	function fopen() {
 		local out
 		# Using preview command directly
-		# shellcheck disable=SC2086
-		out=$(fzf --preview "${FZF_PREVIEW_CMD}") || return
+		out=$(fzf --preview "${FZF_FILE_PREVIEW}") || return
 		if [[ -n "${out}" ]]; then
 			${EDITOR:-vim} "${out}"
 		fi
@@ -86,8 +85,8 @@ if command -v fzf >/dev/null 2>&1; then
 			--header 'Tab to select multiple files, Enter to add' \
 			--preview 'git diff --color=always {2}' \
 			--bind 'tab:toggle-out' \
-			--bind 'shift-tab:toggle-in' |
-			awk '{print $2}') || return
+			--bind 'shift-tab:toggle-in' \
+			| awk '{print $2}') || return
 		if [[ -n "${files}" ]]; then
 			# shellcheck disable=SC2086
 			echo "${files}" | xargs git add && git status -s
@@ -100,7 +99,7 @@ if command -v fzf >/dev/null 2>&1; then
 		branches=$(git branch --all | grep -v HEAD) || return
 		if [[ -n "${branches}" ]]; then
 			# shellcheck disable=SC2086,SC2046
-			branch=$(echo "${branches}" | fzf -d $((2 + $(wc -l <<<"${branches}"))) +m --preview 'git log --color=always {}') || return
+			branch=$(echo "${branches}" | fzf -d $((2 + $(wc -l <<< "${branches}"))) +m --preview 'git log --color=always {}') || return
 			git checkout "$(echo "${branch}" | sed "s/.* //" | sed "s#remotes/[^/]*/##")"
 		fi
 	}
@@ -132,7 +131,7 @@ if command -v fzf >/dev/null 2>&1; then
 	function frg() {
 		local file line
 		# shellcheck disable=SC2162
-		read -r file line <<<"$(rg --line-number --no-heading "$@" | fzf -0 -1 | awk -F: '{print $1, $2}')" || return
+		read -r file line <<< "$(rg --line-number --no-heading "$@" | fzf -0 -1 | awk -F: '{print $1, $2}')" || return
 		if [[ -n "${file}" ]]; then
 			${EDITOR:-vim} "${file}" +"${line}"
 		fi

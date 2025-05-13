@@ -42,7 +42,7 @@ if [[ "${OSTYPE}" == "darwin"* ]]; then
 
 	# Quick look a file
 	function ql() {
-		qlmanage -p "$@" &>/dev/null
+		qlmanage -p "$@" &> /dev/null
 	}
 
 	# Show/hide hidden files in Finder
@@ -188,11 +188,11 @@ if [[ "${OSTYPE}" == "darwin"* ]]; then
 			read -r -p "Select action: " action
 
 			case "${action}" in
-			1) brew services start "${service}" ;;
-			2) brew services stop "${service}" ;;
-			3) brew services restart "${service}" ;;
-			q) return 0 ;;
-			*) echo "Invalid action" ;;
+				1) brew services start "${service}" ;;
+				2) brew services stop "${service}" ;;
+				3) brew services restart "${service}" ;;
+				q) return 0 ;;
+				*) echo "Invalid action" ;;
 			esac
 		fi
 	}
@@ -285,7 +285,7 @@ if [[ "${OSTYPE}" == "darwin"* ]]; then
 			return 1
 		fi
 
-		if ! command -v ffmpeg >/dev/null 2>&1; then
+		if ! command -v ffmpeg > /dev/null 2>&1; then
 			echo "Error: ffmpeg is required. Install with 'brew install ffmpeg'"
 			return 1
 		fi
@@ -340,7 +340,7 @@ if [[ "${OSTYPE}" == "darwin"* ]]; then
 	export PATH="${JAVA_HOME}/bin:${PATH}"
 
 	# Configure zsh and bash completions for Homebrew packages
-	if type brew &>/dev/null; then
+	if type brew &> /dev/null; then
 		FPATH="$(brew --prefix)/share/zsh/site-functions:${FPATH}"
 
 		if [[ -n "${ZSH_VERSION}" ]]; then

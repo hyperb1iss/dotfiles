@@ -3,7 +3,7 @@
 # WSL (Windows Subsystem for Linux) specific utilities and configurations
 
 # Only load these functions if running in WSL
-if grep -qi microsoft /proc/version 2>/dev/null; then
+if grep -qi microsoft /proc/version 2> /dev/null; then
 	# Detect Windows username and set $W
 	if [[ -z "${W}" ]]; then
 		WIN_USERNAME=$(powershell.exe -Command '[System.Environment]::UserName' | tr -d '\r')
@@ -73,12 +73,12 @@ if grep -qi microsoft /proc/version 2>/dev/null; then
 		if [[ "$1" =~ ^https?:// ]]; then
 			# Handle URLs
 			# shellcheck disable=SC2086
-			cmd.exe /c "start $1" 2>/dev/null
+			cmd.exe /c "start $1" 2> /dev/null
 		else
 			# Handle files
 			local path="$1"
 			if [[ -e "${path}" ]]; then
-				cmd.exe /c "start $(command wslpath -w "${path}")" 2>/dev/null
+				cmd.exe /c "start $(command wslpath -w "${path}")" 2> /dev/null
 			else
 				echo "Error: File does not exist: ${path}" >&2
 				return 1
@@ -107,7 +107,7 @@ if grep -qi microsoft /proc/version 2>/dev/null; then
 			return 1
 		fi
 		# shellcheck disable=SC2086
-		cmd.exe /c "$*" 2>/dev/null
+		cmd.exe /c "$*" 2> /dev/null
 	}
 
 	# WSL-specific environment variables
