@@ -5,9 +5,9 @@
 is_minimal && return 0
 
 # Initialize fzf
-if command -v fzf > /dev/null 2>&1; then
+if has_command fzf; then
 	# Set fd command name based on system
-	if command -v fdfind > /dev/null 2>&1; then
+	if has_command fdfind; then
 		FD_COMMAND="fdfind" # Ubuntu/Debian systems
 	else
 		FD_COMMAND="fd" # Other systems
@@ -17,7 +17,7 @@ if command -v fzf > /dev/null 2>&1; then
 	export FZF_DEFAULT_OPTS="--height 40% --layout=reverse --border"
 
 	# Determine which bat command to use
-	if command -v batcat > /dev/null 2>&1; then
+	if has_command batcat; then
 		BAT_COMMAND="batcat"
 	else
 		BAT_COMMAND="bat"
@@ -34,9 +34,9 @@ if command -v fzf > /dev/null 2>&1; then
 	export FZF_ALT_C_COMMAND="${FD_COMMAND} --type d --hidden --follow --exclude .git"
 
 	# Initialize shell completion and key bindings
-	if [[ -n "${BASH_VERSION}" ]]; then
+	if is_bash; then
 		eval "$(fzf --bash)" || true
-	elif [[ -n "${ZSH_VERSION}" ]]; then
+	elif is_zsh; then
 		eval "$(fzf --zsh)" || true
 	fi
 
@@ -107,7 +107,7 @@ if command -v fzf > /dev/null 2>&1; then
 	# Interactive history search
 	function fh() {
 		local cmd
-		if [[ -n "${ZSH_VERSION}" ]]; then
+		if is_zsh; then
 			cmd=$(history -n -r 1 | fzf +s --tac) || return
 		else
 			cmd=$(history | fzf +s --tac | sed 's/ *[0-9]* *//') || return

@@ -2,7 +2,7 @@
 # Shell-agnostic environment setup for both bash and zsh
 
 # Ensure LS_COLORS is set if dircolors exists
-if command -v dircolors > /dev/null 2>&1; then
+if has_command dircolors; then
 	eval "$(dircolors -b ~/.dircolors)" || true
 fi
 
@@ -21,9 +21,9 @@ export VISUAL=nvim
 export EDITOR="${VISUAL}"
 
 # Set up bat/batcat aliases based on what's available
-if command -v batcat > /dev/null 2>&1; then
+if has_command batcat; then
 	alias bat="batcat"
-elif command -v bat > /dev/null 2>&1; then
+elif has_command bat; then
 	alias batcat="bat"
 fi
 
@@ -50,6 +50,4 @@ export FZF_DEFAULT_OPTS="--height 40% --layout=reverse --border --preview 'bat -
 
 # Source private environment variables if they exist
 # shellcheck source=/home/bliss/dev/dotfiles-private/env/private.sh
-if [[ -f ~/dev/dotfiles-private/env/private.sh ]]; then
-	source ~/dev/dotfiles-private/env/private.sh
-fi
+safe_source ~/dev/dotfiles-private/env/private.sh

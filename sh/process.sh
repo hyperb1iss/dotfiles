@@ -1,7 +1,7 @@
 # Process management utilities and enhancements
 
 # Enhanced procs functions - colorful process management
-if command -v procs > /dev/null 2>&1; then
+if has_command procs; then
 	# Show processes for current user
 	function pme() {
 		procs "$(whoami)" "$@"

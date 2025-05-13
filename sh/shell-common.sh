@@ -1,13 +1,47 @@
 # Common shell configurations for both bash and zsh
 
-# History Configuration
-HISTSIZE=50000
-HISTFILESIZE=50000
-HISTCONTROL=ignoreboth:erasedups
-HISTTIMEFORMAT="%F %T "
-HISTIGNORE="ls:ll:cd:pwd:clear:history:fg:bg:jobs"
+# 1. Core utilities - Load first
+#-------------------------------------------------
 
-# Environment detection functions
+# Shell detection functions
+function is_zsh() {
+	[[ -n "${ZSH_VERSION}" ]]
+}
+
+function is_bash() {
+	[[ -n "${BASH_VERSION}" ]]
+}
+
+# Shell detection (used internally)
+function get_shell_type() {
+	if is_zsh; then
+		echo "zsh"
+	elif is_bash; then
+		echo "bash"
+	else
+		echo "unknown"
+	fi
+}
+
+# Platform detection
+function is_macos() {
+	[[ "${OSTYPE}" == "darwin"* ]]
+}
+
+function is_wsl() {
+	grep -qi microsoft /proc/version 2> /dev/null
+}
+
+function is_linux() {
+	[[ "${OSTYPE}" == "linux-gnu"* ]] && ! is_wsl
+}
+
+# Command availability check
+function has_command() {
+	command -v "$1" > /dev/null 2>&1
+}
+
+# Installation type detection
 function get_installation_type() {
 	local install_state_file="${HOME}/dev/dotfiles/.install_state"
 	if [[ -f "${install_state_file}" ]]; then
@@ -25,36 +59,49 @@ function is_full() {
 	[[ "$(get_installation_type)" = "full" ]]
 }
 
-# Make functions available in bash
-# (zsh automatically makes functions available to subshells)
-if [[ -z "${ZSH_VERSION}" ]]; then
-	export -f get_installation_type
-	export -f is_minimal
-	export -f is_full
-fi
+# Safe source function that doesn't break on errors
+function safe_source() {
+	if [[ -f "$1" ]]; then
+		source "$1" || echo "Warning: Error sourcing $1"
+		return 0
+	fi
+	return 1
+}
 
-# Source all utility scripts
-# shellcheck disable=SC2066
+# 2. History configuration
+#-------------------------------------------------
+HISTSIZE=50000
+HISTFILESIZE=50000
+HISTCONTROL=ignoreboth:erasedups
+HISTTIMEFORMAT="%F %T "
+HISTIGNORE="ls:ll:cd:pwd:clear:history:fg:bg:jobs"
+
+# 3. Load all utility scripts with consistent error handling
+#-------------------------------------------------
 for script in "${HOME}/dev/dotfiles/sh/"*.sh; do
 	if [[ "${script}" != *"shell-common.sh" ]]; then
-		# shellcheck source=/home/bliss/dev/dotfiles/sh
 		source "${script}" || echo "Failed to load ${script}"
 	fi
 done
 
-# Load private configurations if they exist
-[[ -f ~/.rc.local ]] && source ~/.rc.local
+# 4. Load private configurations
+#-------------------------------------------------
+safe_source ~/.rc.local
 
-# Determine shell name
-SHELL_NAME=$(if [[ -n "${ZSH_VERSION}" ]]; then echo "zsh"; else echo "bash"; fi)
+# 5. Initialize prompt
+#-------------------------------------------------
+if has_command starship; then
+	if is_zsh; then
+		eval "$(starship init zsh 2> /dev/null)" || true
+	elif is_bash; then
+		eval "$(starship init bash 2> /dev/null)" || true
+	fi
+fi
 
-# Initialize Starship prompt (suppress error output on older versions)
-eval "$(starship init "${SHELL_NAME}" 2> /dev/null)" || true
-
-# Show inspirational quote for interactive shells (only in full installation)
+# 6. Show inspiration (only in interactive shells with full installation)
+#-------------------------------------------------
 if [[ $- == *i* ]] && is_full; then
-	# Check if Python and the script exist
-	if command -v python3 > /dev/null 2>&1 && [[ -f ~/dev/dotfiles/inspiration/inspiration.py ]]; then
+	if has_command python3 && [[ -f ~/dev/dotfiles/inspiration/inspiration.py ]]; then
 		python3 ~/dev/dotfiles/inspiration/inspiration.py
 	fi
 fi

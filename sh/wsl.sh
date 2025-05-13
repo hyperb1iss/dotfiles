@@ -1,9 +1,8 @@
-#!/bin/bash
 # wsl.sh
 # WSL (Windows Subsystem for Linux) specific utilities and configurations
 
 # Only load these functions if running in WSL
-if grep -qi microsoft /proc/version 2> /dev/null; then
+if is_wsl; then
 	# Detect Windows username and set $W
 	if [[ -z "${W}" ]]; then
 		WIN_USERNAME=$(powershell.exe -Command '[System.Environment]::UserName' | tr -d '\r')

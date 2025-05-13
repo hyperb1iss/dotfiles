@@ -4,25 +4,15 @@
 # Skip entire module if not in full installation
 is_minimal && return 0
 
-# Ensure script works in both bash and zsh
-if [[ -n "${ZSH_VERSION}" ]]; then
-	SHELL_NAME="zsh"
-elif [[ -n "${BASH_VERSION}" ]]; then
-	SHELL_NAME="bash"
-else
-	echo "Unsupported shell, some features may not work correctly"
-	SHELL_NAME="unknown"
-fi
-
 # Configure shell options for compatibility
-if [[ "${SHELL_NAME}" = "zsh" ]]; then
+if is_zsh; then
 	# Enable bash-style word splitting
 	setopt SH_WORD_SPLIT
 	# Enable extended globbing
 	setopt EXTENDED_GLOB
 	# Enable bash-style comments
 	setopt INTERACTIVE_COMMENTS
-elif [[ "${SHELL_NAME}" = "bash" ]]; then
+elif is_bash; then
 	# Enable extended pattern matching
 	shopt -s extglob 2> /dev/null
 	# Enable recursive globbing
@@ -33,7 +23,7 @@ fi
 function set_android_env() {
 	if [[ -f build/envsetup.sh ]]; then
 		# Save current options
-		if [[ "${SHELL_NAME}" = "zsh" ]]; then
+		if is_zsh; then
 			local old_opts
 			old_opts=$(setopt)
 		fi
@@ -42,7 +32,7 @@ function set_android_env() {
 		source build/envsetup.sh
 
 		# Restore options for zsh
-		if [[ "${SHELL_NAME}" = "zsh" ]]; then
+		if is_zsh; then
 			eval "${old_opts}"
 			setopt SH_WORD_SPLIT
 		fi
@@ -66,7 +56,7 @@ function mka() {
 	make_args="$*"
 
 	# Use command substitution safely
-	if command -v schedtool > /dev/null 2>&1; then
+	if has_command schedtool; then
 		# shellcheck disable=SC2086
 		schedtool -B -n 10 -e ionice -n 7 make -j"${cores}" ${make_args}
 	else
@@ -197,7 +187,7 @@ function logcat() {
 	fi
 
 	# Handle zsh globbing
-	if [[ "${SHELL_NAME}" = "zsh" ]]; then
+	if is_zsh; then
 		# Disable glob pattern expansion for this function
 		setopt local_options no_nomatch
 	fi
@@ -332,7 +322,7 @@ Options:
 	fi
 
 	# Handle zsh globbing
-	if [[ "${SHELL_NAME}" = "zsh" ]]; then
+	if is_zsh; then
 		# Disable glob pattern expansion for this function
 		setopt local_options no_nomatch
 	fi
@@ -580,7 +570,7 @@ fi
 if [[ -f ~/bin/repo ]]; then
 	repo_completion=$(~/bin/repo --help | grep -A 1 "Shell completion" | tail -1) || true
 
-	if [[ "${SHELL_NAME}" = "zsh" ]]; then
+	if is_zsh; then
 		autoload -Uz compinit && compinit
 		eval "${repo_completion}"
 	else

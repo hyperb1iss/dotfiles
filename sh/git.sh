@@ -210,11 +210,11 @@ function gstatus() {
 }
 
 # Initialize git completion
-if [[ -n "${ZSH_VERSION}" ]]; then
+if is_zsh; then
 	# ZSH completion
 	fpath=(~/.zsh/completion "${fpath[@]}")
 	autoload -Uz compinit && compinit
-elif [[ -n "${BASH_VERSION}" ]]; then
+elif is_bash; then
 	# Bash completion
 	if [[ -f /usr/share/bash-completion/completions/git ]]; then
 		source /usr/share/bash-completion/completions/git

@@ -26,11 +26,11 @@ function set_terminal_title() {
 
 # Setup terminal title updating based on shell
 function setup_terminal_title() {
-	if [[ -n "${ZSH_VERSION}" ]]; then
+	if is_zsh; then
 		# For zsh, use precmd
 		# shellcheck disable=SC2154,SC2034
 		precmd() { set_terminal_title; }
-	elif [[ -n "${BASH_VERSION}" ]]; then
+	elif is_bash; then
 		# For bash, use PROMPT_COMMAND
 		PROMPT_COMMAND="set_terminal_title"
 	fi

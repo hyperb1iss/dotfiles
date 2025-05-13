@@ -3,7 +3,7 @@
 # macOS specific utilities and configurations
 
 # Only load these functions if running on macOS
-if [[ "${OSTYPE}" == "darwin"* ]]; then
+if is_macos; then
 	# macOS application shortcuts
 	alias code='open -a "Visual Studio Code"'
 	alias subl='open -a "Sublime Text"'
@@ -285,7 +285,7 @@ if [[ "${OSTYPE}" == "darwin"* ]]; then
 			return 1
 		fi
 
-		if ! command -v ffmpeg > /dev/null 2>&1; then
+		if ! has_command ffmpeg; then
 			echo "Error: ffmpeg is required. Install with 'brew install ffmpeg'"
 			return 1
 		fi
@@ -340,10 +340,10 @@ if [[ "${OSTYPE}" == "darwin"* ]]; then
 	export PATH="${JAVA_HOME}/bin:${PATH}"
 
 	# Configure zsh and bash completions for Homebrew packages
-	if type brew &> /dev/null; then
+	if has_command brew; then
 		FPATH="$(brew --prefix)/share/zsh/site-functions:${FPATH}"
 
-		if [[ -n "${ZSH_VERSION}" ]]; then
+		if is_zsh; then
 			# ZSH completions
 			FPATH="$(brew --prefix)/share/zsh-completions:${FPATH}"
 			brew_prefix=$(brew --prefix) || true
@@ -352,7 +352,7 @@ if [[ "${OSTYPE}" == "darwin"* ]]; then
 			fi
 			autoload -Uz compinit
 			compinit
-		elif [[ -n "${BASH_VERSION}" ]]; then
+		elif is_bash; then
 			# Bash completions
 			brew_prefix=$(brew --prefix) || true
 			if [[ -r "${brew_prefix}/etc/profile.d/bash_completion.sh" ]]; then
@@ -366,7 +366,7 @@ if [[ "${OSTYPE}" == "darwin"* ]]; then
 	fi
 
 	# Initialize zsh-autosuggestions if installed through Homebrew
-	if [[ -n "${ZSH_VERSION}" ]]; then
+	if is_zsh; then
 		brew_prefix=$(brew --prefix) || true
 		if [[ -f "${brew_prefix}/share/zsh-autosuggestions/zsh-autosuggestions.zsh" ]]; then
 			source "${brew_prefix}/share/zsh-autosuggestions/zsh-autosuggestions.zsh"

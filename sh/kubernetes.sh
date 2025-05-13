@@ -86,9 +86,13 @@ EOF
 mkdir -p "${KUBE_CONFIG_DIR:-${HOME}/.kube/configs}"
 
 # Add kubectl completion
-if command -v kubectl > /dev/null 2>&1; then
+if has_command kubectl; then
 	# shellcheck disable=SC1090
-	source <(kubectl completion bash) 2> /dev/null || true
+	if is_zsh; then
+		source <(kubectl completion zsh) 2> /dev/null || true
+	elif is_bash; then
+		source <(kubectl completion bash) 2> /dev/null || true
+	fi
 	complete -o default -F __start_kubectl k
 fi
 
@@ -98,9 +102,9 @@ if [[ -d "${HOME}/.krew/bin" ]]; then
 fi
 
 # Setup kubectx/kubens completion if available
-if command -v kubectx > /dev/null 2>&1; then
+if has_command kubectx; then
 	# Check if fzf is available for enhanced kubectx/kubens
-	if command -v fzf > /dev/null 2>&1; then
+	if has_command fzf; then
 		export KUBECTX_IGNORE_FZF=0
 		export KUBENS_IGNORE_FZF=0
 	fi
