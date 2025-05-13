@@ -149,8 +149,16 @@ find_scripts() {
 is_shell_script() {
   local file="$1"
 
-  # Check shebang
-  head -n1 "${file}" | grep -q '^#!.*\(sh\|bash\|zsh\)'
+  # Use file command to identify shell scripts more accurately
+  local file_type
+  file_type=$(file -b "${file}")
+
+  # Check if file type contains shell script indicators
+  if [[ "${file_type}" =~ (shell script|sh script|bash script|zsh script|Bourne-Again shell|POSIX shell) ]]; then
+    return 0
+  fi
+
+  return 1
 }
 
 # Get shellcheck configuration
@@ -509,7 +517,14 @@ process_file() {
   # Priority 4: bin/* pattern (files directly in a "bin" directory at the start of the path)
   if [[ "${is_targeted_script}" -ne 0 ]]; then
     if [[ "${file_path_for_glob}" == bin/* && "${file_path_for_glob#bin/}" != */* ]]; then
-      is_targeted_script=0
+      # For bin/ files, explicitly verify it's a shell script using file command
+      is_shell_script "${file}"
+      local bin_file_check=$?
+      if [[ "${bin_file_check}" -eq 0 ]]; then
+        is_targeted_script=0
+      elif [[ "${verbose}" -eq 1 && "${quiet}" -eq 0 ]]; then
+        note "skipping non-shell script in bin/: ${file}"
+      fi
     fi
   fi
 
