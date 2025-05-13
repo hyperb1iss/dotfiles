@@ -167,6 +167,37 @@ get_shellcheck_config() {
   echo "${config_arg}"
 }
 
+# Check if a given path is a submodule directory path (from .gitmodules)
+is_target_a_submodule_dir() {
+  local dir_path="$1"
+
+  if ! git rev-parse --is-inside-work-tree &> /dev/null; then
+    return 1 # Not in a git repo
+  fi
+
+  local submodules_paths
+  submodules_paths=$(git config --file .gitmodules --get-regexp path 2> /dev/null | awk '{print $2}' || echo "")
+
+  if [[ -z "${submodules_paths}" ]]; then
+    return 1 # No submodules defined
+  fi
+
+  # Normalize dir_path by removing trailing slash if any for comparison
+  local normalized_dir_path="${dir_path%/}"
+
+  while IFS= read -r submodule_path_from_config; do
+    if [[ -n "${submodule_path_from_config}" ]]; then
+      # Normalize submodule path from config as well
+      local normalized_submodule_path_from_config="${submodule_path_from_config%/}"
+      if [[ "${normalized_dir_path}" == "${normalized_submodule_path_from_config}" ]]; then
+        return 0 # The path IS a submodule entry path
+      fi
+    fi
+  done <<< "${submodules_paths}"
+
+  return 1 # Not a submodule entry path
+}
+
 # Run shellcheck on a file and report issues
 run_shellcheck() {
   local file="$1"
@@ -366,40 +397,129 @@ process_file() {
   local verbose="$7"
   local include_submodules="$8"
 
-  # Skip non-existent files
+  # 1. If we are excluding submodules, and THIS path is a submodule entry itself (e.g. "tpm" gitlink from git ls-files), skip it.
+  if [[ "${include_submodules}" -eq 0 ]]; then
+    # Checks if 'file' matches a path in .gitmodules
+    is_target_a_submodule_dir "${file}"
+    local is_submodule_entry=$?
+    if [[ "${is_submodule_entry}" -eq 0 ]]; then # If it is a submodule root/entry path
+      if [[ "${verbose}" -eq 1 && "${quiet}" -eq 0 ]]; then
+        note "Skipping submodule entry: ${file}"
+      fi
+      return 0 # Successfully skipped
+    fi
+
+    # 2. If we are excluding submodules, and this path is a file *within* a submodule directory (e.g. "tpm/foo.sh"), skip it.
+    # This check is only relevant if the path was not a submodule entry itself.
+    # Checks if 'file' path starts with a submodule path
+    is_in_submodule "${file}"
+    local in_submodule_dir=$?
+    if [[ "${in_submodule_dir}" -eq 0 ]]; then # If true (is in submodule path)
+      if [[ "${verbose}" -eq 1 && "${quiet}" -eq 0 ]]; then
+        note "Skipping file located within submodule directory: ${file}"
+      fi
+      return 0
+    fi
+  fi
+
+  # 3. If 'file' is a directory, skip it. process_file handles files only.
+  #    (e.g. if a submodule entry "tpm" was passed and include_submodules=1, and "tpm" is a checked-out directory)
+  if [[ -d "${file}" ]]; then
+    if [[ "${verbose}" -eq 1 && "${quiet}" -eq 0 ]]; then
+      note "Skipping directory: ${file} (process_file handles files only)"
+    fi
+    return 0
+  fi
+
+  # 4. If 'file' is not a regular file (after a dir check), it's an issue or needs skipping.
+  #    This covers non-existent files, special files, etc.
   if [[ ! -f "${file}" ]]; then
     if [[ "${quiet}" -eq 0 ]]; then
-      err "File not found: ${file}"
-    fi
-    return 1
-  fi
-
-  # Skip submodules if needed
-  if [[ "${include_submodules}" -eq 0 ]]; then
-    # Fix for SC2310: Call the function separately from the if condition
-    is_in_submodule "${file}"
-    local in_submodule=$?
-    if [[ "${in_submodule}" -eq 0 ]]; then
-      if [[ "${verbose}" -eq 1 && "${quiet}" -eq 0 ]]; then
-        note "Skipping file in submodule: ${file}"
+      if [[ ! -e "${file}" ]]; then # Truly doesn't exist
+        err "File not found: ${file}"
+      else                                # Exists but not a regular file (e.g. named pipe, socket, block/char device, broken symlink)
+        if [[ "${verbose}" -eq 1 ]]; then # Only show note if verbose for non-regular files
+          note "Skipping non-regular file: ${file}"
+        fi
       fi
-      return 0
     fi
+    if [[ ! -e "${file}" ]]; then return 1; else return 0; fi # error if not exists, skip if other non-regular
   fi
 
-  # Check if it's a shell script based on extension
-  if [[ ! "${file}" =~ \.(sh|bash|zsh)$ ]]; then
-    # For files without extension, check content
-    is_shell_script "${file}"
-    local is_shell=$?
-    if [[ "${is_shell}" -ne 0 ]]; then
-      if [[ "${verbose}" -eq 1 && "${quiet}" -eq 0 ]]; then
-        note "Skipping non-shell file: ${file}"
+  local file_basename
+  file_basename=$(basename "${file}")
+  local file_path_for_glob="${file}" # Use the full path for glob-like checks
+
+  # Normalize path for bin/* check if it starts with ./
+  if [[ "${file_path_for_glob}" == "./"* ]]; then
+    file_path_for_glob="${file_path_for_glob#./}"
+  fi
+
+  # Define patterns for script identification
+  local name_contains_patterns=("bashrc" "zshrc" "profile")
+  local exact_name_patterns=("zshenv" "zlogin" "zlogout" "zprofile")
+  local extension_patterns=(".sh" ".bash" ".zsh") # Filename must end with these
+
+  local is_targeted_script=1 # 1 = false (skip), 0 = true (process)
+
+  # Priority 1: Explicit name contains patterns
+  for pattern in "${name_contains_patterns[@]}"; do
+    if [[ "${file_basename}" == *"${pattern}"* ]]; then
+      is_targeted_script=0
+      break
+    fi
+  done
+
+  # Priority 2: Specific exact filenames
+  if [[ "${is_targeted_script}" -ne 0 ]]; then
+    for pattern in "${exact_name_patterns[@]}"; do
+      if [[ "${file_basename}" == "${pattern}" ]]; then
+        is_targeted_script=0
+        break
       fi
-      return 0
+    done
+  fi
+
+  # Priority 3: Standard Shell Extensions
+  if [[ "${is_targeted_script}" -ne 0 ]]; then
+    for ext_pattern in "${extension_patterns[@]}"; do
+      if [[ "${file_basename}" == *"${ext_pattern}" ]]; then # e.g., ends with .sh
+        is_targeted_script=0
+        break
+      fi
+    done
+  fi
+
+  # Priority 4: bin/* pattern (files directly in a "bin" directory at the start of the path)
+  if [[ "${is_targeted_script}" -ne 0 ]]; then
+    if [[ "${file_path_for_glob}" == bin/* && "${file_path_for_glob#bin/}" != */* ]]; then
+      is_targeted_script=0
     fi
   fi
 
+  # Priority 5: Shebang check (if still not identified and is a file)
+  if [[ "${is_targeted_script}" -ne 0 ]]; then
+    if [[ -f "${file}" ]]; then # Only check shebang if it's a file
+      is_shell_script "${file}" # Existing shebang check function
+      local shebang_check_result=$?
+      if [[ "${shebang_check_result}" -eq 0 ]]; then
+        is_targeted_script=0
+      fi
+    fi
+  fi
+
+  # Final decision to skip or process
+  if [[ "${is_targeted_script}" -ne 0 ]]; then
+    if [[ "${verbose}" -eq 1 && "${quiet}" -eq 0 ]]; then
+      # Only log skip message for actual files or symlinks that were considered
+      if [[ -f "${file}" || -L "${file}" ]]; then
+        note "Skipping non-targeted file: ${file}"
+      fi
+    fi
+    return 0 # Skip
+  fi
+
+  # If we reach here, it's a shell script. Proceed.
   local status=0
 
   # Format file if needed
