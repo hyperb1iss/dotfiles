@@ -1,6 +1,9 @@
 # directory.sh
 # Directory navigation and listing utilities
 
+# Skip on minimal installations
+is_minimal && return 0
+
 # Enhanced ls commands using lsd
 alias ls='lsd'
 alias ll='ls -l'

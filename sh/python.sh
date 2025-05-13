@@ -1,6 +1,9 @@
 # python.sh
 # Helper functions for Python and Django development
 
+# Skip on minimal installations
+is_minimal && return 0
+
 # Create and activate Python virtual environment
 function venv() {
 	if [[ -z "$1" ]]; then

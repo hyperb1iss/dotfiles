@@ -1,6 +1,9 @@
 # docker.sh
 # Comprehensive Docker utilities for bash and zsh
 
+# Skip on minimal installations
+is_minimal && return 0
+
 # Docker Aliases
 alias d='docker'
 alias dc='docker compose'

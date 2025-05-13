@@ -1,4 +1,8 @@
+# terminal.sh
 # Terminal title management functions
+
+# Skip on minimal installations
+is_minimal && return 0
 
 # Get the last component of the current directory
 function normalize_path() {

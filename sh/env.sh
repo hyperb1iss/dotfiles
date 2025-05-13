@@ -1,3 +1,4 @@
+# env.sh
 # Environment variables and path configurations
 # Shell-agnostic environment setup for both bash and zsh
 

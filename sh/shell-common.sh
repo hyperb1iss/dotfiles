@@ -1,3 +1,4 @@
+# shell-common.sh
 # Common shell configurations for both bash and zsh
 
 # 1. Core utilities - Load first

@@ -1,6 +1,9 @@
 # shell-utils.sh
 # Cross-compatible utility functions for bash and zsh
 
+# Skip on minimal installations
+is_minimal && return 0
+
 # Search file contents
 function ftext() {
 	grep -iIHrn --color=always "$1" . | ${PAGER:-less}

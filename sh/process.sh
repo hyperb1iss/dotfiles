@@ -1,4 +1,8 @@
+# process.sh
 # Process management utilities and enhancements
+
+# Skip on minimal installations
+is_minimal && return 0
 
 # Enhanced procs functions - colorful process management
 if has_command procs; then

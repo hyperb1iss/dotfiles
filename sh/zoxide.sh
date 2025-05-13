@@ -1,5 +1,9 @@
-# zoxide.sh - Fast directory navigation using zoxide
+# zoxide.sh
+# Fast directory navigation using zoxide
 # https://github.com/ajeetdsouza/zoxide
+
+# Skip entire module if not in full installation
+is_minimal && return 0
 
 # Initialize zoxide for the current shell
 if has_command zoxide; then
