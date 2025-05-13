@@ -170,7 +170,7 @@ get_shellcheck_config() {
   local config_arg=""
 
   if [[ -f "${config_file}" ]]; then
-    config_arg="--rc=${config_file}"
+    config_arg="--rcfile=${config_file}"
   fi
 
   echo "${config_arg}"
