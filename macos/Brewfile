@@ -6,6 +6,7 @@ tap "homebrew/cask"
 tap "homebrew/cask-fonts"
 tap "homebrew/core"
 tap "homebrew/services"
+tap "koekeishiya/formulae"  # For yabai window manager
 
 # CLI Tools
 brew "bat"                   # Cat clone with syntax highlighting
@@ -14,6 +15,7 @@ brew "cmake"                 # Cross-platform make
 brew "coreutils"             # GNU core utilities
 brew "curl"                  # Get a file from an HTTP, HTTPS or FTP server
 brew "fd"                    # Simple, fast and user-friendly alternative to find
+brew "ffmpeg"                # Play, record, convert, and stream audio and video
 brew "findutils"             # Collection of GNU find, xargs, and locate
 brew "fzf"                   # Command-line fuzzy finder
 brew "gh"                    # GitHub CLI
@@ -27,7 +29,9 @@ brew "jq"                    # Lightweight and flexible command-line JSON proces
 brew "lazygit"               # Simple terminal UI for git commands
 brew "llvm"                  # Next-gen compiler infrastructure
 brew "lsd"                   # Enhanced ls command
+brew "mac-cli"               # macOS command line tools for developers
 brew "macchina"              # System information fetcher with a focus on performance
+brew "mas"                   # Mac App Store command line interface
 brew "ncdu"                  # NCurses Disk Usage
 brew "neovim"                # Ambitious Vim-fork focused on extensibility and agility
 brew "ninja"                 # Small build system for use with gyp or CMake
@@ -39,11 +43,13 @@ brew "python@3.10"           # Python programming language
 brew "ripgrep"               # Search tool like grep and The Silver Searcher
 brew "rsync"                 # Utility that provides fast incremental file transfer
 brew "shellcheck"            # Static analysis and lint tool, for (ba)sh scripts
+brew "skhd"                  # Simple hotkey daemon for macOS
 brew "starship"              # Cross-shell prompt
 brew "tmux"                  # Terminal multiplexer
 brew "tree"                  # Display directories as trees
 brew "unzip"                 # Extraction utility for .zip compressed archives
 brew "wget"                  # Internet file retriever
+brew "yabai"                 # Window manager for macOS based on binary space partitioning
 brew "yq"                    # Process YAML documents from the CLI
 brew "zoxide"                # Smarter cd command
 brew "zsh"                   # UNIX shell
@@ -52,6 +58,7 @@ brew "zsh-completions"       # Additional completion definitions for zsh
 brew "zsh-syntax-highlighting" # Fish shell like syntax highlighting for zsh
 
 # Development
+cask "android-studio"        # Android IDE
 cask "docker"                # App to build and share containerized applications
 cask "iterm2"                # Terminal emulator
 cask "visual-studio-code"    # Code editor
@@ -62,10 +69,40 @@ cask "font-jetbrains-mono-nerd-font"
 
 # Utility Applications
 cask "alfred"                # Application launcher and productivity software
+cask "alt-tab"               # Windows alt-tab feature for macOS
+cask "bartender"             # Menu bar icon organizer
+cask "caffeine"              # Prevent your Mac from going to sleep
+cask "karabiner-elements"    # Keyboard customizer
+cask "keepingyouawake"       # Alternative to Caffeine with additional features
+cask "keyboard-cleaner"      # Temporarily disable keyboard and mouse input
 cask "rectangle"             # Move and resize windows using keyboard shortcuts or snap areas
+cask "stats"                 # System monitor menubar
+
+# Quick Look Plugins
+cask "qlcolorcode"           # Quick Look plugin for syntax highlighting
+cask "qlimagesize"           # Quick Look plugin for image dimensions and metadata
+cask "qlmarkdown"            # Quick Look plugin for Markdown files
+cask "qlstephen"             # Quick Look plugin for plain text files without extension
+cask "quicklook-json"        # Quick Look plugin for JSON files
 
 # Optional Applications (uncomment if needed)
 # cask "github"              # Desktop client for GitHub repositories
 # cask "postman"             # API platform for building and using APIs
 # cask "slack"               # Team communication and collaboration software
-# cask "spotify"             # Music streaming service 
+# cask "spotify"             # Music streaming service
+
+# Mac App Store Apps (requires `mas` to be installed)
+# Uncomment and modify these based on your needs
+# mas "1Password", id: 1333542190         # Password manager
+mas "Amphetamine", id: 937984704        # Keep-awake utility
+# mas "Xcode", id: 497799835              # Apple's IDE for macOS/iOS development
+
+# Kubernetes Tools
+brew "kubectl"            # Kubernetes command-line tool
+brew "kubectx"            # Switch between kubectl contexts
+brew "k9s"                # Terminal UI to interact with Kubernetes
+brew "helm"               # Package manager for Kubernetes
+brew "kustomize"          # Customization of Kubernetes YAML
+brew "kind"               # Run local Kubernetes clusters using Docker
+brew "minikube"           # Run Kubernetes locally
+brew "kubernetes-cli"     # Kubernetes command-line interface 

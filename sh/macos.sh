@@ -125,6 +125,174 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
     alias mute='osascript -e "set volume output muted true"'
     alias unmute='osascript -e "set volume output muted false"'
 
+    # Homebrew Services Management
+    # List all services
+    function brew-services-list() {
+        brew services list
+    }
+
+    # Start a service
+    function brew-start() {
+        if [ -z "$1" ]; then
+            echo "Usage: brew-start <service>"
+            return 1
+        fi
+        brew services start "$1"
+    }
+
+    # Stop a service
+    function brew-stop() {
+        if [ -z "$1" ]; then
+            echo "Usage: brew-stop <service>"
+            return 1
+        fi
+        brew services stop "$1"
+    }
+
+    # Restart a service
+    function brew-restart() {
+        if [ -z "$1" ]; then
+            echo "Usage: brew-restart <service>"
+            return 1
+        fi
+        brew services restart "$1"
+    }
+
+    # Interactive service management with fzf
+    function brew-services() {
+        local selected=$(brew services list | fzf --header-lines=1 --preview="echo {}" --preview-window=up:1)
+        
+        if [ -n "$selected" ]; then
+            local service=$(echo "$selected" | awk '{print $1}')
+            local status=$(echo "$selected" | awk '{print $2}')
+            
+            echo "Service: $service (Status: $status)"
+            echo "Actions:"
+            echo "  1) Start"
+            echo "  2) Stop"
+            echo "  3) Restart"
+            echo "  q) Quit"
+            
+            read -p "Select action: " action
+            
+            case "$action" in
+                1) brew services start "$service" ;;
+                2) brew services stop "$service" ;;
+                3) brew services restart "$service" ;;
+                q) return 0 ;;
+                *) echo "Invalid action" ;;
+            esac
+        fi
+    }
+
+    # App Store CLI Functions
+    # Search for an app
+    function app-search() {
+        if [ -z "$1" ]; then
+            echo "Usage: app-search <query>"
+            return 1
+        fi
+        mas search "$1"
+    }
+
+    # Install an app by ID
+    function app-install() {
+        if [ -z "$1" ]; then
+            echo "Usage: app-install <app_id>"
+            return 1
+        fi
+        mas install "$1"
+    }
+
+    # List installed App Store apps
+    function app-list() {
+        mas list
+    }
+
+    # Open Xcode developer tools (useful for iOS development)
+    function xcode-select-install() {
+        xcode-select --install
+    }
+
+    # Advanced Screenshot and Recording Functions
+    
+    # Take a screenshot of a selected area and save to desktop
+    function screenshot-area() {
+        screencapture -i ~/Desktop/screenshot-$(date +%Y%m%d-%H%M%S).png
+        echo "Screenshot saved to Desktop"
+    }
+    
+    # Take a screenshot of a selected area and copy to clipboard
+    function screenshot-area-clipboard() {
+        screencapture -ic
+        echo "Screenshot copied to clipboard"
+    }
+    
+    # Take a screenshot of the entire screen
+    function screenshot-screen() {
+        screencapture ~/Desktop/screenshot-$(date +%Y%m%d-%H%M%S).png
+        echo "Screenshot saved to Desktop"
+    }
+    
+    # Take a screenshot of a specific window (click to select)
+    function screenshot-window() {
+        screencapture -iW ~/Desktop/screenshot-$(date +%Y%m%d-%H%M%S).png
+        echo "Screenshot saved to Desktop"
+    }
+    
+    # Start screen recording (press Ctrl+C to stop)
+    function screen-record() {
+        local output_file=~/Desktop/screen-recording-$(date +%Y%m%d-%H%M%S).mov
+        echo "Recording screen to $output_file..."
+        echo "Press Control+C to stop recording..."
+        screencapture -V 60 -v "$output_file"
+        echo "Screen recording saved to $output_file"
+    }
+    
+    # Create a GIF from the last screen recording
+    function gif-from-recording() {
+        if [ -z "$1" ]; then
+            echo "Usage: gif-from-recording <recording_file.mov>"
+            return 1
+        fi
+        
+        local input_file="$1"
+        local output_file="${input_file%.*}.gif"
+        
+        if ! [ -f "$input_file" ]; then
+            echo "Error: File $input_file does not exist"
+            return 1
+        fi
+        
+        if ! command -v ffmpeg >/dev/null 2>&1; then
+            echo "Error: ffmpeg is required. Install with 'brew install ffmpeg'"
+            return 1
+        fi
+        
+        echo "Converting $input_file to GIF..."
+        ffmpeg -i "$input_file" -vf "fps=10,scale=1280:-1:flags=lanczos,split[s0][s1];[s0]palettegen[p];[s1][p]paletteuse" -loop 0 "$output_file"
+        echo "GIF saved to $output_file"
+    }
+    
+    # Change default screenshot location
+    function screenshot-location() {
+        if [ -z "$1" ]; then
+            # Print current location
+            defaults read com.apple.screencapture location
+            return 0
+        fi
+        
+        # Set new location
+        if [ -d "$1" ]; then
+            defaults write com.apple.screencapture location "$1"
+            killall SystemUIServer
+            echo "Screenshot location changed to $1"
+        else
+            echo "Error: Directory $1 does not exist"
+            return 1
+        fi
+    }
+
     # Modified PATH for macOS to include Homebrew
     if [[ $(uname -m) == "arm64" ]]; then
         # M1/M2 Mac

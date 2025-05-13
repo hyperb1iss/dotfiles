@@ -15,8 +15,20 @@
     ~/.zshrc: zsh/zshrc
     ~/.config/nvim: nvim
     ~/bin: bin
+    ~/.config/karabiner/karabiner.json: macos/karabiner.json
+    ~/.config/yabai/yabairc: macos/yabairc
+    ~/.config/skhd/skhdrc: macos/skhdrc
 
 - shell:
+    - command: |
+        # Create necessary configuration directories
+        mkdir -p ~/.config/karabiner ~/.config/yabai ~/.config/skhd
+        # Make yabai and skhd config files executable
+        chmod +x ~/.config/yabai/yabairc ~/.config/skhd/skhdrc
+      stderr: true
+      stdout: true
+      description: Setting up configuration directories
+
     - command: |
         # Run macOS-specific setup script
         ./macos/brew.sh
