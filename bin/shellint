@@ -14,80 +14,81 @@ set -eo pipefail
 # ANSI color codes for beautiful output 💅
 RESET="\033[0m"
 BOLD="\033[1m"
-RED="\033[38;5;197m"     # Hot pink for errors
-ORANGE="\033[38;5;203m"  # For warnings
-MAGENTA="\033[38;5;171m" # For info
-PURPLE="\033[38;5;141m"  # For debug
-BLUE="\033[38;5;75m"     # For verbose
-CYAN="\033[38;5;123m"    # For success
-PINK="\033[38;5;219m"    # For highlights
-YELLOW="\033[38;5;227m"  # For caution
+RED="\033[38;5;205m"     # Bright pink for errors
+ORANGE="\033[38;5;209m"  # Soft neon orange for warnings
+MAGENTA="\033[38;5;213m" # Bright magenta for info
+PURPLE="\033[38;5;171m"  # Bright purple for debug
+BLUE="\033[38;5;147m"    # Soft lavender for verbose
+CYAN="\033[38;5;159m"    # Pastel cyan for success
+PINK="\033[38;5;219m"    # Bright pink for highlights
+YELLOW="\033[38;5;222m"  # Pastel amber for caution
+GREEN="\033[38;5;157m"   # Pastel mint green for positive outcomes
 
 # Color utility functions - short and sweet 💅
-err() { echo -e "${RED}${BOLD}Error:${RESET} $*"; }
-warn() { echo -e "${ORANGE}$*${RESET}"; }
-info() { echo -e "${MAGENTA}$*${RESET}"; }
-dbg() { echo -e "${PURPLE}$*${RESET}"; }
-verb() { echo -e "${BLUE}$*${RESET}"; }
-ok() { echo -e "${CYAN}$*${RESET}"; }
-hi() { echo -e "${PINK}$*${RESET}"; }
-note() { echo -e "${YELLOW}$*${RESET}"; }
+err() { echo -e "${RED}${BOLD}⨯ error:${RESET} $*"; }
+warn() { echo -e "${ORANGE}⏣ $*${RESET}"; }
+info() { echo -e "${MAGENTA}⏹ $*${RESET}"; }
+dbg() { echo -e "${PURPLE}⏩ $*${RESET}"; }
+verb() { echo -e "${BLUE}» $*${RESET}"; }
+ok() { echo -e "${CYAN}➤ $*${RESET}"; }
+hi() { echo -e "${PINK}⏺ $*${RESET}"; }
+note() { echo -e "${YELLOW}⏧ $*${RESET}"; }
 b() { echo -e "${BOLD}$*${RESET}"; }
 
 # Action messages with consistent formatting
-checking() { info "Checking ${BOLD}$*${RESET}..."; }
-fixing() { hi "Fixing ${BOLD}$*${RESET}..."; }
-formatting() { info "Formatting ${BOLD}$*${RESET}..."; }
+checking() { info "checking ${BOLD}$*${RESET}..."; }
+fixing() { hi "fixing ${BOLD}$*${RESET}..."; }
+formatting() { info "formatting ${BOLD}$*${RESET}..."; }
 
-# Result patterns
-no_issues() { ok "✓ No issues in $*"; }
-fixed() { ok "✓ Fixed issues in $*"; }
-well_formatted() { ok "✓ $* already properly formatted"; }
-no_fixable() { note "No auto-fixable issues in $*"; }
-nothing_to_fix() { ok "✓ No issues to fix in $*"; }
+# Result patterns - update for lowercase
+no_issues() { ok "${GREEN}no issues in $*${RESET}"; }
+fixed() { ok "${GREEN}fixed issues in $*${RESET}"; }
+well_formatted() { ok "${GREEN}$* already properly formatted${RESET}"; }
+no_fixable() { note "no auto-fixable issues in $*"; }
+nothing_to_fix() { ok "${GREEN}no issues to fix in $*${RESET}"; }
 
 # Dependency check
 check_deps() {
   local missing=0
   for cmd in shellcheck shfmt patch; do
     if ! command -v "${cmd}" &> /dev/null; then
-      err "${cmd} is not installed"
+      err "${cmd} not found in system path"
       missing=1
     fi
   done
 
   if [[ ${missing} -eq 1 ]]; then
     echo
-    note "Install missing dependencies:"
-    echo -e "  ${CYAN}• shellcheck:${RESET} https://github.com/koalaman/shellcheck#installing"
-    echo -e "  ${CYAN}• shfmt:${RESET} https://github.com/mvdan/sh#shfmt"
-    echo -e "  ${CYAN}• patch:${RESET} available in most package managers (apt, brew, etc.)"
+    note "missing dependencies:"
+    echo -e "  ${CYAN}» shellcheck:${RESET} https://github.com/koalaman/shellcheck#installing"
+    echo -e "  ${CYAN}» shfmt:${RESET} https://github.com/mvdan/sh#shfmt"
+    echo -e "  ${CYAN}» patch:${RESET} available in most package managers (apt, brew, etc.)"
     exit 1
   fi
 }
 
 # Print usage information
 usage() {
-  echo -e "${BOLD}${PURPLE}shellint${RESET} - Shell script linter and formatter 💖\n"
-  echo -e "${BOLD}Usage:${RESET}"
+  echo -e "${BOLD}${PURPLE}shellint${RESET} - shell script linter and formatter ${PINK}⏩${RESET}\n"
+  echo -e "${BOLD}usage:${RESET}"
   echo -e "  shellint [options] [file(s)/directory]\n"
-  echo -e "${BOLD}Options:${RESET}"
-  echo -e "  -c, --check         Check files without modifying them"
-  echo -e "  -f, --fix           Auto-fix shellcheck issues when possible"
-  echo -e "  -F, --format        Format files with shfmt"
-  echo -e "  -a, --all           Run all checks and fixes (format + fix)"
-  echo -e "  -r, --recursive     Recursively process directories"
-  echo -e "  -q, --quiet         Minimal output"
-  echo -e "  -v, --verbose       Verbose output"
-  echo -e "  -e, --exclude=LIST  Exclude shellcheck codes (comma-separated)"
-  echo -e "  -s, --submodules    Include git submodules (excluded by default)"
-  echo -e "  -h, --help          Display this help message\n"
-  echo -e "${BOLD}Examples:${RESET}"
-  echo -e "  shellint --check sh/           # Check all .sh files in sh/ directory"
-  echo -e "  shellint --fix sh/android.sh   # Fix shellcheck issues in android.sh"
-  echo -e "  shellint --format --recursive  # Format all shell files recursively"
-  echo -e "  shellint --all sh/             # Format and fix all scripts in sh/"
-  echo -e "  shellint -e SC2086,SC2046 --fix # Fix issues excluding certain codes\n"
+  echo -e "${BOLD}options:${RESET}"
+  echo -e "  ${CYAN}-c, --check${RESET}         check files without modifying them"
+  echo -e "  ${CYAN}-f, --fix${RESET}           auto-fix shellcheck issues when possible"
+  echo -e "  ${CYAN}-F, --format${RESET}        format files with shfmt"
+  echo -e "  ${CYAN}-a, --all${RESET}           run all checks and fixes (format + fix)"
+  echo -e "  ${CYAN}-r, --recursive${RESET}     recursively process directories"
+  echo -e "  ${CYAN}-q, --quiet${RESET}         minimal output"
+  echo -e "  ${CYAN}-v, --verbose${RESET}       verbose output"
+  echo -e "  ${CYAN}-e, --exclude=LIST${RESET}  exclude shellcheck codes (comma-separated)"
+  echo -e "  ${CYAN}-s, --submodules${RESET}    include git submodules (excluded by default)"
+  echo -e "  ${CYAN}-h, --help${RESET}          display this help message\n"
+  echo -e "${BOLD}examples:${RESET}"
+  echo -e "  ${BLUE}»${RESET} shellint --check sh/           ${MAGENTA}#${RESET} check all .sh files in sh/ directory"
+  echo -e "  ${BLUE}»${RESET} shellint --fix sh/android.sh   ${MAGENTA}#${RESET} fix shellcheck issues in android.sh"
+  echo -e "  ${BLUE}»${RESET} shellint --format --recursive  ${MAGENTA}#${RESET} format all shell files recursively"
+  echo -e "  ${BLUE}»${RESET} shellint --all sh/             ${MAGENTA}#${RESET} format and fix all scripts in sh/"
+  echo -e "  ${BLUE}»${RESET} shellint -e SC2086,SC2046 --fix ${MAGENTA}#${RESET} fix issues excluding certain codes\n"
 }
 
 # Check if path is in a git submodule
@@ -221,7 +222,7 @@ run_shellcheck() {
   local tmp_file
   tmp_file=$(mktemp)
   cat "${file}" > "${tmp_file}" || {
-    err "Failed to create temporary file"
+    err "failed to create temporary file"
     return 1
   }
 
@@ -237,8 +238,10 @@ run_shellcheck() {
 
   if [[ -n "${issues}" ]]; then
     if [[ "${quiet}" -eq 0 ]]; then
-      warn "Issues found in ${file}:"
-      echo "${issues}"
+      warn "issues detected in ${BOLD}${file}${RESET}:"
+      echo "${issues}" | while IFS= read -r line; do
+        echo -e "${ORANGE}${line}${RESET}"
+      done
       echo
     fi
     return 1
@@ -274,7 +277,7 @@ fix_shellcheck() {
   local tmp_file
   tmp_file=$(mktemp)
   cat "${file}" > "${tmp_file}" || {
-    err "Failed to create temporary file"
+    err "failed to create temporary file"
     return 1
   }
 
@@ -288,15 +291,23 @@ fix_shellcheck() {
   if [[ -n "${diff}" && "${diff}" != "--- a/"* ]]; then
     #  The diff output doesn't look like a proper patch
     if [[ "${quiet}" -eq 0 ]]; then
-      no_fixable "${file}"
+      note "no auto-fixable issues in ${BOLD}${file}${RESET}"
     fi
     return 0
   fi
 
   if [[ -n "${diff}" ]]; then
     if [[ "${verbose}" -eq 1 && "${quiet}" -eq 0 ]]; then
-      verb "Applying fixes to ${file}:"
-      echo "${diff}"
+      verb "applying fixes to ${BOLD}${file}${RESET}:"
+      echo "${diff}" | while IFS= read -r line; do
+        if [[ "${line}" == "+"* ]]; then
+          echo -e "${GREEN}${line}${RESET}"
+        elif [[ "${line}" == "-"* ]]; then
+          echo -e "${RED}${line}${RESET}"
+        else
+          echo -e "${line}"
+        fi
+      done
     fi
 
     # Create a temporary directory for patching
@@ -319,13 +330,9 @@ fix_shellcheck() {
     # Apply the diff in the temporary directory
     if ! echo "${modified_diff}" | (cd "${tmp_dir}" && patch -p1 -s); then
       if [[ "${quiet}" -eq 0 ]]; then
-        warn "Failed to apply patch to ${file}. Leaving original untouched."
+        warn "failed to apply patch to ${BOLD}${file}${RESET}. leaving original untouched."
       fi
       rm -rf "${tmp_dir}"
-      # Optionally, return a specific error code or set a flag
-      # For now, we'll let it proceed to 'nothing_to_fix' or 'fixed' logic,
-      # but the file won't have been changed if patch failed.
-      # A more robust solution might return 1 here.
     else
       # Copy the patched file back only if patch succeeded
       cp "${tmp_dir}/b/${file_name}" "${file}"
@@ -369,15 +376,24 @@ format_script() {
       local diff
       # Get diff, relying on .editorconfig
       diff=$(shfmt -d "${abs_file}" 2> /dev/null)
-      verb "Formatting changes for ${file}:"
-      echo "${diff}"
+      verb "formatting changes for ${BOLD}${file}${RESET}:"
+
+      echo "${diff}" | while IFS= read -r line; do
+        if [[ "${line}" == "+"* ]]; then
+          echo -e "${GREEN}${line}${RESET}"
+        elif [[ "${line}" == "-"* ]]; then
+          echo -e "${RED}${line}${RESET}"
+        else
+          echo -e "${line}"
+        fi
+      done
     fi
 
     # Apply formatting, relying on .editorconfig
     shfmt -w "${abs_file}" 2> /dev/null
 
     if [[ "${quiet}" -eq 0 ]]; then
-      ok "✓ Formatted ${file}"
+      echo -e "${CYAN}➤ ${GREEN}formatted ${BOLD}${file}${RESET} ${PINK}⏩${RESET}"
     fi
   else
     if [[ "${quiet}" -eq 0 ]]; then
@@ -404,7 +420,7 @@ process_file() {
     local is_submodule_entry=$?
     if [[ "${is_submodule_entry}" -eq 0 ]]; then # If it is a submodule root/entry path
       if [[ "${verbose}" -eq 1 && "${quiet}" -eq 0 ]]; then
-        note "Skipping submodule entry: ${file}"
+        note "skipping submodule entry: ${file}"
       fi
       return 0 # Successfully skipped
     fi
@@ -416,7 +432,7 @@ process_file() {
     local in_submodule_dir=$?
     if [[ "${in_submodule_dir}" -eq 0 ]]; then # If true (is in submodule path)
       if [[ "${verbose}" -eq 1 && "${quiet}" -eq 0 ]]; then
-        note "Skipping file located within submodule directory: ${file}"
+        note "skipping file located within submodule directory: ${file}"
       fi
       return 0
     fi
@@ -426,7 +442,7 @@ process_file() {
   #    (e.g. if a submodule entry "tpm" was passed and include_submodules=1, and "tpm" is a checked-out directory)
   if [[ -d "${file}" ]]; then
     if [[ "${verbose}" -eq 1 && "${quiet}" -eq 0 ]]; then
-      note "Skipping directory: ${file} (process_file handles files only)"
+      note "skipping directory: ${file} (process_file handles files only)"
     fi
     return 0
   fi
@@ -436,10 +452,10 @@ process_file() {
   if [[ ! -f "${file}" ]]; then
     if [[ "${quiet}" -eq 0 ]]; then
       if [[ ! -e "${file}" ]]; then # Truly doesn't exist
-        err "File not found: ${file}"
+        err "file not found: ${file}"
       else                                # Exists but not a regular file (e.g. named pipe, socket, block/char device, broken symlink)
         if [[ "${verbose}" -eq 1 ]]; then # Only show note if verbose for non-regular files
-          note "Skipping non-regular file: ${file}"
+          note "skipping non-regular file: ${file}"
         fi
       fi
     fi
@@ -456,7 +472,7 @@ process_file() {
   fi
 
   # Define patterns for script identification
-  local name_contains_patterns=("bashrc" "zshrc" "profile")
+  local name_contains_patterns=("bashrc" "zshrc")
   local exact_name_patterns=("zshenv" "zlogin" "zlogout" "zprofile")
   local extension_patterns=(".sh" ".bash" ".zsh") # Filename must end with these
 
@@ -513,7 +529,7 @@ process_file() {
     if [[ "${verbose}" -eq 1 && "${quiet}" -eq 0 ]]; then
       # Only log skip message for actual files or symlinks that were considered
       if [[ -f "${file}" || -L "${file}" ]]; then
-        note "Skipping non-targeted file: ${file}"
+        note "skipping non-targeted file: ${file}"
       fi
     fi
     return 0 # Skip
@@ -553,20 +569,20 @@ print_summary() {
   local processed=("${@:4}")
 
   echo
-  b "${CYAN}Summary:${RESET}"
-  info "Processed ${BOLD}${file_count}${RESET}${MAGENTA} files${RESET}"
+  info "summary: ${BOLD}${file_count}${RESET}${MAGENTA} files processed${RESET}"
 
   if [[ "${verbose}" -eq 1 ]]; then
-    verb "Files processed:"
+    verb "files checked:"
     for file in "${processed[@]}"; do
-      echo -e "  - ${file}"
+      echo -e "  ${BLUE}»${RESET} ${file}"
     done
   fi
 
   if [[ "${exit_code}" -eq 0 ]]; then
-    b "${CYAN}All checks passed! 💅${RESET}"
+    echo -e "${GREEN}${BOLD}» all checks passed!${RESET}"
   else
-    b "${ORANGE}Some checks failed. Review the output above.${RESET}"
+    echo -e "${ORANGE}${BOLD}» found issues that need attention${RESET}"
+    echo -e "${YELLOW}» run with --fix to auto-fix what's possible${RESET}"
   fi
 }
 
@@ -635,7 +651,7 @@ main() {
         exit 0
         ;;
       -*)
-        err "Unknown option: $1"
+        err "unknown option: $1"
         usage
         exit 1
         ;;
@@ -653,7 +669,7 @@ main() {
 
   # Debug: Show targets
   if [[ "${verbose}" -eq 1 && "${quiet}" -eq 0 ]]; then
-    verb "Processing targets:"
+    verb "processing targets:"
     for target in "${targets[@]}"; do
       echo -e "  - ${target}"
     done
@@ -668,27 +684,27 @@ main() {
 
   for target in "${targets[@]}"; do
     if [[ "${verbose}" -eq 1 && "${quiet}" -eq 0 ]]; then
-      verb "Processing target: ${target}"
+      verb "processing target: ${target}"
     fi
 
     if [[ -d "${target}" ]]; then
       # Process directory
       local scripts
       if [[ "${verbose}" -eq 1 && "${quiet}" -eq 0 ]]; then
-        verb "Finding scripts in directory: ${target} (recursive=${recursive})"
+        verb "finding scripts in directory: ${target} (recursive=${recursive})"
       fi
 
       scripts=$(find_scripts "${target}" "${recursive}" "${include_submodules}")
 
       if [[ -z "${scripts}" ]]; then
         if [[ "${verbose}" -eq 1 && "${quiet}" -eq 0 ]]; then
-          note "No scripts found in ${target}"
+          note "no scripts found in ${target}"
         fi
         continue
       fi
 
       if [[ "${verbose}" -eq 1 && "${quiet}" -eq 0 ]]; then
-        verb "Found scripts:"
+        verb "found scripts:"
         while IFS= read -r script; do
           echo "  - ${script}"
         done <<< "${scripts}"
@@ -698,7 +714,7 @@ main() {
       while IFS= read -r script; do
         if [[ -n "${script}" ]]; then
           if [[ "${verbose}" -eq 1 && "${quiet}" -eq 0 ]]; then
-            verb "Processing script: ${script}"
+            verb "processing script: ${script}"
           fi
 
           # Call process_file separately from the condition to avoid SC2310
@@ -707,7 +723,7 @@ main() {
           if [[ "${process_result}" -ne 0 ]]; then
             exit_code=1
             if [[ "${verbose}" -eq 1 && "${quiet}" -eq 0 ]]; then
-              err "Failed to process ${script}, continuing with next file"
+              err "failed to process ${script}, continuing with next file"
             fi
           fi
           processed+=("${script}")
@@ -717,7 +733,7 @@ main() {
     elif [[ -f "${target}" ]]; then
       # Process single file
       if [[ "${verbose}" -eq 1 && "${quiet}" -eq 0 ]]; then
-        verb "Processing file: ${target}"
+        verb "processing file: ${target}"
       fi
 
       # Call process_file separately from the condition to avoid SC2310
@@ -726,13 +742,13 @@ main() {
       if [[ "${process_result}" -ne 0 ]]; then
         exit_code=1
         if [[ "${verbose}" -eq 1 && "${quiet}" -eq 0 ]]; then
-          err "Failed to process ${target}, continuing with next file"
+          err "failed to process ${target}, continuing with next file"
         fi
       fi
       processed+=("${target}")
       ((file_count++))
     else
-      err "Target not found: ${target}"
+      err "target not found: ${target}"
       exit_code=1
     fi
   done
