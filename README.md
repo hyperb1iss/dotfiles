@@ -1,14 +1,14 @@
 # 🌠 Stefanie's Dotfiles
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Shell-Zsh%20%7C%20Bash-informational?style=flat&logo=gnu-bash&logoColor=white&color=2bbc8a">
-  <img src="https://img.shields.io/badge/Editor-AstroNvim-informational?style=flat&logo=neovim&logoColor=white&color=2bbc8a">
-  <img src="https://img.shields.io/badge/Terminal-Tmux-informational?style=flat&logo=tmux&logoColor=white&color=2bbc8a">
-  <img src="https://img.shields.io/badge/Prompt-Starship-informational?style=flat&logo=starship&logoColor=white&color=2bbc8a">
-  <img src="https://img.shields.io/badge/OS-Linux%20%7C%20WSL2%20%7C%20Windows-informational?style=flat&logo=windows&logoColor=white&color=2bbc8a">
+  <img src="https://img.shields.io/badge/OS-Linux%20%7C%20macOS%20%7C%20Windows%20%7C%20WSL2-informational?style=for-the-badge&logo=windows&logoColor=white&color=ff00ff">
+  <img src="https://img.shields.io/badge/Shell-Bash%20%7C%20Zsh-informational?style=for-the-badge&logo=gnu-bash&logoColor=white&color=b300ff">
+  <img src="https://img.shields.io/badge/Editor-AstroNvim-informational?style=for-the-badge&logo=neovim&logoColor=white&color=9933ff">
+  <img src="https://img.shields.io/badge/Prompt-Starship-informational?style=for-the-badge&logo=starship&logoColor=white&color=00ffff">
+  <img src="https://img.shields.io/badge/Terminal-Tmux-informational?style=for-the-badge&logo=tmux&logoColor=white&color=33ffcc">
 </p>
 
-Hey there! Welcome to my personal dotfiles repository! I'm **Stefanie Jane**, aka **hyperb1iss**—a creative tech enthusiast based in Seattle. These dotfiles create a powerful, consistent development environment that works seamlessly across Linux, WSL2, and Windows, with a special focus on Android development.
+Hey there! Welcome to my personal dotfiles repository! I'm **Stefanie Jane**, aka **hyperb1iss**—a creative technologist based in Seattle. These dotfiles create a powerful, consistent development environment that works seamlessly across Linux, WSL2, and Windows, with a special focus on Android development.
 
 <p align="center">
   <img src="https://github.com/hyperb1iss/elektra/blob/main/screenshot.png" alt="Starship + Elektra" width="600" />
@@ -38,6 +38,7 @@ Hey there! Welcome to my personal dotfiles repository! I'm **Stefanie Jane**, ak
 | 🚀 **[Starship](https://starship.rs/)**     | Cross-shell prompt   | • Custom prompt design<br>• Git status integration<br>• Context-aware display |
 | 📝 **[AstroNvim](https://astronvim.com/)**  | Neovim configuration | • IDE-like features<br>• Custom plugins<br>• Intelligent completions          |
 | 🖥️ **[Tmux](https://github.com/tmux/tmux)** | Terminal multiplexer | • Custom key bindings<br>• Status bar configuration<br>• Session management   |
+| ✨ **[shellint](./bin/shellint)**           | Shell script linter  | • Shellcheck integration<br>• Auto-fixing capabilities<br>• Format with shfmt |
 
 ### 🎯 Modern CLI Tools
 
