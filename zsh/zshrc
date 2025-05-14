@@ -6,6 +6,11 @@ setopt hist_ignore_all_dups
 setopt inc_append_history
 setopt EXTENDED_HISTORY
 
+# Shell compatibility options
+setopt SH_WORD_SPLIT        # Enable bash-style word splitting
+setopt EXTENDED_GLOB        # Enable extended globbing
+setopt INTERACTIVE_COMMENTS # Enable bash-style comments
+
 HISTSIZE=50000
 # Export SAVEHIST so shellcheck knows it's used by zsh internally
 export SAVEHIST=50000

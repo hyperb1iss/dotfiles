@@ -14,8 +14,6 @@ export CCACHE_EXEC=/usr/bin/ccache
 # Development paths
 export GOPATH=~/dev/go
 export GO15VENDOREXPERIMENT=1
-export ANDROID_HOME=~/Android/Sdk
-export ANDROID_NDK_HOME=~/Android/android-ndk
 
 # Editor configuration
 export VISUAL=nvim
