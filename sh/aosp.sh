@@ -218,7 +218,6 @@ if [[ -f ~/bin/repo ]]; then
   repo_completion=$(~/bin/repo --help | grep -A 1 "Shell completion" | tail -1) || true
 
   if is_zsh; then
-    autoload -Uz compinit && compinit
     eval "${repo_completion}"
   else
     eval "${repo_completion}"

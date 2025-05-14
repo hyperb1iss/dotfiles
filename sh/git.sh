@@ -213,7 +213,6 @@ function gstatus() {
 if is_zsh; then
   # ZSH completion
   fpath=(~/.zsh/completion "${fpath[@]}")
-  autoload -Uz compinit && compinit
 elif is_bash; then
   # Bash completion
   if [[ -f /usr/share/bash-completion/completions/git ]]; then

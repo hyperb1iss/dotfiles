@@ -350,8 +350,6 @@ if is_macos; then
       if [[ -d "${brew_prefix}/share/zsh/site-functions" ]]; then
         FPATH="${brew_prefix}/share/zsh/site-functions:${FPATH}"
       fi
-      autoload -Uz compinit
-      compinit
     elif is_bash; then
       # Bash completions
       brew_prefix=$(brew --prefix) || true
