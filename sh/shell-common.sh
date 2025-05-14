@@ -79,11 +79,8 @@ HISTIGNORE="ls:ll:cd:pwd:clear:history:fg:bg:jobs"
 
 # 3. Load all utility scripts with consistent error handling
 #-------------------------------------------------
-for script in "${HOME}/dev/dotfiles/sh/"*.sh; do
-  if [[ "${script}" != *"shell-common.sh" ]]; then
-    source "${script}" || echo "Failed to load ${script}"
-  fi
-done
+# Zsh will use Zinit to load these scripts individually.
+# Bash will load them in bashrc.local.
 
 # 4. Load private configurations
 #-------------------------------------------------
@@ -91,13 +88,8 @@ safe_source ~/.rc.local
 
 # 5. Initialize prompt
 #-------------------------------------------------
-if has_command starship; then
-  if is_zsh; then
-    eval "$(starship init zsh 2> /dev/null)" || true
-  elif is_bash; then
-    eval "$(starship init bash 2> /dev/null)" || true
-  fi
-fi
+# Shell-specific prompt initialization (e.g., Starship)
+# will be handled in their respective rc files (zshrc, bashrc.local).
 
 # 6. Show inspiration (only in interactive shells with full installation)
 #-------------------------------------------------

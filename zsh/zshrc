@@ -19,21 +19,45 @@ HISTFILE=~/.zsh_history
 # Source custom configurations
 source ~/dev/dotfiles/zsh/completion.zsh
 
-# Source system-provided utilities with distribution-specific paths
-# Arch Linux paths
-if [[ -f /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh ]]; then
-  source /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
-# Ubuntu paths
-elif [[ -f /usr/share/zsh-autosuggestions/zsh-autosuggestions.zsh ]]; then
-  source /usr/share/zsh-autosuggestions/zsh-autosuggestions.zsh
+# ZINIT - Zsh Plugin Manager
+ZINIT_HOME="${XDG_DATA_HOME:-${HOME}/.local/share}/zinit/zinit.git"
+if [[ ! -d "${ZINIT_HOME}" ]]; then
+  mkdir -p "$(dirname "${ZINIT_HOME}")"
+  git clone https://github.com/zdharma-continuum/zinit.git "${ZINIT_HOME}"
 fi
+source "${ZINIT_HOME}/zinit.zsh"
 
-# Syntax highlighting
-if [[ -f /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh ]]; then
-  source /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
-elif [[ -f /usr/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh ]]; then
-  source /usr/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
-fi
+# Source critical environment and common functions BEFORE Zinit plugins
+# This ensures PATH is set for plugins (like Starship) and helpers are available.
+source "${HOME}/dev/dotfiles/sh/shell-common.sh" # Source this first for helper functions
+source "${HOME}/dev/dotfiles/sh/env.sh"          # Then source env for PATH and other vars
+
+# Load plugins with Zinit
+# Using 'light' for faster loading without reporting/investigation
+zinit light zsh-users/zsh-autosuggestions
+zinit light zsh-users/zsh-syntax-highlighting
+
+# Initialize Starship prompt
+zinit ice atload"eval \"\$(starship init zsh)\""
+zinit light starship/starship
+
+# Add other plugins here, e.g.:
+# zinit light zdharma-continuum/fast-syntax-highlighting # Alternative syntax highlighting
+# zinit light romkatv/powerlevel10k # If you want Zinit to manage P10k
+
+# Source shell-common.sh directly to make its functions globally available
+# before Zinit compiles other snippets that depend on them.
+
+# Load our own shell scripts using Zinit
+# Loop through sh/*.sh files and load them as snippets, excluding common/env.
+for script_file in "${HOME}/dev/dotfiles/sh/"*.sh; do
+  script_basename=$(basename "${script_file}")
+  if [[ "${script_basename}" == "shell-common.sh" || "${script_basename}" == "env.sh" ]]; then
+    continue # Skip common and env scripts as they are sourced directly
+  fi
+  zinit ice lucid wait"0"
+  zinit snippet "${script_file}"
+done
 
 # Command not found handler
 if [[ -f /usr/share/doc/pkgfile/command-not-found.zsh ]]; then
@@ -41,6 +65,3 @@ if [[ -f /usr/share/doc/pkgfile/command-not-found.zsh ]]; then
 elif [[ -f /etc/zsh_command_not_found ]]; then
   source /etc/zsh_command_not_found
 fi
-
-# Load shell utilities and extensions
-source ~/dev/dotfiles/sh/shell-common.sh

@@ -34,3 +34,18 @@ bind 'set menu-complete-display-prefix on' # Show the common prefix while cyclin
 
 # Source common shell configurations
 source ~/dev/dotfiles/sh/shell-common.sh
+source ~/dev/dotfiles/sh/env.sh # Explicitly source env.sh for PATH and other vars
+
+# Load other utility scripts from sh/ directory
+# This ensures that shell-common.sh and env.sh (sourced above) are not re-sourced.
+for script_file in "${HOME}/dev/dotfiles/sh/"*.sh; do
+  script_basename=$(basename "${script_file}")
+  if [[ "${script_basename}" != "shell-common.sh" && "${script_basename}" != "env.sh" ]]; then
+    source "${script_file}" || echo "Warning: Failed to load ${script_file} in bashrc.local"
+  fi
+done
+
+# Initialize Starship prompt for Bash
+if has_command starship; then
+  eval "$(starship init bash 2> /dev/null)" || true
+fi
