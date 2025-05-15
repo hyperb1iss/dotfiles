@@ -552,7 +552,6 @@ function apull() {
 # Environment variables
 export USE_CCACHE=1
 export CCACHE_EXEC=${CCACHE_EXEC:-/usr/bin/ccache}
-export CCACHE_DIR=${CCACHE_DIR:-/b/.ccache}
 export CCACHE_SIZE=${CCACHE_SIZE:-50G}
 export ANDROID_JACK_VM_ARGS="-Dfile.encoding=UTF-8 -XX:+TieredCompilation -Xmx4g"
 
