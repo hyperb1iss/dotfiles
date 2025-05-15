@@ -4,6 +4,7 @@
 setopt share_history
 setopt hist_ignore_all_dups
 setopt inc_append_history
+setopt EXTENDED_HISTORY
 
 HISTSIZE=50000
 # Export SAVEHIST so shellcheck knows it's used by zsh internally
