@@ -31,6 +31,12 @@ source "${ZINIT_HOME}/zinit.zsh"
 # This ensures PATH is set for plugins (like Starship) and helpers are available.
 source "${HOME}/dev/dotfiles/sh/shell-common.sh" # Source this first for helper functions
 source "${HOME}/dev/dotfiles/sh/env.sh"          # Then source env for PATH and other vars
+source "${HOME}/dev/dotfiles/sh/terminal.sh"     # Source terminal title management
+
+# Set initial terminal title for interactive, non-minimal Zsh sessions
+if is_zsh && [[ $- == *i* ]] && ! is_minimal; then
+  set_terminal_title
+fi
 
 # Load plugins with Zinit
 # Using 'light' for faster loading without reporting/investigation
@@ -52,8 +58,10 @@ zinit light starship/starship
 # Loop through sh/*.sh files and load them as snippets, excluding common/env.
 for script_file in "${HOME}/dev/dotfiles/sh/"*.sh; do
   script_basename=$(basename "${script_file}")
-  if [[ "${script_basename}" == "shell-common.sh" || "${script_basename}" == "env.sh" ]]; then
-    continue # Skip common and env scripts as they are sourced directly
+  if [[ "${script_basename}" == "shell-common.sh" ||
+    "${script_basename}" == "env.sh" ||
+    "${script_basename}" == "terminal.sh" ]]; then
+    continue # Skip common, env, and terminal scripts as they are sourced directly
   fi
   zinit ice lucid wait"0"
   zinit snippet "${script_file}"
