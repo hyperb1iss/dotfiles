@@ -2,16 +2,22 @@
 # macos_config.sh
 # Configure macOS defaults for a developer-friendly environment
 
-# Exit on error
-set -e
+# Continue on error
+set +e
+
+# Function to handle errors gracefully
+handle_error() {
+  echo "⚠️ Command failed: $1"
+  echo "Continuing with next setting..."
+}
 
 echo "🔧 Configuring macOS settings..."
 
 # Close any open System Preferences panes to prevent them from overriding settings
-osascript -e 'tell application "System Preferences" to quit'
+osascript -e 'tell application "System Preferences" to quit' || handle_error "closing System Preferences"
 
 # Ask for the administrator password upfront
-sudo -v
+sudo -v || { echo "⚠️ Failed to get sudo privileges. Some settings might not be applied."; }
 
 # Keep-alive: update existing `sudo` time stamp until script has finished
 while true; do
@@ -24,20 +30,16 @@ done 2> /dev/null &
 # General UI/UX                                                               #
 ###############################################################################
 
-# Set computer name (as done via System Preferences → Sharing)
-sudo scutil --set ComputerName "MacBook-Bliss"
-sudo scutil --set HostName "MacBook-Bliss"
-sudo scutil --set LocalHostName "MacBook-Bliss"
-sudo defaults write /Library/Preferences/SystemConfiguration/com.apple.smb.server NetBIOSName -string "MacBook-Bliss"
+# Hostname configuration removed as requested by user
 
 # Disable the sound effects on boot
-sudo nvram SystemAudioVolume=" "
+sudo nvram SystemAudioVolume=" " || handle_error "setting boot sound"
 
 # Set sidebar icon size to medium
-defaults write NSGlobalDomain NSTableViewDefaultSizeMode -int 2
+defaults write NSGlobalDomain NSTableViewDefaultSizeMode -int 2 || handle_error "NSTableViewDefaultSizeMode"
 
 # Always show scrollbars
-defaults write NSGlobalDomain AppleShowScrollBars -string "Always"
+defaults write NSGlobalDomain AppleShowScrollBars -string "Always" || handle_error "AppleShowScrollBars"
 
 # Disable the "Are you sure you want to open this application?" dialog
 defaults write com.apple.LaunchServices LSQuarantine -bool false
@@ -135,41 +137,7 @@ chflags nohidden ~/Library
 # Dock, Dashboard, and hot corners                                            #
 ###############################################################################
 
-# Set the icon size of Dock items
-defaults write com.apple.dock tilesize -int 48
-
-# Automatically hide and show the Dock
-defaults write com.apple.dock autohide -bool true
-
-# Don't show recent applications in Dock
-defaults write com.apple.dock show-recents -bool false
-
-# Hot corners
-# Possible values:
-#  0: no-op
-#  2: Mission Control
-#  3: Show application windows
-#  4: Desktop
-#  5: Start screen saver
-#  6: Disable screen saver
-#  7: Dashboard
-# 10: Put display to sleep
-# 11: Launchpad
-# 12: Notification Center
-# 13: Lock Screen
-
-# Top left screen corner → Mission Control
-defaults write com.apple.dock wvous-tl-corner -int 2
-defaults write com.apple.dock wvous-tl-modifier -int 0
-# Top right screen corner → Desktop
-defaults write com.apple.dock wvous-tr-corner -int 4
-defaults write com.apple.dock wvous-tr-modifier -int 0
-# Bottom left screen corner → Start screen saver
-defaults write com.apple.dock wvous-bl-corner -int 5
-defaults write com.apple.dock wvous-bl-modifier -int 0
-# Bottom right screen corner → Put display to sleep
-defaults write com.apple.dock wvous-br-corner -int 10
-defaults write com.apple.dock wvous-br-modifier -int 0
+# Dock settings removed as requested by user
 
 ###############################################################################
 # Terminal & iTerm2                                                           #
@@ -213,26 +181,26 @@ sudo spctl --master-disable
 
 # Configure key remapping for developers
 # Map Caps Lock to Escape (useful for Vim users)
-hidutil property --set '{"UserKeyMapping":[{"HIDKeyboardModifierMappingSrc":0x700000039,"HIDKeyboardModifierMappingDst":0x700000029}]}'
+hidutil property --set '{"UserKeyMapping":[{"HIDKeyboardModifierMappingSrc":0x700000039,"HIDKeyboardModifierMappingDst":0x700000029}]}' || handle_error "setting keyboard mapping"
 
 ###############################################################################
 # Safari & WebKit                                                             #
 ###############################################################################
 
 # Privacy: don't send search queries to Apple
-defaults write com.apple.Safari UniversalSearchEnabled -bool false
-defaults write com.apple.Safari SuppressSearchSuggestions -bool true
+defaults write com.apple.Safari UniversalSearchEnabled -bool false || handle_error "Safari UniversalSearchEnabled"
+defaults write com.apple.Safari SuppressSearchSuggestions -bool true || handle_error "Safari SuppressSearchSuggestions"
 
 # Enable Safari's debug menu
-defaults write com.apple.Safari IncludeInternalDebugMenu -bool true
+defaults write com.apple.Safari IncludeInternalDebugMenu -bool true || handle_error "Safari IncludeInternalDebugMenu"
 
 # Enable the Develop menu and the Web Inspector in Safari
-defaults write com.apple.Safari IncludeDevelopMenu -bool true
-defaults write com.apple.Safari WebKitDeveloperExtrasEnabled -bool true
-defaults write com.apple.Safari com.apple.Safari.ContentPageGroupIdentifier.WebKit2DeveloperExtrasEnabled -bool true
+defaults write com.apple.Safari IncludeDevelopMenu -bool true || handle_error "Safari IncludeDevelopMenu"
+defaults write com.apple.Safari WebKitDeveloperExtrasEnabled -bool true || handle_error "Safari WebKitDeveloperExtrasEnabled"
+defaults write com.apple.Safari com.apple.Safari.ContentPageGroupIdentifier.WebKit2DeveloperExtrasEnabled -bool true || handle_error "Safari WebKit2DeveloperExtrasEnabled"
 
 # Add a context menu item for showing the Web Inspector in web views
-defaults write NSGlobalDomain WebKitDeveloperExtras -bool true
+defaults write NSGlobalDomain WebKitDeveloperExtras -bool true || handle_error "WebKitDeveloperExtras"
 
 ###############################################################################
 # Kill affected applications                                                  #

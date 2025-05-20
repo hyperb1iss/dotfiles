@@ -45,6 +45,13 @@ if ! command -v brew &> /dev/null; then
   fi
 fi
 
+# Ensure Homebrew is in PATH
+if [[ $(uname -m) == "arm64" ]]; then
+  eval "$(/opt/homebrew/bin/brew shellenv)"
+else
+  eval "$(/usr/local/bin/brew shellenv)"
+fi
+
 # Update Homebrew
 print_step "Updating Homebrew..."
 brew update
@@ -75,6 +82,12 @@ if [[ ! -d "dotbot" ]]; then
 else
   print_step "Updating Dotbot..."
   git submodule update --remote dotbot
+fi
+
+# Ensure Go is installed for fzf
+if ! command -v go &> /dev/null; then
+  print_step "Installing Go (required for fzf)..."
+  brew install go
 fi
 
 # Run the installation

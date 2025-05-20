@@ -23,6 +23,13 @@ if ! command -v brew > /dev/null 2>&1; then
   fi
 fi
 
+# Ensure Homebrew is in PATH (fixes "not in your PATH" warning)
+if [[ $(uname -m) == "arm64" ]]; then
+  eval "$(/opt/homebrew/bin/brew shellenv)"
+else
+  eval "$(/usr/local/bin/brew shellenv)"
+fi
+
 # Make sure we're using the latest Homebrew
 echo "Updating Homebrew..."
 brew update
@@ -31,13 +38,7 @@ brew update
 echo "Upgrading existing packages..."
 brew upgrade
 
-# Install brew-bundle if not already installed
-if ! brew list brew-bundle &> /dev/null; then
-  echo "Installing brew-bundle..."
-  brew tap Homebrew/bundle
-fi
-
-# Install packages from Brewfile
+# Install packages from Brewfile (directly, without the deprecated brew-bundle)
 echo "Installing packages from Brewfile..."
 brew bundle --file="${HOME}/dev/dotfiles/macos/Brewfile"
 
@@ -45,7 +46,33 @@ brew bundle --file="${HOME}/dev/dotfiles/macos/Brewfile"
 if ! command -v rustup > /dev/null 2>&1; then
   echo "Installing Rust via rustup..."
   curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+  # Export PATH immediately so cargo is available in this script
+  export PATH="${HOME}/.cargo/bin:${PATH}"
+  
+  # Add to profile files for persistence
+  if [[ ! -f "${HOME}/.zprofile" ]] || ! grep -q "source \"\${HOME}/.cargo/env\"" "${HOME}/.zprofile"; then
+    echo 'source "${HOME}/.cargo/env"' >> "${HOME}/.zprofile"
+  fi
+  
+  if [[ ! -f "${HOME}/.profile" ]] || ! grep -q "source \"\${HOME}/.cargo/env\"" "${HOME}/.profile"; then
+    echo 'source "${HOME}/.cargo/env"' >> "${HOME}/.profile"
+  fi
+  
+  # Also add to zshrc for immediate use
+  if [[ ! -f "${HOME}/.zshrc" ]] || ! grep -q "source \"\${HOME}/.cargo/env\"" "${HOME}/.zshrc"; then
+    echo 'source "${HOME}/.cargo/env"' >> "${HOME}/.zshrc"
+  fi
+fi
+
+# Ensure cargo is available for the rest of this script
+if [[ -f "${HOME}/.cargo/env" ]]; then
   source "${HOME}/.cargo/env"
+fi
+
+# Install cargo packages
+if command -v cargo > /dev/null 2>&1; then
+  echo "Installing cargo packages..."
+  cargo install git-delta lsd macchina || true
 fi
 
 # Create symlinks for Homebrew-installed JDK

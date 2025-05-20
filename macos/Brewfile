@@ -1,11 +1,7 @@
 # Brewfile for macOS dotfiles setup
 
 # Taps
-tap "homebrew/bundle"
 tap "homebrew/cask"
-tap "homebrew/cask-fonts"
-tap "homebrew/core"
-tap "homebrew/services"
 tap "koekeishiya/formulae"  # For yabai window manager
 
 # CLI Tools
@@ -29,7 +25,7 @@ brew "jq"                    # Lightweight and flexible command-line JSON proces
 brew "lazygit"               # Simple terminal UI for git commands
 brew "llvm"                  # Next-gen compiler infrastructure
 brew "lsd"                   # Enhanced ls command
-brew "mac-cli"               # macOS command line tools for developers
+brew "m-cli"                 # Swiss Army Knife for macOS (corrected from mac-cli)
 brew "macchina"              # System information fetcher with a focus on performance
 brew "mas"                   # Mac App Store command line interface
 brew "ncdu"                  # NCurses Disk Usage
@@ -43,19 +39,20 @@ brew "python@3.10"           # Python programming language
 brew "ripgrep"               # Search tool like grep and The Silver Searcher
 brew "rsync"                 # Utility that provides fast incremental file transfer
 brew "shellcheck"            # Static analysis and lint tool, for (ba)sh scripts
-brew "skhd"                  # Simple hotkey daemon for macOS
+brew "koekeishiya/formulae/skhd"  # Simple hotkey daemon for macOS (from koekeishiya tap)
 brew "starship"              # Cross-shell prompt
 brew "tmux"                  # Terminal multiplexer
 brew "tree"                  # Display directories as trees
 brew "unzip"                 # Extraction utility for .zip compressed archives
 brew "wget"                  # Internet file retriever
-brew "yabai"                 # Window manager for macOS based on binary space partitioning
+brew "koekeishiya/formulae/yabai"  # Window manager for macOS (from koekeishiya tap)
 brew "yq"                    # Process YAML documents from the CLI
 brew "zoxide"                # Smarter cd command
 brew "zsh"                   # UNIX shell
 brew "zsh-autosuggestions"   # Fish-like fast/unobtrusive autosuggestions for zsh
 brew "zsh-completions"       # Additional completion definitions for zsh
 brew "zsh-syntax-highlighting" # Fish shell like syntax highlighting for zsh
+brew "nvm"                   # Node Version Manager
 
 # Development
 cask "android-studio"        # Android IDE
@@ -80,22 +77,12 @@ cask "stats"                 # System monitor menubar
 
 # Quick Look Plugins
 cask "qlcolorcode"           # Quick Look plugin for syntax highlighting
-cask "qlimagesize"           # Quick Look plugin for image dimensions and metadata
 cask "qlmarkdown"            # Quick Look plugin for Markdown files
 cask "qlstephen"             # Quick Look plugin for plain text files without extension
 cask "quicklook-json"        # Quick Look plugin for JSON files
 
-# Optional Applications (uncomment if needed)
-# cask "github"              # Desktop client for GitHub repositories
-# cask "postman"             # API platform for building and using APIs
-# cask "slack"               # Team communication and collaboration software
-# cask "spotify"             # Music streaming service
-
 # Mac App Store Apps (requires `mas` to be installed)
-# Uncomment and modify these based on your needs
-# mas "1Password", id: 1333542190         # Password manager
-mas "Amphetamine", id: 937984704        # Keep-awake utility
-# mas "Xcode", id: 497799835              # Apple's IDE for macOS/iOS development
+# mas "Amphetamine", id: 937984704        # Keep-awake utility (commented out due to download issues)
 
 # Kubernetes Tools
 brew "kubectl"            # Kubernetes command-line tool
