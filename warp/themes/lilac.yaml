@@ -1,0 +1,26 @@
+# Lilac theme for Warp Terminal
+# A beautiful dark purple theme inspired by the Lilac VS Code theme
+
+accent: "#c792ea"
+background: "#14111F"
+details: "darker"
+foreground: "#FBF5F3"
+terminal_colors:
+  bright:
+    black: "#5f7e97"
+    blue: "#a2bffc"
+    cyan: "#89ddff"
+    green: "#c3e88d"
+    magenta: "#d4a5f9"
+    red: "#ff869a"
+    white: "#ffffff"
+    yellow: "#ffeb95"
+  normal:
+    black: "#14111F"
+    blue: "#82AAFF"
+    cyan: "#7fdbca"
+    green: "#addb67"
+    magenta: "#c792ea"
+    red: "#ff5874"
+    white: "#d6deeb"
+    yellow: "#ffcb8b"

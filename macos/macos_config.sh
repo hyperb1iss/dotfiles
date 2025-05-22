@@ -140,7 +140,7 @@ chflags nohidden ~/Library
 # Dock settings removed as requested by user
 
 ###############################################################################
-# Terminal & iTerm2                                                           #
+# Terminal & Warp                                                            #
 ###############################################################################
 
 # Only use UTF-8 in Terminal.app
@@ -150,11 +150,7 @@ defaults write com.apple.terminal StringEncodings -array 4
 defaults write com.apple.terminal FocusFollowsMouse -bool true
 defaults write org.x.X11 wm_ffm -bool true
 
-# Install custom profile for iTerm2 if available
-if [[ -d ~/Library/Application\ Support/iTerm2/DynamicProfiles ]]; then
-  mkdir -p ~/Library/Application\ Support/iTerm2/DynamicProfiles
-  cp -f ~/dev/dotfiles/macos/iterm2_profile.json ~/Library/Application\ Support/iTerm2/DynamicProfiles/
-fi
+# Warp configuration is handled through symlinked theme files
 
 ###############################################################################
 # Mac App Store                                                               #

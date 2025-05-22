@@ -77,6 +77,11 @@
     ~/.config/starship.toml: starship/starship.toml
 
 - shell:
+    - mkdir -p ~/.warp/themes
+- link:
+    ~/.warp/themes/lilac.yaml: warp/themes/lilac.yaml
+
+- shell:
     -
       command: mkdir -p ~/dev/go && GOPATH=~/dev/go go install github.com/junegunn/fzf@latest
       stderr: true

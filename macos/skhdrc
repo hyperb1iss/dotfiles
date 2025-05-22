@@ -88,4 +88,4 @@ ctrl + alt - f : yabai -m space --layout float
 ctrl + alt - s : yabai -m space --layout stack
 
 # Open terminal quickly
-cmd - return : open -a iTerm
+cmd - return : open -a Warp

@@ -57,7 +57,7 @@ brew "nvm"                   # Node Version Manager
 # Development
 cask "android-studio"        # Android IDE
 cask "docker"                # App to build and share containerized applications
-cask "iterm2"                # Terminal emulator
+cask "warp"                  # Modern terminal emulator
 cask "visual-studio-code"    # Code editor
 
 # Fonts
