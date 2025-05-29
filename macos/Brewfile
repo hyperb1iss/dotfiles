@@ -38,6 +38,7 @@ brew "procs"                 # Modern replacement for ps
 brew "python@3.10"           # Python programming language
 brew "ripgrep"               # Search tool like grep and The Silver Searcher
 brew "rsync"                 # Utility that provides fast incremental file transfer
+brew "rustup-init"           # Rust toolchain installer
 brew "shellcheck"            # Static analysis and lint tool, for (ba)sh scripts
 brew "koekeishiya/formulae/skhd"  # Simple hotkey daemon for macOS (from koekeishiya tap)
 brew "starship"              # Cross-shell prompt

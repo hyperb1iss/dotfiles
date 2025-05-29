@@ -57,37 +57,34 @@ else
   echo "⚠️  No OpenJDK installation found to link"
 fi
 
-# Install Rust via rustup (more flexible than Homebrew's rust)
-if ! command -v rustup > /dev/null 2>&1; then
-  echo "Installing Rust via rustup..."
-  curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
-  # Export PATH immediately so cargo is available in this script
-  export PATH="${HOME}/.cargo/bin:${PATH}"
-
-  # Add to profile files for persistence
-  if [[ ! -f "${HOME}/.zprofile" ]] || ! grep -q "source \"\${HOME}/.cargo/env\"" "${HOME}/.zprofile"; then
-    echo "source \"\${HOME}/.cargo/env\"" >> "${HOME}/.zprofile"
+# Set up Rust environment for Homebrew's rustup
+echo "Setting up Rust environment..."
+if command -v rustup > /dev/null 2>&1; then
+  # Install stable toolchain if none exists
+  if ! rustup toolchain list | grep -q "stable"; then
+    echo "Installing stable Rust toolchain..."
+    rustup toolchain install stable
+    rustup default stable
   fi
 
-  if [[ ! -f "${HOME}/.profile" ]] || ! grep -q "source \"\${HOME}/.cargo/env\"" "${HOME}/.profile"; then
-    echo "source \"\${HOME}/.cargo/env\"" >> "${HOME}/.profile"
+  # Get the active toolchain and set up PATH for current session
+  active_toolchain=$(rustup show active-toolchain 2> /dev/null | cut -d' ' -f1) || true
+  if [[ -n "${active_toolchain}" && -d "${HOME}/.rustup/toolchains/${active_toolchain}/bin" ]]; then
+    export PATH="${HOME}/.rustup/toolchains/${active_toolchain}/bin:${PATH}"
   fi
 
-  # Also add to zshrc for immediate use
-  if [[ ! -f "${HOME}/.zshrc" ]] || ! grep -q "source \"\${HOME}/.cargo/env\"" "${HOME}/.zshrc"; then
-    echo "source \"\${HOME}/.cargo/env\"" >> "${HOME}/.zshrc"
-  fi
+  # Also add ~/.cargo/bin for installed packages
+  [[ -d "${HOME}/.cargo/bin" ]] && export PATH="${HOME}/.cargo/bin:${PATH}"
+else
+  echo "⚠️  rustup not found. Please install it with 'brew install rustup-init && rustup-init'"
 fi
 
-# Ensure cargo is available for the rest of this script
-if [[ -f "${HOME}/.cargo/env" ]]; then
-  source "${HOME}/.cargo/env"
-fi
-
-# Install cargo packages
+# Install cargo packages if cargo is available
 if command -v cargo > /dev/null 2>&1; then
-  echo "Installing cargo packages..."
-  cargo install git-delta lsd macchina || true
+  echo "Installing useful cargo packages..."
+  cargo install --quiet git-delta lsd macchina || echo "⚠️  Some cargo packages failed to install"
+else
+  echo "⚠️  cargo not available, skipping cargo package installation"
 fi
 
 # Remove outdated versions
