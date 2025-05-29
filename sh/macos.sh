@@ -1,4 +1,3 @@
-#!/bin/bash
 # macos.sh
 # macOS specific utilities and configurations
 
@@ -330,14 +329,6 @@ if is_macos; then
   elif [[ -d /usr/local/opt/python@3.10/libexec/bin ]]; then
     export PATH="/usr/local/opt/python@3.10/libexec/bin:${PATH}"
   fi
-
-  # Fix for Java on macOS
-  if [[ -d /opt/homebrew/opt/openjdk@17 ]]; then
-    export JAVA_HOME="/opt/homebrew/opt/openjdk@17"
-  elif [[ -d /usr/local/opt/openjdk@17 ]]; then
-    export JAVA_HOME="/usr/local/opt/openjdk@17"
-  fi
-  export PATH="${JAVA_HOME}/bin:${PATH}"
 
   # Configure zsh and bash completions for Homebrew packages
   if has_command brew; then

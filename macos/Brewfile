@@ -32,7 +32,7 @@ brew "ncdu"                  # NCurses Disk Usage
 brew "neovim"                # Ambitious Vim-fork focused on extensibility and agility
 brew "ninja"                 # Small build system for use with gyp or CMake
 brew "node"                  # Platform for Node.js development
-brew "openjdk@17"            # Java Development Kit
+brew "openjdk"               # Latest Java Development Kit
 brew "p7zip"                 # 7-Zip (high compression file archiver) implementation
 brew "procs"                 # Modern replacement for ps
 brew "python@3.10"           # Python programming language

@@ -42,25 +42,40 @@ brew upgrade
 echo "Installing packages from Brewfile..."
 brew bundle --file="${HOME}/dev/dotfiles/macos/Brewfile"
 
+# Set up Java symlink for java_home utility
+echo "Setting up Java symlink..."
+if [[ $(uname -m) == "arm64" ]]; then
+  brew_prefix="/opt/homebrew"
+else
+  brew_prefix="/usr/local"
+fi
+
+if [[ -d "${brew_prefix}/opt/openjdk" ]]; then
+  sudo ln -sfn "${brew_prefix}/opt/openjdk/libexec/openjdk.jdk" "/Library/Java/JavaVirtualMachines/openjdk.jdk"
+  echo "✓ Linked latest OpenJDK for java_home utility"
+else
+  echo "⚠️  No OpenJDK installation found to link"
+fi
+
 # Install Rust via rustup (more flexible than Homebrew's rust)
 if ! command -v rustup > /dev/null 2>&1; then
   echo "Installing Rust via rustup..."
   curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
   # Export PATH immediately so cargo is available in this script
   export PATH="${HOME}/.cargo/bin:${PATH}"
-  
+
   # Add to profile files for persistence
   if [[ ! -f "${HOME}/.zprofile" ]] || ! grep -q "source \"\${HOME}/.cargo/env\"" "${HOME}/.zprofile"; then
-    echo 'source "${HOME}/.cargo/env"' >> "${HOME}/.zprofile"
+    echo "source \"\${HOME}/.cargo/env\"" >> "${HOME}/.zprofile"
   fi
-  
+
   if [[ ! -f "${HOME}/.profile" ]] || ! grep -q "source \"\${HOME}/.cargo/env\"" "${HOME}/.profile"; then
-    echo 'source "${HOME}/.cargo/env"' >> "${HOME}/.profile"
+    echo "source \"\${HOME}/.cargo/env\"" >> "${HOME}/.profile"
   fi
-  
+
   # Also add to zshrc for immediate use
   if [[ ! -f "${HOME}/.zshrc" ]] || ! grep -q "source \"\${HOME}/.cargo/env\"" "${HOME}/.zshrc"; then
-    echo 'source "${HOME}/.cargo/env"' >> "${HOME}/.zshrc"
+    echo "source \"\${HOME}/.cargo/env\"" >> "${HOME}/.zshrc"
   fi
 fi
 
@@ -73,15 +88,6 @@ fi
 if command -v cargo > /dev/null 2>&1; then
   echo "Installing cargo packages..."
   cargo install git-delta lsd macchina || true
-fi
-
-# Create symlinks for Homebrew-installed JDK
-if [[ -d /opt/homebrew/opt/openjdk@17 ]]; then
-  echo "Setting up JDK symlinks..."
-  sudo ln -sfn /opt/homebrew/opt/openjdk@17/libexec/openjdk.jdk /Library/Java/JavaVirtualMachines/openjdk-17.jdk
-elif [[ -d /usr/local/opt/openjdk@17 ]]; then
-  echo "Setting up JDK symlinks..."
-  sudo ln -sfn /usr/local/opt/openjdk@17/libexec/openjdk.jdk /Library/Java/JavaVirtualMachines/openjdk-17.jdk
 fi
 
 # Remove outdated versions
