@@ -14,7 +14,8 @@
         if command -v pacman >/dev/null 2>&1; then
           # Arch Linux setup
           sudo pacman -Syu --noconfirm
-          sudo pacman -S --needed --noconfirm $(grep -v '^#\|^$' packages_arch.txt)
+          # Install packages from list (failures will be non-fatal)
+          grep -v '^#\|^$' packages_arch.txt | xargs -r sudo pacman -S --needed --noconfirm || true
         else
           # Ubuntu/Debian setup
           sudo add-apt-repository -y ppa:longsleep/golang-backports
@@ -30,6 +31,19 @@
         if command -v update-alternatives >/dev/null 2>&1; then
           sudo update-alternatives --install /usr/bin/editor editor /usr/bin/nvim 60
           sudo update-alternatives --install /usr/bin/vim vim /usr/bin/nvim 60
+        fi
+      stderr: true
+      stdout: true
+    -
+      command: |
+        # Install kind for Kubernetes local clusters (not available in official repos)
+        if command -v pacman >/dev/null 2>&1 && ! command -v kind >/dev/null 2>&1; then
+          echo "Installing kind from GitHub releases..."
+          KIND_VERSION="v0.25.0"
+          curl -Lo ./kind "https://kind.sigs.k8s.io/dl/${KIND_VERSION}/kind-linux-amd64"
+          chmod +x ./kind
+          sudo mv ./kind /usr/local/bin/kind
+          echo "kind installed successfully"
         fi
       stderr: true
       stdout: true

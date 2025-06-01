@@ -93,9 +93,9 @@ bzip2
 # Kubernetes tools
 kubectl
 kubectx
-kubernetes-tools
+# kubernetes-tools
 k9s
 helm
 kustomize
-kind
+# kind
 minikube
