@@ -19,6 +19,8 @@
       force: true
     # Git configuration
     ~/.gitconfig: gitconfig
+    # Warp terminal configuration
+    ~/.warp: warp
 
 - shell:
     # Run the Windows setup script
