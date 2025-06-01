@@ -24,6 +24,12 @@ PINK="\033[38;5;219m"    # Bright pink for highlights
 YELLOW="\033[38;5;222m"  # Pastel amber for caution
 GREEN="\033[38;5;157m"   # Pastel mint green for positive outcomes
 
+# Global cache variables for git operations
+declare -g GIT_REPO_ROOT=""
+declare -g SUBMODULE_PATHS=""
+declare -g IS_GIT_REPO=0
+declare -g SHELLCHECK_CONFIG=""
+
 # Color utility functions - short and sweet 💅
 err() { echo -e "${RED}${BOLD}⨯ error:${RESET} $*"; }
 warn() { echo -e "${ORANGE}⏣ $*${RESET}"; }
@@ -46,6 +52,23 @@ fixed() { ok "${GREEN}fixed issues in $*${RESET}"; }
 well_formatted() { ok "${GREEN}$* already properly formatted${RESET}"; }
 no_fixable() { note "no auto-fixable issues in $*"; }
 nothing_to_fix() { ok "${GREEN}no issues to fix in $*${RESET}"; }
+
+# Initialize git cache - call once at startup
+init_git_cache() {
+  if git rev-parse --is-inside-work-tree &> /dev/null; then
+    IS_GIT_REPO=1
+    GIT_REPO_ROOT=$(git rev-parse --show-toplevel)
+    SUBMODULE_PATHS=$(git config --file .gitmodules --get-regexp path 2> /dev/null | awk '{print $2}' || echo "")
+
+    # Initialize shellcheck config
+    local config_file="${GIT_REPO_ROOT}/.shellcheckrc"
+    if [[ -f "${config_file}" ]]; then
+      SHELLCHECK_CONFIG="--rcfile=${config_file}"
+    fi
+  else
+    IS_GIT_REPO=0
+  fi
+}
 
 # Dependency check
 check_deps() {
@@ -91,29 +114,36 @@ usage() {
   echo -e "  ${BLUE}»${RESET} shellint -e SC2086,SC2046 --fix ${MAGENTA}#${RESET} fix issues excluding certain codes\n"
 }
 
-# Check if path is in a git submodule
+# Fast check if path is in a git submodule using cached data
 is_in_submodule() {
   local path="$1"
 
-  # Skip check if we're not in a git repo
-  if ! git rev-parse --is-inside-work-tree &> /dev/null; then
-    return 1
-  fi
+  [[ ${IS_GIT_REPO} -eq 0 ]] && return 1
+  [[ -z "${SUBMODULE_PATHS}" ]] && return 1
 
-  # Get the list of submodules
-  local submodules
-  submodules=$(git config --file .gitmodules --get-regexp path 2> /dev/null | awk '{print $2}' || echo "")
-
-  if [[ -z "${submodules}" ]]; then
-    return 1
-  fi
-
-  # Check if path is in any submodule
+  # Check if path is in any submodule using cached data
   while IFS= read -r submodule; do
-    if [[ -n "${submodule}" && "${path}" == "${submodule}"* ]]; then
-      return 0
+    [[ -n "${submodule}" && "${path}" == "${submodule}"* ]] && return 0
+  done <<< "${SUBMODULE_PATHS}"
+
+  return 1
+}
+
+# Check if a given path is a submodule directory path using cached data
+is_target_a_submodule_dir() {
+  local dir_path="$1"
+
+  [[ ${IS_GIT_REPO} -eq 0 ]] && return 1
+  [[ -z "${SUBMODULE_PATHS}" ]] && return 1
+
+  local normalized_dir_path="${dir_path%/}"
+
+  while IFS= read -r submodule_path_from_config; do
+    if [[ -n "${submodule_path_from_config}" ]]; then
+      local normalized_submodule_path="${submodule_path_from_config%/}"
+      [[ "${normalized_dir_path}" == "${normalized_submodule_path}" ]] && return 0
     fi
-  done <<< "${submodules}"
+  done <<< "${SUBMODULE_PATHS}"
 
   return 1
 }
@@ -124,125 +154,73 @@ find_scripts() {
   local recursive="$2"
   local include_submodules="$3"
 
-  # Use printf to ensure one item per line, avoid issues with different find implementations
   if [[ "${recursive}" -eq 1 ]]; then
-    # Try to use git ls-files for better handling of submodules if we're in a git repo
-    if git rev-parse --is-inside-work-tree &> /dev/null; then
+    if [[ ${IS_GIT_REPO} -eq 1 ]]; then
       if [[ "${include_submodules}" -eq 1 ]]; then
-        # Find all files, let process_file filter
         git ls-files --recurse-submodules -- "${dir}"
       else
-        # Find all files, let process_file filter
         git ls-files -- "${dir}"
       fi
     else
-      # Find all files, let process_file filter
       find "${dir}" -type f -not -path "*/\\.*" -print 2> /dev/null || true
     fi
   else
-    # Find all files, let process_file filter
     find "${dir}" -maxdepth 1 -type f -not -path "*/\\.*" -print 2> /dev/null || true
   fi
 }
 
-# Check if file is a shell script based on content (for files without extensions)
+# Simplified shell script detection
 is_shell_script() {
   local file="$1"
 
-  # Use file command to identify shell scripts more accurately
+  # Quick file type check using file command
   local file_type
-  file_type=$(file -b "${file}")
-
-  # Check if file type contains shell script indicators
-  if [[ "${file_type}" =~ (shell script|sh script|bash script|zsh script|Bourne-Again shell|POSIX shell) ]]; then
-    return 0
-  fi
-
-  return 1
+  file_type=$(file -b "${file}" 2> /dev/null || echo "")
+  [[ "${file_type}" =~ (shell script|sh script|bash script|zsh script|Bourne-Again shell|POSIX shell) ]]
 }
 
-# Get shellcheck configuration
-get_shellcheck_config() {
-  local project_root
-  project_root=$(git rev-parse --show-toplevel 2> /dev/null || pwd)
+# Simplified script identification
+should_process_file() {
+  local file="$1"
+  local file_basename
+  file_basename=$(basename "${file}")
+  local file_path="${file#./}" # Remove leading ./
 
-  local config_file="${project_root}/.shellcheckrc"
-  local config_arg=""
+  # Quick pattern matching - order by likelihood
+  case "${file_basename}" in
+    *.sh | *.bash | *.zsh) return 0 ;;
+    *bashrc* | *zshrc*) return 0 ;;
+    zshenv | zlogin | zlogout | zprofile) return 0 ;;
+    *) ;; # Continue to other checks
+  esac
 
-  if [[ -f "${config_file}" ]]; then
-    config_arg="--rcfile=${config_file}"
+  # bin/* files need content check
+  if [[ "${file_path}" == bin/* && "${file_path#bin/}" != */* ]]; then
+    is_shell_script "${file}"
+    return $?
   fi
 
-  echo "${config_arg}"
+  # Fallback to shebang check for other files
+  is_shell_script "${file}"
 }
 
-# Check if a given path is a submodule directory path (from .gitmodules)
-is_target_a_submodule_dir() {
-  local dir_path="$1"
-
-  if ! git rev-parse --is-inside-work-tree &> /dev/null; then
-    return 1 # Not in a git repo
-  fi
-
-  local submodules_paths
-  submodules_paths=$(git config --file .gitmodules --get-regexp path 2> /dev/null | awk '{print $2}' || echo "")
-
-  if [[ -z "${submodules_paths}" ]]; then
-    return 1 # No submodules defined
-  fi
-
-  # Normalize dir_path by removing trailing slash if any for comparison
-  local normalized_dir_path="${dir_path%/}"
-
-  while IFS= read -r submodule_path_from_config; do
-    if [[ -n "${submodule_path_from_config}" ]]; then
-      # Normalize submodule path from config as well
-      local normalized_submodule_path_from_config="${submodule_path_from_config%/}"
-      if [[ "${normalized_dir_path}" == "${normalized_submodule_path_from_config}" ]]; then
-        return 0 # The path IS a submodule entry path
-      fi
-    fi
-  done <<< "${submodules_paths}"
-
-  return 1 # Not a submodule entry path
-}
-
-# Run shellcheck on a file and report issues
+# Run shellcheck on a file and report issues - optimized to avoid temp files
 run_shellcheck() {
   local file="$1"
   local exclude="$2"
   local quiet="$3"
 
   local exclude_arg=""
-  if [[ -n "${exclude}" ]]; then
-    exclude_arg="--exclude=${exclude}"
-  fi
+  [[ -n "${exclude}" ]] && exclude_arg="--exclude=${exclude}"
 
-  if [[ "${quiet}" -eq 0 ]]; then
-    checking "${file}"
-  fi
+  [[ "${quiet}" -eq 0 ]] && checking "${file}"
 
-  # Get config
-  local config_arg
-  config_arg=$(get_shellcheck_config)
-
-  # Create a temporary copy of the file
-  local tmp_file
-  tmp_file=$(mktemp)
-  cat "${file}" > "${tmp_file}" || {
-    err "failed to create temporary file"
-    return 1
-  }
-
-  # Run shellcheck with project config
+  # Run shellcheck directly on the file using cached config
   local issues
-  issues=$(shellcheck "${config_arg}" "${exclude_arg}" "${tmp_file}" 2>&1) || true
-
-  # Clean up temp file
-  rm -f "${tmp_file}"
+  issues=$(shellcheck "${SHELLCHECK_CONFIG}" "${exclude_arg}" "${file}" 2>&1) || true
 
   # Filter out the openBinaryFile error message if present
-  issues=$(echo "${issues}" | grep -v "openBinaryFile: does not exist")
+  issues=$(echo "${issues}" | grep -v "openBinaryFile: does not exist" || true)
 
   if [[ -n "${issues}" ]]; then
     if [[ "${quiet}" -eq 0 ]]; then
@@ -254,14 +232,12 @@ run_shellcheck() {
     fi
     return 1
   else
-    if [[ "${quiet}" -eq 0 ]]; then
-      no_issues "${file}"
-    fi
+    [[ "${quiet}" -eq 0 ]] && no_issues "${file}"
     return 0
   fi
 }
 
-# Fix shellcheck issues using diff format
+# Fix shellcheck issues using diff format - optimized
 fix_shellcheck() {
   local file="$1"
   local exclude="$2"
@@ -269,96 +245,53 @@ fix_shellcheck() {
   local verbose="$4"
 
   local exclude_arg=""
-  if [[ -n "${exclude}" ]]; then
-    exclude_arg="--exclude=${exclude}"
-  fi
+  [[ -n "${exclude}" ]] && exclude_arg="--exclude=${exclude}"
 
-  if [[ "${quiet}" -eq 0 ]]; then
-    fixing "${file}"
-  fi
+  [[ "${quiet}" -eq 0 ]] && fixing "${file}"
 
-  # Get config
-  local config_arg
-  config_arg=$(get_shellcheck_config)
-
-  # Create a temporary copy of the file
-  local tmp_file
-  tmp_file=$(mktemp)
-  cat "${file}" > "${tmp_file}" || {
-    err "failed to create temporary file"
-    return 1
-  }
-
-  # Run shellcheck with project config
+  # Run shellcheck directly with cached config
   local diff
-  diff=$(shellcheck -f diff "${config_arg}" "${exclude_arg}" "${tmp_file}" 2> /dev/null)
+  diff=$(shellcheck -f diff "${SHELLCHECK_CONFIG}" "${exclude_arg}" "${file}" 2> /dev/null || true)
 
-  # Clean up temp file
-  rm -f "${tmp_file}"
-
-  if [[ -n "${diff}" && "${diff}" != "--- a/"* ]]; then
-    #  The diff output doesn't look like a proper patch
-    if [[ "${quiet}" -eq 0 ]]; then
-      note "no auto-fixable issues in ${BOLD}${file}${RESET}"
-    fi
+  if [[ -z "${diff}" || "${diff}" != "--- a/"* ]]; then
+    [[ "${quiet}" -eq 0 ]] && note "no auto-fixable issues in ${BOLD}${file}${RESET}"
     return 0
   fi
 
-  if [[ -n "${diff}" ]]; then
-    if [[ "${verbose}" -eq 1 && "${quiet}" -eq 0 ]]; then
-      verb "applying fixes to ${BOLD}${file}${RESET}:"
-      echo "${diff}" | while IFS= read -r line; do
-        if [[ "${line}" == "+"* ]]; then
-          echo -e "${GREEN}${line}${RESET}"
-        elif [[ "${line}" == "-"* ]]; then
-          echo -e "${RED}${line}${RESET}"
-        else
-          echo -e "${line}"
-        fi
-      done
-    fi
+  if [[ "${verbose}" -eq 1 && "${quiet}" -eq 0 ]]; then
+    verb "applying fixes to ${BOLD}${file}${RESET}:"
+    echo "${diff}" | while IFS= read -r line; do
+      case "${line}" in
+        "+"*) echo -e "${GREEN}${line}${RESET}" ;;
+        "-"*) echo -e "${RED}${line}${RESET}" ;;
+        *) echo -e "${line}" ;;
+      esac
+    done
+  fi
 
-    # Create a temporary directory for patching
-    local tmp_dir
-    tmp_dir=$(mktemp -d)
+  # Create a temporary directory for patching
+  local tmp_dir
+  tmp_dir=$(mktemp -d)
+  local file_name
+  file_name=$(basename "${file}")
 
-    # Create subdirectory structure
-    mkdir -p "${tmp_dir}/a" "${tmp_dir}/b"
+  # Setup patch environment
+  mkdir -p "${tmp_dir}/a" "${tmp_dir}/b"
+  cp "${file}" "${tmp_dir}/a/" "${tmp_dir}/b/"
 
-    # Copy the file to both directories
-    cp "${file}" "${tmp_dir}/a/"
-    cp "${file}" "${tmp_dir}/b/"
+  # Modify and apply the diff
+  local modified_diff
+  modified_diff=$(echo "${diff}" | sed "s|--- a/.*|--- a/${file_name}|" | sed "s|+++ b/.*|+++ b/${file_name}|")
 
-    # Modify the diff to use our temporary paths
-    local file_name
-    file_name=$(basename "${file}")
-    local modified_diff
-    modified_diff=$(echo "${diff}" | sed "s|--- a/.*|--- a/${file_name}|" | sed "s|+++ b/.*|+++ b/${file_name}|")
-
-    # Apply the diff in the temporary directory
-    if ! echo "${modified_diff}" | (cd "${tmp_dir}" && patch -p1 -s); then
-      if [[ "${quiet}" -eq 0 ]]; then
-        warn "failed to apply patch to ${BOLD}${file}${RESET}. leaving original untouched."
-      fi
-      rm -rf "${tmp_dir}"
-    else
-      # Copy the patched file back only if patch succeeded
-      cp "${tmp_dir}/b/${file_name}" "${file}"
-
-      if [[ "${quiet}" -eq 0 ]]; then
-        fixed "${file}"
-      fi
-    fi
-
-    # Clean up
-    rm -rf "${tmp_dir}"
-    return 0 # Assuming success if patch applied or no diff
+  if echo "${modified_diff}" | (cd "${tmp_dir}" && patch -p1 -s); then
+    cp "${tmp_dir}/b/${file_name}" "${file}"
+    [[ "${quiet}" -eq 0 ]] && fixed "${file}"
   else
-    if [[ "${quiet}" -eq 0 ]]; then
-      nothing_to_fix "${file}"
-    fi
-    return 0
+    [[ "${quiet}" -eq 0 ]] && warn "failed to apply patch to ${BOLD}${file}${RESET}. leaving original untouched."
   fi
+
+  rm -rf "${tmp_dir}"
+  return 0
 }
 
 # Format script with shfmt
@@ -367,9 +300,7 @@ format_script() {
   local quiet="$2"
   local verbose="$3"
 
-  if [[ "${quiet}" -eq 0 ]]; then
-    formatting "${file}"
-  fi
+  [[ "${quiet}" -eq 0 ]] && formatting "${file}"
 
   # Convert to absolute path if not already
   local abs_file
@@ -377,40 +308,33 @@ format_script() {
 
   # Check if formatting is needed first, relying on .editorconfig
   local needs_formatting
-  needs_formatting=$(shfmt -l "${abs_file}" 2> /dev/null)
+  needs_formatting=$(shfmt -l "${abs_file}" 2> /dev/null || true)
 
   if [[ -n "${needs_formatting}" ]]; then
     if [[ "${verbose}" -eq 1 && "${quiet}" -eq 0 ]]; then
       local diff
-      # Get diff, relying on .editorconfig
-      diff=$(shfmt -d "${abs_file}" 2> /dev/null)
+      diff=$(shfmt -d "${abs_file}" 2> /dev/null || true)
       verb "formatting changes for ${BOLD}${file}${RESET}:"
 
       echo "${diff}" | while IFS= read -r line; do
-        if [[ "${line}" == "+"* ]]; then
-          echo -e "${GREEN}${line}${RESET}"
-        elif [[ "${line}" == "-"* ]]; then
-          echo -e "${RED}${line}${RESET}"
-        else
-          echo -e "${line}"
-        fi
+        case "${line}" in
+          "+"*) echo -e "${GREEN}${line}${RESET}" ;;
+          "-"*) echo -e "${RED}${line}${RESET}" ;;
+          *) echo -e "${line}" ;;
+        esac
       done
     fi
 
     # Apply formatting, relying on .editorconfig
     shfmt -w "${abs_file}" 2> /dev/null
 
-    if [[ "${quiet}" -eq 0 ]]; then
-      echo -e "${CYAN}➤ ${GREEN}formatted ${BOLD}${file}${RESET} ${PINK}⏩${RESET}"
-    fi
+    [[ "${quiet}" -eq 0 ]] && echo -e "${CYAN}➤ ${GREEN}formatted ${BOLD}${file}${RESET} ${PINK}⏩${RESET}"
   else
-    if [[ "${quiet}" -eq 0 ]]; then
-      well_formatted "${file}"
-    fi
+    [[ "${quiet}" -eq 0 ]] && well_formatted "${file}"
   fi
 }
 
-# Process a single file
+# Process a single file - simplified and optimized
 process_file() {
   local file="$1"
   local check="$2"
@@ -421,151 +345,50 @@ process_file() {
   local verbose="$7"
   local include_submodules="$8"
 
-  # 1. If we are excluding submodules, and THIS path is a submodule entry itself (e.g. "tpm" gitlink from git ls-files), skip it.
+  # Skip submodule handling if we're not including them
   if [[ "${include_submodules}" -eq 0 ]]; then
-    # Checks if 'file' matches a path in .gitmodules
     is_target_a_submodule_dir "${file}"
-    local is_submodule_entry=$?
-    if [[ "${is_submodule_entry}" -eq 0 ]]; then # If it is a submodule root/entry path
-      if [[ "${verbose}" -eq 1 && "${quiet}" -eq 0 ]]; then
-        note "skipping submodule entry: ${file}"
-      fi
-      return 0 # Successfully skipped
-    fi
-
-    # 2. If we are excluding submodules, and this path is a file *within* a submodule directory (e.g. "tpm/foo.sh"), skip it.
-    # This check is only relevant if the path was not a submodule entry itself.
-    # Checks if 'file' path starts with a submodule path
+    local is_submodule_dir=$?
     is_in_submodule "${file}"
-    local in_submodule_dir=$?
-    if [[ "${in_submodule_dir}" -eq 0 ]]; then # If true (is in submodule path)
-      if [[ "${verbose}" -eq 1 && "${quiet}" -eq 0 ]]; then
-        note "skipping file located within submodule directory: ${file}"
-      fi
+    local in_submodule=$?
+    if [[ "${is_submodule_dir}" -eq 0 || "${in_submodule}" -eq 0 ]]; then
+      [[ "${verbose}" -eq 1 && "${quiet}" -eq 0 ]] && note "skipping submodule: ${file}"
       return 0
     fi
   fi
 
-  # 3. If 'file' is a directory, skip it. process_file handles files only.
-  #    (e.g. if a submodule entry "tpm" was passed and include_submodules=1, and "tpm" is a checked-out directory)
+  # Handle directories
   if [[ -d "${file}" ]]; then
-    if [[ "${verbose}" -eq 1 && "${quiet}" -eq 0 ]]; then
-      note "skipping directory: ${file} (process_file handles files only)"
-    fi
+    [[ "${verbose}" -eq 1 && "${quiet}" -eq 0 ]] && note "skipping directory: ${file}"
     return 0
   fi
 
-  # 4. If 'file' is not a regular file (after a dir check), it's an issue or needs skipping.
-  #    This covers non-existent files, special files, etc.
+  # Check if file exists and is regular
   if [[ ! -f "${file}" ]]; then
-    if [[ "${quiet}" -eq 0 ]]; then
-      if [[ ! -e "${file}" ]]; then # Truly doesn't exist
-        err "file not found: ${file}"
-      else                                # Exists but not a regular file (e.g. named pipe, socket, block/char device, broken symlink)
-        if [[ "${verbose}" -eq 1 ]]; then # Only show note if verbose for non-regular files
-          note "skipping non-regular file: ${file}"
-        fi
-      fi
-    fi
-    if [[ ! -e "${file}" ]]; then return 1; else return 0; fi # error if not exists, skip if other non-regular
-  fi
-
-  local file_basename
-  file_basename=$(basename "${file}")
-  local file_path_for_glob="${file}" # Use the full path for glob-like checks
-
-  # Normalize path for bin/* check if it starts with ./
-  if [[ "${file_path_for_glob}" == "./"* ]]; then
-    file_path_for_glob="${file_path_for_glob#./}"
-  fi
-
-  # Define patterns for script identification
-  local name_contains_patterns=("bashrc" "zshrc")
-  local exact_name_patterns=("zshenv" "zlogin" "zlogout" "zprofile")
-  local extension_patterns=(".sh" ".bash" ".zsh") # Filename must end with these
-
-  local is_targeted_script=1 # 1 = false (skip), 0 = true (process)
-
-  # Priority 1: Explicit name contains patterns
-  for pattern in "${name_contains_patterns[@]}"; do
-    if [[ "${file_basename}" == *"${pattern}"* ]]; then
-      is_targeted_script=0
-      break
-    fi
-  done
-
-  # Priority 2: Specific exact filenames
-  if [[ "${is_targeted_script}" -ne 0 ]]; then
-    for pattern in "${exact_name_patterns[@]}"; do
-      if [[ "${file_basename}" == "${pattern}" ]]; then
-        is_targeted_script=0
-        break
-      fi
-    done
-  fi
-
-  # Priority 3: Standard Shell Extensions
-  if [[ "${is_targeted_script}" -ne 0 ]]; then
-    for ext_pattern in "${extension_patterns[@]}"; do
-      if [[ "${file_basename}" == *"${ext_pattern}" ]]; then # e.g., ends with .sh
-        is_targeted_script=0
-        break
-      fi
-    done
-  fi
-
-  # Priority 4: bin/* pattern (files directly in a "bin" directory at the start of the path)
-  if [[ "${is_targeted_script}" -ne 0 ]]; then
-    if [[ "${file_path_for_glob}" == bin/* && "${file_path_for_glob#bin/}" != */* ]]; then
-      # For bin/ files, explicitly verify it's a shell script using file command
-      is_shell_script "${file}"
-      local bin_file_check=$?
-      if [[ "${bin_file_check}" -eq 0 ]]; then
-        is_targeted_script=0
-      elif [[ "${verbose}" -eq 1 && "${quiet}" -eq 0 ]]; then
-        note "skipping non-shell script in bin/: ${file}"
-      fi
+    if [[ ! -e "${file}" ]]; then
+      [[ "${quiet}" -eq 0 ]] && err "file not found: ${file}"
+      return 1
+    else
+      [[ "${verbose}" -eq 1 && "${quiet}" -eq 0 ]] && note "skipping non-regular file: ${file}"
+      return 0
     fi
   fi
 
-  # Priority 5: Shebang check (if still not identified and is a file)
-  if [[ "${is_targeted_script}" -ne 0 ]]; then
-    if [[ -f "${file}" ]]; then # Only check shebang if it's a file
-      is_shell_script "${file}" # Existing shebang check function
-      local shebang_check_result=$?
-      if [[ "${shebang_check_result}" -eq 0 ]]; then
-        is_targeted_script=0
-      fi
-    fi
+  # Check if we should process this file
+  should_process_file "${file}"
+  local should_process=$?
+  if [[ "${should_process}" -ne 0 ]]; then
+    [[ "${verbose}" -eq 1 && "${quiet}" -eq 0 ]] && note "skipping non-shell file: ${file}"
+    return 0
   fi
 
-  # Final decision to skip or process
-  if [[ "${is_targeted_script}" -ne 0 ]]; then
-    if [[ "${verbose}" -eq 1 && "${quiet}" -eq 0 ]]; then
-      # Only log skip message for actual files or symlinks that were considered
-      if [[ -f "${file}" || -L "${file}" ]]; then
-        note "skipping non-targeted file: ${file}"
-      fi
-    fi
-    return 0 # Skip
-  fi
-
-  # If we reach here, it's a shell script. Proceed.
   local status=0
 
-  # Format file if needed
-  if [[ "${format}" -eq 1 ]]; then
-    format_script "${file}" "${quiet}" "${verbose}"
-  fi
+  # Process the file in order: format, fix, check
+  [[ "${format}" -eq 1 ]] && format_script "${file}" "${quiet}" "${verbose}"
+  [[ "${fix}" -eq 1 ]] && fix_shellcheck "${file}" "${exclude}" "${quiet}" "${verbose}"
 
-  # Fix shellcheck issues
-  if [[ "${fix}" -eq 1 ]]; then
-    fix_shellcheck "${file}" "${exclude}" "${quiet}" "${verbose}"
-  fi
-
-  # Check for issues
   if [[ "${check}" -eq 1 ]]; then
-    # Call run_shellcheck separately from the condition to avoid SC2310
     run_shellcheck "${file}" "${exclude}" "${quiet}"
     local shellcheck_result=$?
     if [[ "${shellcheck_result}" -ne 0 ]]; then
@@ -604,6 +427,7 @@ print_summary() {
 # Main function
 main() {
   check_deps
+  init_git_cache # Initialize git operations cache
 
   local check=1 # Default to check mode
   local fix=0
@@ -678,16 +502,12 @@ main() {
   done
 
   # If no targets specified, use current directory
-  if [[ ${#targets[@]} -eq 0 ]]; then
-    targets=(".")
-  fi
+  [[ ${#targets[@]} -eq 0 ]] && targets=(".")
 
   # Debug: Show targets
   if [[ "${verbose}" -eq 1 && "${quiet}" -eq 0 ]]; then
     verb "processing targets:"
-    for target in "${targets[@]}"; do
-      echo -e "  - ${target}"
-    done
+    printf '  - %s\n' "${targets[@]}"
   fi
 
   # Process all targets
@@ -698,23 +518,17 @@ main() {
   set +e
 
   for target in "${targets[@]}"; do
-    if [[ "${verbose}" -eq 1 && "${quiet}" -eq 0 ]]; then
-      verb "processing target: ${target}"
-    fi
+    [[ "${verbose}" -eq 1 && "${quiet}" -eq 0 ]] && verb "processing target: ${target}"
 
     if [[ -d "${target}" ]]; then
       # Process directory
       local scripts
-      if [[ "${verbose}" -eq 1 && "${quiet}" -eq 0 ]]; then
-        verb "finding scripts in directory: ${target} (recursive=${recursive})"
-      fi
+      [[ "${verbose}" -eq 1 && "${quiet}" -eq 0 ]] && verb "finding scripts in directory: ${target} (recursive=${recursive})"
 
       scripts=$(find_scripts "${target}" "${recursive}" "${include_submodules}")
 
       if [[ -z "${scripts}" ]]; then
-        if [[ "${verbose}" -eq 1 && "${quiet}" -eq 0 ]]; then
-          note "no scripts found in ${target}"
-        fi
+        [[ "${verbose}" -eq 1 && "${quiet}" -eq 0 ]] && note "no scripts found in ${target}"
         continue
       fi
 
@@ -728,18 +542,13 @@ main() {
       # Process each script found
       while IFS= read -r script; do
         if [[ -n "${script}" ]]; then
-          if [[ "${verbose}" -eq 1 && "${quiet}" -eq 0 ]]; then
-            verb "processing script: ${script}"
-          fi
+          [[ "${verbose}" -eq 1 && "${quiet}" -eq 0 ]] && verb "processing script: ${script}"
 
-          # Call process_file separately from the condition to avoid SC2310
           process_file "${script}" "${check}" "${fix}" "${format}" "${exclude}" "${quiet}" "${verbose}" "${include_submodules}"
           local process_result=$?
           if [[ "${process_result}" -ne 0 ]]; then
             exit_code=1
-            if [[ "${verbose}" -eq 1 && "${quiet}" -eq 0 ]]; then
-              err "failed to process ${script}, continuing with next file"
-            fi
+            [[ "${verbose}" -eq 1 && "${quiet}" -eq 0 ]] && err "failed to process ${script}, continuing with next file"
           fi
           processed+=("${script}")
           ((file_count++))
@@ -747,18 +556,13 @@ main() {
       done < <(echo "${scripts}")
     elif [[ -f "${target}" ]]; then
       # Process single file
-      if [[ "${verbose}" -eq 1 && "${quiet}" -eq 0 ]]; then
-        verb "processing file: ${target}"
-      fi
+      [[ "${verbose}" -eq 1 && "${quiet}" -eq 0 ]] && verb "processing file: ${target}"
 
-      # Call process_file separately from the condition to avoid SC2310
       process_file "${target}" "${check}" "${fix}" "${format}" "${exclude}" "${quiet}" "${verbose}" "${include_submodules}"
       local process_result=$?
       if [[ "${process_result}" -ne 0 ]]; then
         exit_code=1
-        if [[ "${verbose}" -eq 1 && "${quiet}" -eq 0 ]]; then
-          err "failed to process ${target}, continuing with next file"
-        fi
+        [[ "${verbose}" -eq 1 && "${quiet}" -eq 0 ]] && err "failed to process ${target}, continuing with next file"
       fi
       processed+=("${target}")
       ((file_count++))
