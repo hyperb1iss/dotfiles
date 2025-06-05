@@ -51,6 +51,13 @@ if is_macos; then
   # Open current directory in VSCode
   alias vsc='code .'
 
+  # Add Homebrew's unversioned Python symlinks to PATH
+  if [[ -d /opt/homebrew/opt/python@3.13/libexec/bin ]]; then
+    export PATH="/opt/homebrew/opt/python@3.13/libexec/bin:${PATH}"
+  elif [[ -d /usr/local/opt/python@3.13/libexec/bin ]]; then
+    export PATH="/usr/local/opt/python@3.13/libexec/bin:${PATH}"
+  fi
+
   # Flush DNS cache
   alias flushdns='sudo dscacheutil -flushcache; sudo killall -HUP mDNSResponder'
 
@@ -323,12 +330,7 @@ if is_macos; then
     export PATH="/usr/local/bin:/usr/local/sbin:${PATH}"
   fi
 
-  # Add common Homebrew Python locations to PATH
-  if [[ -d /opt/homebrew/opt/python@3.10/libexec/bin ]]; then
-    export PATH="/opt/homebrew/opt/python@3.10/libexec/bin:${PATH}"
-  elif [[ -d /usr/local/opt/python@3.10/libexec/bin ]]; then
-    export PATH="/usr/local/opt/python@3.10/libexec/bin:${PATH}"
-  fi
+  # Homebrew's default Python is already properly linked, no manual PATH needed
 
   # Configure zsh and bash completions for Homebrew packages
   if has_command brew; then
