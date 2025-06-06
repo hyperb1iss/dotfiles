@@ -1,0 +1,264 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Dotfiles Project Rules
+
+@context {
+  "type": "project_guidelines",
+  "purpose": "dotfiles_management",
+  "format_version": "1.0.0",
+  "target_platforms": ["arch_linux", "debian", "windows_11", "macos"],
+  "shell_targets": ["bash", "zsh", "powershell_7"]
+}
+
+## Project Structure
+
+@structure_rules [
+  {
+    "id": "tool_organization",
+    "rule": "dotfiles should be organized by tool/application",
+    "severity": "error"
+  },
+  {
+    "id": "config_placement",
+    "rule": "configuration files should be placed in their respective tool directories",
+    "severity": "error"
+  },
+  {
+    "id": "symbolic_links",
+    "rule": "use symbolic links to map configurations to their system locations",
+    "severity": "warning"
+  }
+]
+
+## Package Management
+
+@package_management {
+  "philosophy": "prefer official package repositories over manual installations",
+  "documentation": "document all package dependencies clearly",
+  "versioning": "specify version constraints only when necessary",
+  "package_files": {
+    "packages.txt": "main package list for Linux systems",
+    "packages_arch.txt": "Arch Linux specific packages", 
+    "packages_minimal.txt": "minimal set of essential packages"
+  }
+}
+
+## Installation and Configuration
+
+@installation_config {
+  "dotbot_files": {
+    "minimal.yaml": "basic configuration for minimal installs",
+    "system.yaml": "system-wide configuration settings", 
+    "local.yaml": "user-specific configuration and links",
+    "windows.yaml": "Windows-specific configuration"
+  },
+  "windows_setup": {
+    "main_script": "hypershell/setup-windows.ps1",
+    "installer": "install.ps1"
+  }
+}
+
+## Compatibility Requirements
+
+@compatibility_rules [
+  {
+    "id": "linux_support", 
+    "rule": "ensure compatibility with Arch Linux and Debian based systems",
+    "severity": "error"
+  },
+  {
+    "id": "windows_support",
+    "rule": "ensure compatibility with Windows 11",
+    "severity": "error"
+  },
+  {
+    "id": "powershell_target",
+    "rule": "we target PowerShell 7 on Windows", 
+    "severity": "error"
+  },
+  {
+    "id": "shell_support",
+    "rule": "ensure compatibility with zsh and bash",
+    "severity": "error"
+  }
+]
+
+## Code Style Guidelines
+
+@style_rules [
+  {
+    "id": "naming_convention",
+    "rule": "use clear, descriptive names for files and directories",
+    "severity": "warning"
+  },
+  {
+    "id": "indentation",
+    "rule": "maintain consistent indentation (2 spaces preferred)",
+    "severity": "warning"
+  },
+  {
+    "id": "documentation",
+    "rule": "include comments for complex configurations",
+    "severity": "warning"
+  },
+  {
+    "id": "modularity",
+    "rule": "keep configurations modular and well-organized",
+    "severity": "error"
+  }
+]
+
+## Shell Script Organization
+
+@shell_structure {
+  "posix_compliance": "prefer POSIX-compliant shell scripting",
+  "interactive_shell": "use zsh for interactive shell configurations",
+  "error_handling": "implement error handling in scripts",
+  "portability": "make scripts portable across Unix-like systems",
+  "directory_structure": {
+    "sh/": "contains common shell modules shared between bash and zsh",
+    "bash/ and zsh/": "Linux shell configurations that source common modules", 
+    "hypershell/modules/": "PowerShell modules for Windows environments"
+  },
+  "module_loading": {
+    "linux": "Linux shells (bash/zsh) load common functionality from sh/ directory",
+    "windows": "Windows uses Microsoft.PowerShell_profile.ps1 to load hypershell/modules"
+  }
+}
+
+@shell_modules {
+  "common_modules": [
+    "environment variables",
+    "shell utilities", 
+    "git operations",
+    "directory navigation",
+    "development tools (python, java, docker)",
+    "system-specific functions (WSL, Arch)"
+  ]
+}
+
+## Documentation Standards
+
+@documentation_rules [
+  {
+    "id": "readme_maintenance",
+    "rule": "maintain clear README files",
+    "severity": "warning"
+  },
+  {
+    "id": "installation_docs",
+    "rule": "document installation steps",
+    "severity": "error"
+  },
+  {
+    "id": "config_explanation",
+    "rule": "explain configuration options",
+    "severity": "warning"
+  },
+  {
+    "id": "usage_examples",
+    "rule": "include usage examples",
+    "severity": "warning"
+  },
+  {
+    "id": "system_requirements",
+    "rule": "note system requirements",
+    "severity": "error"
+  }
+]
+
+## Version Control Guidelines
+
+@git_rules [
+  {
+    "id": "commit_messages",
+    "rule": "use meaningful commit messages",
+    "severity": "warning"
+  },
+  {
+    "id": "commit_grouping",
+    "rule": "group related changes in single commits",
+    "severity": "warning"
+  },
+  {
+    "id": "clean_history",
+    "rule": "maintain a clean git history",
+    "severity": "warning"
+  },
+  {
+    "id": "ignore_sensitive",
+    "rule": "ignore system-specific and sensitive files",
+    "severity": "error"
+  }
+]
+
+## Security Guidelines
+
+@security_rules [
+  {
+    "id": "no_secrets_commit",
+    "rule": "never commit sensitive information or tokens",
+    "severity": "error"
+  },
+  {
+    "id": "environment_variables",
+    "rule": "use environment variables for secrets",
+    "severity": "error"
+  },
+  {
+    "id": "file_permissions",
+    "rule": "implement proper file permissions",
+    "severity": "error"
+  },
+  {
+    "id": "script_validation",
+    "rule": "validate external scripts before sourcing",
+    "severity": "error"
+  }
+]
+
+## Testing Requirements
+
+@testing_rules [
+  {
+    "id": "isolated_testing",
+    "rule": "test configurations in isolated environments",
+    "severity": "warning"
+  },
+  {
+    "id": "compatibility_testing",
+    "rule": "verify compatibility across different systems",
+    "severity": "error"
+  },
+  {
+    "id": "symlink_validation",
+    "rule": "validate symbolic links",
+    "severity": "warning"
+  },
+  {
+    "id": "syntax_checking",
+    "rule": "check for syntax errors in config files",
+    "severity": "error"
+  }
+]
+
+## Theme Guidelines
+
+@theme_rules [
+  {
+    "id": "consistent_colors",
+    "rule": "use a consistent color scheme for all files and directories",
+    "severity": "warning"
+  },
+  {
+    "id": "beautiful_functional",
+    "rule": "ensure that the theme is beautiful and functional",
+    "severity": "warning"
+  }
+]
+
+@version "1.0.0"
+@last_updated "2025-01-29"

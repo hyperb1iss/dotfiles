@@ -1,0 +1,12 @@
+---
+description: Guidelines for shell configuration files including bash, zsh, and PowerShell modules
+globs: ["sh/**/*", "bash/**/*", "zsh/**/*", "hypershell/**/*", "*.sh", "*.zsh", "*.ps1"]
+alwaysApply: false
+---
+
+# Shell Configuration Rules
+
+@context {
+  "type": "shell_configuration",
+  "scope": "shell_files"
+}
