@@ -225,3 +225,122 @@ export GIT_PS1_SHOWDIRTYSTATE=1
 export GIT_PS1_SHOWSTASHSTATE=1
 export GIT_PS1_SHOWUNTRACKEDFILES=1
 export GIT_PS1_SHOWUPSTREAM="verbose"
+
+# ============================================================================
+# Git Worktree Management System
+# ============================================================================
+
+# Simple, robust git worktree manager
+function gwt() {
+  case "$1" in
+    ls | list)
+      echo "📁 Git Worktrees"
+      # Use porcelain format for reliable parsing
+      local cur_pwd
+      cur_pwd=$(pwd)
+      git worktree list --porcelain | awk -v cur="${cur_pwd}" '
+      /^worktree / {
+        path=$2;
+        getline; # skip HEAD line
+        getline; # branch line
+        branch=$2; sub("refs/heads/", "", branch);
+        short=path;
+        sub(/.*\//, "", short); # basename
+        prefix=(path==cur)?"→":" ";
+        printf "%s %s (%s) [%s]\n", prefix, short, branch, path;
+      }'
+      ;;
+
+    cd | switch)
+      local selection
+      selection=$(git worktree list | fzf --header="Select worktree:" | awk '{print $1}')
+      if [[ -n "${selection}" ]]; then
+        cd "${selection}" || return 1
+      fi
+      ;;
+
+    new | add)
+      local branch="$2"
+      local wt_path="$3"
+
+      # If branch not provided, let user pick one interactively
+      if [[ -z "${branch}" ]]; then
+        branch=$(git for-each-ref --format='%(refname:short)' refs/heads | fzf --header="Select base branch:") || return 1
+      fi
+
+      # Compute default worktree path under /tmp/<repo>/<branch>
+      if [[ -z "${wt_path}" ]]; then
+        local repo_root repo_name
+        repo_root=$(git rev-parse --show-toplevel)
+        repo_name=$(basename "${repo_root}")
+        wt_path="/tmp/${repo_name}/${branch}"
+      fi
+
+      mkdir -p "$(dirname "${wt_path}")"
+
+      if git worktree add -b "${branch}" "${wt_path}"; then
+        echo "✅ Created worktree: ${wt_path} (switching)"
+        cd "${wt_path}" || return 1
+      fi
+      ;;
+
+    rm | remove | del)
+      # Use porcelain output for reliable parsing and exclude main worktree
+      local main_path
+      main_path=$(git rev-parse --show-toplevel)
+      local pattern="$2"
+      local candidates sel_count selection
+
+      # Build candidate list: one path per worktree (excluding main)
+      candidates=$(git worktree list --porcelain | awk '/^worktree /{path=$2;getline;getline;branch=$2;sub("refs/heads/","",branch);short=path;sub(/.*\//,"",short); if (path!="'"${main_path}"'") {printf "%s\t%s\t%s\n", path, short, branch}}')
+
+      if [[ -n "${pattern}" ]]; then
+        # Filter candidates by pattern match against path, short name, or branch
+        selection=$(echo "${candidates}" | awk -v p="${pattern}" '$0 ~ p {print $1}')
+        sel_count=$(echo "${selection}" | wc -l | tr -d ' ')
+        if [[ ${sel_count} -gt 1 ]]; then
+          # Ambiguous: let user choose
+          selection=$(echo "${selection}" | fzf --header="Multiple matches, select worktree to remove:") || return 0
+        fi
+      else
+        # No pattern supplied: interactive selection
+        selection=$(echo "${candidates}" | awk '{print $1" ("$3")"}' | fzf --with-nth=1 --header="Select worktree to remove:" | awk '{print $1}') || return 0
+      fi
+
+      if [[ -z "${selection}" ]]; then
+        echo "No worktree selected."
+        return 0
+      fi
+
+      echo "🗑️  Removing worktree: ${selection}"
+      git worktree remove "${selection}" || {
+        echo "Failed to remove worktree ${selection}"
+        return 1
+      }
+      ;;
+
+    clean)
+      echo "🧹 Cleaning worktrees..."
+      git worktree prune
+      ;;
+
+    info)
+      echo "📊 Current worktree: $(git rev-parse --show-toplevel)"
+      echo "Branch: $(git branch --show-current)"
+      echo "Commit: $(git rev-parse --short HEAD)"
+      ;;
+
+    help | *)
+      echo "Git Worktree Manager"
+      echo "Usage: gwt <command>"
+      echo ""
+      echo "Commands:"
+      echo "  ls      List all worktrees"
+      echo "  cd      Switch to a worktree"
+      echo "  new     Create new worktree"
+      echo "  rm      Remove a worktree"
+      echo "  clean   Clean up stale worktrees"
+      echo "  info    Show current worktree info"
+      ;;
+  esac
+}
