@@ -1,11 +1,5 @@
 # WSL (Windows Subsystem for Linux) integration
 
-# Function to run Linux commands from PowerShell
-function Invoke-WSLCommand {
-    wsl.exe -e $args
-}
-Set-Alias -Name wsl -Value Invoke-WSLCommand
-
 # Function to easily switch to WSL
 function Enter-WSL {
     wsl ~
