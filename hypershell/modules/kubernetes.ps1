@@ -29,7 +29,7 @@ function Switch-KubeConfig {
     
     if ([string]::IsNullOrEmpty($ConfigName)) {
         Write-Host "Current KUBECONFIG: $env:KUBECONFIG"
-        Write-Host "Available configs in $configDir:"
+        Write-Host "Available configs in ${configDir}:"
         if (Test-Path $configDir) {
             Get-ChildItem -Path $configDir -File | Select-Object -ExpandProperty Name
         } else {
@@ -134,5 +134,3 @@ if (Get-Module -ListAvailable -Name PSReadLine) {
         }
     }
 }
-
-Write-Host "✨ Kubernetes PowerShell utilities loaded - use 'khelp' for quick reference 🛳️" -ForegroundColor Magenta 
