@@ -8,6 +8,12 @@ return {
   { import = "astrocommunity.colorscheme.catppuccin" },
   { import = "astrocommunity.pack.lua" },
   { import = "astrocommunity.pack.rust" },
+  { import = "astrocommunity.pack.typescript" }, -- TypeScript/JavaScript support
+  { import = "astrocommunity.pack.tailwindcss" }, -- TailwindCSS support
+  { import = "astrocommunity.pack.html-css" }, -- HTML/CSS support
+  { import = "astrocommunity.pack.json" }, -- JSON support
+  { import = "astrocommunity.pack.yaml" }, -- YAML support
+  { import = "astrocommunity.pack.markdown" }, -- Markdown support
 
   -- import/override with your plugins folder
 }

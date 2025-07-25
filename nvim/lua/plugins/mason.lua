@@ -1,5 +1,3 @@
-if true then return {} end -- WARN: REMOVE THIS LINE TO ACTIVATE THIS FILE
-
 -- Customize Mason plugins
 
 ---@type LazySpec
@@ -11,7 +9,17 @@ return {
     opts = {
       ensure_installed = {
         "lua_ls",
-        -- add more arguments for adding more language servers
+        -- TypeScript/JavaScript language servers
+        "ts_ls", -- TypeScript Language Server (previously typescript-language-server)
+        "eslint", -- ESLint language server
+        "biome", -- Biome - Fast formatter and linter for JS/TS
+        "volar", -- Vue language server (if you work with Vue)
+        -- Other useful language servers
+        "html",
+        "cssls",
+        "jsonls",
+        "tailwindcss",
+        "graphql",
       },
     },
   },
@@ -22,7 +30,13 @@ return {
     opts = {
       ensure_installed = {
         "stylua",
-        -- add more arguments for adding more null-ls sources
+        -- TypeScript/JavaScript formatters and linters
+        "biome", -- Biome for formatting and linting
+        "prettier", -- Code formatter for JS/TS/CSS/HTML/JSON/etc
+        "prettierd", -- Faster prettier daemon
+        -- Additional tools
+        "markdownlint",
+        "yamllint",
       },
     },
   },
@@ -32,7 +46,8 @@ return {
     opts = {
       ensure_installed = {
         "python",
-        -- add more arguments for adding more debuggers
+        -- TypeScript/JavaScript debugger
+        "js", -- Node.js debugger (works for TypeScript too)
       },
     },
   },
