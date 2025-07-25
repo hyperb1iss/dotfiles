@@ -49,7 +49,8 @@ def main():
         else:
             match = file_re.match(line)
             if match:
-                strip_whitespace_regions(curfile, hunks)
+                if curfile is not None:  # Only process if we have a valid file
+                    strip_whitespace_regions(curfile, hunks)
                 curfile = match.group(1)
                 hunks = []
     if curfile:
