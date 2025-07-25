@@ -73,6 +73,45 @@ return {
     config = function() require("lsp_signature").setup() end,
   },
 
+  -- Rainbow brackets/delimiters
+  {
+    "HiPhish/rainbow-delimiters.nvim",
+    dependencies = "nvim-treesitter/nvim-treesitter",
+    event = "User AstroFile",
+    config = function()
+      local rainbow_delimiters = require("rainbow-delimiters")
+
+      -- SilkCircuit rainbow colors
+      vim.api.nvim_set_hl(0, "RainbowDelimiterRed", { fg = "#ff79c6" })
+      vim.api.nvim_set_hl(0, "RainbowDelimiterYellow", { fg = "#f1fa8c" })
+      vim.api.nvim_set_hl(0, "RainbowDelimiterBlue", { fg = "#80ffea" })
+      vim.api.nvim_set_hl(0, "RainbowDelimiterOrange", { fg = "#ffb86c" })
+      vim.api.nvim_set_hl(0, "RainbowDelimiterGreen", { fg = "#50fa7b" })
+      vim.api.nvim_set_hl(0, "RainbowDelimiterViolet", { fg = "#bd93f9" })
+      vim.api.nvim_set_hl(0, "RainbowDelimiterCyan", { fg = "#8be9fd" })
+
+      vim.g.rainbow_delimiters = {
+        strategy = {
+          [""] = rainbow_delimiters.strategy["global"],
+          vim = rainbow_delimiters.strategy["local"],
+        },
+        query = {
+          [""] = "rainbow-delimiters",
+          lua = "rainbow-blocks",
+        },
+        highlight = {
+          "RainbowDelimiterRed",
+          "RainbowDelimiterYellow",
+          "RainbowDelimiterBlue",
+          "RainbowDelimiterOrange",
+          "RainbowDelimiterGreen",
+          "RainbowDelimiterViolet",
+          "RainbowDelimiterCyan",
+        },
+      }
+    end,
+  },
+
   -- == Examples of Overriding Plugins ==
 
   -- customize alpha options
