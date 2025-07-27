@@ -132,6 +132,13 @@ return {
         "    ██  ██ ██  ██  ██  ██ ██  ██  ██",
         "    ██   ████   ████   ██ ██      ██",
       }
+      -- Apply SilkCircuit highlight groups
+      opts.section.header.opts.hl = "AlphaHeader"
+      -- For button shortcuts (like [f] for find file)
+      for _, button in ipairs(opts.section.buttons.val) do
+        button.opts.hl_shortcut = "AlphaButtonShortcut"
+      end
+      opts.section.footer.opts.hl = "AlphaFooter"
       return opts
     end,
   },
