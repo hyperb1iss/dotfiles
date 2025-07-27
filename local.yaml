@@ -11,6 +11,7 @@
     ~/.bashrc.local: bash/bashrc.local
     ~/.rc.local: bash/rc.local
     ~/.config/lsd: lsd
+    ~/.config/bat: bat
     ~/.fonts:
     ~/.gitconfig:
     ~/.tmux.conf:

@@ -1,5 +1,21 @@
 [color]
 	ui = auto
+[color "branch"]
+	current = 183 bold    # purple - current branch
+	local = 123          # cyan - local branches
+	remote = 212         # pink - remote branches
+[color "diff"]
+	meta = 221           # yellow - meta information
+	frag = 183 bold      # purple - hunk header
+	old = 197            # red - deletions
+	new = 149            # green - additions
+	whitespace = 197 reverse
+[color "status"]
+	added = 149          # green - added files
+	changed = 212        # bright purple/pink - changed files
+	untracked = 123      # cyan - untracked files
+	deleted = 197        # red - deleted files
+	branch = 221 bold    # yellow - branch info
 [user]
 	name = Stefanie Jane
 	email = stef@hyperbliss.tech
@@ -19,6 +35,21 @@
 [delta]
 	navigate = true
 	dark = true
+	syntax-theme = Dracula
+	line-numbers = true
+	side-by-side = false
+	file-style = "#c792ea bold"       # purple for file names
+	file-decoration-style = "#c792ea box"
+	hunk-header-style = "#ff79c6 bold"  # pink for hunk headers
+	hunk-header-decoration-style = "#ff79c6 box"
+	line-numbers-left-style = "#5a4a78"  # muted purple
+	line-numbers-right-style = "#5a4a78"
+	line-numbers-minus-style = "#f78c6c" # coral for deletions
+	line-numbers-plus-style = "#addb67"  # green for additions
+	minus-style = syntax "#3a2a2a"       # dark red background
+	minus-emph-style = syntax "#5a2a2a"  # darker red for emphasis
+	plus-style = syntax "#2a3a2a"        # dark green background
+	plus-emph-style = syntax "#2a5a2a"   # darker green for emphasis
 
 [merge]
 	conflictstyle = zdiff3
