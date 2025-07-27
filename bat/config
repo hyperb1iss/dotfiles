@@ -1,6 +1,5 @@
 # SilkCircuit theme for bat
 --theme="SilkCircuit"
---style="numbers,changes,header"
 --italic-text=always
 --map-syntax="*.conf:INI"
 --map-syntax="*.service:INI"
@@ -8,4 +7,3 @@
 --map-syntax="*.zshrc:Bourne Again Shell (bash)"
 --map-syntax=".zshrc:Bourne Again Shell (bash)"
 --map-syntax=".zprofile:Bourne Again Shell (bash)"
---paging=never

@@ -16,6 +16,18 @@
 	untracked = 123      # cyan - untracked files
 	deleted = 197        # red - deleted files
 	branch = 221 bold    # yellow - branch info
+	nobranch = 197 bold  # red - detached HEAD warning
+	unmerged = 197 bold  # red - unmerged files
+[color "interactive"]
+	prompt = 183 bold    # purple - prompts
+	header = 212         # pink - headers
+	help = 123           # cyan - help text
+	error = 197          # red - errors
+[color "grep"]
+	filename = 183 bold  # purple - filenames
+	linenumber = 221     # yellow - line numbers
+	match = 212 bold     # pink - matching text
+	separator = 123      # cyan - separators
 [user]
 	name = Stefanie Jane
 	email = stef@hyperbliss.tech
@@ -61,3 +73,32 @@
 	clean = git-lfs clean -- %f
 	smudge = git-lfs smudge -- %f
 	process = git-lfs filter-process
+
+[log]
+	# SilkCircuit-inspired log formatting
+	decorate = full
+	abbrevCommit = false
+
+[pretty]
+	# SilkCircuit full format - matches default git log but with colors
+	silkcircuit = %C(183 bold)commit %H%Creset%C(212)%d%Creset%n%C(white)Author: %C(123)%an <%ae>%Creset%n%C(white)Date:   %C(221)%ad%Creset%n%n%C(white)    %s%Creset%n%n%w(0,4,4)%C(white)%b%Creset
+
+[format]
+	# Use SilkCircuit format by default
+	pretty = silkcircuit
+
+[alias]
+	# Beautiful one-line log with graph
+	lg = log --graph --pretty=format:'%C(183 bold)%h%Creset %C(212)%d%Creset %C(white)%s%Creset %C(221)(%cr)%Creset %C(123)<%an>%Creset'
+
+	# Full log with SilkCircuit colors (like regular git log but styled)
+	l = log --pretty=silkcircuit
+
+	# Full log with graph
+	lgf = log --graph --pretty=silkcircuit
+
+	# Show commits from all branches with full format
+	lga = log --graph --all --pretty=silkcircuit
+
+	# Compact log for quick overview
+	lgs = log --graph --pretty=format:'%C(183)%h%Creset %C(white)%s%Creset %C(221)(%cr)%Creset' --abbrev-commit
