@@ -57,7 +57,7 @@ function dstopi() {
     echo "Stopped containers:"
     while IFS= read -r container; do
       echo "  ${container}"
-    done <<< "${containers}"
+    done <<<"${containers}"
   fi
 }
 
@@ -73,7 +73,7 @@ function drmi() {
     echo "Removed containers:"
     while IFS= read -r container; do
       echo "  ${container}"
-    done <<< "${containers}"
+    done <<<"${containers}"
   fi
 }
 

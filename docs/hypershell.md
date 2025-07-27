@@ -1,6 +1,9 @@
 # 🪟 Windows/HyperShell Environment Documentation
 
-This guide covers the core configuration and tools that make HyperShell on Windows a productive environment. You’ll find details on essential components, PowerShell tuning, WSL usage, handy shortcuts, Git and Docker commands, directory navigation tricks, and more. By the time you reach the end, you’ll have a Windows setup tailored for smooth development and system administration tasks.
+This guide covers the core configuration and tools that make HyperShell on Windows a productive environment. You’ll find
+details on essential components, PowerShell tuning, WSL usage, handy shortcuts, Git and Docker commands, directory
+navigation tricks, and more. By the time you reach the end, you’ll have a Windows setup tailored for smooth development
+and system administration tasks.
 
 ## 📋 Table of Contents
 
@@ -21,7 +24,8 @@ This guide covers the core configuration and tools that make HyperShell on Windo
 
 ## 🌟 Core Components
 
-These are the fundamental building blocks for your Windows + HyperShell setup, automatically installed via **setup-windows.ps1**.
+These are the fundamental building blocks for your Windows + HyperShell setup, automatically installed via
+**setup-windows.ps1**.
 
 ### Essential Tools
 
@@ -79,7 +83,8 @@ Set-PSReadLineOption -Colors @{
 
 ## 🌐 WSL Integration
 
-HyperShell provides commands to bridge Windows and WSL, making path conversions and cross-environment tooling straightforward.
+HyperShell provides commands to bridge Windows and WSL, making path conversions and cross-environment tooling
+straightforward.
 
 ### Path Operations
 
@@ -191,7 +196,8 @@ Manage containers and images with short aliases.
 
 ## 🧭 Frequent Directory Navigation (z)
 
-HyperShell includes a port of the **z** directory jumper (`z.ps1`). It tracks how often and how recently you visit directories, then helps you jump to them quickly:
+HyperShell includes a port of the **z** directory jumper (`z.ps1`). It tracks how often and how recently you visit
+directories, then helps you jump to them quickly:
 
 - **`z [options] <query>`**: Jump to the directory matching `<query>` (using a frecency algorithm).
 - **`-l, --list`**: List matching directories.

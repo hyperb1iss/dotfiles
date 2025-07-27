@@ -179,7 +179,7 @@ if has_command nvm; then
   function nvmrc-create() {
     local current_version
     current_version=$(node --version)
-    echo "${current_version}" > .nvmrc
+    echo "${current_version}" >.nvmrc
     echo "Created .nvmrc with Node.js ${current_version}"
   }
 
@@ -197,7 +197,7 @@ if [[ "${NVM_AUTO_SWITCH}" = "true" ]] && has_command nvm; then
   function nvm_auto_switch() {
     if [[ -f ".nvmrc" ]]; then
       local nvmrc_version
-      nvmrc_version=$(tr -d '\r\n' < .nvmrc)
+      nvmrc_version=$(tr -d '\r\n' <.nvmrc)
       local current_version
       current_version=$(nvm current)
 

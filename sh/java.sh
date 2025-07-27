@@ -27,7 +27,7 @@ function list_java_versions() {
       echo "No Java installations found or java_home utility not available."
       echo "Install Java with: brew install openjdk@17"
     fi
-  elif command -v archlinux-java > /dev/null 2>&1; then
+  elif command -v archlinux-java >/dev/null 2>&1; then
     # Arch Linux: Use archlinux-java
     echo "Using Arch Linux archlinux-java utility:"
     echo
@@ -36,7 +36,7 @@ function list_java_versions() {
     echo "Usage:"
     echo "  - Switch version: sudo archlinux-java set java-17-openjdk"
     echo "  - Or use setjdk function: setjdk 17"
-  elif command -v update-java-alternatives > /dev/null 2>&1; then
+  elif command -v update-java-alternatives >/dev/null 2>&1; then
     # Debian/Ubuntu: Use update-java-alternatives
     echo "Using Debian update-java-alternatives:"
     echo
@@ -65,7 +65,7 @@ function setjdk() {
     # macOS: Use java_home
     if [[ -x /usr/libexec/java_home ]]; then
       local java_home
-      java_home=$(/usr/libexec/java_home -v "${target_version}" 2> /dev/null)
+      java_home=$(/usr/libexec/java_home -v "${target_version}" 2>/dev/null)
       if [[ $? -eq 0 && -n "${java_home}" ]]; then
         export JAVA_HOME="${java_home}"
         local cleaned_path
@@ -83,7 +83,7 @@ function setjdk() {
       echo "Error: /usr/libexec/java_home not available"
       return 1
     fi
-  elif command -v archlinux-java > /dev/null 2>&1; then
+  elif command -v archlinux-java >/dev/null 2>&1; then
     # Arch Linux: Use archlinux-java
     local java_env="java-${target_version}-openjdk"
     if archlinux-java status | grep -q "${java_env}"; then
@@ -100,7 +100,7 @@ function setjdk() {
       archlinux-java status
       return 1
     fi
-  elif command -v update-java-alternatives > /dev/null 2>&1; then
+  elif command -v update-java-alternatives >/dev/null 2>&1; then
     # Debian/Ubuntu: Use update-java-alternatives
     local alternatives
     alternatives=$(update-java-alternatives --list | grep "${target_version}" | head -n1 | awk '{print $1}')

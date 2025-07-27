@@ -24,7 +24,7 @@ while true; do
   sudo -n true
   sleep 60
   kill -0 "$$" || exit
-done 2> /dev/null &
+done 2>/dev/null &
 
 ###############################################################################
 # General UI/UX                                                               #
@@ -216,7 +216,7 @@ for app in "Activity Monitor" \
   "SystemUIServer" \
   "Terminal" \
   "iCal"; do
-  killall "${app}" &> /dev/null
+  killall "${app}" &>/dev/null
 done
 
 echo "✅ macOS settings configured successfully! Some changes require a restart to take effect."

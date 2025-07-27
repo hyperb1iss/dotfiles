@@ -30,7 +30,7 @@ function is_macos() {
 }
 
 function is_wsl() {
-  grep -qi microsoft /proc/version 2> /dev/null
+  grep -qi microsoft /proc/version 2>/dev/null
 }
 
 function is_linux() {
@@ -39,7 +39,7 @@ function is_linux() {
 
 # Command availability check
 function has_command() {
-  command -v "$1" > /dev/null 2>&1
+  command -v "$1" >/dev/null 2>&1
 }
 
 # Installation type detection
@@ -63,6 +63,7 @@ function is_full() {
 # Safe source function that doesn't break on errors
 function safe_source() {
   if [[ -f "$1" ]]; then
+    # shellcheck disable=SC1090
     source "$1" || echo "Warning: Error sourcing $1"
     return 0
   fi

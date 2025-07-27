@@ -22,7 +22,7 @@ zstyle ':completion:*:kill:*' command "ps -u ${USER} -o pid,%cpu,tty,cputime,cmd
 
 # SSH Hostname completion based on ~/.ssh/config
 if [[ -e "${HOME}/.ssh/config" ]]; then
-    zstyle ':completion:*:*:ssh:*' hosts "$(awk '/^Host / {print $2}' ~/.ssh/config | grep -v '[*?]')"
+  zstyle ':completion:*:*:ssh:*' hosts "$(awk '/^Host / {print $2}' ~/.ssh/config | grep -v '[*?]')"
 fi
 
 # Enable extended globbing for more powerful pattern matching

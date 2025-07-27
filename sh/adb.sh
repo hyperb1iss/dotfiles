@@ -26,7 +26,7 @@ function get_device() {
     # shellcheck disable=SC2162
     echo "${devices}" | while read -r device; do
       local name
-      name=$(adb -s "${device}" shell getprop ro.product.model 2> /dev/null)
+      name=$(adb -s "${device}" shell getprop ro.product.model 2>/dev/null)
       printf "[%d] %s (%s)\n" "${i}" "${device}" "${name}" >&2
       i=$((i + 1))
     done
@@ -124,16 +124,16 @@ function colorize_logcat() {
       # Verbose - soft blue
       echo -e "${BLUE}${line}${RESET}"
     # Check for special patterns without using grep
-    elif [[ "${line}" == *"Exception"* ]] \
-      || [[ "${line}" == *"Error:"* ]] \
-      || [[ "${line}" == *"FATAL"* ]] \
-      || [[ "${line}" == *"ANR"* ]]; then
+    elif [[ "${line}" == *"Exception"* ]] ||
+      [[ "${line}" == *"Error:"* ]] ||
+      [[ "${line}" == *"FATAL"* ]] ||
+      [[ "${line}" == *"ANR"* ]]; then
       # Exception and error keywords - bold hot pink
       echo -e "${BOLD}${RED}${line}${RESET}"
-    elif [[ "${line}" == *"success"* ]] \
-      || [[ "${line}" == *"Success"* ]] \
-      || [[ "${line}" == *"CONNECTED"* ]] \
-      || [[ "${line}" == *"ready"* ]]; then
+    elif [[ "${line}" == *"success"* ]] ||
+      [[ "${line}" == *"Success"* ]] ||
+      [[ "${line}" == *"CONNECTED"* ]] ||
+      [[ "${line}" == *"ready"* ]]; then
       # Success indicators - bold pink
       echo -e "${BOLD}${PINK}${line}${RESET}"
     elif [[ "${line}" == *"WARNING"* ]] || [[ "${line}" == *"deprecated"* ]]; then
@@ -265,7 +265,7 @@ Options:
     if [[ -n "${pid}" ]]; then
       pids+=("${pid}")
     fi
-  done <<< "${pid_list}"
+  done <<<"${pid_list}"
 
   # Execute the logcat command directly with proper arguments
   echo "📊 Streaming logs for '${app_name}'..."
@@ -312,7 +312,7 @@ function apush() {
     fi
 
     local realfile relpath
-    realfile=$(readlink -f "${file}" 2> /dev/null || realpath "${file}" 2> /dev/null || echo "${file}")
+    realfile=$(readlink -f "${file}" 2>/dev/null || realpath "${file}" 2>/dev/null || echo "${file}")
     relpath=${realfile#"${OUT}/"}
 
     echo "Pushing ${file} to /${relpath}"
@@ -351,7 +351,7 @@ function adbdev() {
     adbdev --list            - List all device aliases"
 
   # Create config file if it doesn't exist
-  touch "${config_file}" 2> /dev/null || {
+  touch "${config_file}" 2>/dev/null || {
     echo "Error: Cannot create/access ${config_file}" >&2
     return 1
   }
@@ -367,7 +367,7 @@ function adbdev() {
       # Remove existing entry if any
       sed -i "/${alias}:/d" "${config_file}"
       # Add new entry
-      echo "${alias}:${serial}" >> "${config_file}"
+      echo "${alias}:${serial}" >>"${config_file}"
       echo "Added device alias '${alias}' for serial '${serial}'"
       ;;
     --remove)
@@ -392,7 +392,7 @@ function adbdev() {
       # shellcheck disable=SC2162
       while IFS=: read -r alias serial || [[ -n "${alias}" ]]; do
         printf "  %-20s %s\n" "${alias}" "${serial}"
-      done < "${config_file}"
+      done <"${config_file}"
       ;;
     "")
       echo "${usage}" >&2

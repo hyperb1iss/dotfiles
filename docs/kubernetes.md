@@ -1,6 +1,7 @@
 # 🛳️ Kubernetes Tools
 
-This module adds streamlined support for Kubernetes cluster management to Stefanie's dotfiles, with a focus on using the interactive k9s tool rather than numerous aliases.
+This module adds streamlined support for Kubernetes cluster management to Stefanie's dotfiles, with a focus on using the
+interactive k9s tool rather than numerous aliases.
 
 ## 📦 Installed Tools
 
@@ -19,16 +20,16 @@ The module installs these powerful Kubernetes tools:
 
 Instead of numerous aliases that you'll never remember, we provide just a few essential ones:
 
-| Alias | Description |
-|-------|-------------|
-| `k` | Short for `kubectl` |
-| `kx` | Short for `kubectx` |
-| `kns` | Short for `kubens` |
-| `kgp` | Get pods |
-| `kaf` | Apply a YAML file |
+| Alias  | Description                      |
+| ------ | -------------------------------- |
+| `k`    | Short for `kubectl`              |
+| `kx`   | Short for `kubectx`              |
+| `kns`  | Short for `kubens`               |
+| `kgp`  | Get pods                         |
+| `kaf`  | Apply a YAML file                |
 | `keti` | Execute a command in a container |
 
-## 🔍 Quick Reference 
+## 🔍 Quick Reference
 
 We've included the `khelp` command to display a quick reference guide:
 
@@ -107,4 +108,4 @@ Use the `kconfig` command to switch between configurations.
 
 - [k9s Documentation](https://k9scli.io/)
 - [Kubectl Cheat Sheet](https://kubernetes.io/docs/reference/kubectl/cheatsheet/)
-- [Helm Documentation](https://helm.sh/docs/) 
+- [Helm Documentation](https://helm.sh/docs/)

@@ -7,18 +7,18 @@ set -e # Exit on error
 echo "🍺 Setting up Homebrew for macOS..."
 
 # Install Homebrew if it's not installed
-if ! command -v brew > /dev/null 2>&1; then
+if ! command -v brew >/dev/null 2>&1; then
   echo "Installing Homebrew..."
   /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 
   # Add Homebrew to path based on architecture
   if [[ $(uname -m) == "arm64" ]]; then
     # M1/M2 Mac
-    echo "eval \"\$(/opt/homebrew/bin/brew shellenv)\"" >> ~/.zprofile
+    echo "eval \"\$(/opt/homebrew/bin/brew shellenv)\"" >>~/.zprofile
     eval "$(/opt/homebrew/bin/brew shellenv)"
   else
     # Intel Mac
-    echo "eval \"\$(/usr/local/bin/brew shellenv)\"" >> ~/.zprofile
+    echo "eval \"\$(/usr/local/bin/brew shellenv)\"" >>~/.zprofile
     eval "$(/usr/local/bin/brew shellenv)"
   fi
 fi
@@ -59,7 +59,7 @@ fi
 
 # Set up Rust environment for Homebrew's rustup
 echo "Setting up Rust environment..."
-if command -v rustup > /dev/null 2>&1; then
+if command -v rustup >/dev/null 2>&1; then
   # Install stable toolchain if none exists
   if ! rustup toolchain list | grep -q "stable"; then
     echo "Installing stable Rust toolchain..."
@@ -68,7 +68,7 @@ if command -v rustup > /dev/null 2>&1; then
   fi
 
   # Get the active toolchain and set up PATH for current session
-  active_toolchain=$(rustup show active-toolchain 2> /dev/null | cut -d' ' -f1) || true
+  active_toolchain=$(rustup show active-toolchain 2>/dev/null | cut -d' ' -f1) || true
   if [[ -n "${active_toolchain}" && -d "${HOME}/.rustup/toolchains/${active_toolchain}/bin" ]]; then
     export PATH="${HOME}/.rustup/toolchains/${active_toolchain}/bin:${PATH}"
   fi
@@ -80,7 +80,7 @@ else
 fi
 
 # Install cargo packages if cargo is available
-if command -v cargo > /dev/null 2>&1; then
+if command -v cargo >/dev/null 2>&1; then
   echo "Installing useful cargo packages..."
   cargo install --quiet git-delta lsd macchina || echo "⚠️  Some cargo packages failed to install"
 else

@@ -14,48 +14,48 @@ return {
     },
     event = "VeryLazy",
     config = function()
-      require("claude-code").setup({
+      require("claude-code").setup {
         -- Terminal window settings
         window = {
-          split_ratio = 0.4,      -- 40% of screen for the terminal window
-          position = "botright",  -- Bottom right position
-          enter_insert = true,    -- Enter insert mode when opening Claude Code
-          hide_numbers = true,    -- Hide line numbers in the terminal window
+          split_ratio = 0.4, -- 40% of screen for the terminal window
+          position = "botright", -- Bottom right position
+          enter_insert = true, -- Enter insert mode when opening Claude Code
+          hide_numbers = true, -- Hide line numbers in the terminal window
           hide_signcolumn = true, -- Hide the sign column in the terminal window
         },
         -- File refresh settings
         refresh = {
-          enable = true,           -- Enable file change detection
-          updatetime = 100,        -- updatetime when Claude Code is active (milliseconds)
-          timer_interval = 1000,   -- How often to check for file changes (milliseconds)
+          enable = true, -- Enable file change detection
+          updatetime = 100, -- updatetime when Claude Code is active (milliseconds)
+          timer_interval = 1000, -- How often to check for file changes (milliseconds)
           show_notifications = true, -- Show notification when files are reloaded
         },
         -- Git project settings
         git = {
-          use_git_root = true,     -- Set CWD to git root when opening Claude Code (if in git project)
+          use_git_root = true, -- Set CWD to git root when opening Claude Code (if in git project)
         },
         -- Command settings
-        command = "claude",        -- Command used to launch Claude Code
+        command = "claude", -- Command used to launch Claude Code
         -- Command variants
         command_variants = {
           continue = "--continue", -- Resume the most recent conversation
-          resume = "--resume",     -- Display an interactive conversation picker
-          verbose = "--verbose",   -- Enable verbose logging with full turn-by-turn output
+          resume = "--resume", -- Display an interactive conversation picker
+          verbose = "--verbose", -- Enable verbose logging with full turn-by-turn output
         },
         -- Keymaps
         keymaps = {
           toggle = {
-            normal = "<C-,>",       -- Normal mode keymap for toggling Claude Code
-            terminal = "<C-,>",     -- Terminal mode keymap for toggling Claude Code
+            normal = "<C-,>", -- Normal mode keymap for toggling Claude Code
+            terminal = "<C-,>", -- Terminal mode keymap for toggling Claude Code
             variants = {
               continue = "<leader>cC", -- Normal mode keymap for Claude Code with continue flag
-              verbose = "<leader>cV",  -- Normal mode keymap for Claude Code with verbose flag
+              verbose = "<leader>cV", -- Normal mode keymap for Claude Code with verbose flag
             },
           },
           window_navigation = true, -- Enable window navigation keymaps (<C-h/j/k/l>)
-          scrolling = true,         -- Enable scrolling keymaps (<C-f/b>) for page up/down
-        }
-      })
+          scrolling = true, -- Enable scrolling keymaps (<C-f/b>) for page up/down
+        },
+      }
     end,
     cmd = { "ClaudeCode", "ClaudeCodeContinue", "ClaudeCodeResume", "ClaudeCodeVerbose" },
     keys = {
@@ -79,7 +79,7 @@ return {
     dependencies = "nvim-treesitter/nvim-treesitter",
     event = "User AstroFile",
     config = function()
-      local rainbow_delimiters = require("rainbow-delimiters")
+      local rainbow_delimiters = require "rainbow-delimiters"
 
       -- SilkCircuit rainbow colors
       vim.api.nvim_set_hl(0, "RainbowDelimiterRed", { fg = "#ff79c6" })

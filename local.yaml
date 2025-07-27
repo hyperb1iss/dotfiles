@@ -2,7 +2,7 @@
     link:
       relink: true
 
-- clean: ['~']
+- clean: ["~"]
 
 - shell:
     - if [ -d ~/dev/dotfiles-private ]; then ln -sf ~/dev/dotfiles-private/fonts/Pragmata\ Pro fonts/;fi
@@ -62,11 +62,8 @@
     ~/.warp/themes/lilac.yaml: warp/themes/lilac.yaml
 
 - shell:
-    -
-      command: mkdir -p ~/dev/go && GOPATH=~/dev/go go install github.com/junegunn/fzf@latest
+    - command: mkdir -p ~/dev/go && GOPATH=~/dev/go go install github.com/junegunn/fzf@latest
       stderr: true
       stdout: true
       quiet: false
       description: Installing fzf from source
-
-

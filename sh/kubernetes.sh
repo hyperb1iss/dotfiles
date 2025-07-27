@@ -19,7 +19,7 @@ function kconfig() {
   if [[ -z "$1" ]]; then
     echo "Current KUBECONFIG: ${KUBECONFIG:-Not set}"
     echo "Available configs in ${config_dir}:"
-    if ! ls -1 "${config_dir}" 2> /dev/null; then
+    if ! ls -1 "${config_dir}" 2>/dev/null; then
       echo "No configs found in ${config_dir}"
       [[ -d "${config_dir}" ]] || echo "Directory ${config_dir} doesn't exist - will be created on first use"
     fi
@@ -55,7 +55,7 @@ function klogs() {
 
 # Kubernetes help/cheatsheet function
 function khelp() {
-  cat << EOF
+  cat <<EOF
 🛳️ Kubernetes Quick Reference 
 
 📊 Interactive UI:
@@ -89,10 +89,10 @@ mkdir -p "${KUBE_CONFIG_DIR:-${HOME}/.kube/configs}"
 if has_command kubectl; then
   # shellcheck disable=SC1090
   if is_zsh; then
-    source <(kubectl completion zsh) 2> /dev/null || true
+    source <(kubectl completion zsh) 2>/dev/null || true
     compdef k=kubectl
   elif is_bash; then
-    source <(kubectl completion bash) 2> /dev/null || true
+    source <(kubectl completion bash) 2>/dev/null || true
     complete -o default -F __start_kubectl k
   fi
 fi

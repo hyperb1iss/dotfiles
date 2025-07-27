@@ -18,7 +18,7 @@ fi
 print_step "Welcome to Stefanie's dotfiles installation for macOS!"
 
 # Install command line tools if needed
-if ! xcode-select -p &> /dev/null; then
+if ! xcode-select -p &>/dev/null; then
   print_step "Installing Command Line Tools..."
   xcode-select --install
 
@@ -29,18 +29,18 @@ if ! xcode-select -p &> /dev/null; then
 fi
 
 # Install Homebrew if needed
-if ! command -v brew &> /dev/null; then
+if ! command -v brew &>/dev/null; then
   print_step "Installing Homebrew..."
   /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 
   # Add Homebrew to PATH based on architecture
   if [[ $(uname -m) == "arm64" ]]; then
     # M1/M2 Mac
-    echo "eval \"\$(/opt/homebrew/bin/brew shellenv)\"" >> ~/.zprofile
+    echo "eval \"\$(/opt/homebrew/bin/brew shellenv)\"" >>~/.zprofile
     eval "$(/opt/homebrew/bin/brew shellenv)"
   else
     # Intel Mac
-    echo "eval \"\$(/usr/local/bin/brew shellenv)\"" >> ~/.zprofile
+    echo "eval \"\$(/usr/local/bin/brew shellenv)\"" >>~/.zprofile
     eval "$(/usr/local/bin/brew shellenv)"
   fi
 fi
@@ -57,7 +57,7 @@ print_step "Updating Homebrew..."
 brew update
 
 # Install git if not already installed
-if ! command -v git &> /dev/null; then
+if ! command -v git &>/dev/null; then
   print_step "Installing Git..."
   brew install git
 fi
@@ -85,7 +85,7 @@ else
 fi
 
 # Ensure Go is installed for fzf
-if ! command -v go &> /dev/null; then
+if ! command -v go &>/dev/null; then
   print_step "Installing Go (required for fzf)..."
   brew install go
 fi

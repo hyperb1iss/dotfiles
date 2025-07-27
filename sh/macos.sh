@@ -41,7 +41,7 @@ if is_macos; then
 
   # Quick look a file
   function ql() {
-    qlmanage -p "$@" &> /dev/null
+    qlmanage -p "$@" &>/dev/null
   }
 
   # Show/hide hidden files in Finder
@@ -350,6 +350,7 @@ if is_macos; then
         source "${brew_prefix}/etc/profile.d/bash_completion.sh"
       else
         for COMPLETION in "${brew_prefix}/etc/bash_completion.d/"*; do
+          # shellcheck disable=SC1090
           [[ -r "${COMPLETION}" ]] && source "${COMPLETION}"
         done
       fi

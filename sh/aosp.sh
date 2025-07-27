@@ -80,7 +80,7 @@ function reposync() {
   local sync_success=false
   local cores
 
-  cores=$(nproc 2> /dev/null || echo "4")
+  cores=$(nproc 2>/dev/null || echo "4")
 
   while [[ ${retry_count} -lt ${max_retries} ]] && [[ "${sync_success}" = false ]]; do
     echo "Attempt $((retry_count + 1)) of ${max_retries}"
@@ -142,7 +142,7 @@ function installboot() {
   adb -s "${device}" root
   sleep 1
   adb -s "${device}" wait-for-device
-  adb -s "${device}" shell mount /system 2> /dev/null
+  adb -s "${device}" shell mount /system 2>/dev/null
   adb -s "${device}" remount
 
   local product_name
@@ -163,12 +163,12 @@ function installboot() {
 
 # Remote management functions with proper error handling
 function aospremote() {
-  if ! git rev-parse --git-dir > /dev/null 2>&1; then
+  if ! git rev-parse --git-dir >/dev/null 2>&1; then
     echo ".git directory not found. Please run this from the root directory of the Android repository you wish to set up."
     return 1
   fi
 
-  git remote rm aosp 2> /dev/null
+  git remote rm aosp 2>/dev/null
   local PROJECT PFX
   local current_dir
   current_dir=$(pwd -P) || true
@@ -181,12 +181,12 @@ function aospremote() {
 }
 
 function cafremote() {
-  if ! git rev-parse --git-dir > /dev/null 2>&1; then
+  if ! git rev-parse --git-dir >/dev/null 2>&1; then
     echo ".git directory not found. Please run this from the root directory of the Android repository you wish to set up."
     return 1
   fi
 
-  git remote rm caf 2> /dev/null
+  git remote rm caf 2>/dev/null
   local PROJECT PFX
   local current_dir
   current_dir=$(pwd -P) || true

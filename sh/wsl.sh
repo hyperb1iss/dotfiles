@@ -72,12 +72,12 @@ if is_wsl; then
     if [[ "$1" =~ ^https?:// ]]; then
       # Handle URLs
       # shellcheck disable=SC2086
-      cmd.exe /c "start $1" 2> /dev/null
+      cmd.exe /c "start $1" 2>/dev/null
     else
       # Handle files
       local path="$1"
       if [[ -e "${path}" ]]; then
-        cmd.exe /c "start $(command wslpath -w "${path}")" 2> /dev/null
+        cmd.exe /c "start $(command wslpath -w "${path}")" 2>/dev/null
       else
         echo "Error: File does not exist: ${path}" >&2
         return 1
@@ -106,7 +106,7 @@ if is_wsl; then
       return 1
     fi
     # shellcheck disable=SC2086
-    cmd.exe /c "$*" 2> /dev/null
+    cmd.exe /c "$*" 2>/dev/null
   }
 
   # WSL-specific environment variables

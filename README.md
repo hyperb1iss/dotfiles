@@ -8,7 +8,9 @@
   <img src="https://img.shields.io/badge/Terminal-Tmux-informational?style=for-the-badge&logo=tmux&logoColor=white&color=33ffcc">
 </p>
 
-Hey there! Welcome to my personal dotfiles repository! I'm **Stefanie Jane**, aka **hyperb1iss**—a creative technologist based in Seattle. These dotfiles create a powerful, consistent development environment that works seamlessly across Linux, WSL2, and Windows, with a special focus on Android development.
+Hey there! Welcome to my personal dotfiles repository! I'm **Stefanie Jane**, aka **hyperb1iss**—a creative technologist
+based in Seattle. These dotfiles create a powerful, consistent development environment that works seamlessly across
+Linux, WSL2, and Windows, with a special focus on Android development.
 
 <p align="center">
   <img src="https://github.com/hyperb1iss/elektra/blob/main/screenshot.png" alt="Starship + Elektra" width="600" />
@@ -76,7 +78,8 @@ dotfiles/
 
 ## 🔤 Installing Nerd Fonts
 
-Nerd Fonts are required for proper icon display in the terminal. These are not automatically installed by dotbot. Follow these steps to install them:
+Nerd Fonts are required for proper icon display in the terminal. These are not automatically installed by dotbot. Follow
+these steps to install them:
 
 1. Visit the [Nerd Fonts website](https://www.nerdfonts.com/)
 2. Download your preferred font (I recommend JetBrainsMono Nerd Font)
@@ -237,7 +240,8 @@ dstop container   # Stop containers
 
 ### 🎨 Theming System
 
-The environment uses a carefully crafted theme based on the Dracula color palette. Each color has been specially tuned for optimal visibility and aesthetic appeal:
+The environment uses a carefully crafted theme based on the Dracula color palette. Each color has been specially tuned
+for optimal visibility and aesthetic appeal:
 
 |                         Color Preview                         | Name             | Hex Code  | Usage                            |
 | :-----------------------------------------------------------: | ---------------- | --------- | -------------------------------- |
@@ -263,7 +267,8 @@ This color scheme is consistently applied across the entire environment:
 - **Tmux** - Status bar and active window indicators
 - **Git** - Status and diff coloring
 
-The theme provides excellent contrast and readability while maintaining a cohesive and beautiful aesthetic across all tools and interfaces.
+The theme provides excellent contrast and readability while maintaining a cohesive and beautiful aesthetic across all
+tools and interfaces.
 
 ## 🔄 Updating
 
@@ -291,9 +296,11 @@ Got ideas for improvements? Found a bug? Feel free to:
 If you like these dotfiles, you might be interested in some of my other projects:
 
 - [git-iris](https://github.com/hyperb1iss/git-iris): AI-accelerated git workflow tool
-- [signalrgb-homeassistant](https://github.com/hyperb1iss/signalrgb-homeassistant): SignalRGB integration for Home Assistant
+- [signalrgb-homeassistant](https://github.com/hyperb1iss/signalrgb-homeassistant): SignalRGB integration for Home
+  Assistant
 - [signalrgb-python](https://github.com/hyperb1iss/signalrgb-python): Python API client for SignalRGB Pro
-- [hyper-light-card](https://github.com/hyperb1iss/hyper-light-card): Custom card for controlling SignalRGB through Home Assistant
+- [hyper-light-card](https://github.com/hyperb1iss/hyper-light-card): Custom card for controlling SignalRGB through Home
+  Assistant
 - [contexter](https://github.com/hyperb1iss/contexter): Chrome extension and CLI for quickly copying code into LLMs
 - [aeonsync](https://github.com/hyperb1iss/aeonsync): An rsync backup tool for developers
 

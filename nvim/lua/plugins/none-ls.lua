@@ -15,9 +15,9 @@ return {
     -- (If you wish to replace, use `opts.sources = {}` instead of the `list_insert_unique` function)
     opts.sources = require("astrocore").list_insert_unique(opts.sources, {
       -- Prettier for YAML formatting (and other files)
-      null_ls.builtins.formatting.prettier.with({
+      null_ls.builtins.formatting.prettier.with {
         filetypes = { "yaml", "yml", "json", "jsonc", "markdown", "html", "css", "scss", "javascript", "typescript" },
-      }),
+      },
       -- Keep yamllint for structural validation
       null_ls.builtins.diagnostics.yamllint,
       -- Stylua for Lua formatting

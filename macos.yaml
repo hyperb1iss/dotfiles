@@ -2,7 +2,7 @@
     link:
       relink: true
 
-- clean: ['~']
+- clean: ["~"]
 
 - link:
     ~/.bashrc.local: bash/bashrc.local
@@ -82,9 +82,8 @@
     ~/.warp/themes/lilac.yaml: warp/themes/lilac.yaml
 
 - shell:
-    -
-      command: mkdir -p ~/dev/go && GOPATH=~/dev/go go install github.com/junegunn/fzf@latest
+    - command: mkdir -p ~/dev/go && GOPATH=~/dev/go go install github.com/junegunn/fzf@latest
       stderr: true
       stdout: true
       quiet: false
-      description: Installing fzf from source 
+      description: Installing fzf from source

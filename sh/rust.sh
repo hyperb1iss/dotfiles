@@ -11,7 +11,7 @@ function rust_env_init() {
   if has_command rustup; then
     # Get the active toolchain and ensure it's in PATH
     local active_toolchain
-    active_toolchain=$(rustup show active-toolchain 2> /dev/null | cut -d' ' -f1) || true
+    active_toolchain=$(rustup show active-toolchain 2>/dev/null | cut -d' ' -f1) || true
 
     if [[ -n "${active_toolchain}" ]]; then
       local toolchain_bin="${HOME}/.rustup/toolchains/${active_toolchain}/bin"
@@ -80,7 +80,7 @@ function rswitch() {
 
 # Interactive Cargo dependency tree viewer using fzf.
 function crtree() {
-  if cargo tree --help > /dev/null 2>&1; then
+  if cargo tree --help >/dev/null 2>&1; then
     cargo tree | fzf --height 40% --reverse --prompt="Cargo dependency tree > " --preview 'echo {}'
   else
     echo "Cargo tree subcommand not found. Try 'cargo install cargo-tree'"

@@ -97,4 +97,4 @@ To update your configuration:
 cd ~/dev/dotfiles
 git pull
 make macos
-``` 
+```

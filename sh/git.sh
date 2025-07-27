@@ -33,7 +33,7 @@ alias gswc='git switch -c'
 
 # Get current branch name
 function git_current_branch() {
-  git branch --show-current 2> /dev/null
+  git branch --show-current 2>/dev/null
 }
 
 # Interactive git add using fzf
@@ -45,7 +45,7 @@ function gadd() {
     echo "Added files:"
     while IFS= read -r file; do
       echo "  ${file}"
-    done <<< "${files}"
+    done <<<"${files}"
   fi
 }
 
@@ -55,7 +55,7 @@ function gco() {
   branches=$(git branch --all | grep -v HEAD) || return 0
 
   if [[ -n "${branches}" ]]; then
-    branch=$(echo "${branches}" | fzf -d $((2 + $(wc -l <<< "${branches}"))) +m --preview 'git log --color=always {}') || return 0
+    branch=$(echo "${branches}" | fzf -d $((2 + $(wc -l <<<"${branches}"))) +m --preview 'git log --color=always {}') || return 0
     git checkout "$(echo "${branch}" | sed "s/.* //" | sed "s#remotes/[^/]*/##")"
   fi
 }
@@ -67,8 +67,8 @@ function glog() {
   export PAGER
 
   git log --graph --color=always \
-    --format="%C(auto)%h%d %s %C(black)%C(bold)%cr" "$@" \
-    | fzf --ansi --no-sort --reverse --tac --toggle-sort=\` \
+    --format="%C(auto)%h%d %s %C(black)%C(bold)%cr" "$@" |
+    fzf --ansi --no-sort --reverse --tac --toggle-sort=\` \
       --bind "ctrl-m:execute:
                 (grep -o '[a-f0-9]\{7\}' | head -1 |
                 xargs -I % sh -c 'git show --color=always % | ${PAGER}') << 'FZF-EOF'
@@ -131,11 +131,11 @@ function gsetup() {
   fi
 
   # Initialize main branch
-  git checkout -b main 2> /dev/null || true
+  git checkout -b main 2>/dev/null || true
 
   # Create initial .gitignore
   if [[ ! -f .gitignore ]]; then
-    cat > .gitignore << 'EOF'
+    cat >.gitignore <<'EOF'
 # OS generated files
 .DS_Store
 .DS_Store?
@@ -164,7 +164,7 @@ EOF
   fi
 
   git add .gitignore
-  git commit -m "Initial commit" 2> /dev/null || true
+  git commit -m "Initial commit" 2>/dev/null || true
 }
 
 # Clean git branches
@@ -189,21 +189,21 @@ function gstatus() {
     modified_files=$(echo "${status_output}" | grep "^.M" | cut -c4-)
     while IFS= read -r file; do
       [[ -n "${file}" ]] && echo "  ${file}"
-    done <<< "${modified_files}"
+    done <<<"${modified_files}"
 
     printf "\nStaged files:\n"
     local staged_files
     staged_files=$(echo "${status_output}" | grep "^M" | cut -c4-)
     while IFS= read -r file; do
       [[ -n "${file}" ]] && echo "  ${file}"
-    done <<< "${staged_files}"
+    done <<<"${staged_files}"
 
     printf "\nUntracked files:\n"
     local untracked_files
     untracked_files=$(echo "${status_output}" | grep "^??" | cut -c4-)
     while IFS= read -r file; do
       [[ -n "${file}" ]] && echo "  ${file}"
-    done <<< "${untracked_files}"
+    done <<<"${untracked_files}"
   else
     echo "Working directory clean"
   fi

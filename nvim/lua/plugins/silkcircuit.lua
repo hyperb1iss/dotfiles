@@ -6,11 +6,11 @@ return {
     lazy = false,
     priority = 1000,
     config = function()
-      require("silkcircuit").setup({
+      require("silkcircuit").setup {
         -- Enable all features
         terminal_colors = true,
         compile = false, -- Disable compilation for development
-        
+
         -- Enable all integrations
         integrations = {
           aerial = true,
@@ -35,7 +35,7 @@ return {
           which_key = true,
           window_picker = true,
         },
-        
+
         -- Style customizations
         styles = {
           comments = { italic = true },
@@ -44,7 +44,7 @@ return {
           strings = { italic = true },
           variables = {},
         },
-      })
+      }
     end,
   },
 }

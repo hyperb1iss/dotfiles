@@ -2,15 +2,14 @@
     link:
       relink: true
 
-- clean: ['~']
+- clean: ["~"]
 
 - link:
     /lib/udev/rules.d/60-android.rules: rules.d/60-android.rules
     /etc/sysctl.d/50-inotify.conf: sysctl.d/50-inotify.conf
 
 - shell:
-    - 
-      command: |
+    - command: |
         if command -v pacman >/dev/null 2>&1; then
           # Arch Linux setup
           sudo pacman -Syu --noconfirm
@@ -26,16 +25,14 @@
         fi
       stderr: true
       stdout: true
-    -
-      command: |
+    - command: |
         if command -v update-alternatives >/dev/null 2>&1; then
           sudo update-alternatives --install /usr/bin/editor editor /usr/bin/nvim 60
           sudo update-alternatives --install /usr/bin/vim vim /usr/bin/nvim 60
         fi
       stderr: true
       stdout: true
-    -
-      command: |
+    - command: |
         # Install kind for Kubernetes local clusters (not available in official repos)
         if command -v pacman >/dev/null 2>&1 && ! command -v kind >/dev/null 2>&1; then
           echo "Installing kind from GitHub releases..."
@@ -47,4 +44,3 @@
         fi
       stderr: true
       stdout: true
-
