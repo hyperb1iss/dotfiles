@@ -28,8 +28,8 @@ Linux, WSL2, and Windows, with a special focus on Android development.
 | 📱 **Android Development** | • Complete AOSP build environment<br>• Smart device management<br>• Optimized build commands<br>• Comprehensive udev rules<br>• Quick navigation system                              |
 | 🖥️ **Terminal Setup**      | • Custom Tmux configuration<br>• Starship prompt with Git integration<br>• Modern CLI replacements<br>• Fuzzy finding and completion<br>• Directory jumping                          |
 | 🪟 **WSL2 Integration**    | • Seamless Windows/Linux operation<br>• Path conversion utilities<br>• File system integration<br>• Shared Git configuration<br>• Backup tools                                       |
-| 🎨 **Theming**             | • Dracula-inspired color scheme<br>• Custom Elektra theme for Macchina<br>• Consistent cross-tool styling<br>• Beautiful CLI visuals<br>• Custom icons and highlights                |
-| 🛠️ **Development Tools**   | • AstroNvim configuration<br>• Git workflow enhancements<br>• Docker management<br>• Build automation<br>• Performance optimizations                                                 |
+| 🎨 **Theming**             | • SilkCircuit custom color scheme<br>• Violet Circuit Starship theme<br>• Consistent cross-tool styling<br>• Beautiful CLI visuals<br>• Neon magenta & electric cyan accents         |
+| 🛠️ **Development Tools**   | • AstroNvim + Avante.nvim AI assistant<br>• Git workflow enhancements<br>• Docker & Kubernetes management<br>• Build automation<br>• Performance optimizations                       |
 
 ## 🔧 Tool Suite
 
@@ -37,9 +37,9 @@ Linux, WSL2, and Windows, with a special focus on Android development.
 
 | Tool                                        | Description          | Features                                                                      |
 | ------------------------------------------- | -------------------- | ----------------------------------------------------------------------------- |
-| 🚀 **[Starship](https://starship.rs/)**     | Cross-shell prompt   | • Custom prompt design<br>• Git status integration<br>• Context-aware display |
-| 📝 **[AstroNvim](https://astronvim.com/)**  | Neovim configuration | • IDE-like features<br>• Custom plugins<br>• Intelligent completions          |
-| 🖥️ **[Tmux](https://github.com/tmux/tmux)** | Terminal multiplexer | • Custom key bindings<br>• Status bar configuration<br>• Session management   |
+| 🚀 **[Starship](https://starship.rs/)**     | Cross-shell prompt   | • Violet Circuit theme<br>• Git status integration<br>• Context-aware display |
+| 📝 **[AstroNvim](https://astronvim.com/)**  | Neovim configuration | • IDE-like features<br>• Avante.nvim AI assistant<br>• SilkCircuit theme      |
+| 🖥️ **[Tmux](https://github.com/tmux/tmux)** | Terminal multiplexer | • Custom key bindings<br>• SilkCircuit color scheme<br>• Session management   |
 | ✨ **[shellint](./bin/shellint)**           | Shell script linter  | • Shellcheck integration<br>• Auto-fixing capabilities<br>• Format with shfmt |
 
 ### 🎯 Modern CLI Tools
@@ -47,8 +47,8 @@ Linux, WSL2, and Windows, with a special focus on Android development.
 | Tool                                                    | Description   | Features                                                          |
 | ------------------------------------------------------- | ------------- | ----------------------------------------------------------------- |
 | 🌳 **[FZF](https://github.com/junegunn/fzf)**           | Fuzzy finder  | • File searching<br>• History exploration<br>• Command completion |
-| 📂 **[LSDeluxe](https://github.com/Peltoche/lsd)**      | Modern ls     | • Icon support<br>• Color coding<br>• Tree view                   |
-| 🎨 **[Bat](https://github.com/sharkdp/bat)**            | Enhanced cat  | • Syntax highlighting<br>• Git integration<br>• Line numbering    |
+| 📂 **[LSDeluxe](https://github.com/Peltoche/lsd)**      | Modern ls     | • Icon support<br>• SilkCircuit colors<br>• Tree view             |
+| 🎨 **[Bat](https://github.com/sharkdp/bat)**            | Enhanced cat  | • Syntax highlighting<br>• SilkCircuit theme<br>• Line numbering  |
 | 🔍 **[Ripgrep](https://github.com/BurntSushi/ripgrep)** | Fast searcher | • Code searching<br>• Regular expressions<br>• Ignore rules       |
 
 ### 🖼️ System & Customization
@@ -56,7 +56,7 @@ Linux, WSL2, and Windows, with a special focus on Android development.
 | Tool                                                        | Description    | Features                                                              |
 | ----------------------------------------------------------- | -------------- | --------------------------------------------------------------------- |
 | 📊 **[Macchina](https://github.com/Macchina-CLI/macchina)** | System info    | • Custom Elektra theme<br>• Performance metrics<br>• System details   |
-| 🎯 **[HyperShell](./hypershell)**                           | PowerShell env | • Linux-like experience<br>• Custom aliases<br>• WSL integration      |
+| 🎯 **[HyperShell](./hypershell)**                           | PowerShell env | • Modular architecture<br>• Kubernetes support<br>• Zoxide & FZF      |
 | 🔧 **[DotBot](https://github.com/anishathalye/dotbot)**     | Config manager | • Automated setup<br>• Cross-platform support<br>• Profile management |
 
 ## 📁 Repository Structure
@@ -149,12 +149,13 @@ fzf               # Fuzzy find files or history
 
 **Key Features:**
 
-- Unified configuration across Bash and Zsh
+- Unified configuration across Bash and Zsh with Zinit plugin management
 - Enhanced history with timestamps and duplicate removal
 - Intelligent tab completion with fuzzy finding
-- Directory jumping with `z` command
-- Cross-platform environment variables
-- Smart aliases that work everywhere
+- Directory jumping with `z` command and bookmarking system
+- Git worktree manager (`gwt`) with comprehensive subcommands
+- Interactive FZF functions for files, processes, and Docker
+- Cross-platform environment variables and platform detection
 
 ### 📱 Android Development
 
@@ -232,43 +233,50 @@ dstop container   # Stop containers
 
 **Key Features:**
 
-- Linux command aliases
-- WSL integration
-- Docker management
-- Modern CLI tools
-- Custom prompt and themes
+- Modular architecture with 13 specialized modules
+- Linux command aliases using GNU tools
+- Kubernetes support with kubectl aliases and k9s
+- Zoxide for smart directory navigation
+- Android development utilities
+- HyperShell branding with Violet Circuit theme
+- Advanced FZF integration and Docker management
 
-### 🎨 Theming System
+### 🤖 AI Integration
 
-The environment uses a carefully crafted theme based on the Dracula color palette. Each color has been specially tuned
-for optimal visibility and aesthetic appeal:
+The environment includes advanced AI coding assistance through **Avante.nvim**, providing:
 
-|                         Color Preview                         | Name             | Hex Code  | Usage                            |
-| :-----------------------------------------------------------: | ---------------- | --------- | -------------------------------- |
-|  ![Background](https://placehold.co/50x30/282a36/282a36.png)  | **Background**   | `#282a36` | Terminal background, editor base |
-| ![Current Line](https://placehold.co/50x30/44475a/44475a.png) | **Current Line** | `#44475a` | Active line highlighting         |
-|  ![Foreground](https://placehold.co/50x30/f8f8f2/f8f8f2.png)  | **Foreground**   | `#f8f8f2` | Primary text color               |
-|   ![Comment](https://placehold.co/50x30/6272a4/6272a4.png)    | **Comment**      | `#6272a4` | Comments and secondary elements  |
-|     ![Cyan](https://placehold.co/50x30/5fb7c2/5fb7c2.png)     | **Cyan**         | `#5fb7c2` | Symbols and constants            |
-|    ![Green](https://placehold.co/50x30/3ac165/3ac165.png)     | **Green**        | `#3ac165` | Strings and success states       |
-|    ![Orange](https://placehold.co/50x30/d99a5e/d99a5e.png)    | **Orange**       | `#d99a5e` | Numbers and warning states       |
-|     ![Pink](https://placehold.co/50x30/d664a6/d664a6.png)     | **Pink**         | `#d664a6` | Functions and special keywords   |
-|    ![Purple](https://placehold.co/50x30/9d7cd6/9d7cd6.png)    | **Purple**       | `#9d7cd6` | Keywords and headings            |
-|     ![Red](https://placehold.co/50x30/ff5555/ff5555.png)      | **Red**          | `#ff5555` | Errors and deletions             |
-|    ![Yellow](https://placehold.co/50x30/f1fa8c/f1fa8c.png)    | **Yellow**       | `#f1fa8c` | Classes and variables            |
+- **Claude Integration**: Configured with Claude Sonnet 4 for intelligent code suggestions
+- **Interactive Sidebar**: Right-positioned AI assistant with rounded borders
+- **Smart Diff Resolution**: Intelligent conflict resolution with keyboard shortcuts
+- **Navigation**: Easy movement between AI suggestions and code changes
+- **Manual Control**: Auto-suggestions disabled for better control over AI assistance
 
-This color scheme is consistently applied across the entire environment:
+### 🎨 Theming System - SilkCircuit
 
-- **Terminal** - Background, text, and highlighting colors
-- **Starship Prompt** - Status indicators and segment colors
-- **Elektra Theme** - System information display
-- **LSDeluxe** - File type and permission colors
-- **Bat** - Syntax highlighting
-- **Tmux** - Status bar and active window indicators
-- **Git** - Status and diff coloring
+The environment features the custom **SilkCircuit** color scheme, a cyberpunk-inspired theme with neon accents:
 
-The theme provides excellent contrast and readability while maintaining a cohesive and beautiful aesthetic across all
-tools and interfaces.
+|                          Color Preview                          | Name               | Hex Code  | Usage                                   |
+| :-------------------------------------------------------------: | ------------------ | --------- | --------------------------------------- |
+|   ![Background](https://placehold.co/50x30/1a1a2e/1a1a2e.png)   | **Background**     | `#1a1a2e` | Terminal background, deep space purple  |
+|  ![Neon Magenta](https://placehold.co/50x30/ff00ff/ff00ff.png)  | **Neon Magenta**   | `#ff00ff` | Current branches, prompts, highlights   |
+| ![Electric Cyan](https://placehold.co/50x30/00ffff/00ffff.png)  | **Electric Cyan**  | `#00ffff` | Local branches, help text, dates        |
+| ![Bright Magenta](https://placehold.co/50x30/ff79c6/ff79c6.png) | **Bright Magenta** | `#ff79c6` | Changed files, authors, remote branches |
+|     ![Yellow](https://placehold.co/50x30/ffdc00/ffdc00.png)     | **Yellow**         | `#ffdc00` | Branch decorations, code files          |
+|     ![Green](https://placehold.co/50x30/50fa7b/50fa7b.png)      | **Green**          | `#50fa7b` | Added files, executables                |
+|      ![Red](https://placehold.co/50x30/ff5555/ff5555.png)       | **Red**            | `#ff5555` | Deleted files, errors                   |
+|     ![Purple](https://placehold.co/50x30/c792ea/c792ea.png)     | **Purple**         | `#c792ea` | Keywords, tmux accents                  |
+
+The SilkCircuit theme is consistently applied across the entire environment:
+
+- **Neovim** - Full theme integration with 30+ plugin support
+- **Git** - Custom log formatting with `silkcircuit` pretty format
+- **Starship Prompt** - Violet Circuit theme with gradient effects
+- **LSDeluxe** - File type colors matching the theme
+- **Bat** - Custom SilkCircuit.tmTheme for syntax highlighting
+- **Tmux** - Status bar with purple and pink accents
+- **Delta** - Git diff viewer with themed colors
+
+The theme provides a striking cyberpunk aesthetic with excellent contrast and readability across all tools.
 
 ## 🔄 Updating
 
