@@ -28,7 +28,7 @@ Linux, WSL2, and Windows, with a special focus on Android development.
 | 📱 **Android Development** | • Complete AOSP build environment<br>• Smart device management<br>• Optimized build commands<br>• Comprehensive udev rules<br>• Quick navigation system                              |
 | 🖥️ **Terminal Setup**      | • Custom Tmux configuration<br>• Starship prompt with Git integration<br>• Modern CLI replacements<br>• Fuzzy finding and completion<br>• Directory jumping                          |
 | 🪟 **WSL2 Integration**    | • Seamless Windows/Linux operation<br>• Path conversion utilities<br>• File system integration<br>• Shared Git configuration<br>• Backup tools                                       |
-| 🎨 **Theming**             | • SilkCircuit custom color scheme<br>• Violet Circuit Starship theme<br>• Consistent cross-tool styling<br>• Beautiful CLI visuals<br>• Neon magenta & electric cyan accents         |
+| 🎨 **Theming**             | • SilkCircuit custom color scheme<br>• SilkCircuit Starship theme<br>• Consistent cross-tool styling<br>• Beautiful CLI visuals<br>• Neon magenta & electric cyan accents            |
 | 🛠️ **Development Tools**   | • AstroNvim + Avante.nvim AI assistant<br>• Git workflow enhancements<br>• Docker & Kubernetes management<br>• Build automation<br>• Performance optimizations                       |
 
 ## 🔧 Tool Suite
@@ -37,7 +37,7 @@ Linux, WSL2, and Windows, with a special focus on Android development.
 
 | Tool                                        | Description          | Features                                                                      |
 | ------------------------------------------- | -------------------- | ----------------------------------------------------------------------------- |
-| 🚀 **[Starship](https://starship.rs/)**     | Cross-shell prompt   | • Violet Circuit theme<br>• Git status integration<br>• Context-aware display |
+| 🚀 **[Starship](https://starship.rs/)**     | Cross-shell prompt   | • SilkCircuit theme<br>• Git status integration<br>• Context-aware display    |
 | 📝 **[AstroNvim](https://astronvim.com/)**  | Neovim configuration | • IDE-like features<br>• Avante.nvim AI assistant<br>• SilkCircuit theme      |
 | 🖥️ **[Tmux](https://github.com/tmux/tmux)** | Terminal multiplexer | • Custom key bindings<br>• SilkCircuit color scheme<br>• Session management   |
 | ✨ **[shellint](./bin/shellint)**           | Shell script linter  | • Shellcheck integration<br>• Auto-fixing capabilities<br>• Format with shfmt |
@@ -238,7 +238,7 @@ dstop container   # Stop containers
 - Kubernetes support with kubectl aliases and k9s
 - Zoxide for smart directory navigation
 - Android development utilities
-- HyperShell branding with Violet Circuit theme
+- HyperShell branding with SilkCircuit theme
 - Advanced FZF integration and Docker management
 
 ### 🤖 AI Integration
@@ -270,7 +270,7 @@ The SilkCircuit theme is consistently applied across the entire environment:
 
 - **Neovim** - Full theme integration with 30+ plugin support
 - **Git** - Custom log formatting with `silkcircuit` pretty format
-- **Starship Prompt** - Violet Circuit theme with gradient effects
+- **Starship Prompt** - SilkCircuit theme with gradient effects
 - **LSDeluxe** - File type colors matching the theme
 - **Bat** - Custom SilkCircuit.tmTheme for syntax highlighting
 - **Tmux** - Status bar with purple and pink accents

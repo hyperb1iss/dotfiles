@@ -1,4 +1,4 @@
-# Violet Circuit theme for Starship
+# SilkCircuit theme for Starship
 
 # Background:       #1a1a2e  (deep space purple)
 # Segment 1:        #4a1a4a  (deep magenta) 
@@ -131,7 +131,13 @@ symbol = " "
 style = "bold fg:#FFEEFF bg:#d060d0"
 format = "[ $symbol(${virtualenv}) ]($style)"
 detect_extensions = ["py"]
-detect_files = ["requirements.txt", "pyproject.toml", "Pipfile", "tox.ini", "setup.py"]
+detect_files = [
+  "requirements.txt",
+  "pyproject.toml",
+  "Pipfile",
+  "tox.ini",
+  "setup.py",
+]
 disabled = false
 
 # Rust module
