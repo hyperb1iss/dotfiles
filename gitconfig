@@ -1,33 +1,33 @@
 [color]
 	ui = auto
 [color "branch"]
-	current = 183 bold    # purple - current branch
-	local = 123          # cyan - local branches
-	remote = 212         # pink - remote branches
+	current = 201 bold    # neon magenta - current branch
+	local = 51           # electric cyan - local branches
+	remote = 213         # bright magenta - remote branches
 [color "diff"]
-	meta = 221           # yellow - meta information
-	frag = 183 bold      # purple - hunk header
+	meta = 201 bold      # neon magenta - meta information
+	frag = 213 bold      # bright magenta - hunk header
 	old = 197            # red - deletions
 	new = 149            # green - additions
 	whitespace = 197 reverse
 [color "status"]
 	added = 149          # green - added files
-	changed = 212        # bright purple/pink - changed files
-	untracked = 123      # cyan - untracked files
+	changed = 213        # bright magenta - changed files
+	untracked = 51       # electric cyan - untracked files
 	deleted = 197        # red - deleted files
-	branch = 221 bold    # yellow - branch info
+	branch = 220 bold    # yellow - branch info
 	nobranch = 197 bold  # red - detached HEAD warning
 	unmerged = 197 bold  # red - unmerged files
 [color "interactive"]
-	prompt = 183 bold    # purple - prompts
-	header = 212         # pink - headers
-	help = 123           # cyan - help text
+	prompt = 201 bold    # neon magenta - prompts
+	header = 213         # bright magenta - headers
+	help = 51            # electric cyan - help text
 	error = 197          # red - errors
 [color "grep"]
-	filename = 183 bold  # purple - filenames
-	linenumber = 221     # yellow - line numbers
-	match = 212 bold     # pink - matching text
-	separator = 123      # cyan - separators
+	filename = 201 bold  # neon magenta - filenames
+	linenumber = 213     # bright magenta - line numbers
+	match = 201 bold     # neon magenta - matching text
+	separator = 51       # electric cyan - separators
 [user]
 	name = Stefanie Jane
 	email = stef@hyperbliss.tech
@@ -81,7 +81,7 @@
 
 [pretty]
 	# SilkCircuit full format - matches default git log but with colors
-	silkcircuit = %C(183 bold)commit %H%Creset%C(212)%d%Creset%n%C(white)Author: %C(123)%an <%ae>%Creset%n%C(white)Date:   %C(221)%ad%Creset%n%n%C(white)    %s%Creset%n%n%w(0,4,4)%C(white)%b%Creset
+	silkcircuit = %C(201 bold)commit %H%Creset%C(220)%d%Creset%n%C(white)Author: %C(213)%an <%ae>%Creset%n%C(white)Date:   %C(51)%ad%Creset%n%n%C(white)    %s%Creset%n%n%w(0,4,4)%C(white)%b%Creset
 
 [format]
 	# Use SilkCircuit format by default
@@ -89,7 +89,7 @@
 
 [alias]
 	# Beautiful one-line log with graph
-	lg = log --graph --pretty=format:'%C(183 bold)%h%Creset %C(212)%d%Creset %C(white)%s%Creset %C(221)(%cr)%Creset %C(123)<%an>%Creset'
+	lg = log --graph --pretty=format:'%C(201 bold)%h%Creset %C(220)%d%Creset %C(white)%s%Creset %C(51)(%cr)%Creset %C(213)<%an>%Creset'
 
 	# Full log with SilkCircuit colors (like regular git log but styled)
 	l = log --pretty=silkcircuit
@@ -101,4 +101,4 @@
 	lga = log --graph --all --pretty=silkcircuit
 
 	# Compact log for quick overview
-	lgs = log --graph --pretty=format:'%C(183)%h%Creset %C(white)%s%Creset %C(221)(%cr)%Creset' --abbrev-commit
+	lgs = log --graph --pretty=format:'%C(201)%h%Creset %C(white)%s%Creset %C(51)(%cr)%Creset' --abbrev-commit
