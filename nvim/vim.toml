@@ -1,0 +1,17 @@
+[selene]
+base = "neovim"
+name = "vim"
+
+[vim]
+any = true
+
+[Snacks]
+any = true
+
+[dd]
+args = [
+    { type = "any", variadic = { type = "any" } }
+]
+
+[bt]
+args = []

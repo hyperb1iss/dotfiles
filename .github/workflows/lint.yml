@@ -63,14 +63,14 @@ jobs:
             local pattern=$2
             local output=$3
             local latest_url
-            
-            latest_url=$(curl -s "https://api.github.com/repos/${repo}/releases/latest" | 
+
+            latest_url=$(curl -s "https://api.github.com/repos/${repo}/releases/latest" |
               jq -r ".assets[] | select(.name | test(\"${pattern}\")) | .browser_download_url")
-            
+
             if [[ -n "$latest_url" ]]; then
               echo "Installing ${output} from ${latest_url}"
               curl -sSL "$latest_url" -o "${output}.tmp"
-              
+
               # Handle different archive types
               if [[ "$latest_url" == *.tar.xz ]]; then
                 tar -xf "${output}.tmp" --strip-components=1 -C ~/.local/bin
