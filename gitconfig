@@ -28,6 +28,13 @@
 	linenumber = 213     # bright magenta - line numbers
 	match = 201 bold     # neon magenta - matching text
 	separator = 51       # electric cyan - separators
+[color "reflog"]
+	head = 201 bold      # neon magenta - HEAD@{n}
+	branch = 213         # bright magenta - branch info
+	remoteBranch = 51    # electric cyan - remote branches
+	tag = 220            # yellow - tags
+	stash = 149          # green - stash entries
+	other = 197          # red - other refs
 [user]
 	name = Stefanie Jane
 	email = stef@hyperbliss.tech
