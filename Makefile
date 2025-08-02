@@ -84,9 +84,8 @@ lint-shell:
 
 lint-yaml:
 	@echo "$(PINK)$(ARROW)$(RESET) $(BOLD)YAML Files$(RESET)"
-	@echo "  $(GRAY)$(BULLET) Running yamllint...$(RESET)"
-	-@git ls-files '*.yml' '*.yaml' | xargs -n1 yamllint 2>&1 | \
-		sed 's/^/  │ /' || true
+	@echo "  $(GRAY)$(BULLET) Validating with prettier...$(RESET)"
+	-@git ls-files '*.yml' '*.yaml' | xargs npx prettier --check 2>&1 | sed 's/^/  │ /' || true
 	@echo "  $(GREEN)$(CHECK) YAML linting complete$(RESET)"
 	@echo ""
 
@@ -118,7 +117,7 @@ lint-footer:
 	@echo "$(GREEN)$(CHECK)$(RESET) $(BOLD)All linting checks completed!$(RESET)"
 	@echo ""
 
-format: format-header format-shell format-yaml format-lua format-json format-markdown format-footer
+format: format-header format-shell format-prettier format-lua format-footer
 
 format-header:
 	@echo ""
@@ -132,41 +131,19 @@ format-shell:
 		shfmt -w -i 2 -ci "$$file" 2>&1 | sed 's/^/  │ /' || \
 		echo "  │ $(GREEN)$(CHECK)$(RESET) $$file"; \
 	done
-	@echo "  $(GRAY)$(BULLET) Formatting with beautysh...$(RESET)"
-	-@git ls-files '*.zsh' | while read -r file; do \
-		beautysh -i 2 "$$file" 2>&1 | sed 's/^/  │ /' || \
-		echo "  │ $(GREEN)$(CHECK)$(RESET) $$file"; \
-	done
 	@echo ""
 
-format-yaml:
-	@echo "$(PINK)$(ARROW)$(RESET) $(BOLD)YAML Files$(RESET)"
+format-prettier:
+	@echo "$(PINK)$(ARROW)$(RESET) $(BOLD)YAML, JSON & Markdown Files$(RESET)"
 	@echo "  $(GRAY)$(BULLET) Formatting with prettier...$(RESET)"
-	-@git ls-files '*.yml' '*.yaml' | while read -r file; do \
-		npx prettier --write "$$file" 2>&1 | grep -v "unchanged" | sed 's/^/  │ /' || true; \
-	done
+	-@git ls-files '*.yml' '*.yaml' '*.json' '*.md' | xargs npx prettier --write 2>&1 | \
+		grep -v "unchanged" | sed 's/^/  │ /' || true
 	@echo ""
 
 format-lua:
 	@echo "$(PURPLE)$(ARROW)$(RESET) $(BOLD)Lua Files$(RESET)"
 	@echo "  $(GRAY)$(BULLET) Formatting with stylua...$(RESET)"
 	-@cd nvim && stylua lua 2>&1 | sed 's/^/  │ /' || true
-	@echo ""
-
-format-json:
-	@echo "$(CORAL)$(ARROW)$(RESET) $(BOLD)JSON Files$(RESET)"
-	@echo "  $(GRAY)$(BULLET) Formatting with prettier...$(RESET)"
-	-@git ls-files '*.json' | while read -r file; do \
-		npx prettier --write "$$file" 2>&1 | grep -v "unchanged" | sed 's/^/  │ /' || true; \
-	done
-	@echo ""
-
-format-markdown:
-	@echo "$(YELLOW)$(ARROW)$(RESET) $(BOLD)Markdown Files$(RESET)"
-	@echo "  $(GRAY)$(BULLET) Formatting with prettier...$(RESET)"
-	-@git ls-files '*.md' | while read -r file; do \
-		npx prettier --write "$$file" 2>&1 | grep -v "unchanged" | sed 's/^/  │ /' || true; \
-	done
 	@echo ""
 
 format-footer:
