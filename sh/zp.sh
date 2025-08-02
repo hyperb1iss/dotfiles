@@ -44,7 +44,7 @@ function zp() {
       ;;
     -c | --clear)
       # Clear the stack
-      >"$ZP_STACK_FILE"
+      : >"$ZP_STACK_FILE"
       echo "zp: stack cleared"
       ;;
     -h | --help)
