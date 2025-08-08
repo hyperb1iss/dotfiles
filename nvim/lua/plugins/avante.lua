@@ -67,20 +67,31 @@ return {
       sidebar_header = {
         enabled = true,
         align = "center",
-        rounded = true,
+        rounded = false, -- Sharp edges for electric feel
+      },
+      -- Vibrant spinners with neon colors
+      spinner = {
+        -- Electric purple dots for editing
+        editing = { "⚡", "✦", "◆", "✧", "♦", "✦" },
+        -- Cyan animation for generating
+        generating = { "◐", "◓", "◑", "◒" },
+        -- Smooth dots for thinking
+        thinking = { "⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏" },
       },
       input = {
-        prefix = "> ",
+        prefix = "▸ ", -- Sharp electric arrow
         height = 8, -- in lines
       },
       edit = {
-        border = "rounded",
+        -- Vibrant double-line borders
+        border = { "╔", "═", "╗", "║", "╝", "═", "╚", "║" },
         start_insert = true, -- start in insert mode
       },
       ask = {
-        floating = false, -- Open the 'AvanteAsk' prompt in a floating window
+        floating = true, -- Float for modern feel
         start_insert = true, -- Start insert mode when opening the ask window
-        border = "rounded",
+        -- Rounded neon borders
+        border = { "╭", "─", "╮", "│", "╯", "─", "╰", "│" },
         ---@type "ours" | "theirs"
         focus_on_apply = "ours", -- which diff to focus after applying
       },

@@ -21,8 +21,6 @@ return {
     },
     -- Diagnostics configuration (for vim.diagnostics.config({...})) when diagnostics are on
     diagnostics = {
-      virtual_text = true,
-      underline = true,
     },
     -- vim options can be configured here
     options = {
@@ -33,6 +31,8 @@ return {
         signcolumn = "yes", -- sets vim.opt.signcolumn to yes
         wrap = false, -- sets vim.opt.wrap
         -- termguicolors = true, -- already set in init.lua
+        autoindent = true, -- enable auto indentation
+        smartindent = true, -- enable smart indentation
       },
       g = { -- vim.g.<key>
         -- configure global vim variables (vim.g)
@@ -67,6 +67,25 @@ return {
 
         -- setting a mapping to false will disable it
         -- ["<C-S>"] = false,
+      },
+    },
+    -- Configure auto commands
+    autocmds = {
+      -- YAML indentation fix
+      yaml_indent = {
+        {
+          event = "FileType",
+          pattern = { "yaml", "yml" },
+          callback = function()
+            vim.opt_local.autoindent = true
+            vim.opt_local.smartindent = false -- disable smart indent for YAML
+            vim.opt_local.indentexpr = "" -- use simple autoindent
+            vim.opt_local.shiftwidth = 2
+            vim.opt_local.tabstop = 2
+            vim.opt_local.softtabstop = 2
+            vim.opt_local.expandtab = true
+          end,
+        },
       },
     },
   },
