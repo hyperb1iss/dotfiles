@@ -244,6 +244,7 @@ Commands:
   info          Show details about the current worktree
 
 Flags:
+  gwt list [--date|-d]                        Sort by date instead of branch name
   gwt new [branch] [--from base] [--path dir]
   gwt remove [pattern] [--force]
 
@@ -265,22 +266,19 @@ __gwt_init_styles() {
   fi
 
   if [[ ${colors_enabled} -eq 1 ]]; then
+    # SilkCircuit Neon color palette
     GWT_RESET=$'\033[0m'
     GWT_BOLD=$'\033[1m'
-    GWT_DIM=$'\033[38;5;245m'
-    GWT_MUTED=$'\033[38;5;244m'
-    GWT_ACCENT=$'\033[38;5;213m'
-    GWT_BRANCH=$'\033[38;5;147m'
-    GWT_HASH=$'\033[38;5;117m'
-    GWT_AGE=$'\033[38;5;180m'
-    GWT_PATH=$'\033[38;5;159m'
-    GWT_STATUS_WARN=$'\033[38;5;215m'
-    GWT_STATUS_LOCKED=$'\033[38;5;203m'
-    GWT_STATUS_OK=$'\033[38;5;120m'
+    GWT_MUTED=$'\033[38;2;98;92;122m'         # Muted purple
+    GWT_ACCENT=$'\033[38;2;225;53;255m'       # Electric Purple #e135ff
+    GWT_BRANCH=$'\033[38;2;128;255;234m'      # Neon Cyan #80ffea
+    GWT_HASH=$'\033[38;2;255;106;193m'        # Coral #ff6ac1
+    GWT_AGE=$'\033[38;2;241;250;140m'         # Electric Yellow #f1fa8c
+    GWT_PATH=$'\033[38;2;128;255;234m'        # Neon Cyan #80ffea
+    GWT_STATUS_WARN=$'\033[38;2;241;250;140m' # Electric Yellow #f1fa8c
   else
     GWT_RESET=""
     GWT_BOLD=""
-    GWT_DIM=""
     GWT_MUTED=""
     GWT_ACCENT=""
     GWT_BRANCH=""
@@ -288,11 +286,8 @@ __gwt_init_styles() {
     GWT_AGE=""
     GWT_PATH=""
     GWT_STATUS_WARN=""
-    GWT_STATUS_LOCKED=""
-    GWT_STATUS_OK=""
   fi
 
-  GWT_COLORS_ENABLED=${colors_enabled}
   __GWT_STYLES_READY=1
 }
 
@@ -373,7 +368,7 @@ __gwt_short_path() {
     return 0
   fi
   if [[ -n "${HOME}" && "${input}" == "${HOME}"* ]]; then
-    printf '~%s' "${input#${HOME}}"
+    printf '~%s' "${input#"${HOME}"}"
   else
     printf '%s' "${input}"
   fi
@@ -385,14 +380,14 @@ __gwt_collect_worktrees() {
 
   git worktree list --porcelain | awk -v repo_root="${repo_root}" '
     function flush() {
-      if (path == "") {
+      if (wt_path == "") {
         return
       }
       gsub("^refs/heads/", "", branch)
-      printf "%s\t%s\t%s\t%s\t%s\t%s\n", path, branch, head, (path==repo_root?"1":"0"), (detached?"1":"0"), flags
-      path=""; head=""; branch=""; detached=0; flags=""
+      printf "%s\t%s\t%s\t%s\t%s\t%s\n", wt_path, branch, head, (wt_path==repo_root?"1":"0"), (detached?"1":"0"), flags
+      wt_path=""; head=""; branch=""; detached=0; flags=""
     }
-    /^worktree / { flush(); path=$2 }
+    /^worktree / { flush(); wt_path=$2 }
     /^HEAD / { head=$2 }
     /^branch / { branch=$2 }
     /^detached$/ { detached=1 }
@@ -405,113 +400,148 @@ __gwt_collect_worktrees() {
 }
 
 __gwt_worktree_table() {
-  local data
+  emulate -L zsh 2>/dev/null || true
+  setopt LOCAL_OPTIONS 2>/dev/null || true
+
+  local data current_root WIDTH_MARK WIDTH_BRANCH WIDTH_HEAD WIDTH_UPDATED WIDTH_PATH sort_by
+  sort_by="${1:-branch}" # Default to branch sorting
+
   data=$(__gwt_collect_worktrees) || return 1
+
   if [[ -z "${data}" ]]; then
     echo "No worktrees found."
     return 0
   fi
 
   __gwt_init_styles
+  current_root=$(git rev-parse --show-toplevel 2>/dev/null)
 
-  local repo_root repo_name header
-  repo_root=$(git rev-parse --show-toplevel 2>/dev/null)
-  repo_name=$(basename "${repo_root}")
+  # Column widths
+  WIDTH_MARK=2
+  WIDTH_BRANCH=30
+  WIDTH_HEAD=10
+  WIDTH_UPDATED=16
+  WIDTH_PATH=50
 
-  printf '📁  %s%sWorktrees%s for %s%s%s\n' \
-    "${GWT_ACCENT}" "${GWT_BOLD}" "${GWT_RESET}" \
-    "${GWT_BRANCH}" "${repo_name}" "${GWT_RESET}"
+  # Print header and separator
+  printf "${GWT_BOLD}%-2s %-30s %-10s %-16s %-50s %s${GWT_RESET}\n" "" \
+    "BRANCH" "HEAD" "UPDATED" "PATH" "SUBJECT"
+  printf -- '%.0s─' {1..160}
   printf '\n'
 
-  local idx=0
-  while IFS=$'\t' read -r path branch head is_main detached flags; do
-    ((idx++))
-    local short age subject branch_label icon branch_style age_label subject_label status_text display_path
-    short=$(git -C "${path}" rev-parse --short "${head}" 2>/dev/null)
-    short=${short:-$(printf '%.7s' "${head}")}
-    age=$(git -C "${path}" log -1 --format='%cr' 2>/dev/null)
-    age=${age:--}
-    subject=$(git -C "${path}" log -1 --format='%s' 2>/dev/null)
-    subject=${subject:--}
-    if [[ "${subject}" != "-" && ${#subject} -gt 70 ]]; then
-      subject="${subject:0:67}…"
-    fi
-    display_path=$(__gwt_short_path "${path}")
-    if [[ ${#display_path} -gt 60 ]]; then
-      display_path="…${display_path: -57}"
-    fi
+  # Print rows - using awk for cleaner processing with colors
+  printf '%s\n' "${data}" | awk -F'\t' -v current="${current_root}" \
+    -v w_mark="${WIDTH_MARK}" -v w_branch="${WIDTH_BRANCH}" \
+    -v w_head="${WIDTH_HEAD}" -v w_updated="${WIDTH_UPDATED}" -v w_path="${WIDTH_PATH}" \
+    -v sort_by="${sort_by}" \
+    -v reset="${GWT_RESET}" -v branch_col="${GWT_BRANCH}" -v hash_col="${GWT_HASH}" \
+    -v age_col="${GWT_AGE}" -v path_col="${GWT_PATH}" -v warn_col="${GWT_STATUS_WARN}" \
+    -v accent_col="${GWT_ACCENT}" -v muted_col="${GWT_MUTED}" '
+  function shorten(str, maxlen) {
+    if (length(str) > maxlen) return substr(str, 1, maxlen-1) "…"
+    return str
+  }
+  function short_path(p) {
+    if (index(p, ENVIRON["HOME"]) == 1)
+      return "~" substr(p, length(ENVIRON["HOME"])+1)
+    return p
+  }
+  function get_timestamp(wt) {
+    cmd = "git -C '\''" wt "'\'' log -1 --format='\''%ct'\'' 2>/dev/null"
+    if ((cmd | getline ts) <= 0) ts = 0
+    close(cmd)
+    return ts
+  }
+  {
+    wt_path=$1; branch=$2; head=$3; is_main=$4; detached=$5; flags=$6
 
-    if [[ -z "${branch}" ]]; then
-      if [[ "${detached}" == "1" ]]; then
-        branch_label="detached@${short}"
-      else
-        branch_label="(no branch)"
-      fi
-    else
-      branch_label="${branch}"
-    fi
+    # Get commit info - clear variables first
+    short = ""; age = ""; subject = ""
 
-    status_text=$(__gwt_join_status_flags "${flags}")
+    cmd_short = "git -C '\''" wt_path "'\'' rev-parse --short '\''" head "'\'' 2>/dev/null"
+    if ((cmd_short | getline short) <= 0) short = ""
+    close(cmd_short)
+    if (short == "") short = substr(head, 1, 7)
 
-    if [[ ${idx} -gt 1 ]]; then
-      printf '\n'
-    fi
+    cmd_age = "git -C '\''" wt_path "'\'' log -1 --format='\''%cr'\'' 2>/dev/null"
+    if ((cmd_age | getline age) <= 0) age = ""
+    close(cmd_age)
+    if (age == "") age = "-"
 
-    if [[ "${is_main}" == "1" ]]; then
-      icon=$(printf '%s%s➤%s' "${GWT_ACCENT}" "${GWT_BOLD}" "${GWT_RESET}")
-      branch_style="${GWT_ACCENT}${GWT_BOLD}"
-    else
-      icon=$(printf '%s•%s' "${GWT_DIM}" "${GWT_RESET}")
-      branch_style="${GWT_BRANCH}${GWT_BOLD}"
-    fi
+    cmd_subj = "git -C '\''" wt_path "'\'' log -1 --format='\''%s'\'' 2>/dev/null"
+    if ((cmd_subj | getline subject) <= 0) subject = ""
+    close(cmd_subj)
+    if (subject == "") subject = "-"
 
-    if [[ "${age}" == "-" ]]; then
-      age_label="${GWT_MUTED}uncommitted${GWT_RESET}"
-    else
-      age_label=$(printf '%s%s%s' "${GWT_AGE}" "${age}" "${GWT_RESET}")
-    fi
+    # Detect if prunable
+    is_prunable = (index(flags, "prunable") > 0) ? 1 : 0
 
-    if [[ "${subject}" == "-" ]]; then
-      subject_label="${GWT_MUTED}no commits yet${GWT_RESET}"
-    else
-      subject_label=$(printf '%s%s%s' "${GWT_MUTED}" "${subject}" "${GWT_RESET}")
-    fi
+    # Branch label
+    if (branch == "") {
+      branch_label = (detached == "1") ? "detached@" short : "(no branch)"
+    } else {
+      branch_label = branch
+    }
+    if (flags != "") branch_label = branch_label " [" flags "]"
 
-    local short_label
-    short_label=$(printf '%s%s%s' "${GWT_HASH}" "${short}" "${GWT_RESET}")
+    # Marker
+    marker = (wt_path == current) ? "*" : " "
 
-    printf '%s %s%s%s %s@%s %s\n' \
-      "${icon}" \
-      "${branch_style}" "${branch_label}" "${GWT_RESET}" \
-      "${GWT_DIM}" "${GWT_RESET}" \
-      "${short_label}"
+    # Display path
+    display_path = short_path(wt_path)
 
-    printf '    %s%-7s%s %s%s\n' "${GWT_DIM}" "Updated" "${GWT_RESET}" "${age_label}" "${GWT_RESET}"
-    printf '    %s%-7s%s %s%s%s\n' "${GWT_DIM}" "Path" "${GWT_RESET}" "${GWT_PATH}" "${display_path}" "${GWT_RESET}"
-    printf '    %s%-7s%s %s%s\n' "${GWT_DIM}" "Commit" "${GWT_RESET}" "${subject_label}" "${GWT_RESET}"
+    # Truncate fields
+    branch_disp = shorten(branch_label, w_branch)
+    subject_disp = shorten(subject, 100)
+    display_path_short = shorten(display_path, w_path)
 
-    if [[ -n "${status_text}" ]]; then
-      local status_color="${GWT_STATUS_OK}"
-      if [[ "${status_text}" == *locked* ]]; then
-        status_color="${GWT_STATUS_LOCKED}"
-      elif [[ "${status_text}" == *prunable* ]]; then
-        status_color="${GWT_STATUS_WARN}"
-      fi
-      printf '    %s%-7s%s %s%s%s\n' "${GWT_DIM}" "Status" "${GWT_RESET}" "${status_color}" "${status_text}" "${GWT_RESET}"
-    fi
-  done <<<"${data}"
+    # Get timestamp for sorting
+    timestamp = get_timestamp(wt_path)
+
+    # Build sort key and output line
+    sort_key = ""
+    if (sort_by == "date") {
+      sort_key = sprintf("%d|%010d|%s", is_prunable, 9999999999-timestamp, branch_label)
+    } else {
+      sort_key = sprintf("%d|%s", is_prunable, tolower(branch_label))
+    }
+
+    # Pad fields to fixed widths BEFORE adding colors
+    marker_padded = sprintf("%-2s", marker)
+    branch_padded = sprintf("%-30s", branch_disp)
+    hash_padded = sprintf("%-10s", short)
+    age_padded = sprintf("%-16s", age)
+    path_padded = sprintf("%-50s", display_path_short)
+
+    # Apply colors to padded strings
+    marker_colored = (marker == "*") ? accent_col marker_padded reset : muted_col marker_padded reset
+    branch_colored = (is_prunable) ? warn_col branch_padded reset : branch_col branch_padded reset
+    hash_colored = hash_col hash_padded reset
+    age_colored = (age == "-") ? muted_col age_padded reset : age_col age_padded reset
+    path_colored = path_col path_padded reset
+
+    # Output with sort key prefix (will be removed after sorting)
+    printf "%s\t%s%s%s%s%s%s\n",
+      sort_key,
+      marker_colored,
+      branch_colored,
+      hash_colored,
+      age_colored,
+      path_colored,
+      subject_disp
+  }' | sort -t$'\t' -k1,1 | cut -f2-
 }
 
 __gwt_fzf_source() {
   local data
   data=$(__gwt_collect_worktrees) || return 1
-  while IFS=$'\t' read -r path branch head is_main detached flags; do
+  while IFS=$'\t' read -r wt_path branch head is_main detached flags; do
     local short age subject branch_label marker
-    short=$(git -C "${path}" rev-parse --short "${head}" 2>/dev/null)
+    short=$(git -C "${wt_path}" rev-parse --short "${head}" 2>/dev/null)
     short=${short:-$(printf '%.7s' "${head}")}
-    age=$(git -C "${path}" log -1 --format='%cr' 2>/dev/null)
+    age=$(git -C "${wt_path}" log -1 --format='%cr' 2>/dev/null)
     age=${age:--}
-    subject=$(git -C "${path}" log -1 --format='%s' 2>/dev/null)
+    subject=$(git -C "${wt_path}" log -1 --format='%s' 2>/dev/null)
     subject=${subject:--}
 
     if [[ -z "${branch}" ]]; then
@@ -529,7 +559,7 @@ __gwt_fzf_source() {
     fi
 
     marker=$([[ "${is_main}" == "1" ]] && printf '*' || printf ' ')
-    printf '%s\t%s\t%s\t%s\t%s\t%s\t%s\n' "${path}" "${marker}" "${branch_label}" "${short}" "${age}" "${subject}" "${is_main}"
+    printf '%s\t%s\t%s\t%s\t%s\t%s\t%s\n' "${wt_path}" "${marker}" "${branch_label}" "${short}" "${age}" "${subject}" "${is_main}"
   done <<<"${data}"
 }
 
@@ -683,9 +713,7 @@ __gwt_new_worktree() {
     git worktree add "${wt_path}" "${branch}"
   else
     git worktree add -b "${branch}" "${wt_path}" "${base}"
-  fi
-
-  if [[ $? -eq 0 ]]; then
+  fi && {
     printf '✅ worktree ready: %s\n' "${wt_path}"
     if [[ ${auto_switch} -eq 1 ]]; then
       cd "${wt_path}" || return 1
@@ -693,7 +721,7 @@ __gwt_new_worktree() {
     else
       printf 'Run: cd "%s"\n' "${wt_path}"
     fi
-  fi
+  }
 }
 
 __gwt_remove_worktrees() {
@@ -730,120 +758,105 @@ __gwt_remove_worktrees() {
     return 0
   fi
 
-  while IFS= read -r path; do
-    [[ -z "${path}" ]] && continue
-    printf 'Removing %s…\n' "${path}"
+  while IFS= read -r wt_path; do
+    [[ -z "${wt_path}" ]] && continue
+    printf 'Removing %s…\n' "${wt_path}"
     if [[ ${force} -eq 1 ]]; then
-      git worktree remove -f "${path}"
+      git worktree remove -f "${wt_path}"
     else
-      git worktree remove "${path}"
+      git worktree remove "${wt_path}"
     fi
   done <<<"${paths}"
 }
 
 function gwt() {
-  local __gwt_restore_trace=0
-  if [[ -n "${ZSH_VERSION:-}" ]]; then
-    if [[ -o xtrace ]]; then
-      set +x
-      __gwt_restore_trace=1
-    fi
-  elif [[ -n "${BASH_VERSION:-}" ]]; then
-    if [[ $(set -o | awk '$1=="xtrace" {print $2}') == on ]]; then
-      set +x
-      __gwt_restore_trace=1
-    fi
-  fi
+  ( # Run in subshell to isolate from xtrace
+    set +x 2>/dev/null # Disable xtrace for clean output
 
-  local action="$1" rc=0
+    local action="$1" rc=0
 
-  if [[ $# -eq 0 ]]; then
-    if __gwt_have_fzf && git rev-parse --show-toplevel >/dev/null 2>&1; then
-      action=$(printf '%s\n' "switch" "new" "list" "remove" "clean" "info" | fzf --prompt='gwt> ' --header='Select action' --height=60%)
-      if [[ -z "${action}" ]]; then
-        if [[ ${__gwt_restore_trace} -eq 1 ]]; then
-          set -x
-        fi
+    if [[ $# -eq 0 ]]; then
+      if __gwt_have_fzf && git rev-parse --show-toplevel >/dev/null 2>&1; then
+        action=$(printf '%s\n' "switch" "new" "list" "remove" "clean" "info" | fzf --prompt='gwt> ' --header='Select action' --height=60%)
+        [[ -z "${action}" ]] && return 0
+        set -- "${action}"
+      else
+        __gwt_usage
         return 0
       fi
-      set -- "${action}"
-    else
-      __gwt_usage
-      if [[ ${__gwt_restore_trace} -eq 1 ]]; then
-        set -x
-      fi
-      return 0
     fi
-  fi
 
-  case "$1" in
-    help | --help | -h | "")
-      __gwt_usage
-      if [[ ${__gwt_restore_trace} -eq 1 ]]; then
-        set -x
-      fi
-      return 0
-      ;;
-  esac
+    case "$1" in
+      help | --help | -h | "")
+        __gwt_usage
+        return 0
+        ;;
+    esac
 
-  if ! __gwt_require_repo; then
-    if [[ ${__gwt_restore_trace} -eq 1 ]]; then
-      set -x
-    fi
-    return 1
-  fi
+    __gwt_require_repo || return 1
 
-  case "$1" in
-    list | ls)
-      __gwt_worktree_table || rc=$?
-      ;;
-    switch | cd | open)
-      local target sel_rc pattern="${2:-}"
-      target=$(__gwt_select_paths "1" "${pattern}" "0")
-      sel_rc=$?
-      if [[ ${sel_rc} -ne 0 ]]; then
-        if [[ -n "${pattern}" ]]; then
-          echo "gwt: unable to find worktree matching '${pattern}'" >&2
-          rc=${sel_rc}
+    case "$1" in
+      list | ls)
+        shift
+        local sort_mode="branch"
+        while [[ $# -gt 0 ]]; do
+          case "$1" in
+            --date | -d)
+              sort_mode="date"
+              shift
+              ;;
+            *)
+              shift
+              ;;
+          esac
+        done
+        __gwt_worktree_table "${sort_mode}" || rc=$?
+        ;;
+      switch | cd | open)
+        local target sel_rc pattern="${2:-}"
+        target=$(__gwt_select_paths "1" "${pattern}" "0")
+        sel_rc=$?
+        if [[ ${sel_rc} -ne 0 ]]; then
+          if [[ -n "${pattern}" ]]; then
+            echo "gwt: unable to find worktree matching '${pattern}'" >&2
+            rc=${sel_rc}
+          fi
+        elif [[ -n "${target}" ]]; then
+          if cd "${target}"; then
+            printf 'Switched to %s\n' "${target}"
+          else
+            rc=1
+          fi
         fi
-      elif [[ -n "${target}" ]]; then
-        if cd "${target}"; then
-          printf 'Switched to %s\n' "${target}"
-        else
-          rc=1
-        fi
-      fi
-      ;;
-    new | add)
-      shift
-      __gwt_new_worktree "$@" || rc=$?
-      ;;
-    remove | rm | del)
-      shift
-      __gwt_remove_worktrees "$@" || rc=$?
-      ;;
-    clean | prune)
-      printf 'Pruning stale worktrees…\n'
-      git worktree prune || rc=$?
-      ;;
-    info)
-      local root branch head
-      root=$(git rev-parse --show-toplevel)
-      branch=$(git branch --show-current 2>/dev/null)
-      head=$(git rev-parse --short HEAD)
-      printf 'Worktree: %s\n' "${root}"
-      printf 'Branch:   %s\n' "${branch:-(detached)}"
-      printf 'Commit:   %s\n' "${head}"
-      ;;
-    *)
-      echo "gwt: unknown command '$1'" >&2
-      __gwt_usage
-      rc=1
-      ;;
-  esac
+        ;;
+      new | add)
+        shift
+        __gwt_new_worktree "$@" || rc=$?
+        ;;
+      remove | rm | del)
+        shift
+        __gwt_remove_worktrees "$@" || rc=$?
+        ;;
+      clean | prune)
+        printf 'Pruning stale worktrees…\n'
+        git worktree prune || rc=$?
+        ;;
+      info)
+        local root branch head
+        root=$(git rev-parse --show-toplevel)
+        branch=$(git branch --show-current 2>/dev/null)
+        head=$(git rev-parse --short HEAD)
+        printf 'Worktree: %s\n' "${root}"
+        printf 'Branch:   %s\n' "${branch:-(detached)}"
+        printf 'Commit:   %s\n' "${head}"
+        ;;
+      *)
+        echo "gwt: unknown command '$1'" >&2
+        __gwt_usage
+        rc=1
+        ;;
+    esac
 
-  if [[ ${__gwt_restore_trace} -eq 1 ]]; then
-    set -x
-  fi
-  return ${rc}
+    return ${rc}
+  )
 }
