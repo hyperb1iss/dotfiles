@@ -1,0 +1,600 @@
+/**
+ * SilkCircuit Theme for VitePress
+ * Electric meets elegant - neon cyberpunk aesthetic
+ */
+
+/* ============================================================================
+   Color Palette
+   ============================================================================ */
+:root {
+  /* SilkCircuit Core Colors */
+  --silk-purple: #e135ff;
+  --silk-cyan: #80ffea;
+  --silk-coral: #ff6ac1;
+  --silk-yellow: #f1fa8c;
+  --silk-green: #50fa7b;
+  --silk-red: #ff6363;
+  --silk-muted: #6272a4;
+
+  /* Light mode adjustments */
+  --silk-bg: #faf8ff;
+  --silk-bg-soft: #f0eef5;
+  --silk-bg-mute: #e8e5f0;
+  --silk-text: #2b2540;
+  --silk-text-muted: #5a5070;
+
+  /* VitePress overrides - Light */
+  --vp-c-brand-1: #7e2bd5;
+  --vp-c-brand-2: #9b4de0;
+  --vp-c-brand-3: #b86feb;
+  --vp-c-brand-soft: rgba(126, 43, 213, 0.14);
+
+  --vp-c-tip-1: #007f8e;
+  --vp-c-tip-2: #009aa8;
+  --vp-c-tip-soft: rgba(0, 127, 142, 0.14);
+
+  --vp-c-warning-1: #b5890a;
+  --vp-c-warning-soft: rgba(241, 250, 140, 0.14);
+
+  --vp-c-danger-1: #cc3d3d;
+  --vp-c-danger-soft: rgba(255, 99, 99, 0.14);
+
+  --vp-code-color: #7e2bd5;
+}
+
+/* Dark mode */
+.dark {
+  --silk-bg: #121218;
+  --silk-bg-soft: #1a1a24;
+  --silk-bg-mute: #242430;
+  --silk-text: #f8f8f2;
+  --silk-text-muted: #a0a0b0;
+
+  /* VitePress overrides - Dark */
+  --vp-c-brand-1: #e135ff;
+  --vp-c-brand-2: #c92de6;
+  --vp-c-brand-3: #ff69b4;
+  --vp-c-brand-soft: rgba(225, 53, 255, 0.16);
+
+  --vp-c-tip-1: #80ffea;
+  --vp-c-tip-2: #60e0d0;
+  --vp-c-tip-soft: rgba(128, 255, 234, 0.16);
+
+  --vp-c-warning-1: #f1fa8c;
+  --vp-c-warning-soft: rgba(241, 250, 140, 0.16);
+
+  --vp-c-danger-1: #ff6363;
+  --vp-c-danger-soft: rgba(255, 99, 99, 0.16);
+
+  --vp-code-color: #e135ff;
+
+  --vp-c-bg: var(--silk-bg);
+  --vp-c-bg-soft: var(--silk-bg-soft);
+  --vp-c-bg-mute: var(--silk-bg-mute);
+}
+
+/* ============================================================================
+   Navigation
+   ============================================================================ */
+.VPNav {
+  background: var(--vp-c-bg) !important;
+  border-bottom: 1px solid var(--vp-c-divider);
+}
+
+.dark .VPNav {
+  background: rgba(18, 18, 24, 0.95) !important;
+  backdrop-filter: blur(12px);
+}
+
+.VPNavBarTitle .title {
+  font-weight: 700;
+  background: linear-gradient(135deg, var(--silk-purple), var(--silk-cyan));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ============================================================================
+   Sidebar
+   ============================================================================ */
+.VPSidebar {
+  background: var(--vp-c-bg-soft) !important;
+}
+
+.dark .VPSidebar {
+  background: var(--silk-bg-soft) !important;
+}
+
+.VPSidebarItem.is-active > .item > .link > .text {
+  color: var(--silk-purple) !important;
+  font-weight: 600;
+}
+
+.dark .VPSidebarItem.is-active > .item > .link > .text {
+  color: var(--silk-cyan) !important;
+}
+
+/* ============================================================================
+   Content
+   ============================================================================ */
+.vp-doc h1 {
+  background: linear-gradient(135deg, var(--silk-purple), var(--silk-coral));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.vp-doc h2 {
+  margin-top: 2rem;
+}
+
+.vp-doc a {
+  color: var(--vp-c-brand-1);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.2s ease;
+}
+
+.vp-doc a:hover {
+  border-bottom-color: var(--vp-c-brand-1);
+}
+
+/* ============================================================================
+   Code Blocks
+   ============================================================================ */
+.vp-doc div[class*='language-'] {
+  border-radius: 12px;
+  border: 1px solid var(--vp-c-divider);
+}
+
+.dark .vp-doc div[class*='language-'] {
+  background: #1a1a24 !important;
+  border-color: #2a2a3a;
+}
+
+.vp-doc div[class*='language-']::before {
+  color: var(--silk-muted);
+  font-size: 0.75rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.vp-doc :not(pre) > code {
+  background: var(--vp-c-brand-soft);
+  color: var(--vp-code-color);
+  border-radius: 4px;
+  padding: 0.15em 0.4em;
+  font-size: 0.9em;
+}
+
+/* ============================================================================
+   Tables
+   ============================================================================ */
+.vp-doc table {
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid var(--vp-c-divider);
+}
+
+.vp-doc th {
+  background: var(--vp-c-brand-soft) !important;
+  font-weight: 600;
+}
+
+.dark .vp-doc th {
+  background: rgba(225, 53, 255, 0.1) !important;
+}
+
+.vp-doc tr:nth-child(even) {
+  background: var(--vp-c-bg-soft);
+}
+
+/* ============================================================================
+   Custom Containers
+   ============================================================================ */
+.vp-doc .custom-block.tip {
+  border-color: var(--silk-cyan);
+  background: var(--vp-c-tip-soft);
+}
+
+.vp-doc .custom-block.warning {
+  border-color: var(--silk-yellow);
+  background: var(--vp-c-warning-soft);
+}
+
+.vp-doc .custom-block.danger {
+  border-color: var(--silk-red);
+  background: var(--vp-c-danger-soft);
+}
+
+/* ============================================================================
+   Buttons
+   ============================================================================ */
+.VPButton.brand {
+  background: linear-gradient(135deg, var(--silk-purple), var(--silk-coral)) !important;
+  border: none !important;
+  color: white !important;
+  font-weight: 600;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.VPButton.brand:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(225, 53, 255, 0.4);
+}
+
+.VPButton.alt {
+  border: 2px solid var(--silk-cyan) !important;
+  color: var(--silk-cyan) !important;
+  background: transparent !important;
+}
+
+.dark .VPButton.alt:hover {
+  background: rgba(128, 255, 234, 0.1) !important;
+}
+
+/* ============================================================================
+   Hero Section
+   ============================================================================ */
+.VPHero .name {
+  font-weight: 800;
+}
+
+.VPHero .text {
+  color: var(--silk-text-muted);
+  font-weight: 600;
+}
+
+.dark .VPHero .text {
+  color: var(--silk-cyan);
+  font-weight: 700;
+}
+
+.VPHero .tagline {
+  font-size: 1.125rem;
+  line-height: 1.7;
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+.dark .VPHero .tagline {
+  color: var(--silk-text-muted);
+  font-weight: 400;
+}
+
+/* ============================================================================
+   Features
+   ============================================================================ */
+.VPFeature {
+  border: 1px solid var(--vp-c-divider) !important;
+  border-radius: 12px !important;
+  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.VPFeature:hover {
+  transform: translateY(-4px);
+  border-color: var(--silk-purple) !important;
+}
+
+.dark .VPFeature:hover {
+  border-color: var(--silk-cyan) !important;
+}
+
+.VPFeature .title {
+  font-weight: 600;
+  font-size: 1.05rem;
+}
+
+.VPFeature .details {
+  line-height: 1.6;
+}
+
+/* ============================================================================
+   Footer
+   ============================================================================ */
+.VPFooter {
+  border-top: 1px solid var(--vp-c-divider);
+}
+
+/* ============================================================================
+   Scrollbar (dark mode)
+   ============================================================================ */
+.dark ::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.dark ::-webkit-scrollbar-track {
+  background: var(--silk-bg);
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: var(--silk-muted);
+  border-radius: 4px;
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: var(--silk-purple);
+}
+
+/* ============================================================================
+   Selection
+   ============================================================================ */
+::selection {
+  background: rgba(225, 53, 255, 0.3);
+  color: inherit;
+}
+
+.dark ::selection {
+  background: rgba(128, 255, 234, 0.3);
+}
+
+/* ============================================================================
+   DOTFILES CUSTOM TOUCHES
+   Terminal-inspired styling for that authentic dotfiles feel
+   ============================================================================ */
+
+/* Clean code blocks with subtle glow */
+.dark .vp-doc div[class*='language-'] {
+  border: 1px solid #3a3a4a !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+}
+
+/* Blinking cursor effect for the hero tagline */
+.VPHero .tagline::after {
+  content: '▋';
+  animation: blink 1s step-end infinite;
+  color: var(--silk-cyan);
+  margin-left: 2px;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+/* Prompt-style custom blocks */
+.vp-doc .custom-block {
+  position: relative;
+  border-radius: 8px;
+  border-left-width: 4px;
+}
+
+.dark .vp-doc .custom-block.tip::before {
+  content: '➜';
+  position: absolute;
+  left: -28px;
+  top: 16px;
+  color: var(--silk-cyan);
+  font-weight: bold;
+  font-size: 14px;
+}
+
+.dark .vp-doc .custom-block.warning::before {
+  content: '⚠';
+  position: absolute;
+  left: -26px;
+  top: 16px;
+  color: var(--silk-yellow);
+  font-size: 14px;
+}
+
+.dark .vp-doc .custom-block.danger::before {
+  content: '✗';
+  position: absolute;
+  left: -26px;
+  top: 16px;
+  color: var(--silk-red);
+  font-weight: bold;
+  font-size: 14px;
+}
+
+/* Glow effect on headings */
+.dark .vp-doc h1 {
+  text-shadow: 0 0 30px rgba(225, 53, 255, 0.3);
+}
+
+/* h2 styling inherits from base */
+
+/* Sidebar with subtle terminal feel */
+.dark .VPSidebar {
+  border-right: 1px solid #2a2a3a !important;
+}
+
+.dark .VPSidebarItem.is-active > .item {
+  position: relative;
+}
+
+.dark .VPSidebarItem.is-active > .item::before {
+  content: '▸';
+  position: absolute;
+  left: -16px;
+  color: var(--silk-cyan);
+  font-size: 12px;
+}
+
+/* Glowing links on hover */
+.dark .vp-doc a:hover {
+  text-shadow: 0 0 8px rgba(225, 53, 255, 0.5);
+  border-bottom-color: var(--silk-purple);
+}
+
+/* Feature cards with terminal-inspired hover */
+.dark .VPFeature {
+  background: linear-gradient(135deg, #1a1a24 0%, #121218 100%) !important;
+  position: relative;
+  overflow: hidden;
+}
+
+.dark .VPFeature::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    135deg,
+    transparent 0%,
+    rgba(225, 53, 255, 0.03) 50%,
+    transparent 100%
+  );
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.dark .VPFeature:hover::before {
+  opacity: 1;
+}
+
+.dark .VPFeature:hover {
+  box-shadow:
+    0 0 0 1px rgba(128, 255, 234, 0.3),
+    0 8px 32px rgba(128, 255, 234, 0.1);
+}
+
+/* Inline code with subtle glow */
+.dark .vp-doc :not(pre) > code {
+  background: rgba(225, 53, 255, 0.15);
+  border: 1px solid rgba(225, 53, 255, 0.2);
+  text-shadow: 0 0 8px rgba(225, 53, 255, 0.3);
+}
+
+/* Table styling with terminal vibes */
+.dark .vp-doc table {
+  border: 1px solid #3a3a4a;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+}
+
+.dark .vp-doc th {
+  background: linear-gradient(180deg, #2a2a3a 0%, #1a1a24 100%) !important;
+  border-bottom: 1px solid var(--silk-purple) !important;
+  text-transform: uppercase;
+  font-size: 0.8em;
+  letter-spacing: 0.05em;
+}
+
+.dark .vp-doc td {
+  border-color: #2a2a3a !important;
+}
+
+.dark .vp-doc tr:hover {
+  background: rgba(128, 255, 234, 0.05) !important;
+}
+
+/* Nav with subtle scanline effect */
+.dark .VPNav::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0, 0, 0, 0.03) 2px,
+    rgba(0, 0, 0, 0.03) 4px
+  );
+  pointer-events: none;
+}
+
+/* Hero section enhancements */
+.dark .VPHero .VPImage {
+  filter: drop-shadow(0 0 40px rgba(225, 53, 255, 0.4));
+}
+
+.dark .VPHero .name {
+  text-shadow:
+    0 0 40px rgba(225, 53, 255, 0.5),
+    0 0 80px rgba(128, 255, 234, 0.2);
+}
+
+/* Search with terminal style */
+.dark .VPNavBarSearch .search-input {
+  background: #1a1a24 !important;
+  border: 1px solid #3a3a4a !important;
+}
+
+.dark .VPNavBarSearch .search-input:focus {
+  border-color: var(--silk-cyan) !important;
+  box-shadow: 0 0 0 2px rgba(128, 255, 234, 0.2);
+}
+
+/* Footer with gradient border */
+.dark .VPFooter {
+  border-top: 1px solid transparent;
+  border-image: linear-gradient(90deg, transparent, var(--silk-purple), var(--silk-cyan), transparent) 1;
+}
+
+/* Path breadcrumbs styled like terminal prompt */
+.dark .VPDocAsideOutline .outline-title {
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--silk-muted);
+}
+
+.dark .VPDocAsideOutline .outline-title::before {
+  content: '# ';
+  color: var(--silk-cyan);
+}
+
+/* Badge/tag styling */
+.dark .VPBadge {
+  background: linear-gradient(135deg, var(--silk-purple), var(--silk-coral)) !important;
+  border: none;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+/* Subtle grid background for hero */
+.dark .VPHero .container {
+  background-image:
+    linear-gradient(rgba(225, 53, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(225, 53, 255, 0.03) 1px, transparent 1px);
+  background-size: 50px 50px;
+}
+
+/* Monospace for all code-related elements */
+.vp-doc code,
+.vp-doc kbd,
+.vp-doc pre {
+  font-family: 'JetBrains Mono', 'Fira Code', 'SF Mono', monospace;
+}
+
+/* Keyboard shortcut styling */
+.vp-doc kbd {
+  background: linear-gradient(180deg, #2a2a3a 0%, #1a1a24 100%);
+  border: 1px solid #3a3a4a;
+  border-radius: 4px;
+  padding: 2px 6px;
+  font-size: 0.85em;
+  box-shadow: 0 2px 0 #0a0a10;
+}
+
+/* Animate the feature icons */
+.dark .VPFeature .icon {
+  transition: transform 0.3s ease, filter 0.3s ease;
+}
+
+.dark .VPFeature:hover .icon {
+  transform: scale(1.15) rotate(5deg);
+  filter: drop-shadow(0 0 12px rgba(128, 255, 234, 0.6));
+}
+
+/* Enhanced feature box interaction */
+.VPFeature .box {
+  transition: all 0.3s ease;
+}
+
+.dark .VPFeature:hover .box {
+  background: rgba(225, 53, 255, 0.02);
+}
+
+/* Hero actions spacing */
+.VPHero .actions {
+  gap: 16px;
+}

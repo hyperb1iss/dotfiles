@@ -8,3 +8,6 @@ nvim/lazy-lock.json
 fonts/Pragmata\ Pro
 vim/.netrwhist
 .install_state
+node_modules
+docs/.vitepress/cache
+docs/.vitepress/dist
