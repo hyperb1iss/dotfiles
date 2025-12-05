@@ -20,8 +20,7 @@ return {
       notifications = true, -- enable notifications at start
     },
     -- Diagnostics configuration (for vim.diagnostics.config({...})) when diagnostics are on
-    diagnostics = {
-    },
+    diagnostics = {},
     -- vim options can be configured here
     options = {
       opt = { -- vim.opt.<key>
