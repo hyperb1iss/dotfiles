@@ -28,6 +28,7 @@ alias gpsup='git push --set-upstream origin $(git_current_branch)'
 alias gst='git status'
 alias gsw='git switch'
 alias gswc='git switch -c'
+alias gig='git iris gen -a --no-verify --preset conventional'
 
 # Enhanced Git Functions
 
@@ -770,93 +771,91 @@ __gwt_remove_worktrees() {
 }
 
 function gwt() {
-  ( # Run in subshell to isolate from xtrace
-    set +x 2>/dev/null # Disable xtrace for clean output
+  set +x 2>/dev/null # Disable xtrace for clean output
 
-    local action="$1" rc=0
+  local action="$1" rc=0
 
-    if [[ $# -eq 0 ]]; then
-      if __gwt_have_fzf && git rev-parse --show-toplevel >/dev/null 2>&1; then
-        action=$(printf '%s\n' "switch" "new" "list" "remove" "clean" "info" | fzf --prompt='gwt> ' --header='Select action' --height=60%)
-        [[ -z "${action}" ]] && return 0
-        set -- "${action}"
-      else
-        __gwt_usage
-        return 0
-      fi
+  if [[ $# -eq 0 ]]; then
+    if __gwt_have_fzf && git rev-parse --show-toplevel >/dev/null 2>&1; then
+      action=$(printf '%s\n' "switch" "new" "list" "remove" "clean" "info" | fzf --prompt='gwt> ' --header='Select action' --height=60%)
+      [[ -z "${action}" ]] && return 0
+      set -- "${action}"
+    else
+      __gwt_usage
+      return 0
     fi
+  fi
 
-    case "$1" in
-      help | --help | -h | "")
-        __gwt_usage
-        return 0
-        ;;
-    esac
+  case "$1" in
+    help | --help | -h | "")
+      __gwt_usage
+      return 0
+      ;;
+  esac
 
-    __gwt_require_repo || return 1
+  __gwt_require_repo || return 1
 
-    case "$1" in
-      list | ls)
-        shift
-        local sort_mode="branch"
-        while [[ $# -gt 0 ]]; do
-          case "$1" in
-            --date | -d)
-              sort_mode="date"
-              shift
-              ;;
-            *)
-              shift
-              ;;
-          esac
-        done
-        __gwt_worktree_table "${sort_mode}" || rc=$?
-        ;;
-      switch | cd | open)
-        local target sel_rc pattern="${2:-}"
-        target=$(__gwt_select_paths "1" "${pattern}" "0")
-        sel_rc=$?
-        if [[ ${sel_rc} -ne 0 ]]; then
-          if [[ -n "${pattern}" ]]; then
-            echo "gwt: unable to find worktree matching '${pattern}'" >&2
-            rc=${sel_rc}
-          fi
-        elif [[ -n "${target}" ]]; then
-          if cd "${target}"; then
-            printf 'Switched to %s\n' "${target}"
-          else
-            rc=1
-          fi
+  case "$1" in
+    list | ls)
+      shift
+      local sort_mode="branch"
+      while [[ $# -gt 0 ]]; do
+        case "$1" in
+          --date | -d)
+            sort_mode="date"
+            shift
+            ;;
+          *)
+            shift
+            ;;
+        esac
+      done
+      __gwt_worktree_table "${sort_mode}" || rc=$?
+      ;;
+    switch | cd | open)
+      local target sel_rc pattern="${2:-}"
+      target=$(__gwt_select_paths "1" "${pattern}" "0")
+      sel_rc=$?
+      if [[ ${sel_rc} -ne 0 ]]; then
+        if [[ -n "${pattern}" ]]; then
+          echo "gwt: unable to find worktree matching '${pattern}'" >&2
+          rc=${sel_rc}
         fi
-        ;;
-      new | add)
-        shift
-        __gwt_new_worktree "$@" || rc=$?
-        ;;
-      remove | rm | del)
-        shift
-        __gwt_remove_worktrees "$@" || rc=$?
-        ;;
-      clean | prune)
-        printf 'Pruning stale worktrees…\n'
-        git worktree prune || rc=$?
-        ;;
-      info)
-        local root branch head
-        root=$(git rev-parse --show-toplevel)
-        branch=$(git branch --show-current 2>/dev/null)
-        head=$(git rev-parse --short HEAD)
-        printf 'Worktree: %s\n' "${root}"
-        printf 'Branch:   %s\n' "${branch:-(detached)}"
-        printf 'Commit:   %s\n' "${head}"
-        ;;
-      *)
-        echo "gwt: unknown command '$1'" >&2
-        __gwt_usage
-        rc=1
-        ;;
-    esac
+      elif [[ -n "${target}" ]]; then
+        if cd "${target}"; then
+          printf 'Switched to %s\n' "${target}"
+        else
+          rc=1
+        fi
+      fi
+      ;;
+    new | add)
+      shift
+      __gwt_new_worktree "$@" || rc=$?
+      ;;
+    remove | rm | del)
+      shift
+      __gwt_remove_worktrees "$@" || rc=$?
+      ;;
+    clean | prune)
+      printf 'Pruning stale worktrees…\n'
+      git worktree prune || rc=$?
+      ;;
+    info)
+      local root branch head
+      root=$(git rev-parse --show-toplevel)
+      branch=$(git branch --show-current 2>/dev/null)
+      head=$(git rev-parse --short HEAD)
+      printf 'Worktree: %s\n' "${root}"
+      printf 'Branch:   %s\n' "${branch:-(detached)}"
+      printf 'Commit:   %s\n' "${head}"
+      ;;
+    *)
+      echo "gwt: unknown command '$1'" >&2
+      __gwt_usage
+      rc=1
+      ;;
+  esac
 
-    return ${rc}
-  )
+  return ${rc}
 }
