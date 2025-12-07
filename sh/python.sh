@@ -36,7 +36,7 @@ function va() {
 
 # Deactivate virtual environment
 function vd() {
-  deactivate 2>/dev/null || echo "No virtualenv is active"
+  deactivate 2> /dev/null || echo "No virtualenv is active"
 }
 
 # Run Django development server on specified port (default 8000)
@@ -47,7 +47,7 @@ function drs() {
 
 # Django shell plus (if installed) or regular shell
 function dsh() {
-  if python manage.py help shell_plus >/dev/null 2>&1; then
+  if python manage.py help shell_plus > /dev/null 2>&1; then
     python manage.py shell_plus
   else
     python manage.py shell

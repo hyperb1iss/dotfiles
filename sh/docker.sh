@@ -5,7 +5,7 @@
 is_minimal && return 0
 
 # Source shared colors
-source "${DOTFILES:-$HOME/.dotfiles}/sh/colors.sh" 2>/dev/null || true
+source "${DOTFILES:-$HOME/.dotfiles}/sh/colors.sh" 2> /dev/null || true
 
 # ─────────────────────────────────────────────────────────────
 # Aliases
@@ -34,17 +34,17 @@ function dexec() {
   __sc_init_colors
   local container
 
-  container=$(docker ps --format '{{.Names}}\t{{.Image}}\t{{.Status}}' |
-    fzf --height 50% --reverse \
+  container=$(docker ps --format '{{.Names}}\t{{.Image}}\t{{.Status}}' \
+    | fzf --height 50% --reverse \
       --header="⚡ Select container to exec into" \
       --prompt="container ▸ " \
       --preview 'docker inspect {1} | head -50' \
-      --preview-window=right:40% |
-    awk '{print $1}') || return 0
+      --preview-window=right:40% \
+    | awk '{print $1}') || return 0
 
   if [[ -n "${container}" ]]; then
     sc_info "Connecting to ${SC_CYAN}${container}${SC_RESET}..."
-    docker exec -it "${container}" bash 2>/dev/null || docker exec -it "${container}" sh
+    docker exec -it "${container}" bash 2> /dev/null || docker exec -it "${container}" sh
   fi
 }
 
@@ -53,13 +53,13 @@ function dlf() {
   __sc_init_colors
   local container
 
-  container=$(docker ps --format '{{.Names}}\t{{.Image}}\t{{.Status}}' |
-    fzf --height 50% --reverse \
+  container=$(docker ps --format '{{.Names}}\t{{.Image}}\t{{.Status}}' \
+    | fzf --height 50% --reverse \
       --header="⚡ Select container for logs" \
       --prompt="logs ▸ " \
       --preview 'docker logs --tail 20 {1} 2>&1' \
-      --preview-window=right:50% |
-    awk '{print $1}') || return 0
+      --preview-window=right:50% \
+    | awk '{print $1}') || return 0
 
   if [[ -n "${container}" ]]; then
     sc_info "Following logs for ${SC_CYAN}${container}${SC_RESET}..."
@@ -73,12 +73,12 @@ function dstopi() {
   __sc_init_colors
   local containers
 
-  containers=$(docker ps --format '{{.Names}}\t{{.Image}}\t{{.Status}}' |
-    fzf -m --height 50% --reverse \
+  containers=$(docker ps --format '{{.Names}}\t{{.Image}}\t{{.Status}}' \
+    | fzf -m --height 50% --reverse \
       --header="⚡ Select containers to stop (TAB to multi-select)" \
       --prompt="stop ▸ " \
-      --preview 'docker inspect {1} | head -30' |
-    awk '{print $1}') || return 0
+      --preview 'docker inspect {1} | head -30' \
+    | awk '{print $1}') || return 0
 
   if [[ -n "${containers}" ]]; then
     sc_header "Stopping Containers"
@@ -86,12 +86,12 @@ function dstopi() {
     while IFS= read -r container; do
       [[ -z "${container}" ]] && continue
       echo -ne "  ${SC_PURPLE}▸${SC_RESET} ${container}... "
-      if docker stop "${container}" >/dev/null 2>&1; then
+      if docker stop "${container}" > /dev/null 2>&1; then
         echo -e "${SC_GREEN}stopped${SC_RESET}"
       else
         echo -e "${SC_RED}failed${SC_RESET}"
       fi
-    done <<<"${containers}"
+    done <<< "${containers}"
     echo ""
     sc_success "Done"
   fi
@@ -102,11 +102,11 @@ function drmi() {
   __sc_init_colors
   local containers
 
-  containers=$(docker ps -a --filter "status=exited" --format '{{.Names}}\t{{.Image}}\t{{.Status}}' |
-    fzf -m --height 50% --reverse \
+  containers=$(docker ps -a --filter "status=exited" --format '{{.Names}}\t{{.Image}}\t{{.Status}}' \
+    | fzf -m --height 50% --reverse \
       --header="⚡ Select stopped containers to remove (TAB to multi-select)" \
-      --prompt="remove ▸ " |
-    awk '{print $1}') || return 0
+      --prompt="remove ▸ " \
+    | awk '{print $1}') || return 0
 
   if [[ -n "${containers}" ]]; then
     sc_header "Removing Containers"
@@ -114,12 +114,12 @@ function drmi() {
     while IFS= read -r container; do
       [[ -z "${container}" ]] && continue
       echo -ne "  ${SC_PURPLE}▸${SC_RESET} ${container}... "
-      if docker rm "${container}" >/dev/null 2>&1; then
+      if docker rm "${container}" > /dev/null 2>&1; then
         echo -e "${SC_GREEN}removed${SC_RESET}"
       else
         echo -e "${SC_RED}failed${SC_RESET}"
       fi
-    done <<<"${containers}"
+    done <<< "${containers}"
     echo ""
     sc_success "Done"
   fi
@@ -131,11 +131,11 @@ function dip() {
   local container="$1"
 
   if [[ -z "${container}" ]]; then
-    container=$(docker ps --format '{{.Names}}\t{{.Image}}' |
-      fzf --height 40% --reverse \
+    container=$(docker ps --format '{{.Names}}\t{{.Image}}' \
+      | fzf --height 40% --reverse \
         --header="⚡ Select container" \
-        --prompt="ip ▸ " |
-      awk '{print $1}') || return 0
+        --prompt="ip ▸ " \
+      | awk '{print $1}') || return 0
   fi
 
   if [[ -n "${container}" ]]; then
@@ -156,8 +156,8 @@ function dcr() {
   local service
 
   if [[ -f "docker-compose.yml" ]] || [[ -f "docker-compose.yaml" ]] || [[ -f "compose.yml" ]]; then
-    service=$(docker compose config --services |
-      fzf --height 40% --reverse \
+    service=$(docker compose config --services \
+      | fzf --height 40% --reverse \
         --header="⚡ Select service to restart" \
         --prompt="service ▸ ") || return 0
 
@@ -192,32 +192,32 @@ function dinfo() {
 
   # Containers
   local running stopped total
-  running=$(docker ps -q 2>/dev/null | wc -l | tr -d ' ')
-  stopped=$(docker ps -aq --filter "status=exited" 2>/dev/null | wc -l | tr -d ' ')
-  total=$(docker ps -aq 2>/dev/null | wc -l | tr -d ' ')
+  running=$(docker ps -q 2> /dev/null | wc -l | tr -d ' ')
+  stopped=$(docker ps -aq --filter "status=exited" 2> /dev/null | wc -l | tr -d ' ')
+  total=$(docker ps -aq 2> /dev/null | wc -l | tr -d ' ')
 
   echo -e "${SC_CYAN}•${SC_RESET} Containers: ${SC_GREEN}${running} running${SC_RESET}, ${SC_YELLOW}${stopped} stopped${SC_RESET}, ${SC_GRAY}${total} total${SC_RESET}"
 
   # Images
   local images
-  images=$(docker images -q 2>/dev/null | wc -l | tr -d ' ')
+  images=$(docker images -q 2> /dev/null | wc -l | tr -d ' ')
   echo -e "${SC_CYAN}•${SC_RESET} Images: ${SC_PINK}${images}${SC_RESET}"
 
   # Volumes
   local volumes
-  volumes=$(docker volume ls -q 2>/dev/null | wc -l | tr -d ' ')
+  volumes=$(docker volume ls -q 2> /dev/null | wc -l | tr -d ' ')
   echo -e "${SC_CYAN}•${SC_RESET} Volumes: ${SC_CORAL}${volumes}${SC_RESET}"
 
   # Networks
   local networks
-  networks=$(docker network ls -q 2>/dev/null | wc -l | tr -d ' ')
+  networks=$(docker network ls -q 2> /dev/null | wc -l | tr -d ' ')
   echo -e "${SC_CYAN}•${SC_RESET} Networks: ${SC_CYAN}${networks}${SC_RESET}"
 
   echo ""
 
   # Disk usage
   sc_info "Disk Usage"
-  docker system df 2>/dev/null | tail -n +2 | while read -r line; do
+  docker system df 2> /dev/null | tail -n +2 | while read -r line; do
     local type size reclaimable
     type=$(echo "${line}" | awk '{print $1}')
     size=$(echo "${line}" | awk '{print $3}')
@@ -262,10 +262,6 @@ function dclean() {
   echo -e "${SC_GREEN}${networks_removed:-0} removed${SC_RESET}"
 
   echo ""
-
-  # Show reclaimed space
-  local reclaimed
-  reclaimed=$(docker system df 2>/dev/null | awk 'NR>1 {sum+=$4} END {print sum}')
   sc_success "Cleanup complete"
 }
 

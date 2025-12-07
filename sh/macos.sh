@@ -41,7 +41,7 @@ if is_macos; then
 
   # Quick look a file
   function ql() {
-    qlmanage -p "$@" &>/dev/null
+    qlmanage -p "$@" &> /dev/null
   }
 
   # Show/hide hidden files in Finder

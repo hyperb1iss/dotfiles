@@ -5,7 +5,7 @@
 is_minimal && return 0
 
 # Source shared colors
-source "${DOTFILES:-$HOME/.dotfiles}/sh/colors.sh" 2>/dev/null || true
+source "${DOTFILES:-$HOME/.dotfiles}/sh/colors.sh" 2> /dev/null || true
 
 # ─────────────────────────────────────────────────────────────
 # Turborepo Aliases
@@ -22,10 +22,10 @@ alias tc='turbo typecheck'
 alias tf='turbo --filter'
 
 # Quick filter patterns (expand as needed)
-function tdf() { turbo dev --filter="$@"; }
-function tbf() { turbo build --filter="$@"; }
-function tcf() { turbo typecheck --filter="$@"; }
-function ttf() { turbo test --filter="$@"; }
+function tdf() { turbo dev --filter="$*"; }
+function tbf() { turbo build --filter="$*"; }
+function tcf() { turbo typecheck --filter="$*"; }
+function ttf() { turbo test --filter="$*"; }
 
 # Turbo housekeeping
 alias tkill='pkill turbo'
@@ -144,14 +144,14 @@ function mono() {
   fi
 
   local root
-  root=$(git rev-parse --show-toplevel 2>/dev/null) || {
+  root=$(git rev-parse --show-toplevel 2> /dev/null) || {
     sc_error "Not in a git repo"
     return 1
   }
 
   local pkg
-  pkg=$(fd -t d -d 3 'package.json' "${root}" --exec dirname {} \; 2>/dev/null |
-    fzf --preview 'jq -r ".name // \"(no name)\"" {}/package.json 2>/dev/null; echo "---"; ls -la {}' \
+  pkg=$(fd -t d -d 3 'package.json' "${root}" --exec dirname {} \; 2> /dev/null \
+    | fzf --preview 'jq -r ".name // \"(no name)\"" {}/package.json 2>/dev/null; echo "---"; ls -la {}' \
       --header '⚡ Select package')
 
   if [[ -n "${pkg}" ]]; then
@@ -164,7 +164,7 @@ function mono() {
 function monols() {
   __sc_init_colors
   local root
-  root=$(git rev-parse --show-toplevel 2>/dev/null) || {
+  root=$(git rev-parse --show-toplevel 2> /dev/null) || {
     sc_error "Not in a git repo"
     return 1
   }
@@ -172,12 +172,13 @@ function monols() {
   echo -e "${SC_CYAN}${SC_BOLD}━━━ Workspace Packages ━━━${SC_RESET}"
   echo ""
 
+  # shellcheck disable=SC2016  # Single quotes intentional - subshell expands $1
   fd -t f 'package.json' "${root}" -d 3 --exec sh -c '
     dir=$(dirname "$1")
     name=$(jq -r ".name // \"(unnamed)\"" "$1" 2>/dev/null)
     version=$(jq -r ".version // \"-\"" "$1" 2>/dev/null)
     printf "\033[38;2;225;53;255m▸\033[0m \033[38;2;128;255;234m%-35s\033[0m \033[38;2;241;250;140m%s\033[0m\n" "${name}" "${version}"
-  ' _ {} \; 2>/dev/null | grep -v node_modules | sort
+  ' _ {} \; 2> /dev/null | grep -v node_modules | sort
 }
 
 # ─────────────────────────────────────────────────────────────
@@ -205,7 +206,7 @@ function ts-info() {
   # TypeScript version
   if [[ -f "node_modules/.bin/tsc" ]]; then
     local tsv
-    tsv=$(pnpm exec tsc --version 2>/dev/null | grep -oE '[0-9]+\.[0-9]+\.[0-9]+')
+    tsv=$(pnpm exec tsc --version 2> /dev/null | grep -oE '[0-9]+\.[0-9]+\.[0-9]+')
     echo -e "${SC_PURPLE}▸${SC_RESET} TypeScript: ${SC_CYAN}${tsv:-not installed}${SC_RESET}"
   fi
 

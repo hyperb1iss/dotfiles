@@ -5,7 +5,7 @@
 is_minimal && return 0
 
 # Source shared colors
-source "${DOTFILES:-$HOME/.dotfiles}/sh/colors.sh" 2>/dev/null || true
+source "${DOTFILES:-$HOME/.dotfiles}/sh/colors.sh" 2> /dev/null || true
 
 # ─────────────────────────────────────────────────────────────
 # Port & Connection Tools
@@ -27,7 +27,7 @@ function port() {
   if is_macos; then
     # macOS version using lsof
     local result
-    result=$(lsof -iTCP:"${port}" -sTCP:LISTEN 2>/dev/null)
+    result=$(lsof -iTCP:"${port}" -sTCP:LISTEN 2> /dev/null)
 
     if [[ -n "${result}" ]]; then
       echo -e "${SC_RED}•${SC_RESET} Port ${SC_YELLOW}${port}${SC_RESET} is in use:"
@@ -40,7 +40,7 @@ function port() {
     # Linux version using ss or netstat
     if has_command ss; then
       local result
-      result=$(ss -tlnp 2>/dev/null | grep ":${port}\s")
+      result=$(ss -tlnp 2> /dev/null | grep ":${port}\s")
 
       if [[ -n "${result}" ]]; then
         echo -e "${SC_RED}•${SC_RESET} Port ${SC_YELLOW}${port}${SC_RESET} is in use:"
@@ -51,7 +51,7 @@ function port() {
       fi
     elif has_command netstat; then
       local result
-      result=$(netstat -tlnp 2>/dev/null | grep ":${port}\s")
+      result=$(netstat -tlnp 2> /dev/null | grep ":${port}\s")
 
       if [[ -n "${result}" ]]; then
         echo -e "${SC_RED}•${SC_RESET} Port ${SC_YELLOW}${port}${SC_RESET} is in use:"
@@ -73,19 +73,19 @@ function ports() {
   echo ""
 
   if is_macos; then
-    lsof -iTCP -sTCP:LISTEN -P -n 2>/dev/null |
-      awk 'NR==1 {printf "%-15s %-8s %-20s %-15s\n", "COMMAND", "PID", "USER", "PORT"} 
-           NR>1 {split($9,a,":"); printf "%-15s %-8s %-20s %-15s\n", $1, $2, $3, a[length(a)]}' |
-      sort -k4 -n | uniq
+    lsof -iTCP -sTCP:LISTEN -P -n 2> /dev/null \
+      | awk 'NR==1 {printf "%-15s %-8s %-20s %-15s\n", "COMMAND", "PID", "USER", "PORT"} 
+           NR>1 {split($9,a,":"); printf "%-15s %-8s %-20s %-15s\n", $1, $2, $3, a[length(a)]}' \
+      | sort -k4 -n | uniq
   else
     if has_command ss; then
-      ss -tlnp 2>/dev/null |
-        awk 'NR>1 {split($4,a,":"); printf "%-20s %-15s %-30s\n", $1, a[length(a)], $6}' |
-        sort -k2 -n
+      ss -tlnp 2> /dev/null \
+        | awk 'NR>1 {split($4,a,":"); printf "%-20s %-15s %-30s\n", $1, a[length(a)], $6}' \
+        | sort -k2 -n
     elif has_command netstat; then
-      netstat -tlnp 2>/dev/null |
-        awk '/^tcp/ {split($4,a,":"); printf "%-20s %-15s %-30s\n", $1, a[length(a)], $7}' |
-        sort -k2 -n
+      netstat -tlnp 2> /dev/null \
+        | awk '/^tcp/ {split($4,a,":"); printf "%-20s %-15s %-30s\n", $1, a[length(a)], $7}' \
+        | sort -k2 -n
     fi
   fi
 }
@@ -97,7 +97,7 @@ function netcheck() {
 
   # DNS check
   echo -ne "${SC_CYAN}→${SC_RESET} DNS Resolution: "
-  if nslookup google.com >/dev/null 2>&1; then
+  if nslookup google.com > /dev/null 2>&1; then
     echo -e "${SC_GREEN}✓ Working${SC_RESET}"
   else
     echo -e "${SC_RED}✗ Failed${SC_RESET}"
@@ -107,15 +107,15 @@ function netcheck() {
   echo -ne "${SC_CYAN}→${SC_RESET} Gateway: "
   local gateway
   if is_macos; then
-    gateway=$(route -n get default 2>/dev/null | grep gateway | awk '{print $2}')
+    gateway=$(route -n get default 2> /dev/null | grep gateway | awk '{print $2}')
   else
-    gateway=$(ip route 2>/dev/null | grep default | awk '{print $3}')
+    gateway=$(ip route 2> /dev/null | grep default | awk '{print $3}')
   fi
 
   if [[ -n "${gateway}" ]]; then
     echo -e "${SC_YELLOW}${gateway}${SC_RESET}"
     echo -ne "  ${SC_GRAY}•${SC_RESET} Ping: "
-    if ping -c 1 -W 2 "${gateway}" >/dev/null 2>&1; then
+    if ping -c 1 -W 2 "${gateway}" > /dev/null 2>&1; then
       echo -e "${SC_GREEN}✓ Reachable${SC_RESET}"
     else
       echo -e "${SC_RED}✗ Unreachable${SC_RESET}"
@@ -126,7 +126,7 @@ function netcheck() {
 
   # Internet check
   echo -ne "${SC_CYAN}→${SC_RESET} Internet: "
-  if ping -c 1 -W 2 8.8.8.8 >/dev/null 2>&1; then
+  if ping -c 1 -W 2 8.8.8.8 > /dev/null 2>&1; then
     echo -e "${SC_GREEN}✓ Connected${SC_RESET}"
   else
     echo -e "${SC_RED}✗ Disconnected${SC_RESET}"
@@ -146,16 +146,16 @@ function netif() {
     # macOS version
     for interface in $(ifconfig -l); do
       local if_status
-      if_status=$(ifconfig "${interface}" 2>/dev/null | grep "status:" | awk '{print $2}')
+      if_status=$(ifconfig "${interface}" 2> /dev/null | grep "status:" | awk '{print $2}')
       local ip
-      ip=$(ifconfig "${interface}" 2>/dev/null | grep "inet " | awk '{print $2}')
+      ip=$(ifconfig "${interface}" 2> /dev/null | grep "inet " | awk '{print $2}')
 
       if [[ -n "${ip}" ]] || [[ "${if_status}" == "active" ]]; then
         echo -e "${SC_CYAN}${SC_BOLD}• ${interface}${SC_RESET}"
         [[ -n "${ip}" ]] && echo -e "  ${SC_GRAY}→${SC_RESET} IPv4: ${SC_YELLOW}${ip}${SC_RESET}"
 
         local ip6
-        ip6=$(ifconfig "${interface}" 2>/dev/null | grep "inet6" | grep -v "fe80" | awk '{print $2}')
+        ip6=$(ifconfig "${interface}" 2> /dev/null | grep "inet6" | grep -v "fe80" | awk '{print $2}')
         [[ -n "${ip6}" ]] && echo -e "  ${SC_GRAY}→${SC_RESET} IPv6: ${SC_PINK}${ip6}${SC_RESET}"
 
         [[ -n "${if_status}" ]] && echo -e "  ${SC_GRAY}→${SC_RESET} Status: ${SC_GREEN}${if_status}${SC_RESET}"
@@ -166,16 +166,16 @@ function netif() {
     # Linux version
     for interface in $(ip -o link show | awk -F': ' '{print $2}'); do
       local state
-      state=$(ip link show "${interface}" 2>/dev/null | grep -oP '(?<=state )\w+')
+      state=$(ip link show "${interface}" 2> /dev/null | grep -oP '(?<=state )\w+')
       local ip
-      ip=$(ip -4 addr show "${interface}" 2>/dev/null | grep -oP '(?<=inet )\S+')
+      ip=$(ip -4 addr show "${interface}" 2> /dev/null | grep -oP '(?<=inet )\S+')
 
       if [[ -n "${ip}" ]] || [[ "${state}" == "UP" ]]; then
         echo -e "${SC_CYAN}${SC_BOLD}• ${interface}${SC_RESET}"
         [[ -n "${ip}" ]] && echo -e "  ${SC_GRAY}→${SC_RESET} IPv4: ${SC_YELLOW}${ip}${SC_RESET}"
 
         local ip6
-        ip6=$(ip -6 addr show "${interface}" 2>/dev/null | grep -oP '(?<=inet6 )\S+' | grep -v "fe80")
+        ip6=$(ip -6 addr show "${interface}" 2> /dev/null | grep -oP '(?<=inet6 )\S+' | grep -v "fe80")
         [[ -n "${ip6}" ]] && echo -e "  ${SC_GRAY}→${SC_RESET} IPv6: ${SC_PINK}${ip6}${SC_RESET}"
 
         [[ -n "${state}" ]] && echo -e "  ${SC_GRAY}→${SC_RESET} State: ${SC_GREEN}${state}${SC_RESET}"
@@ -207,13 +207,13 @@ function connections() {
   else
     case "${filter}" in
       tcp)
-        ss -tnp 2>/dev/null | grep ESTAB
+        ss -tnp 2> /dev/null | grep ESTAB
         ;;
       udp)
-        ss -unp 2>/dev/null
+        ss -unp 2> /dev/null
         ;;
       *)
-        ss -tunp 2>/dev/null | grep -E "(ESTAB|LISTEN)"
+        ss -tunp 2> /dev/null | grep -E "(ESTAB|LISTEN)"
         ;;
     esac
   fi | column -t

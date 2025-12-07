@@ -5,7 +5,7 @@
 is_minimal && return 0
 
 # Source shared colors
-source "${DOTFILES:-$HOME/.dotfiles}/sh/colors.sh" 2>/dev/null || true
+source "${DOTFILES:-$HOME/.dotfiles}/sh/colors.sh" 2> /dev/null || true
 
 # ─────────────────────────────────────────────────────────────
 # System Information
@@ -19,7 +19,7 @@ function sysinfo() {
   # Hostname and User
   echo -e "${SC_CYAN}•${SC_RESET} Host: ${SC_YELLOW}$(hostname)${SC_RESET}"
   echo -e "${SC_CYAN}•${SC_RESET} User: ${SC_PINK}$(whoami)${SC_RESET}"
-  echo -e "${SC_CYAN}•${SC_RESET} Shell: ${SC_GREEN}$(basename "$SHELL")${SC_RESET} ${SC_GRAY}$(${SHELL} --version 2>/dev/null | head -1 | awk '{print $NF}')${SC_RESET}"
+  echo -e "${SC_CYAN}•${SC_RESET} Shell: ${SC_GREEN}$(basename "$SHELL")${SC_RESET} ${SC_GRAY}$(${SHELL} --version 2> /dev/null | head -1 | awk '{print $NF}')${SC_RESET}"
   echo ""
 
   # OS Information
@@ -34,7 +34,7 @@ function sysinfo() {
 
     # Hardware info
     local model
-    model=$(sysctl -n hw.model 2>/dev/null)
+    model=$(sysctl -n hw.model 2> /dev/null)
     [[ -n "${model}" ]] && echo -e "${SC_CYAN}•${SC_RESET} Model: ${SC_PINK}${model}${SC_RESET}"
   else
     # Linux version
@@ -48,7 +48,7 @@ function sysinfo() {
     # Hardware info
     if [[ -f /sys/devices/virtual/dmi/id/product_name ]]; then
       local model
-      model=$(cat /sys/devices/virtual/dmi/id/product_name 2>/dev/null)
+      model=$(cat /sys/devices/virtual/dmi/id/product_name 2> /dev/null)
       [[ -n "${model}" ]] && echo -e "${SC_CYAN}•${SC_RESET} Model: ${SC_PINK}${model}${SC_RESET}"
     fi
   fi
@@ -70,7 +70,7 @@ function sysinfo() {
     local minutes=$(((uptime_seconds % 3600) / 60))
     echo -e "${SC_CYAN}•${SC_RESET} Uptime: ${SC_YELLOW}${days}d ${hours}h ${minutes}m${SC_RESET}"
   else
-    echo -e "${SC_CYAN}•${SC_RESET} Uptime: ${SC_YELLOW}$(uptime -p 2>/dev/null || uptime)${SC_RESET}"
+    echo -e "${SC_CYAN}•${SC_RESET} Uptime: ${SC_YELLOW}$(uptime -p 2> /dev/null || uptime)${SC_RESET}"
   fi
 
   # Load average
@@ -85,11 +85,11 @@ function cpuinfo() {
   if is_macos; then
     # macOS CPU info
     local cpu_name
-    cpu_name=$(sysctl -n machdep.cpu.brand_string 2>/dev/null)
+    cpu_name=$(sysctl -n machdep.cpu.brand_string 2> /dev/null)
     local cpu_cores
-    cpu_cores=$(sysctl -n hw.ncpu 2>/dev/null)
+    cpu_cores=$(sysctl -n hw.ncpu 2> /dev/null)
     local cpu_freq
-    cpu_freq=$(sysctl -n hw.cpufrequency_max 2>/dev/null | awk '{printf "%.2f GHz", $1/1000000000}')
+    cpu_freq=$(sysctl -n hw.cpufrequency_max 2> /dev/null | awk '{printf "%.2f GHz", $1/1000000000}')
 
     [[ -n "${cpu_name}" ]] && echo "• Model: ${cpu_name}"
     [[ -n "${cpu_cores}" ]] && echo "• Cores: ${cpu_cores}"
@@ -98,7 +98,7 @@ function cpuinfo() {
     # Temperature if available
     if has_command osx-cpu-temp; then
       local temp
-      temp=$(osx-cpu-temp 2>/dev/null)
+      temp=$(osx-cpu-temp 2> /dev/null)
       [[ -n "${temp}" ]] && echo "• Temp: ${temp}"
     fi
   else
@@ -119,7 +119,7 @@ function cpuinfo() {
     # Temperature if available
     if has_command sensors; then
       local temp
-      temp=$(sensors 2>/dev/null | grep "Core 0" | awk '{print $3}')
+      temp=$(sensors 2> /dev/null | grep "Core 0" | awk '{print $3}')
       [[ -n "${temp}" ]] && echo "• Temp: ${temp}"
     fi
   fi
@@ -212,7 +212,7 @@ function meminfo() {
   echo ""
   if is_macos; then
     local swap_usage
-    swap_usage=$(sysctl vm.swapusage 2>/dev/null | awk '{print $7, $10, $13}')
+    swap_usage=$(sysctl vm.swapusage 2> /dev/null | awk '{print $7, $10, $13}')
     if [[ -n "${swap_usage}" ]]; then
       echo -e "${SC_CYAN}•${SC_RESET} Swap: ${SC_PINK}${swap_usage}${SC_RESET}"
     fi
@@ -319,7 +319,7 @@ function gpuinfo() {
   if is_macos; then
     # macOS GPU info
     local gpu_info
-    gpu_info=$(system_profiler SPDisplaysDataType 2>/dev/null | grep -E "Chipset Model:|VRAM")
+    gpu_info=$(system_profiler SPDisplaysDataType 2> /dev/null | grep -E "Chipset Model:|VRAM")
     if [[ -n "${gpu_info}" ]]; then
       echo "${gpu_info}" | while IFS=: read -r key value; do
         echo "• ${key}: ${value# }"
@@ -341,8 +341,8 @@ function gpuinfo() {
     if has_command nvidia-smi; then
       echo ""
       echo "→ NVIDIA GPU Status:"
-      nvidia-smi --query-gpu=name,temperature.gpu,utilization.gpu,memory.used,memory.total --format=csv,noheader |
-        awk -F', ' '{printf "  • %s\n    Temp: %s°C  Usage: %s  Memory: %s / %s\n", $1, $2, $3, $4, $5}'
+      nvidia-smi --query-gpu=name,temperature.gpu,utilization.gpu,memory.used,memory.total --format=csv,noheader \
+        | awk -F', ' '{printf "  • %s\n    Temp: %s°C  Usage: %s  Memory: %s / %s\n", $1, $2, $3, $4, $5}'
     fi
   fi
 }
@@ -355,7 +355,7 @@ function battery() {
   if is_macos; then
     # macOS battery info
     local battery_info
-    battery_info=$(pmset -g batt 2>/dev/null | grep -E "InternalBattery")
+    battery_info=$(pmset -g batt 2> /dev/null | grep -E "InternalBattery")
     if [[ -n "${battery_info}" ]]; then
       local percent
       percent=$(echo "${battery_info}" | grep -oE '[0-9]+%' | head -1 | sed 's/%//')
@@ -434,8 +434,8 @@ function temps() {
 
     # Try alternative methods
     if has_command istats; then
-      istats cpu temp 2>/dev/null
-      istats fan 2>/dev/null
+      istats cpu temp 2> /dev/null
+      istats fan 2> /dev/null
     fi
   else
     # Linux temperature
@@ -477,7 +477,7 @@ function services() {
     if has_command brew; then
       echo ""
       echo "→ Homebrew Services:"
-      brew services list 2>/dev/null | tail -n +2 | while read -r line; do
+      brew services list 2> /dev/null | tail -n +2 | while read -r line; do
         local name
         name=$(echo "${line}" | awk '{print $1}')
         local svc_status
@@ -497,7 +497,7 @@ function services() {
       # Check common services
       local services=("sshd" "nginx" "apache2" "mysql" "postgresql" "docker")
       for service in "${services[@]}"; do
-        if systemctl is-active "${service}" >/dev/null 2>&1; then
+        if systemctl is-active "${service}" > /dev/null 2>&1; then
           echo "  ✓ ${service}"
         elif systemctl list-units --all | grep -q "${service}"; then
           echo "  ✗ ${service}"
@@ -505,7 +505,7 @@ function services() {
       done
     elif has_command service; then
       echo "→ Init Services:"
-      service --status-all 2>/dev/null | while read -r line; do
+      service --status-all 2> /dev/null | while read -r line; do
         if [[ "${line}" == *"[ + ]"* ]]; then
           echo "  ✓ $(echo "${line}" | awk '{print $4}')"
         elif [[ "${line}" == *"[ - ]"* ]]; then
@@ -525,7 +525,7 @@ function health() {
   local load
   load=$(uptime | awk -F'load average:' '{print $2}' | awk '{print $1}' | sed 's/,//')
   local cores
-  cores=$(nproc 2>/dev/null || sysctl -n hw.ncpu 2>/dev/null || echo 1)
+  cores=$(nproc 2> /dev/null || sysctl -n hw.ncpu 2> /dev/null || echo 1)
 
   echo -n "• CPU Load: "
   # Use awk for floating point comparison since bc might not be available
@@ -604,7 +604,7 @@ function health() {
     fi
   elif has_command sensors; then
     local temp
-    temp=$(sensors 2>/dev/null | grep "Core 0" | grep -oE '[0-9]+' | head -1)
+    temp=$(sensors 2> /dev/null | grep "Core 0" | grep -oE '[0-9]+' | head -1)
     if [[ -n "${temp}" ]]; then
       echo -n "• Temperature: "
       if [[ ${temp} -lt 70 ]]; then

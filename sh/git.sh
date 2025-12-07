@@ -2,7 +2,7 @@
 # ⚡ Git utilities with SilkCircuit energy
 
 # Source shared colors
-source "${DOTFILES:-$HOME/.dotfiles}/sh/colors.sh" 2>/dev/null || true
+source "${DOTFILES:-$HOME/.dotfiles}/sh/colors.sh" 2> /dev/null || true
 
 # ─────────────────────────────────────────────────────────────
 # Aliases
@@ -41,7 +41,7 @@ alias gig='git iris gen -a --no-verify --preset conventional'
 
 # Get current branch name
 function git_current_branch() {
-  git branch --show-current 2>/dev/null
+  git branch --show-current 2> /dev/null
 }
 
 # ─────────────────────────────────────────────────────────────
@@ -53,13 +53,13 @@ function gadd() {
   __sc_init_colors
   local files
 
-  files=$(git status -s |
-    fzf -m --height 60% --reverse \
+  files=$(git status -s \
+    | fzf -m --height 60% --reverse \
       --header="⚡ Select files to stage (TAB to multi-select)" \
       --prompt="add ▸ " \
       --preview 'git diff --color=always {2}' \
-      --preview-window=right:60% |
-    awk '{print $2}') || return 0
+      --preview-window=right:60% \
+    | awk '{print $2}') || return 0
 
   if [[ -n "${files}" ]]; then
     echo "${files}" | xargs git add
@@ -67,7 +67,7 @@ function gadd() {
     echo ""
     while IFS= read -r file; do
       [[ -n "${file}" ]] && echo -e "  ${SC_GREEN}+${SC_RESET} ${file}"
-    done <<<"${files}"
+    done <<< "${files}"
     echo ""
     sc_success "Files staged"
   fi
@@ -81,8 +81,8 @@ function gco() {
   branches=$(git branch --all | grep -v HEAD) || return 0
 
   if [[ -n "${branches}" ]]; then
-    branch=$(echo "${branches}" |
-      fzf --height 50% --reverse \
+    branch=$(echo "${branches}" \
+      | fzf --height 50% --reverse \
         --header="⚡ Select branch to checkout" \
         --prompt="branch ▸ " \
         --preview 'git log --oneline --color=always -20 {}' \
@@ -105,8 +105,8 @@ function glog() {
   echo ""
 
   git log --graph --color=always \
-    --format="%C(#ff6ac1)%h%C(reset) %C(#80ffea)%d%C(reset) %s %C(#8b91b1)%cr%C(reset)" "$@" |
-    fzf --ansi --no-sort --reverse --tac --toggle-sort=\` \
+    --format="%C(#ff6ac1)%h%C(reset) %C(#80ffea)%d%C(reset) %s %C(#8b91b1)%cr%C(reset)" "$@" \
+    | fzf --ansi --no-sort --reverse --tac --toggle-sort=\` \
       --header="⚡ Git Log Browser" \
       --prompt="commit ▸ " \
       --bind "ctrl-m:execute:
@@ -123,8 +123,8 @@ function gstash() {
   local preview="git stash show -p {1} --color=always"
   local selection stash_id
 
-  selection=$(eval "${cmd}" |
-    fzf --height 60% --reverse \
+  selection=$(eval "${cmd}" \
+    | fzf --height 60% --reverse \
       --header="⚡ Select stash entry" \
       --prompt="stash ▸ " \
       --preview "${preview}" \
@@ -165,7 +165,8 @@ function gstash() {
         git stash show -p "${stash_id}" | ${PAGER:-less}
         ;;
       b)
-        local branch_name="stash-branch-$(date +%Y%m%d-%H%M)"
+        local branch_name
+        branch_name="stash-branch-$(date +%Y%m%d-%H%M)"
         sc_info "Creating branch ${SC_CYAN}${branch_name}${SC_RESET}..."
         git stash branch "${branch_name}" "${stash_id}"
         sc_success "Branch created"
@@ -185,13 +186,13 @@ function grebase() {
   sc_info "Select commit to rebase from (multi-select with TAB)"
   echo ""
 
-  commits=$(git log --oneline -n 50 --color=always |
-    fzf --ansi --multi --height 60% --reverse \
+  commits=$(git log --oneline -n 50 --color=always \
+    | fzf --ansi --multi --height 60% --reverse \
       --header="⚡ Interactive Rebase" \
       --prompt="rebase ▸ " \
       --preview 'git show --color=always {1}' \
-      --preview-window=right:50% |
-    cut -d' ' -f1) || return 0
+      --preview-window=right:50% \
+    | cut -d' ' -f1) || return 0
 
   if [[ -n "${commits}" ]]; then
     local target
@@ -238,11 +239,11 @@ function gsetup() {
   fi
 
   # Initialize main branch
-  git checkout -b main 2>/dev/null && echo -e "  ${SC_GREEN}✓${SC_RESET} Created main branch" || true
+  git checkout -b main 2> /dev/null && echo -e "  ${SC_GREEN}✓${SC_RESET} Created main branch" || true
 
   # Create initial .gitignore
   if [[ ! -f .gitignore ]]; then
-    cat >.gitignore <<'EOF'
+    cat > .gitignore << 'EOF'
 # OS generated files
 .DS_Store
 .DS_Store?
@@ -272,7 +273,7 @@ EOF
   fi
 
   git add .gitignore
-  git commit -m "Initial commit" 2>/dev/null && echo -e "  ${SC_GREEN}✓${SC_RESET} Initial commit created" || true
+  git commit -m "Initial commit" 2> /dev/null && echo -e "  ${SC_GREEN}✓${SC_RESET} Initial commit created" || true
 
   echo ""
   sc_success "Repository setup complete"
@@ -334,7 +335,7 @@ function gstatus() {
 
   # Get current branch
   local branch
-  branch=$(git branch --show-current 2>/dev/null)
+  branch=$(git branch --show-current 2> /dev/null)
 
   sc_header "Repository Status"
   echo ""
@@ -342,11 +343,11 @@ function gstatus() {
 
   # Ahead/behind info
   local upstream
-  upstream=$(git rev-parse --abbrev-ref "@{upstream}" 2>/dev/null)
+  upstream=$(git rev-parse --abbrev-ref "@{upstream}" 2> /dev/null)
   if [[ -n "${upstream}" ]]; then
     local ahead behind
-    ahead=$(git rev-list --count "@{upstream}..HEAD" 2>/dev/null)
-    behind=$(git rev-list --count "HEAD..@{upstream}" 2>/dev/null)
+    ahead=$(git rev-list --count "@{upstream}..HEAD" 2> /dev/null)
+    behind=$(git rev-list --count "HEAD..@{upstream}" 2> /dev/null)
     if [[ ${ahead} -gt 0 ]] || [[ ${behind} -gt 0 ]]; then
       echo -e "${SC_CYAN}•${SC_RESET} Upstream: ${SC_GRAY}${upstream}${SC_RESET} ${SC_GREEN}↑${ahead}${SC_RESET} ${SC_RED}↓${behind}${SC_RESET}"
     fi
@@ -361,7 +362,7 @@ function gstatus() {
       echo -e "${SC_GREEN}Staged:${SC_RESET}"
       while IFS= read -r file; do
         [[ -n "${file}" ]] && echo -e "  ${SC_GREEN}+${SC_RESET} ${file}"
-      done <<<"${staged_files}"
+      done <<< "${staged_files}"
       echo ""
     fi
 
@@ -372,7 +373,7 @@ function gstatus() {
       echo -e "${SC_YELLOW}Modified:${SC_RESET}"
       while IFS= read -r file; do
         [[ -n "${file}" ]] && echo -e "  ${SC_YELLOW}~${SC_RESET} ${file}"
-      done <<<"${modified_files}"
+      done <<< "${modified_files}"
       echo ""
     fi
 
@@ -383,7 +384,7 @@ function gstatus() {
       echo -e "${SC_GRAY}Untracked:${SC_RESET}"
       while IFS= read -r file; do
         [[ -n "${file}" ]] && echo -e "  ${SC_GRAY}?${SC_RESET} ${file}"
-      done <<<"${untracked_files}"
+      done <<< "${untracked_files}"
     fi
   else
     sc_success "Working directory clean"
@@ -413,7 +414,7 @@ export GIT_PS1_SHOWUPSTREAM="verbose"
 
 # Modern git worktree manager
 __gwt_usage() {
-  cat <<'EOF'
+  cat << 'EOF'
 Git Worktree Manager
 
 Commands:
@@ -487,14 +488,14 @@ __gwt_join_status_flags() {
 }
 
 __gwt_require_repo() {
-  if ! git rev-parse --show-toplevel >/dev/null 2>&1; then
+  if ! git rev-parse --show-toplevel > /dev/null 2>&1; then
     echo "gwt: not inside a git repository" >&2
     return 1
   fi
 }
 
 __gwt_have_fzf() {
-  command -v fzf >/dev/null 2>&1
+  command -v fzf > /dev/null 2>&1
 }
 
 __gwt_require_fzf() {
@@ -567,8 +568,8 @@ __gwt_collect_worktrees() {
 }
 
 __gwt_worktree_table() {
-  emulate -L zsh 2>/dev/null || true
-  setopt LOCAL_OPTIONS 2>/dev/null || true
+  emulate -L zsh 2> /dev/null || true
+  setopt LOCAL_OPTIONS 2> /dev/null || true
 
   local data current_root WIDTH_MARK WIDTH_BRANCH WIDTH_HEAD WIDTH_UPDATED WIDTH_PATH sort_by
   sort_by="${1:-branch}" # Default to branch sorting
@@ -581,7 +582,7 @@ __gwt_worktree_table() {
   fi
 
   __gwt_init_styles
-  current_root=$(git rev-parse --show-toplevel 2>/dev/null)
+  current_root=$(git rev-parse --show-toplevel 2> /dev/null)
 
   # Column widths
   WIDTH_MARK=2
@@ -704,11 +705,11 @@ __gwt_fzf_source() {
   data=$(__gwt_collect_worktrees) || return 1
   while IFS=$'\t' read -r wt_path branch head is_main detached flags; do
     local short age subject branch_label marker
-    short=$(git -C "${wt_path}" rev-parse --short "${head}" 2>/dev/null)
+    short=$(git -C "${wt_path}" rev-parse --short "${head}" 2> /dev/null)
     short=${short:-$(printf '%.7s' "${head}")}
-    age=$(git -C "${wt_path}" log -1 --format='%cr' 2>/dev/null)
+    age=$(git -C "${wt_path}" log -1 --format='%cr' 2> /dev/null)
     age=${age:--}
-    subject=$(git -C "${wt_path}" log -1 --format='%s' 2>/dev/null)
+    subject=$(git -C "${wt_path}" log -1 --format='%s' 2> /dev/null)
     subject=${subject:--}
 
     if [[ -z "${branch}" ]]; then
@@ -727,7 +728,7 @@ __gwt_fzf_source() {
 
     marker=$([[ "${is_main}" == "1" ]] && printf '*' || printf ' ')
     printf '%s\t%s\t%s\t%s\t%s\t%s\t%s\n' "${wt_path}" "${marker}" "${branch_label}" "${short}" "${age}" "${subject}" "${is_main}"
-  done <<<"${data}"
+  done <<< "${data}"
 }
 
 __gwt_select_paths() {
@@ -765,8 +766,8 @@ __gwt_select_base() {
   local default_base base_list selection
   default_base="${GWT_DEFAULT_BASE:-origin/main}"
 
-  base_list=$(git for-each-ref --sort=-committerdate --format='%(refname:short)\t%(committerdate:relative)\t%(objectname:short)\t%(contents:subject)' refs/heads refs/remotes 2>/dev/null |
-    awk -F'\t' '($1 !~ /^(HEAD|.*\/HEAD)$/) && !seen[$1]++ {print}')
+  base_list=$(git for-each-ref --sort=-committerdate --format='%(refname:short)\t%(committerdate:relative)\t%(objectname:short)\t%(contents:subject)' refs/heads refs/remotes 2> /dev/null \
+    | awk -F'\t' '($1 !~ /^(HEAD|.*\/HEAD)$/) && !seen[$1]++ {print}')
 
   if ! __gwt_have_fzf || [[ -z "${base_list}" ]]; then
     printf '%s\n' "${default_base}"
@@ -776,8 +777,8 @@ __gwt_select_base() {
   selection=$({
     printf '%s\t(default)\t\t\n' "${default_base}"
     printf '%s\n' "${base_list}"
-  } |
-    fzf --ansi --height=80% --prompt='base> ' --header="Select base branch (Enter for ${default_base})" --with-nth=1,2,4 --preview 'git log --oneline -5 {1}')
+  } \
+    | fzf --ansi --height=80% --prompt='base> ' --header="Select base branch (Enter for ${default_base})" --with-nth=1,2,4 --preview 'git log --oneline -5 {1}')
 
   if [[ -z "${selection}" ]]; then
     printf '%s\n' "${default_base}"
@@ -847,7 +848,7 @@ __gwt_new_worktree() {
   repo_root=$(git rev-parse --show-toplevel) || return 1
   repo_name=$(basename "${repo_root}")
   default_root=$(__gwt_default_root)
-  mkdir -p "${default_root}/${repo_name}" 2>/dev/null || true
+  mkdir -p "${default_root}/${repo_name}" 2> /dev/null || true
 
   if [[ -z "${wt_path}" ]]; then
     wt_path="${default_root}/${repo_name}/${branch}"
@@ -855,7 +856,7 @@ __gwt_new_worktree() {
 
   wt_path=$(__gwt_expand_path "${wt_path}")
 
-  if [[ -d "${wt_path}" && -n "$(command ls -A "${wt_path}" 2>/dev/null)" ]]; then
+  if [[ -d "${wt_path}" && -n "$(command ls -A "${wt_path}" 2> /dev/null)" ]]; then
     echo "gwt: target path ${wt_path} already exists and is not empty" >&2
     return 1
   fi
@@ -933,16 +934,16 @@ __gwt_remove_worktrees() {
     else
       git worktree remove "${wt_path}"
     fi
-  done <<<"${paths}"
+  done <<< "${paths}"
 }
 
 function gwt() {
-  set +x 2>/dev/null # Disable xtrace for clean output
+  set +x 2> /dev/null # Disable xtrace for clean output
 
   local action="$1" rc=0
 
   if [[ $# -eq 0 ]]; then
-    if __gwt_have_fzf && git rev-parse --show-toplevel >/dev/null 2>&1; then
+    if __gwt_have_fzf && git rev-parse --show-toplevel > /dev/null 2>&1; then
       action=$(printf '%s\n' "switch" "new" "list" "remove" "clean" "info" | fzf --prompt='gwt> ' --header='Select action' --height=60%)
       [[ -z "${action}" ]] && return 0
       set -- "${action}"
@@ -1010,7 +1011,7 @@ function gwt() {
     info)
       local root branch head
       root=$(git rev-parse --show-toplevel)
-      branch=$(git branch --show-current 2>/dev/null)
+      branch=$(git branch --show-current 2> /dev/null)
       head=$(git rev-parse --short HEAD)
       printf 'Worktree: %s\n' "${root}"
       printf 'Branch:   %s\n' "${branch:-(detached)}"

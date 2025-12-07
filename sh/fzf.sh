@@ -85,8 +85,8 @@ if has_command fzf; then
       --header 'Tab to select multiple files, Enter to add' \
       --preview 'git diff --color=always {2}' \
       --bind 'tab:toggle-out' \
-      --bind 'shift-tab:toggle-in' |
-      awk '{print $2}') || return
+      --bind 'shift-tab:toggle-in' \
+      | awk '{print $2}') || return
     if [[ -n "${files}" ]]; then
       # shellcheck disable=SC2086
       echo "${files}" | xargs git add && git status -s
@@ -99,7 +99,7 @@ if has_command fzf; then
     branches=$(git branch --all | grep -v HEAD) || return
     if [[ -n "${branches}" ]]; then
       # shellcheck disable=SC2086,SC2046
-      branch=$(echo "${branches}" | fzf -d $((2 + $(wc -l <<<"${branches}"))) +m --preview 'git log --color=always {}') || return
+      branch=$(echo "${branches}" | fzf -d $((2 + $(wc -l <<< "${branches}"))) +m --preview 'git log --color=always {}') || return
       git checkout "$(echo "${branch}" | sed "s/.* //" | sed "s#remotes/[^/]*/##")"
     fi
   }
@@ -131,7 +131,7 @@ if has_command fzf; then
   function frg() {
     local file line
     # shellcheck disable=SC2162
-    read -r file line <<<"$(rg --line-number --no-heading "$@" | fzf -0 -1 | awk -F: '{print $1, $2}')" || return
+    read -r file line <<< "$(rg --line-number --no-heading "$@" | fzf -0 -1 | awk -F: '{print $1, $2}')" || return
     if [[ -n "${file}" ]]; then
       ${EDITOR:-vim} "${file}" +"${line}"
     fi

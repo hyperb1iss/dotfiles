@@ -44,11 +44,11 @@ function zp() {
       ;;
     -c | --clear)
       # Clear the stack
-      : >"$ZP_STACK_FILE"
+      : > "$ZP_STACK_FILE"
       echo "zp: stack cleared"
       ;;
     -h | --help)
-      cat <<EOF
+      cat << EOF
 zp - zoxide with pushd/popd semantics
 
 Usage:
@@ -74,7 +74,7 @@ EOF
         current_dir=$(pwd)
 
         # Always push current directory before jumping
-        echo "$current_dir" >>"$ZP_STACK_FILE"
+        echo "$current_dir" >> "$ZP_STACK_FILE"
 
         # Use z to jump (let zoxide handle the query internally)
         z "$@"

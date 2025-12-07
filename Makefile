@@ -73,13 +73,7 @@ lint-header:
 
 lint-shell:
 	@echo "$(CYAN)$(ARROW)$(RESET) $(BOLD)Shell Scripts$(RESET)"
-	@echo "  $(GRAY)$(BULLET) Running shellcheck...$(RESET)"
-	-@git ls-files '*.sh' '*.bash' | xargs -n1 shellcheck -x 2>&1 | \
-		sed 's/^/  │ /' || true
-	@echo "  $(GRAY)$(BULLET) Checking zsh syntax...$(RESET)"
-	-@git ls-files '*.zsh' | xargs -n1 zsh -n 2>&1 | \
-		sed 's/^/  │ /' || true
-	@echo "  $(GREEN)$(CHECK) Shell linting complete$(RESET)"
+	@./bin/shellint --check sh/ bin/
 	@echo ""
 
 lint-yaml:
@@ -126,11 +120,7 @@ format-header:
 
 format-shell:
 	@echo "$(CYAN)$(ARROW)$(RESET) $(BOLD)Shell Scripts$(RESET)"
-	@echo "  $(GRAY)$(BULLET) Formatting with shfmt...$(RESET)"
-	-@git ls-files '*.sh' '*.bash' | while read -r file; do \
-		shfmt -w -i 2 -ci "$$file" 2>&1 | sed 's/^/  │ /' || \
-		echo "  │ $(GREEN)$(CHECK)$(RESET) $$file"; \
-	done
+	@./bin/shellint --format --fix sh/ bin/
 	@echo ""
 
 format-prettier:

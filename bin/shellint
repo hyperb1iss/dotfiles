@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
 #
-# shellint - Shell script linter and formatter
-# A powerful tool for checking and fixing shell scripts in your dotfiles
+# ╭──────────────────────────────────────────────────────────────╮
+# │  shellint ⚡ Shell script linter & formatter                 │
+# │  Part of the SilkCircuit dotfiles ecosystem                  │
+# ╰──────────────────────────────────────────────────────────────╯
 #
 # Handles:
 # 1. Linting with shellcheck
@@ -11,47 +13,52 @@
 
 set -eo pipefail
 
-# ANSI color codes for beautiful output 💅
+# ─────────────────────────────────────────────────────────────
+# SilkCircuit Neon Palette (24-bit RGB)
+# ─────────────────────────────────────────────────────────────
 RESET="\033[0m"
 BOLD="\033[1m"
-RED="\033[38;5;205m"     # Bright pink for errors
-ORANGE="\033[38;5;209m"  # Soft neon orange for warnings
-MAGENTA="\033[38;5;213m" # Bright magenta for info
-PURPLE="\033[38;5;171m"  # Bright purple for debug
-BLUE="\033[38;5;147m"    # Soft lavender for verbose
-CYAN="\033[38;5;159m"    # Pastel cyan for success
-PINK="\033[38;5;219m"    # Bright pink for highlights
-YELLOW="\033[38;5;222m"  # Pastel amber for caution
-GREEN="\033[38;5;157m"   # Pastel mint green for positive outcomes
 
-# Global cache variables for git operations
-declare -g GIT_REPO_ROOT=""
-declare -g SUBMODULE_PATHS=""
-declare -g IS_GIT_REPO=0
-declare -g SHELLCHECK_CONFIG=""
+# Core palette
+SC_PURPLE='\033[38;2;225;53;255m'  # #e135ff - Electric Purple
+SC_CYAN='\033[38;2;128;255;234m'   # #80ffea - Neon Cyan
+SC_PINK='\033[38;2;255;121;198m'   # #ff79c6 - Hot Pink
+SC_YELLOW='\033[38;2;241;250;140m' # #f1fa8c - Electric Yellow
+SC_GREEN='\033[38;2;80;250;123m'   # #50fa7b - Success Green
+SC_RED='\033[38;2;255;99;99m'      # #ff6363 - Error Red
+SC_ORANGE='\033[38;2;255;180;100m' # #ffb464 - Warning Orange
+SC_GRAY='\033[38;2;98;114;164m'    # #6272a4 - Muted Gray
+SC_WHITE='\033[38;2;248;248;242m'  # #f8f8f2 - Pure White
 
-# Color utility functions - short and sweet 💅
-err() { echo -e "${RED}${BOLD}⨯ error:${RESET} $*"; }
-warn() { echo -e "${ORANGE}⏣ $*${RESET}"; }
-info() { echo -e "${MAGENTA}⏹ $*${RESET}"; }
-dbg() { echo -e "${PURPLE}⏩ $*${RESET}"; }
-verb() { echo -e "${BLUE}» $*${RESET}"; }
-ok() { echo -e "${CYAN}➤ $*${RESET}"; }
-hi() { echo -e "${PINK}⏺ $*${RESET}"; }
-note() { echo -e "${YELLOW}⏧ $*${RESET}"; }
-b() { echo -e "${BOLD}$*${RESET}"; }
+# Global cache variables for git operations (bash 3.x compatible)
+GIT_REPO_ROOT=""
+SUBMODULE_PATHS=""
+IS_GIT_REPO=0
+SHELLCHECK_CONFIG=""
+
+# ─────────────────────────────────────────────────────────────
+# SilkCircuit Output Functions
+# ─────────────────────────────────────────────────────────────
+err() { echo -e "${SC_RED}${BOLD}✖ error:${RESET} $*"; }
+warn() { echo -e "${SC_ORANGE}⚠ $*${RESET}"; }
+info() { echo -e "${SC_PURPLE}▸ $*${RESET}"; }
+dbg() { echo -e "${SC_GRAY}◦ $*${RESET}"; }
+verb() { echo -e "${SC_CYAN}› $*${RESET}"; }
+ok() { echo -e "${SC_GREEN}✓ $*${RESET}"; }
+hi() { echo -e "${SC_PINK}★ $*${RESET}"; }
+note() { echo -e "${SC_YELLOW}◆ $*${RESET}"; }
 
 # Action messages with consistent formatting
-checking() { info "checking ${BOLD}$*${RESET}..."; }
-fixing() { hi "fixing ${BOLD}$*${RESET}..."; }
-formatting() { info "formatting ${BOLD}$*${RESET}..."; }
+checking() { echo -e "${SC_CYAN}⚡${RESET} checking ${BOLD}${SC_WHITE}$*${RESET}..."; }
+fixing() { echo -e "${SC_PINK}⚙${RESET} fixing ${BOLD}${SC_WHITE}$*${RESET}..."; }
+formatting() { echo -e "${SC_PURPLE}◈${RESET} formatting ${BOLD}${SC_WHITE}$*${RESET}..."; }
 
-# Result patterns - update for lowercase
-no_issues() { ok "${GREEN}no issues in $*${RESET}"; }
-fixed() { ok "${GREEN}fixed issues in $*${RESET}"; }
-well_formatted() { ok "${GREEN}$* already properly formatted${RESET}"; }
-no_fixable() { note "no auto-fixable issues in $*"; }
-nothing_to_fix() { ok "${GREEN}no issues to fix in $*${RESET}"; }
+# Result patterns
+no_issues() { echo -e "  ${SC_GREEN}✓${RESET} ${SC_GRAY}no issues in${RESET} ${SC_CYAN}$*${RESET}"; }
+fixed() { echo -e "  ${SC_GREEN}✓${RESET} ${SC_PINK}fixed${RESET} ${SC_CYAN}$*${RESET}"; }
+well_formatted() { echo -e "  ${SC_GREEN}✓${RESET} ${SC_GRAY}already formatted${RESET} ${SC_CYAN}$*${RESET}"; }
+no_fixable() { echo -e "  ${SC_YELLOW}◆${RESET} ${SC_GRAY}no auto-fixes for${RESET} ${SC_CYAN}$*${RESET}"; }
+nothing_to_fix() { echo -e "  ${SC_GREEN}✓${RESET} ${SC_GRAY}nothing to fix in${RESET} ${SC_CYAN}$*${RESET}"; }
 
 # Initialize git cache - call once at startup
 init_git_cache() {
@@ -75,43 +82,51 @@ check_deps() {
   local missing=0
   for cmd in shellcheck shfmt patch; do
     if ! command -v "${cmd}" &> /dev/null; then
-      err "${cmd} not found in system path"
+      echo -e "${SC_RED}✖${RESET} ${SC_WHITE}${cmd}${RESET} ${SC_GRAY}not found${RESET}"
       missing=1
     fi
   done
 
   if [[ ${missing} -eq 1 ]]; then
-    echo
-    note "missing dependencies:"
-    echo -e "  ${CYAN}» shellcheck:${RESET} https://github.com/koalaman/shellcheck#installing"
-    echo -e "  ${CYAN}» shfmt:${RESET} https://github.com/mvdan/sh#shfmt"
-    echo -e "  ${CYAN}» patch:${RESET} available in most package managers (apt, brew, etc.)"
+    echo ""
+    echo -e "${SC_YELLOW}◆ Install missing dependencies:${RESET}"
+    echo -e "  ${SC_CYAN}shellcheck${RESET} ${SC_GRAY}→${RESET} https://github.com/koalaman/shellcheck"
+    echo -e "  ${SC_CYAN}shfmt${RESET}      ${SC_GRAY}→${RESET} https://github.com/mvdan/sh"
+    echo -e "  ${SC_CYAN}patch${RESET}      ${SC_GRAY}→${RESET} brew install patch ${SC_GRAY}/${RESET} apt install patch"
+    echo ""
     exit 1
   fi
 }
 
 # Print usage information
 usage() {
-  echo -e "${BOLD}${PURPLE}shellint${RESET} - shell script linter and formatter ${PINK}⏩${RESET}\n"
-  echo -e "${BOLD}usage:${RESET}"
-  echo -e "  shellint [options] [file(s)/directory]\n"
-  echo -e "${BOLD}options:${RESET}"
-  echo -e "  ${CYAN}-c, --check${RESET}         check files without modifying them"
-  echo -e "  ${CYAN}-f, --fix${RESET}           auto-fix shellcheck issues when possible"
-  echo -e "  ${CYAN}-F, --format${RESET}        format files with shfmt"
-  echo -e "  ${CYAN}-a, --all${RESET}           run all checks and fixes (format + fix)"
-  echo -e "  ${CYAN}-r, --recursive${RESET}     recursively process directories"
-  echo -e "  ${CYAN}-q, --quiet${RESET}         minimal output"
-  echo -e "  ${CYAN}-v, --verbose${RESET}       verbose output"
-  echo -e "  ${CYAN}-e, --exclude=LIST${RESET}  exclude shellcheck codes (comma-separated)"
-  echo -e "  ${CYAN}-s, --submodules${RESET}    include git submodules (excluded by default)"
-  echo -e "  ${CYAN}-h, --help${RESET}          display this help message\n"
-  echo -e "${BOLD}examples:${RESET}"
-  echo -e "  ${BLUE}»${RESET} shellint --check sh/           ${MAGENTA}#${RESET} check all .sh files in sh/ directory"
-  echo -e "  ${BLUE}»${RESET} shellint --fix sh/android.sh   ${MAGENTA}#${RESET} fix shellcheck issues in android.sh"
-  echo -e "  ${BLUE}»${RESET} shellint --format --recursive  ${MAGENTA}#${RESET} format all shell files recursively"
-  echo -e "  ${BLUE}»${RESET} shellint --all sh/             ${MAGENTA}#${RESET} format and fix all scripts in sh/"
-  echo -e "  ${BLUE}»${RESET} shellint -e SC2086,SC2046 --fix ${MAGENTA}#${RESET} fix issues excluding certain codes\n"
+  echo ""
+  echo -e "${SC_PURPLE}${BOLD}  ╭────────────────────────────────────────╮${RESET}"
+  echo -e "${SC_PURPLE}${BOLD}  │${RESET}  ${SC_CYAN}${BOLD}shellint${RESET} ${SC_GRAY}⚡${RESET} ${SC_WHITE}shell linter & formatter${RESET}  ${SC_PURPLE}${BOLD}│${RESET}"
+  echo -e "${SC_PURPLE}${BOLD}  ╰────────────────────────────────────────╯${RESET}"
+  echo ""
+  echo -e "${SC_WHITE}${BOLD}USAGE${RESET}"
+  echo -e "  ${SC_CYAN}shellint${RESET} ${SC_GRAY}[options]${RESET} ${SC_WHITE}[file(s)/directory]${RESET}"
+  echo ""
+  echo -e "${SC_WHITE}${BOLD}OPTIONS${RESET}"
+  echo -e "  ${SC_CYAN}-c${RESET}, ${SC_CYAN}--check${RESET}         ${SC_GRAY}check files without modifying${RESET}"
+  echo -e "  ${SC_CYAN}-f${RESET}, ${SC_CYAN}--fix${RESET}           ${SC_GRAY}auto-fix shellcheck issues${RESET}"
+  echo -e "  ${SC_CYAN}-F${RESET}, ${SC_CYAN}--format${RESET}        ${SC_GRAY}format files with shfmt${RESET}"
+  echo -e "  ${SC_CYAN}-a${RESET}, ${SC_CYAN}--all${RESET}           ${SC_GRAY}run all (format + fix + check)${RESET}"
+  echo -e "  ${SC_CYAN}-r${RESET}, ${SC_CYAN}--recursive${RESET}     ${SC_GRAY}recursively process directories${RESET}"
+  echo -e "  ${SC_CYAN}-q${RESET}, ${SC_CYAN}--quiet${RESET}         ${SC_GRAY}minimal output${RESET}"
+  echo -e "  ${SC_CYAN}-v${RESET}, ${SC_CYAN}--verbose${RESET}       ${SC_GRAY}verbose output${RESET}"
+  echo -e "  ${SC_CYAN}-e${RESET}, ${SC_CYAN}--exclude${RESET}=${SC_YELLOW}LIST${RESET}  ${SC_GRAY}exclude shellcheck codes${RESET}"
+  echo -e "  ${SC_CYAN}-s${RESET}, ${SC_CYAN}--submodules${RESET}    ${SC_GRAY}include git submodules${RESET}"
+  echo -e "  ${SC_CYAN}-h${RESET}, ${SC_CYAN}--help${RESET}          ${SC_GRAY}display this help${RESET}"
+  echo ""
+  echo -e "${SC_WHITE}${BOLD}EXAMPLES${RESET}"
+  echo -e "  ${SC_PURPLE}▸${RESET} shellint --check sh/           ${SC_GRAY}# check all scripts in sh/${RESET}"
+  echo -e "  ${SC_PURPLE}▸${RESET} shellint --fix script.sh       ${SC_GRAY}# auto-fix a single file${RESET}"
+  echo -e "  ${SC_PURPLE}▸${RESET} shellint --format --recursive  ${SC_GRAY}# format everything${RESET}"
+  echo -e "  ${SC_PURPLE}▸${RESET} shellint --all sh/             ${SC_GRAY}# full cleanup${RESET}"
+  echo -e "  ${SC_PURPLE}▸${RESET} shellint -e SC2086 --fix       ${SC_GRAY}# fix, skip specific code${RESET}"
+  echo ""
 }
 
 # Fast check if path is in a git submodule using cached data
@@ -224,9 +239,18 @@ run_shellcheck() {
 
   if [[ -n "${issues}" ]]; then
     if [[ "${quiet}" -eq 0 ]]; then
-      warn "issues detected in ${BOLD}${file}${RESET}:"
+      echo -e "  ${SC_RED}✖${RESET} ${SC_ORANGE}issues in${RESET} ${SC_CYAN}${file}${RESET}"
       echo "${issues}" | while IFS= read -r line; do
-        echo -e "${ORANGE}${line}${RESET}"
+        # Colorize based on line content
+        if [[ "${line}" =~ ^In\ .* ]]; then
+          echo -e "    ${SC_GRAY}${line}${RESET}"
+        elif [[ "${line}" =~ ^[[:space:]]*\^-- ]]; then
+          echo -e "    ${SC_YELLOW}${line}${RESET}"
+        elif [[ "${line}" =~ SC[0-9]+ ]]; then
+          echo -e "    ${SC_ORANGE}${line}${RESET}"
+        else
+          echo -e "    ${SC_WHITE}${line}${RESET}"
+        fi
       done
       echo
     fi
@@ -247,24 +271,23 @@ fix_shellcheck() {
   local exclude_arg=""
   [[ -n "${exclude}" ]] && exclude_arg="--exclude=${exclude}"
 
-  [[ "${quiet}" -eq 0 ]] && fixing "${file}"
-
   # Run shellcheck directly with cached config
   local diff
   diff=$(shellcheck -f diff "${SHELLCHECK_CONFIG}" "${exclude_arg}" "${file}" 2> /dev/null || true)
 
+  # Silent if no fixes needed
   if [[ -z "${diff}" || "${diff}" != "--- a/"* ]]; then
-    [[ "${quiet}" -eq 0 ]] && note "no auto-fixable issues in ${BOLD}${file}${RESET}"
     return 0
   fi
 
   if [[ "${verbose}" -eq 1 && "${quiet}" -eq 0 ]]; then
-    verb "applying fixes to ${BOLD}${file}${RESET}:"
+    echo -e "${SC_PINK}⚙${RESET} ${SC_WHITE}${file}${RESET}"
     echo "${diff}" | while IFS= read -r line; do
       case "${line}" in
-        "+"*) echo -e "${GREEN}${line}${RESET}" ;;
-        "-"*) echo -e "${RED}${line}${RESET}" ;;
-        *) echo -e "${line}" ;;
+        "+"*) echo -e "  ${SC_GREEN}${line}${RESET}" ;;
+        "-"*) echo -e "  ${SC_RED}${line}${RESET}" ;;
+        "@"*) echo -e "  ${SC_PURPLE}${line}${RESET}" ;;
+        *) echo -e "  ${SC_GRAY}${line}${RESET}" ;;
       esac
     done
   fi
@@ -285,9 +308,9 @@ fix_shellcheck() {
 
   if echo "${modified_diff}" | (cd "${tmp_dir}" && patch -p1 -s); then
     cp "${tmp_dir}/b/${file_name}" "${file}"
-    [[ "${quiet}" -eq 0 ]] && fixed "${file}"
+    [[ "${quiet}" -eq 0 ]] && echo -e "${SC_PINK}⚙${RESET} ${SC_GREEN}fixed${RESET} ${SC_CYAN}${file}${RESET}"
   else
-    [[ "${quiet}" -eq 0 ]] && warn "failed to apply patch to ${BOLD}${file}${RESET}. leaving original untouched."
+    [[ "${quiet}" -eq 0 ]] && echo -e "${SC_YELLOW}◆${RESET} ${SC_GRAY}patch failed${RESET} ${SC_CYAN}${file}${RESET}"
   fi
 
   rm -rf "${tmp_dir}"
@@ -299,8 +322,6 @@ format_script() {
   local file="$1"
   local quiet="$2"
   local verbose="$3"
-
-  [[ "${quiet}" -eq 0 ]] && formatting "${file}"
 
   # Convert to absolute path if not already
   local abs_file
@@ -314,13 +335,14 @@ format_script() {
     if [[ "${verbose}" -eq 1 && "${quiet}" -eq 0 ]]; then
       local diff
       diff=$(shfmt -d "${abs_file}" 2> /dev/null || true)
-      verb "formatting changes for ${BOLD}${file}${RESET}:"
+      echo -e "${SC_PURPLE}◈${RESET} ${SC_WHITE}${file}${RESET}"
 
       echo "${diff}" | while IFS= read -r line; do
         case "${line}" in
-          "+"*) echo -e "${GREEN}${line}${RESET}" ;;
-          "-"*) echo -e "${RED}${line}${RESET}" ;;
-          *) echo -e "${line}" ;;
+          "+"*) echo -e "  ${SC_GREEN}${line}${RESET}" ;;
+          "-"*) echo -e "  ${SC_RED}${line}${RESET}" ;;
+          "@"*) echo -e "  ${SC_PURPLE}${line}${RESET}" ;;
+          *) echo -e "  ${SC_GRAY}${line}${RESET}" ;;
         esac
       done
     fi
@@ -328,10 +350,9 @@ format_script() {
     # Apply formatting, relying on .editorconfig
     shfmt -w "${abs_file}" 2> /dev/null
 
-    [[ "${quiet}" -eq 0 ]] && echo -e "${CYAN}➤ ${GREEN}formatted ${BOLD}${file}${RESET} ${PINK}⏩${RESET}"
-  else
-    [[ "${quiet}" -eq 0 ]] && well_formatted "${file}"
+    [[ "${quiet}" -eq 0 ]] && echo -e "${SC_PURPLE}◈${RESET} ${SC_PINK}formatted${RESET} ${SC_CYAN}${file}${RESET}"
   fi
+  # Silent if already formatted
 }
 
 # Process a single file - simplified and optimized
@@ -406,22 +427,24 @@ print_summary() {
   local verbose="$3"
   local processed=("${@:4}")
 
-  echo
-  info "summary: ${BOLD}${file_count}${RESET}${MAGENTA} files processed${RESET}"
+  echo ""
+  echo -e "${SC_PURPLE}─────────────────────────────────────────${RESET}"
 
   if [[ "${verbose}" -eq 1 ]]; then
-    verb "files checked:"
+    echo -e "${SC_GRAY}files processed:${RESET}"
     for file in "${processed[@]}"; do
-      echo -e "  ${BLUE}»${RESET} ${file}"
+      echo -e "  ${SC_CYAN}›${RESET} ${SC_WHITE}${file}${RESET}"
     done
+    echo ""
   fi
 
   if [[ "${exit_code}" -eq 0 ]]; then
-    echo -e "${GREEN}${BOLD}» all checks passed!${RESET}"
+    echo -e "${SC_GREEN}${BOLD}✓ All checks passed!${RESET} ${SC_GRAY}(${file_count} files)${RESET}"
   else
-    echo -e "${ORANGE}${BOLD}» found issues that need attention${RESET}"
-    echo -e "${YELLOW}» run with --fix to auto-fix what's possible${RESET}"
+    echo -e "${SC_ORANGE}${BOLD}⚠ Issues found${RESET} ${SC_GRAY}(${file_count} files checked)${RESET}"
+    echo -e "${SC_YELLOW}  run ${SC_CYAN}--fix${RESET}${SC_YELLOW} to auto-fix what's possible${RESET}"
   fi
+  echo ""
 }
 
 # Main function
@@ -429,7 +452,8 @@ main() {
   check_deps
   init_git_cache # Initialize git operations cache
 
-  local check=1 # Default to check mode
+  local check=0
+  local check_explicit=0 # Track if --check was explicitly requested
   local fix=0
   local format=0
   local recursive=0
@@ -445,6 +469,7 @@ main() {
     case "$1" in
       -c | --check)
         check=1
+        check_explicit=1
         shift
         ;;
       -f | --fix)
@@ -500,6 +525,11 @@ main() {
         ;;
     esac
   done
+
+  # Default to check mode if no action flags specified
+  if [[ "${check}" -eq 0 && "${fix}" -eq 0 && "${format}" -eq 0 ]]; then
+    check=1
+  fi
 
   # If no targets specified, use current directory
   [[ ${#targets[@]} -eq 0 ]] && targets=(".")

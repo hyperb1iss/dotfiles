@@ -24,7 +24,7 @@ function take() {
 # Interactive directory navigation using fzf
 function fcd() {
   local dir
-  dir=$(find "${1:-.}" -path '*/\.*' -prune -o -type d -print 2>/dev/null | fzf +m) || return
+  dir=$(find "${1:-.}" -path '*/\.*' -prune -o -type d -print 2> /dev/null | fzf +m) || return
   if [[ -n "${dir}" ]]; then
     cd "${dir}" || return
   fi
@@ -76,7 +76,7 @@ function mark() {
     echo "Usage: mark <bookmark_name>"
     return 1
   fi
-  echo "${mark_name}:${PWD}" >>"${BOOKMARKS_FILE}"
+  echo "${mark_name}:${PWD}" >> "${BOOKMARKS_FILE}"
   sort -u -o "${BOOKMARKS_FILE}" "${BOOKMARKS_FILE}"
   echo "Bookmark '${mark_name}' created for ${PWD}"
 }
@@ -97,7 +97,7 @@ function marks() {
     echo "No bookmarks found"
     return
   fi
-  column -t -s ':' <"${BOOKMARKS_FILE}"
+  column -t -s ':' < "${BOOKMARKS_FILE}"
 }
 
 function jump() {
@@ -105,7 +105,7 @@ function jump() {
   if [[ -z "${mark_name}" ]]; then
     # Interactive selection if no bookmark specified
     local selection
-    selection=$(<"${BOOKMARKS_FILE}" fzf --preview "tree -C \$(echo {2})" | cut -d ':' -f2) || return
+    selection=$(< "${BOOKMARKS_FILE}" fzf --preview "tree -C \$(echo {2})" | cut -d ':' -f2) || return
     if [[ -n "${selection}" ]]; then
       cd "${selection}" || return
     fi
@@ -122,4 +122,4 @@ function jump() {
 }
 
 # Initialize bookmarks file if it doesn't exist
-[[ -f "${BOOKMARKS_FILE}" ]] || touch "${BOOKMARKS_FILE}" 2>/dev/null
+[[ -f "${BOOKMARKS_FILE}" ]] || touch "${BOOKMARKS_FILE}" 2> /dev/null
