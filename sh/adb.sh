@@ -1,9 +1,11 @@
-#!/bin/bash
 # adb.sh
-# ADB utilities for interacting with Android devices
+# ⚡ ADB utilities with SilkCircuit energy
 
 # Skip entire module if not in full installation
 is_minimal && return 0
+
+# Source shared colors
+source "${DOTFILES:-$HOME/.dotfiles}/sh/colors.sh" 2>/dev/null || true
 
 # Smart device selector for multiple devices
 function get_device() {
@@ -84,61 +86,51 @@ function logcat() {
   fi
 }
 
-# Logcat colorizer function
+# Logcat colorizer function using SilkCircuit palette
 function colorize_logcat() {
-  # violet circuit color codes
-  local RED='\033[38;5;197m'     # Hot pink-red for errors
-  local ORANGE='\033[38;5;203m'  # Vibrant orange for warnings
-  local MAGENTA='\033[38;5;171m' # Bright magenta for info
-  local PURPLE='\033[38;5;141m'  # Lavender purple for debug
-  local BLUE='\033[38;5;75m'     # Soft blue for verbose
-  local CYAN='\033[38;5;123m'    # Cyan for markers
-  local PINK='\033[38;5;219m'    # Pink for special highlights
-  local YELLOW='\033[38;5;227m'  # Bright yellow for emphasis
-  local RESET='\033[0m'
-  local BOLD='\033[1m'
+  __sc_init_colors
 
   # Read logcat output line by line
   while IFS= read -r line; do
     # Check for beginning markers first to avoid grep errors
     if [[ "${line}" == *"--------- beginning of"* ]]; then
-      # Log markers - bright cyan
-      echo -e "${BOLD}${CYAN}${line}${RESET}"
+      # Log markers - neon cyan
+      echo -e "${SC_BOLD}${SC_CYAN}${line}${SC_RESET}"
       continue
     fi
 
     # Color based on log level using safer pattern matching
     if [[ "${line}" == *" E "* ]]; then
-      # Error - hot pink-red with bold
-      echo -e "${BOLD}${RED}${line}${RESET}"
+      # Error - bold red
+      echo -e "${SC_BOLD}${SC_RED}${line}${SC_RESET}"
     elif [[ "${line}" == *" W "* ]]; then
-      # Warning - vibrant orange
-      echo -e "${ORANGE}${line}${RESET}"
+      # Warning - orange/yellow
+      echo -e "${SC_ORANGE}${line}${SC_RESET}"
     elif [[ "${line}" == *" I "* ]]; then
-      # Info - bright magenta
-      echo -e "${MAGENTA}${line}${RESET}"
+      # Info - pink
+      echo -e "${SC_PINK}${line}${SC_RESET}"
     elif [[ "${line}" == *" D "* ]]; then
-      # Debug - lavender purple
-      echo -e "${PURPLE}${line}${RESET}"
+      # Debug - purple
+      echo -e "${SC_PURPLE}${line}${SC_RESET}"
     elif [[ "${line}" == *" V "* ]]; then
-      # Verbose - soft blue
-      echo -e "${BLUE}${line}${RESET}"
+      # Verbose - gray
+      echo -e "${SC_GRAY}${line}${SC_RESET}"
     # Check for special patterns without using grep
     elif [[ "${line}" == *"Exception"* ]] ||
       [[ "${line}" == *"Error:"* ]] ||
       [[ "${line}" == *"FATAL"* ]] ||
       [[ "${line}" == *"ANR"* ]]; then
-      # Exception and error keywords - bold hot pink
-      echo -e "${BOLD}${RED}${line}${RESET}"
+      # Exception and error keywords - bold red
+      echo -e "${SC_BOLD}${SC_RED}${line}${SC_RESET}"
     elif [[ "${line}" == *"success"* ]] ||
       [[ "${line}" == *"Success"* ]] ||
       [[ "${line}" == *"CONNECTED"* ]] ||
       [[ "${line}" == *"ready"* ]]; then
-      # Success indicators - bold pink
-      echo -e "${BOLD}${PINK}${line}${RESET}"
+      # Success indicators - bold green
+      echo -e "${SC_BOLD}${SC_GREEN}${line}${SC_RESET}"
     elif [[ "${line}" == *"WARNING"* ]] || [[ "${line}" == *"deprecated"* ]]; then
-      # Add warning matches to use YELLOW
-      echo -e "${YELLOW}${line}${RESET}"
+      # Add warning matches to use yellow
+      echo -e "${SC_YELLOW}${line}${SC_RESET}"
     else
       # Other lines - plain but still visible
       echo -e "${line}"

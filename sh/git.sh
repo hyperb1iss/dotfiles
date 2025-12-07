@@ -1,7 +1,12 @@
 # git.sh
-# Comprehensive Git utilities for bash and zsh
+# ⚡ Git utilities with SilkCircuit energy
 
-# Git Aliases
+# Source shared colors
+source "${DOTFILES:-$HOME/.dotfiles}/sh/colors.sh" 2>/dev/null || true
+
+# ─────────────────────────────────────────────────────────────
+# Aliases
+# ─────────────────────────────────────────────────────────────
 alias g='git'
 alias ga='git add'
 alias gaa='git add --all'
@@ -30,46 +35,80 @@ alias gsw='git switch'
 alias gswc='git switch -c'
 alias gig='git iris gen -a --no-verify --preset conventional'
 
-# Enhanced Git Functions
+# ─────────────────────────────────────────────────────────────
+# Core Functions
+# ─────────────────────────────────────────────────────────────
 
 # Get current branch name
 function git_current_branch() {
   git branch --show-current 2>/dev/null
 }
 
+# ─────────────────────────────────────────────────────────────
+# Interactive Functions
+# ─────────────────────────────────────────────────────────────
+
 # Interactive git add using fzf
 function gadd() {
+  __sc_init_colors
   local files
-  files=$(git status -s | fzf -m --preview 'git diff --color=always {2}' | awk '{print $2}') || return 0
+
+  files=$(git status -s |
+    fzf -m --height 60% --reverse \
+      --header="⚡ Select files to stage (TAB to multi-select)" \
+      --prompt="add ▸ " \
+      --preview 'git diff --color=always {2}' \
+      --preview-window=right:60% |
+    awk '{print $2}') || return 0
+
   if [[ -n "${files}" ]]; then
     echo "${files}" | xargs git add
-    echo "Added files:"
+    sc_header "Staged Files"
+    echo ""
     while IFS= read -r file; do
-      echo "  ${file}"
+      [[ -n "${file}" ]] && echo -e "  ${SC_GREEN}+${SC_RESET} ${file}"
     done <<<"${files}"
+    echo ""
+    sc_success "Files staged"
   fi
 }
 
 # Interactive git checkout branch
 function gco() {
+  __sc_init_colors
   local branches branch
+
   branches=$(git branch --all | grep -v HEAD) || return 0
 
   if [[ -n "${branches}" ]]; then
-    branch=$(echo "${branches}" | fzf -d $((2 + $(wc -l <<<"${branches}"))) +m --preview 'git log --color=always {}') || return 0
-    git checkout "$(echo "${branch}" | sed "s/.* //" | sed "s#remotes/[^/]*/##")"
+    branch=$(echo "${branches}" |
+      fzf --height 50% --reverse \
+        --header="⚡ Select branch to checkout" \
+        --prompt="branch ▸ " \
+        --preview 'git log --oneline --color=always -20 {}' \
+        --preview-window=right:50%) || return 0
+
+    local target
+    target=$(echo "${branch}" | sed "s/.* //" | sed "s#remotes/[^/]*/##")
+    sc_info "Switching to ${SC_CYAN}${target}${SC_RESET}..."
+    git checkout "${target}"
   fi
 }
 
 # Interactive git log browser
 function glog() {
-  # Define PAGER if not set
+  __sc_init_colors
   PAGER=${PAGER:-less}
   export PAGER
 
+  sc_info "Browse commits (Enter to view, \` to toggle sort)"
+  echo ""
+
   git log --graph --color=always \
-    --format="%C(auto)%h%d %s %C(black)%C(bold)%cr" "$@" |
+    --format="%C(#ff6ac1)%h%C(reset) %C(#80ffea)%d%C(reset) %s %C(#8b91b1)%cr%C(reset)" "$@" |
     fzf --ansi --no-sort --reverse --tac --toggle-sort=\` \
+      --header="⚡ Git Log Browser" \
+      --prompt="commit ▸ " \
       --bind "ctrl-m:execute:
                 (grep -o '[a-f0-9]\{7\}' | head -1 |
                 xargs -I % sh -c 'git show --color=always % | ${PAGER}') << 'FZF-EOF'
@@ -79,60 +118,127 @@ FZF-EOF"
 
 # Interactive git stash operations
 function gstash() {
+  __sc_init_colors
   local cmd="git stash list"
   local preview="git stash show -p {1} --color=always"
   local selection stash_id
 
-  selection=$(eval "${cmd}" | fzf --preview "${preview}" --height 80%) || return 0
+  selection=$(eval "${cmd}" |
+    fzf --height 60% --reverse \
+      --header="⚡ Select stash entry" \
+      --prompt="stash ▸ " \
+      --preview "${preview}" \
+      --preview-window=right:60%) || return 0
 
   if [[ -n "${selection}" ]]; then
     stash_id=$(echo "${selection}" | cut -d: -f1)
-    echo "Actions: [a]pply, [p]op, [d]rop, [s]how, [b]ranch"
+
+    echo ""
+    sc_header "Stash Actions"
+    echo ""
+    echo -e "  ${SC_PURPLE}a${SC_RESET} → Apply stash"
+    echo -e "  ${SC_PURPLE}p${SC_RESET} → Pop stash"
+    echo -e "  ${SC_PURPLE}d${SC_RESET} → Drop stash"
+    echo -e "  ${SC_PURPLE}s${SC_RESET} → Show stash"
+    echo -e "  ${SC_PURPLE}b${SC_RESET} → Create branch from stash"
+    echo ""
+    echo -ne "Select action: "
     read -r action
 
     case "${action}" in
-      a) git stash apply "${stash_id}" ;;
-      p) git stash pop "${stash_id}" ;;
-      d) git stash drop "${stash_id}" ;;
-      s) git stash show -p "${stash_id}" | ${PAGER:-less} ;;
-      b) git stash branch "stash-branch-$(date +%Y%m%d)" "${stash_id}" ;;
-      *) echo "Invalid action" ;;
+      a)
+        sc_info "Applying stash..."
+        git stash apply "${stash_id}"
+        sc_success "Stash applied"
+        ;;
+      p)
+        sc_info "Popping stash..."
+        git stash pop "${stash_id}"
+        sc_success "Stash popped"
+        ;;
+      d)
+        sc_warn "Dropping stash..."
+        git stash drop "${stash_id}"
+        sc_success "Stash dropped"
+        ;;
+      s)
+        git stash show -p "${stash_id}" | ${PAGER:-less}
+        ;;
+      b)
+        local branch_name="stash-branch-$(date +%Y%m%d-%H%M)"
+        sc_info "Creating branch ${SC_CYAN}${branch_name}${SC_RESET}..."
+        git stash branch "${branch_name}" "${stash_id}"
+        sc_success "Branch created"
+        ;;
+      *)
+        sc_muted "Cancelled"
+        ;;
     esac
   fi
 }
 
 # Interactive git rebase
 function grebase() {
+  __sc_init_colors
   local commits
-  commits=$(git log --oneline -n 50 --color=always | fzf --ansi --multi --preview 'git show --color=always {1}' | cut -d' ' -f1) || return 0
+
+  sc_info "Select commit to rebase from (multi-select with TAB)"
+  echo ""
+
+  commits=$(git log --oneline -n 50 --color=always |
+    fzf --ansi --multi --height 60% --reverse \
+      --header="⚡ Interactive Rebase" \
+      --prompt="rebase ▸ " \
+      --preview 'git show --color=always {1}' \
+      --preview-window=right:50% |
+    cut -d' ' -f1) || return 0
 
   if [[ -n "${commits}" ]]; then
-    git rebase -i "$(echo "${commits}" | tail -n1)^"
+    local target
+    target=$(echo "${commits}" | tail -n1)
+    sc_warn "Rebasing from ${SC_CORAL}${target}${SC_RESET}..."
+    git rebase -i "${target}^"
   fi
 }
 
+# ─────────────────────────────────────────────────────────────
+# Repository Setup & Maintenance
+# ─────────────────────────────────────────────────────────────
+
 # Setup git repository with common configurations
 function gsetup() {
+  __sc_init_colors
   local email name
 
+  sc_header "Git Repository Setup"
+  echo ""
+
   # Configure common settings
+  sc_info "Configuring repository defaults..."
   git config pull.rebase true
   git config push.default current
   git config core.autocrlf input
   git config core.fileMode true
 
+  echo -e "  ${SC_GREEN}✓${SC_RESET} pull.rebase = true"
+  echo -e "  ${SC_GREEN}✓${SC_RESET} push.default = current"
+  echo -e "  ${SC_GREEN}✓${SC_RESET} core.autocrlf = input"
+  echo ""
+
   # Ask for user details if not set
   if [[ -z "$(git config --global user.email)" ]]; then
-    read -r email?"Git email: "
+    echo -ne "${SC_CYAN}Git email:${SC_RESET} "
+    read -r email
     git config --global user.email "${email}"
   fi
   if [[ -z "$(git config --global user.name)" ]]; then
-    read -r name?"Git name: "
+    echo -ne "${SC_CYAN}Git name:${SC_RESET} "
+    read -r name
     git config --global user.name "${name}"
   fi
 
   # Initialize main branch
-  git checkout -b main 2>/dev/null || true
+  git checkout -b main 2>/dev/null && echo -e "  ${SC_GREEN}✓${SC_RESET} Created main branch" || true
 
   # Create initial .gitignore
   if [[ ! -f .gitignore ]]; then
@@ -162,51 +268,125 @@ Thumbs.db
 /node_modules/
 /vendor/
 EOF
+    echo -e "  ${SC_GREEN}✓${SC_RESET} Created .gitignore"
   fi
 
   git add .gitignore
-  git commit -m "Initial commit" 2>/dev/null || true
+  git commit -m "Initial commit" 2>/dev/null && echo -e "  ${SC_GREEN}✓${SC_RESET} Initial commit created" || true
+
+  echo ""
+  sc_success "Repository setup complete"
 }
 
 # Clean git branches
 function gclean() {
+  __sc_init_colors
+
+  sc_header "Git Branch Cleanup"
+  echo ""
+
+  # Count branches before
+  local before_count
+  before_count=$(git branch | wc -l | tr -d ' ')
+
   # Remove merged local branches
-  git branch --merged | grep -v "\*" | grep -v "main" | grep -v "master" | xargs -n 1 git branch -d || true
+  sc_info "Removing merged branches..."
+  local removed
+  removed=$(git branch --merged | grep -v "\*" | grep -v "main" | grep -v "master" | xargs -n 1 git branch -d 2>&1 || true)
+
+  if [[ -n "${removed}" ]]; then
+    echo "${removed}" | while read -r line; do
+      if [[ "${line}" == *"Deleted branch"* ]]; then
+        local branch_name
+        branch_name=$(echo "${line}" | sed 's/Deleted branch //' | sed 's/ (was.*//')
+        echo -e "  ${SC_RED}−${SC_RESET} ${branch_name}"
+      fi
+    done
+  fi
 
   # Remove remote tracking branches that no longer exist
-  git fetch --prune
+  echo ""
+  sc_info "Pruning stale remote tracking branches..."
+  git fetch --prune 2>&1 | grep -E "^\s*-\s*\[deleted\]" | while read -r line; do
+    local ref
+    ref=$(echo "${line}" | awk '{print $NF}')
+    echo -e "  ${SC_RED}−${SC_RESET} ${ref}"
+  done
 
-  echo "Branches cleaned"
+  # Count branches after
+  local after_count
+  after_count=$(git branch | wc -l | tr -d ' ')
+  local removed_count=$((before_count - after_count))
+
+  echo ""
+  if [[ ${removed_count} -gt 0 ]]; then
+    sc_success "Cleaned ${removed_count} branch(es)"
+  else
+    sc_muted "No branches to clean"
+  fi
 }
 
 # Show git repository status with enhanced output
 function gstatus() {
+  __sc_init_colors
   local status_output
   status_output=$(git status --porcelain) || return 0
 
+  # Get current branch
+  local branch
+  branch=$(git branch --show-current 2>/dev/null)
+
+  sc_header "Repository Status"
+  echo ""
+  sc_label "Branch" "${branch:-detached}"
+
+  # Ahead/behind info
+  local upstream
+  upstream=$(git rev-parse --abbrev-ref "@{upstream}" 2>/dev/null)
+  if [[ -n "${upstream}" ]]; then
+    local ahead behind
+    ahead=$(git rev-list --count "@{upstream}..HEAD" 2>/dev/null)
+    behind=$(git rev-list --count "HEAD..@{upstream}" 2>/dev/null)
+    if [[ ${ahead} -gt 0 ]] || [[ ${behind} -gt 0 ]]; then
+      echo -e "${SC_CYAN}•${SC_RESET} Upstream: ${SC_GRAY}${upstream}${SC_RESET} ${SC_GREEN}↑${ahead}${SC_RESET} ${SC_RED}↓${behind}${SC_RESET}"
+    fi
+  fi
+  echo ""
+
   if [[ -n "${status_output}" ]]; then
-    echo "Modified files:"
-    local modified_files
-    modified_files=$(echo "${status_output}" | grep "^.M" | cut -c4-)
-    while IFS= read -r file; do
-      [[ -n "${file}" ]] && echo "  ${file}"
-    done <<<"${modified_files}"
-
-    printf "\nStaged files:\n"
+    # Staged files
     local staged_files
-    staged_files=$(echo "${status_output}" | grep "^M" | cut -c4-)
-    while IFS= read -r file; do
-      [[ -n "${file}" ]] && echo "  ${file}"
-    done <<<"${staged_files}"
+    staged_files=$(echo "${status_output}" | grep -E "^[MADRC]" | cut -c4-)
+    if [[ -n "${staged_files}" ]]; then
+      echo -e "${SC_GREEN}Staged:${SC_RESET}"
+      while IFS= read -r file; do
+        [[ -n "${file}" ]] && echo -e "  ${SC_GREEN}+${SC_RESET} ${file}"
+      done <<<"${staged_files}"
+      echo ""
+    fi
 
-    printf "\nUntracked files:\n"
+    # Modified files (unstaged)
+    local modified_files
+    modified_files=$(echo "${status_output}" | grep -E "^.[MD]" | cut -c4-)
+    if [[ -n "${modified_files}" ]]; then
+      echo -e "${SC_YELLOW}Modified:${SC_RESET}"
+      while IFS= read -r file; do
+        [[ -n "${file}" ]] && echo -e "  ${SC_YELLOW}~${SC_RESET} ${file}"
+      done <<<"${modified_files}"
+      echo ""
+    fi
+
+    # Untracked files
     local untracked_files
     untracked_files=$(echo "${status_output}" | grep "^??" | cut -c4-)
-    while IFS= read -r file; do
-      [[ -n "${file}" ]] && echo "  ${file}"
-    done <<<"${untracked_files}"
+    if [[ -n "${untracked_files}" ]]; then
+      echo -e "${SC_GRAY}Untracked:${SC_RESET}"
+      while IFS= read -r file; do
+        [[ -n "${file}" ]] && echo -e "  ${SC_GRAY}?${SC_RESET} ${file}"
+      done <<<"${untracked_files}"
+    fi
   else
-    echo "Working directory clean"
+    sc_success "Working directory clean"
   fi
 }
 
@@ -261,33 +441,19 @@ __gwt_init_styles() {
     return
   fi
 
-  local colors_enabled=1
-  if [[ ! -t 1 ]] || [[ -n "${NO_COLOR:-}" ]] || [[ -n "${GWT_NO_COLOR:-}" ]] || [[ "${TERM:-}" == "dumb" ]]; then
-    colors_enabled=0
-  fi
+  # Use shared SilkCircuit colors
+  __sc_init_colors
 
-  if [[ ${colors_enabled} -eq 1 ]]; then
-    # SilkCircuit Neon color palette
-    GWT_RESET=$'\033[0m'
-    GWT_BOLD=$'\033[1m'
-    GWT_MUTED=$'\033[38;2;98;92;122m'         # Muted purple
-    GWT_ACCENT=$'\033[38;2;225;53;255m'       # Electric Purple #e135ff
-    GWT_BRANCH=$'\033[38;2;128;255;234m'      # Neon Cyan #80ffea
-    GWT_HASH=$'\033[38;2;255;106;193m'        # Coral #ff6ac1
-    GWT_AGE=$'\033[38;2;241;250;140m'         # Electric Yellow #f1fa8c
-    GWT_PATH=$'\033[38;2;128;255;234m'        # Neon Cyan #80ffea
-    GWT_STATUS_WARN=$'\033[38;2;241;250;140m' # Electric Yellow #f1fa8c
-  else
-    GWT_RESET=""
-    GWT_BOLD=""
-    GWT_MUTED=""
-    GWT_ACCENT=""
-    GWT_BRANCH=""
-    GWT_HASH=""
-    GWT_AGE=""
-    GWT_PATH=""
-    GWT_STATUS_WARN=""
-  fi
+  # Map GWT-specific aliases to shared colors for compatibility
+  GWT_RESET="${SC_RESET}"
+  GWT_BOLD="${SC_BOLD}"
+  GWT_MUTED="${SC_DIM}"
+  GWT_ACCENT="${SC_PURPLE}"
+  GWT_BRANCH="${SC_CYAN}"
+  GWT_HASH="${SC_CORAL}"
+  GWT_AGE="${SC_YELLOW}"
+  GWT_PATH="${SC_CYAN}"
+  GWT_STATUS_WARN="${SC_YELLOW}"
 
   __GWT_STYLES_READY=1
 }

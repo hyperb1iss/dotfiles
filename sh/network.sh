@@ -1,35 +1,15 @@
 # network.sh
-# ⚡ Cross-platform network utilities
+# ⚡ Network utilities with SilkCircuit energy
 
 # Skip on minimal installations
 is_minimal && return 0
 
-# SilkCircuit colors
-if [[ -t 1 ]]; then
-  # Colors only if output is to terminal
-  SC_PURPLE='\033[38;2;225;53;255m'  # #e135ff - Electric Purple
-  SC_CYAN='\033[38;2;128;255;234m'   # #80ffea - Neon Cyan
-  SC_PINK='\033[38;2;255;153;255m'   # #ff99ff - Pure Pink
-  SC_YELLOW='\033[38;2;241;250;140m' # #f1fa8c - Electric Yellow
-  SC_GREEN='\033[38;2;80;250;123m'   # #50fa7b - Success Green
-  SC_RED='\033[38;2;255;99;99m'      # #ff6363 - Error Red
-  SC_GRAY='\033[38;2;139;145;177m'   # #8b91b1 - Muted
-  SC_RESET='\033[0m'
-  SC_BOLD='\033[1m'
-else
-  # No colors if output is piped
-  SC_PURPLE=''
-  SC_CYAN=''
-  SC_PINK=''
-  SC_YELLOW=''
-  SC_GREEN=''
-  SC_RED=''
-  SC_GRAY=''
-  SC_RESET=''
-  SC_BOLD=''
-fi
+# Source shared colors
+source "${DOTFILES:-$HOME/.dotfiles}/sh/colors.sh" 2>/dev/null || true
 
-# ⚡ Port & Connection Tools
+# ─────────────────────────────────────────────────────────────
+# Port & Connection Tools
+# ─────────────────────────────────────────────────────────────
 
 # Find what's using a specific port (cross-platform)
 function port() {

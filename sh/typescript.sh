@@ -1,12 +1,15 @@
 # typescript.sh
-# TypeScript & Monorepo development utilities
+# ⚡ TypeScript & Monorepo development utilities
 
 # Skip if in minimal mode
 is_minimal && return 0
 
-# ============================================================================
+# Source shared colors
+source "${DOTFILES:-$HOME/.dotfiles}/sh/colors.sh" 2>/dev/null || true
+
+# ─────────────────────────────────────────────────────────────
 # Turborepo Aliases
-# ============================================================================
+# ─────────────────────────────────────────────────────────────
 
 alias t='turbo'
 alias tb='turbo build'
@@ -26,12 +29,12 @@ function ttf() { turbo test --filter="$@"; }
 
 # Turbo housekeeping
 alias tkill='pkill turbo'
-alias tclear='rm -rf .turbo && printf "\033[38;2;80;250;123m✓\033[0m Turbo cache cleared\n"'
+alias tclear='rm -rf .turbo && sc_success "Turbo cache cleared"'
 alias trestart='pkill turbo; sleep 1; turbo dev'
 
-# ============================================================================
+# ─────────────────────────────────────────────────────────────
 # pnpm Aliases
-# ============================================================================
+# ─────────────────────────────────────────────────────────────
 
 alias p='pnpm'
 alias pi='pnpm install'
@@ -44,9 +47,9 @@ alias pupi='pnpm update --interactive'
 alias pout='pnpm outdated'
 alias paudit='pnpm audit'
 
-# ============================================================================
+# ─────────────────────────────────────────────────────────────
 # Git Iris Aliases (AI commit magic)
-# ============================================================================
+# ─────────────────────────────────────────────────────────────
 
 # Your main workflow alias is already in git.sh as `gig`
 # These are extras:
@@ -66,25 +69,26 @@ function gprc() {
   git iris pr --from "${from}" --copy
 }
 
-# ============================================================================
+# ─────────────────────────────────────────────────────────────
 # TypeScript Type Checking
-# ============================================================================
+# ─────────────────────────────────────────────────────────────
 
 alias tsc='pnpm exec tsc'
 alias tcheck='pnpm exec tsc --noEmit'
 alias tcw='pnpm exec tsc --noEmit --watch'
 alias tsv='pnpm exec tsc --version'
 
-# ============================================================================
+# ─────────────────────────────────────────────────────────────
 # Quick Runners
-# ============================================================================
+# ─────────────────────────────────────────────────────────────
 
 alias tsx='pnpm exec tsx'
 
 # Run TypeScript file directly
 function ts() {
+  __sc_init_colors
   if [[ -z "$1" ]]; then
-    printf '\033[38;2;241;250;140m⚠\033[0m Usage: ts <file.ts> [args...]\n'
+    sc_warn "Usage: ts <file.ts> [args...]"
     return 1
   fi
   pnpm exec tsx "$@"
@@ -92,16 +96,17 @@ function ts() {
 
 # Watch mode
 function tsw() {
+  __sc_init_colors
   if [[ -z "$1" ]]; then
-    printf '\033[38;2;241;250;140m⚠\033[0m Usage: tsw <file.ts> [args...]\n'
+    sc_warn "Usage: tsw <file.ts> [args...]"
     return 1
   fi
   pnpm exec tsx watch "$@"
 }
 
-# ============================================================================
+# ─────────────────────────────────────────────────────────────
 # Testing
-# ============================================================================
+# ─────────────────────────────────────────────────────────────
 
 alias vt='pnpm exec vitest'
 alias vtw='pnpm exec vitest --watch'
@@ -109,9 +114,9 @@ alias vtu='pnpm exec vitest --ui'
 alias vtc='pnpm exec vitest --coverage'
 alias vtr='pnpm exec vitest run'
 
-# ============================================================================
+# ─────────────────────────────────────────────────────────────
 # Linting & Formatting
-# ============================================================================
+# ─────────────────────────────────────────────────────────────
 
 alias lint='pnpm run lint:all'
 alias lintf='pnpm run lint:fix'
@@ -119,50 +124,53 @@ alias fmt='pnpm exec prettier --write'
 alias bio='pnpm exec biome'
 alias biof='pnpm exec biome check --write'
 
-# ============================================================================
+# ─────────────────────────────────────────────────────────────
 # Claude Code
-# ============================================================================
+# ─────────────────────────────────────────────────────────────
 
 alias cc='claude'
 alias ccc='claude --continue'
 
-# ============================================================================
+# ─────────────────────────────────────────────────────────────
 # Monorepo Navigation (fzf-powered)
-# ============================================================================
+# ─────────────────────────────────────────────────────────────
 
 # Jump to a package/app in the monorepo
 function mono() {
+  __sc_init_colors
   if ! has_command fzf; then
-    printf '\033[38;2;255;99;99m✗\033[0m fzf required\n'
+    sc_error "fzf required"
     return 1
   fi
 
   local root
   root=$(git rev-parse --show-toplevel 2>/dev/null) || {
-    printf '\033[38;2;255;99;99m✗\033[0m Not in a git repo\n'
+    sc_error "Not in a git repo"
     return 1
   }
 
   local pkg
   pkg=$(fd -t d -d 3 'package.json' "${root}" --exec dirname {} \; 2>/dev/null |
     fzf --preview 'jq -r ".name // \"(no name)\"" {}/package.json 2>/dev/null; echo "---"; ls -la {}' \
-      --header 'Select package')
+      --header '⚡ Select package')
 
   if [[ -n "${pkg}" ]]; then
     cd "${pkg}" || return 1
-    printf '\033[38;2;128;255;234m→\033[0m %s\n' "${pkg}"
+    sc_info "${pkg}"
   fi
 }
 
 # List all workspace packages
 function monols() {
+  __sc_init_colors
   local root
   root=$(git rev-parse --show-toplevel 2>/dev/null) || {
-    printf '\033[38;2;255;99;99m✗\033[0m Not in a git repo\n'
+    sc_error "Not in a git repo"
     return 1
   }
 
-  printf '\033[38;2;128;255;234;1m━━━ Workspace Packages ━━━\033[0m\n\n'
+  echo -e "${SC_CYAN}${SC_BOLD}━━━ Workspace Packages ━━━${SC_RESET}"
+  echo ""
 
   fd -t f 'package.json' "${root}" -d 3 --exec sh -c '
     dir=$(dirname "$1")
@@ -172,44 +180,49 @@ function monols() {
   ' _ {} \; 2>/dev/null | grep -v node_modules | sort
 }
 
-# ============================================================================
+# ─────────────────────────────────────────────────────────────
 # Project Info
-# ============================================================================
+# ─────────────────────────────────────────────────────────────
 
 function ts-info() {
-  printf '\033[38;2;128;255;234;1m━━━ Project Info ━━━\033[0m\n\n'
+  __sc_init_colors
+
+  echo -e "${SC_CYAN}${SC_BOLD}━━━ Project Info ━━━${SC_RESET}"
+  echo ""
 
   # Node version
   if has_command node; then
-    printf '\033[38;2;225;53;255m▸\033[0m Node: \033[38;2;128;255;234m%s\033[0m\n' "$(node --version)"
+    echo -e "${SC_PURPLE}▸${SC_RESET} Node: ${SC_CYAN}$(node --version)${SC_RESET}"
   fi
 
   # Package manager
   if [[ -f "pnpm-lock.yaml" ]]; then
-    printf '\033[38;2;225;53;255m▸\033[0m PM: \033[38;2;128;255;234mpnpm\033[0m'
-    [[ -f "pnpm-workspace.yaml" ]] && printf ' (monorepo)'
-    printf '\n'
+    echo -ne "${SC_PURPLE}▸${SC_RESET} PM: ${SC_CYAN}pnpm${SC_RESET}"
+    [[ -f "pnpm-workspace.yaml" ]] && echo -ne " (monorepo)"
+    echo ""
   fi
 
   # TypeScript version
   if [[ -f "node_modules/.bin/tsc" ]]; then
     local tsv
     tsv=$(pnpm exec tsc --version 2>/dev/null | grep -oE '[0-9]+\.[0-9]+\.[0-9]+')
-    printf '\033[38;2;225;53;255m▸\033[0m TypeScript: \033[38;2;128;255;234m%s\033[0m\n' "${tsv:-not installed}"
+    echo -e "${SC_PURPLE}▸${SC_RESET} TypeScript: ${SC_CYAN}${tsv:-not installed}${SC_RESET}"
   fi
 
   # Turbo
   if [[ -f "turbo.json" ]]; then
-    printf '\033[38;2;225;53;255m▸\033[0m Turbo: \033[38;2;80;250;123menabled\033[0m\n'
+    echo -e "${SC_PURPLE}▸${SC_RESET} Turbo: ${SC_GREEN}enabled${SC_RESET}"
   fi
 
   # Check for common tooling in package.json
   if [[ -f "package.json" ]]; then
-    printf '\n\033[38;2;128;255;234;1m━━━ Tooling ━━━\033[0m\n\n'
+    echo ""
+    echo -e "${SC_CYAN}${SC_BOLD}━━━ Tooling ━━━${SC_RESET}"
+    echo ""
     local pkg="package.json"
-    [[ $(grep -c '"vitest"' "${pkg}") -gt 0 ]] && printf '  \033[38;2;80;250;123m✓\033[0m vitest\n'
-    [[ $(grep -c '"biome"' "${pkg}") -gt 0 ]] && printf '  \033[38;2;80;250;123m✓\033[0m biome\n'
-    [[ $(grep -c '"eslint"' "${pkg}") -gt 0 ]] && printf '  \033[38;2;80;250;123m✓\033[0m eslint\n'
-    [[ $(grep -c '"prettier"' "${pkg}") -gt 0 ]] && printf '  \033[38;2;80;250;123m✓\033[0m prettier\n'
+    [[ $(grep -c '"vitest"' "${pkg}") -gt 0 ]] && echo -e "  ${SC_GREEN}✓${SC_RESET} vitest"
+    [[ $(grep -c '"biome"' "${pkg}") -gt 0 ]] && echo -e "  ${SC_GREEN}✓${SC_RESET} biome"
+    [[ $(grep -c '"eslint"' "${pkg}") -gt 0 ]] && echo -e "  ${SC_GREEN}✓${SC_RESET} eslint"
+    [[ $(grep -c '"prettier"' "${pkg}") -gt 0 ]] && echo -e "  ${SC_GREEN}✓${SC_RESET} prettier"
   fi
 }

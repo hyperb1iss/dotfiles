@@ -1,8 +1,11 @@
 # aosp.sh
-# AOSP and Android OS build system utilities
+# ⚡ AOSP and Android OS build system utilities
 
 # Skip entire module if not in full installation
 is_minimal && return 0
+
+# Source shared colors
+source "${DOTFILES:-$HOME/.dotfiles}/sh/colors.sh" 2>/dev/null || true
 
 # Android build environment setup
 function set_android_env() {
@@ -57,17 +60,18 @@ function mka() {
   mins=$(((tdiff % 3600) / 60))
   secs=$((tdiff % 60))
 
+  __sc_init_colors
   echo
   if [[ ${status} -eq 0 ]]; then
-    printf "\033[32m#### Build completed successfully "
+    echo -ne "${SC_GREEN}${SC_BOLD}#### Build completed successfully "
   else
-    printf "\033[31m#### Build failed "
+    echo -ne "${SC_RED}${SC_BOLD}#### Build failed "
   fi
 
   if [[ ${hours} -gt 0 ]]; then
-    printf "(%02d:%02d:%02d)\033[0m\n" "${hours}" "${mins}" "${secs}"
+    printf "(%02d:%02d:%02d)${SC_RESET}\n" "${hours}" "${mins}" "${secs}"
   else
-    printf "(%02d:%02d)\033[0m\n" "${mins}" "${secs}"
+    printf "(%02d:%02d)${SC_RESET}\n" "${mins}" "${secs}"
   fi
 
   return "${status}"
