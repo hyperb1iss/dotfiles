@@ -13,7 +13,6 @@ export CCACHE_EXEC=/usr/bin/ccache
 
 # Development paths
 export GOPATH=~/dev/go
-export GO15VENDOREXPERIMENT=1
 
 # Editor configuration
 export VISUAL=nvim

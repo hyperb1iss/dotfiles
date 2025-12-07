@@ -1,7 +1,6 @@
 # Brewfile for macOS dotfiles setup
 
 # Taps
-tap "homebrew/cask"
 tap "koekeishiya/formulae"  # For yabai window manager
 
 # CLI Tools
@@ -26,7 +25,7 @@ brew "lazygit"               # Simple terminal UI for git commands
 brew "llvm"                  # Next-gen compiler infrastructure
 brew "lsd"                   # Enhanced ls command
 brew "m-cli"                 # Swiss Army Knife for macOS (corrected from mac-cli)
-brew "macchina"              # System information fetcher with a focus on performance
+brew "fastfetch"             # System information fetcher (replaced macchina)
 brew "mas"                   # Mac App Store command line interface
 brew "ncdu"                  # NCurses Disk Usage
 brew "neovim"                # Ambitious Vim-fork focused on extensibility and agility
@@ -93,4 +92,3 @@ brew "helm"               # Package manager for Kubernetes
 brew "kustomize"          # Customization of Kubernetes YAML
 brew "kind"               # Run local Kubernetes clusters using Docker
 brew "minikube"           # Run Kubernetes locally
-brew "kubernetes-cli"     # Kubernetes command-line interface 
