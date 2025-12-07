@@ -21,6 +21,18 @@
     ~/.gitconfig: gitconfig
     # Warp terminal configuration
     ~/.warp: warp
+    # Fastfetch configuration (Windows path)
+    ~/AppData/Roaming/fastfetch/config.jsonc: fastfetch/config.jsonc
+
+- shell:
+    # Ensure fastfetch config directory exists on Windows
+    - command:
+        powershell.exe -NoProfile -Command "New-Item -ItemType Directory -Force -Path \"$Env:APPDATA\\fastfetch\" |
+        Out-Null"
+      stdin: true
+      stdout: true
+      stderr: true
+      description: Create fastfetch config directory
 
 - shell:
     # Run the Windows setup script
@@ -36,6 +48,13 @@
       stdout: true
       stderr: true
       description: Installing Rust components
+
+    # Install fastfetch (silent; ignore if already present)
+    - command: powershell.exe -NoProfile -Command "winget install --id fastfetch-cli.fastfetch -e --silent; exit 0"
+      stdin: true
+      stdout: true
+      stderr: true
+      description: Installing fastfetch via winget
 
     # Install pynvim for Neovim Python support
     - command: pip install pynvim

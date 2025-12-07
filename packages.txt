@@ -64,3 +64,4 @@ gperf
 rsync
 procs 
 software-properties-common
+fastfetch

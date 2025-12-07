@@ -63,10 +63,11 @@
     - cargo install lsd
 
 - shell:
-    - cargo install macchina
-    - mkdir -p ~/.config/macchina/themes
+    - command: brew install fastfetch || true
+      description: Installing fastfetch
+    - mkdir -p ~/.config/fastfetch
 - link:
-    ~/.config/macchina/themes/elektra.toml: elektra/elektra.toml
+    ~/.config/fastfetch/config.jsonc: fastfetch/config.jsonc
 
 - shell:
     - mkdir -p ~/.config/procs

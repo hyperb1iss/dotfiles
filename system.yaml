@@ -44,3 +44,8 @@
         fi
       stderr: true
       stdout: true
+
+- shell:
+    - mkdir -p ~/.config/fastfetch
+- link:
+    ~/.config/fastfetch/config.jsonc: fastfetch/config.jsonc

@@ -54,6 +54,7 @@ procs
 rsync
 strace
 sysstat
+fastfetch
 
 # Linux kernel build dependencies
 bc
