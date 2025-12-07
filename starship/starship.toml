@@ -29,6 +29,7 @@ $gradle\
 $c\
 $lua\
 $docker_context\
+$kubernetes\
 [](bg:#ff69b4 fg:#d060d0)\
 [](bg:#1a1a2e fg:#ff69b4)\
 [➤](bold fg:#ff69b4) \
@@ -195,6 +196,17 @@ symbol = "󰡨 "
 style = "bold fg:#FFEEFF bg:#d060d0"
 format = "[ $symbol$context ]($style)"
 disabled = false
+
+# Kubernetes context — shouts when on prod
+[kubernetes]
+symbol = "󱃾 "
+format = "[ $symbol$context ]($style)"
+style = "bold fg:#FFEEFF bg:#d060d0"
+disabled = false
+contexts = [
+  { context_pattern = ".*[Pp][Rr][Oo][Dd].*", context_alias = "PROD", style = "bold fg:#1a1a2e bg:#ffcc00", symbol = " " },
+  { context_pattern = ".*", style = "bold fg:#FFEEFF bg:#d060d0" }
+]
 
 # Time
 [time]
