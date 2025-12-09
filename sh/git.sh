@@ -33,7 +33,7 @@ alias gpsup='git push --set-upstream origin $(git_current_branch)'
 alias gst='git status'
 alias gsw='git switch'
 alias gswc='git switch -c'
-alias gig='git iris gen -a --no-verify --preset conventional'
+alias gig='git iris gen -a --no-verify'
 
 # ─────────────────────────────────────────────────────────────
 # Core Functions
