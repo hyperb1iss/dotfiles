@@ -205,6 +205,9 @@ style = "bold fg:#FFEEFF bg:#d060d0"
 disabled = false
 contexts = [
   { context_pattern = ".*[Pp][Rr][Oo][Dd].*", context_alias = "PROD", style = "bold fg:#1a1a2e bg:#ffcc00", symbol = " " },
+  # EKS contexts — strip region (e.g., eks-us-west-2-int → eks-int)
+  { context_pattern = "eks-[a-z]+-[a-z]+-\\d+-(?P<env>.*)", context_alias = "eks-$env", style = "bold fg:#FFEEFF bg:#d060d0" },
+  # Fallback
   { context_pattern = ".*", style = "bold fg:#FFEEFF bg:#d060d0" }
 ]
 
