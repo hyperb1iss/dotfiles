@@ -1,0 +1,194 @@
+# ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+# ┃             ✨ Ghostty Config - SilkCircuit Neon ✨                       ┃
+# ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Typography
+# ─────────────────────────────────────────────────────────────────────────────
+font-family = PragmataPro Mono Liga
+font-family-bold = PragmataPro Mono Liga
+font-family-italic = PragmataPro Mono Liga
+font-family-bold-italic = PragmataPro Mono Liga
+font-style-bold = Bold
+font-style-italic = Italic
+font-style-bold-italic = Bold Italic
+font-size = 14
+font-thicken = true
+adjust-cell-height = 10%
+adjust-cursor-thickness = 2
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Window & Transparency
+# ─────────────────────────────────────────────────────────────────────────────
+background-opacity = 0.92
+background-blur-radius = 20
+window-padding-x = 14
+window-padding-y = 10
+window-padding-balance = true
+window-padding-color = extend
+window-decoration = true
+macos-titlebar-style = tabs
+window-theme = dark
+window-colorspace = display-p3
+window-vsync = true
+window-save-state = always
+window-inherit-working-directory = true
+window-inherit-font-size = true
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Cursor — Electric purple beacon
+# ─────────────────────────────────────────────────────────────────────────────
+cursor-color = #e135ff
+cursor-text = #0d0d1a
+cursor-style = block
+cursor-style-blink = true
+cursor-opacity = 0.9
+cursor-click-to-move = true
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Selection — Royal purple highlight
+# ─────────────────────────────────────────────────────────────────────────────
+selection-background = #7a2d7a
+selection-foreground = #ffffff
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Splits & Focus
+# ─────────────────────────────────────────────────────────────────────────────
+unfocused-split-opacity = 0.80
+unfocused-split-fill = #0d0d1a
+split-divider-color = #4a1a4a
+focus-follows-mouse = true
+
+# ─────────────────────────────────────────────────────────────────────────────
+# SilkCircuit Neon Color Palette
+# ─────────────────────────────────────────────────────────────────────────────
+
+# Background: Deep void with silk undertones
+background = #0d0d1a
+foreground = #e8e0f0
+
+# Minimum contrast for accessibility
+minimum-contrast = 1.1
+
+# Black (0) / Bright Black (8) — Used for autosuggestions
+palette = 0=#0d0d1a
+palette = 8=#5a5478
+
+# Red (1) / Bright Red (9) — Error Red
+palette = 1=#ff6363
+palette = 9=#ff8080
+
+# Green (2) / Bright Green (10) — Success Green
+palette = 2=#50fa7b
+palette = 10=#70ff9b
+
+# Yellow (3) / Bright Yellow (11) — Electric Yellow
+palette = 3=#f1fa8c
+palette = 11=#f5fcb0
+
+# Blue (4) / Bright Blue (12) — Muted Indigo
+palette = 4=#6272a4
+palette = 12=#8292c4
+
+# Magenta (5) / Bright Magenta (13) — Electric Purple
+palette = 5=#e135ff
+palette = 13=#eb6fff
+
+# Cyan (6) / Bright Cyan (14) — Neon Cyan
+palette = 6=#80ffea
+palette = 14=#a0ffef
+
+# White (7) / Bright White (15) — Soft lavender
+palette = 7=#b8aed8
+palette = 15=#e0daf0
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Mouse & Interactions
+# ─────────────────────────────────────────────────────────────────────────────
+mouse-hide-while-typing = true
+mouse-scroll-multiplier = 3
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Clipboard & Selection
+# ─────────────────────────────────────────────────────────────────────────────
+copy-on-select = clipboard
+clipboard-read = allow
+clipboard-write = allow
+clipboard-trim-trailing-spaces = true
+clipboard-paste-protection = true
+clipboard-paste-bracketed-safe = true
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Hyperlinks & URLs
+# ─────────────────────────────────────────────────────────────────────────────
+link-url = true
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Shell Integration
+# ─────────────────────────────────────────────────────────────────────────────
+shell-integration = detect
+shell-integration-features = cursor,sudo,title,no-ssh-terminfo
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Scrollback & Performance
+# ─────────────────────────────────────────────────────────────────────────────
+scrollback-limit = 100000
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Quick Terminal — Drop-down quake style
+# ─────────────────────────────────────────────────────────────────────────────
+quick-terminal-position = top
+quick-terminal-screen = mouse
+quick-terminal-animation-duration = 0.15
+quick-terminal-autohide = true
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Resize Overlay
+# ─────────────────────────────────────────────────────────────────────────────
+resize-overlay = after-first
+resize-overlay-position = bottom-right
+resize-overlay-duration = 500ms
+
+# ─────────────────────────────────────────────────────────────────────────────
+# macOS Refinements
+# ─────────────────────────────────────────────────────────────────────────────
+macos-option-as-alt = true
+confirm-close-surface = false
+quit-after-last-window-closed = false
+window-step-resize = true
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Keybindings — SilkCircuit workflow essentials
+# ─────────────────────────────────────────────────────────────────────────────
+
+# Tabs
+keybind = super+t=new_tab
+keybind = super+w=close_surface
+keybind = super+shift+]=next_tab
+keybind = super+shift+[=previous_tab
+
+# Splits
+keybind = super+d=new_split:right
+keybind = super+shift+d=new_split:down
+keybind = super+alt+left=goto_split:left
+keybind = super+alt+right=goto_split:right
+keybind = super+alt+up=goto_split:top
+keybind = super+alt+down=goto_split:bottom
+keybind = super+ctrl+left=resize_split:left,20
+keybind = super+ctrl+right=resize_split:right,20
+keybind = super+ctrl+up=resize_split:up,20
+keybind = super+ctrl+down=resize_split:down,20
+keybind = super+shift+enter=equalize_splits
+
+# Font scaling
+keybind = super+equal=increase_font_size:1
+keybind = super+minus=decrease_font_size:1
+keybind = super+0=reset_font_size
+
+# Utilities
+keybind = super+k=clear_screen
+keybind = super+shift+c=copy_to_clipboard
+keybind = super+shift+v=paste_from_clipboard
+
+# Quick terminal toggle (global hotkey)
+keybind = global:ctrl+grave_accent=toggle_quick_terminal

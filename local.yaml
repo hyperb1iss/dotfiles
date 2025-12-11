@@ -61,6 +61,11 @@
     ~/.warp/themes/lilac.yaml: warp/themes/lilac.yaml
 
 - shell:
+    - mkdir -p "$HOME/Library/Application Support/com.mitchellh.ghostty"
+- link:
+    ~/Library/Application Support/com.mitchellh.ghostty/config: ghostty/config
+
+- shell:
     - command: mkdir -p ~/dev/go && GOPATH=~/dev/go go install github.com/junegunn/fzf@latest
       stderr: true
       stdout: true
