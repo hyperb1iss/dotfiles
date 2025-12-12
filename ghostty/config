@@ -130,9 +130,9 @@ shell-integration = detect
 shell-integration-features = cursor,sudo,title,no-ssh-terminfo
 
 # ─────────────────────────────────────────────────────────────────────────────
-# Scrollback & Performance
+# Scrollback & Performance (50MB buffer)
 # ─────────────────────────────────────────────────────────────────────────────
-scrollback-limit = 100000
+scrollback-limit = 50000000
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Quick Terminal — Drop-down quake style
