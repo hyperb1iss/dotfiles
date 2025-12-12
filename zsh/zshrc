@@ -51,9 +51,26 @@ zinit light zsh-users/zsh-syntax-highlighting
 zinit light zsh-users/zsh-history-substring-search
 zinit light Aloxaf/fzf-tab
 
-# History substring search keybindings (type partial cmd, arrow up/down to search)
-bindkey '^[[A' history-substring-search-up
-bindkey '^[[B' history-substring-search-down
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# Atuin: Modern shell history with per-directory awareness
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# Atuin replaces Ctrl+R with a full-screen fuzzy search UI
+# Features: SQLite backend, directory filtering, cross-machine sync, stats
+if command -v atuin &>/dev/null; then
+  eval "$(atuin init zsh)"
+
+  # Custom strategy for zsh-autosuggestions using Atuin's per-directory history
+  _zsh_autosuggest_strategy_atuin() {
+    suggestion=$(atuin search --cmd-only --limit 1 --search-mode prefix -- "$1" 2>/dev/null)
+  }
+  # Use Atuin first, fall back to standard history if no match
+  ZSH_AUTOSUGGEST_STRATEGY=(atuin history completion)
+fi
+
+# Note: Up/down arrows handled by Atuin with workspace filtering
+# history-substring-search still available via Ctrl+P/Ctrl+N if needed
+bindkey '^P' history-substring-search-up
+bindkey '^N' history-substring-search-down
 
 # Initialize Starship prompt
 zinit ice atload"eval \"\$(starship init zsh)\""

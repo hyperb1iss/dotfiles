@@ -76,3 +76,9 @@
     - mkdir -p ~/.claude
 - link:
     ~/.claude/statusline-command.sh: claude/statusline-command.sh
+
+- shell:
+    - mkdir -p ~/.config/atuin/themes
+- link:
+    ~/.config/atuin/config.toml: atuin/config.toml
+    ~/.config/atuin/themes/silkcircuit.toml: atuin/themes/silkcircuit.toml
