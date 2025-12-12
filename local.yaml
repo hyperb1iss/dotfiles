@@ -71,3 +71,8 @@
       stdout: true
       quiet: false
       description: Installing fzf from source
+
+- shell:
+    - mkdir -p ~/.claude
+- link:
+    ~/.claude/statusline-command.sh: claude/statusline-command.sh
