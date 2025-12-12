@@ -88,7 +88,8 @@
 
 [pretty]
 	# SilkCircuit full format - matches default git log but with colors
-	silkcircuit = %C(201 bold)commit %H%Creset%C(220)%d%Creset%n%C(white)Author: %C(213)%an <%ae>%Creset%n%C(white)Date:   %C(51)%ad%Creset%n%n%C(white)    %s%Creset%n%n%w(0,4,4)%C(white)%b%Creset
+	# Title: soft green (149) - distinct, calm | Body: muted gray
+	silkcircuit = %C(201 bold)commit %H%Creset%C(220 bold)%d%Creset%n%C(white)Author: %C(213)%an <%ae>%Creset%n%C(white)Date:   %C(51)%ad%Creset%n%n%w(0,4,4)%C(149)%s%Creset%n%n%C(252)%b%Creset
 
 [format]
 	# Use SilkCircuit format by default
@@ -96,7 +97,7 @@
 
 [alias]
 	# Beautiful one-line log with graph
-	lg = log --graph --pretty=format:'%C(201 bold)%h%Creset %C(220)%d%Creset %C(white)%s%Creset %C(51)(%cr)%Creset %C(213)<%an>%Creset'
+	lg = log --graph --pretty=format:'%C(201 bold)%h%Creset%C(220 bold)%d%Creset %C(149)%s%Creset %C(243)(%cr)%Creset %C(213)<%an>%Creset'
 
 	# Full log with SilkCircuit colors (like regular git log but styled)
 	l = log --pretty=silkcircuit
@@ -108,4 +109,4 @@
 	lga = log --graph --all --pretty=silkcircuit
 
 	# Compact log for quick overview
-	lgs = log --graph --pretty=format:'%C(201)%h%Creset %C(white)%s%Creset %C(51)(%cr)%Creset' --abbrev-commit
+	lgs = log --graph --pretty=format:'%C(201)%h%Creset %C(149)%s%Creset %C(243)(%cr)%Creset' --abbrev-commit
