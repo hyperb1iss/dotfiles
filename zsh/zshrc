@@ -11,6 +11,12 @@ setopt SH_WORD_SPLIT        # Enable bash-style word splitting
 setopt EXTENDED_GLOB        # Enable extended globbing
 setopt INTERACTIVE_COMMENTS # Enable bash-style comments
 
+# Navigation magic
+setopt AUTO_CD              # Type directory name to cd into it
+setopt AUTO_PUSHD           # cd pushes old dir to stack
+setopt PUSHD_IGNORE_DUPS    # No duplicates in dir stack
+setopt PUSHD_SILENT         # Don't print stack after pushd
+
 HISTSIZE=50000
 # Export SAVEHIST so shellcheck knows it's used by zsh internally
 export SAVEHIST=50000
@@ -42,6 +48,12 @@ fi
 # Using 'light' for faster loading without reporting/investigation
 zinit light zsh-users/zsh-autosuggestions
 zinit light zsh-users/zsh-syntax-highlighting
+zinit light zsh-users/zsh-history-substring-search
+zinit light Aloxaf/fzf-tab
+
+# History substring search keybindings (type partial cmd, arrow up/down to search)
+bindkey '^[[A' history-substring-search-up
+bindkey '^[[B' history-substring-search-down
 
 # Initialize Starship prompt
 zinit ice atload"eval \"\$(starship init zsh)\""
@@ -76,6 +88,35 @@ fi
 
 # Development alias for clearing Zinit cache and reloading shell
 alias zzz='zinit update'
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# Zsh Power Features
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+# zmv — batch renaming: zmv '(*).txt' '$1.md'
+autoload -Uz zmv
+
+# Edit current command in $EDITOR (Ctrl+X, Ctrl+E)
+autoload -Uz edit-command-line
+zle -N edit-command-line
+bindkey '^x^e' edit-command-line
+
+# Named directories — teleportation shortcuts
+# Usage: cd ~dots, vim ~cfg/ghostty/config
+hash -d dots=~/dev/dotfiles
+hash -d cfg=~/.config
+hash -d dev=~/dev
+
+# Global aliases — expand anywhere in pipeline
+alias -g G='| grep'
+alias -g L='| less'
+alias -g J='| jq .'
+alias -g NE='2>/dev/null'
+
+# Suffix aliases — open files by extension
+alias -s md='code'
+alias -s json='jq .'
+alias -s git='git clone'
 
 # pnpm
 if [[ "$OSTYPE" == "darwin"* ]]; then

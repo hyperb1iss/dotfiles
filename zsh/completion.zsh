@@ -70,3 +70,25 @@ zstyle ':completion:*' completer _complete _match _approximate
 zstyle ':completion:*:match:*' original only
 zstyle ':completion:*:approximate:*' max-errors 1 numeric
 
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# fzf-tab configuration
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+# Disable sort when completing `git checkout`
+zstyle ':completion:*:git-checkout:*' sort false
+
+# Set descriptions format to enable group support
+zstyle ':completion:*:descriptions' format '[%d]'
+
+# Preview directory contents with eza (fallback to ls)
+zstyle ':fzf-tab:complete:cd:*' fzf-preview 'eza -1 --color=always $realpath 2>/dev/null || ls -1 $realpath'
+
+# Preview files with bat (fallback to cat)
+zstyle ':fzf-tab:complete:*:*' fzf-preview 'bat --color=always --style=numbers --line-range=:100 $realpath 2>/dev/null || cat $realpath 2>/dev/null || eza -1 --color=always $realpath 2>/dev/null'
+
+# Switch groups with < and >
+zstyle ':fzf-tab:*' switch-group '<' '>'
+
+# Use tmux popup if available (comment out if not using tmux)
+# zstyle ':fzf-tab:*' fzf-command ftb-tmux-popup
+
