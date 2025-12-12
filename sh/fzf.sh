@@ -13,8 +13,22 @@ if has_command fzf; then
     FD_COMMAND="fd" # Other systems
   fi
 
-  # Default options
-  export FZF_DEFAULT_OPTS="--height 40% --layout=reverse --border"
+  # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  # SilkCircuit Theme for fzf
+  # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  export FZF_DEFAULT_OPTS="
+    --height 40%
+    --layout=reverse
+    --border=rounded
+    --margin=0,1
+    --prompt='▸ '
+    --pointer='▶'
+    --marker='✓'
+    --color=fg:#c0caf5,fg+:#ffffff,bg:-1,bg+:#2a2139
+    --color=hl:#e135ff,hl+:#ff79c6,info:#f1fa8c,marker:#50fa7b
+    --color=prompt:#80ffea,spinner:#80ffea,pointer:#e135ff,header:#ff6ac1
+    --color=border:#e135ff,scrollbar:#e135ff,label:#80ffea,query:#ffffff
+  "
 
   # Determine which bat command to use
   if has_command batcat; then
