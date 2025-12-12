@@ -453,7 +453,6 @@ main() {
   init_git_cache # Initialize git operations cache
 
   local check=0
-  local check_explicit=0 # Track if --check was explicitly requested
   local fix=0
   local format=0
   local recursive=0
@@ -469,7 +468,6 @@ main() {
     case "$1" in
       -c | --check)
         check=1
-        check_explicit=1
         shift
         ;;
       -f | --fix)
