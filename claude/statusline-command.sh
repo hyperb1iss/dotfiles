@@ -9,7 +9,15 @@ input=$(cat)
 model=$(echo "$input" | jq -r '.model.display_name // "Claude"')
 current_dir=$(echo "$input" | jq -r '.workspace.current_dir // ""')
 output_style=$(echo "$input" | jq -r '.output_style.name // "default"')
-token_count=$(echo "$input" | jq -r '.conversation.token_count // null')
+
+# Updated for Claude Code 2.0.70+ — context_window replaces conversation
+current_tokens=$(echo "$input" | jq -r '(.context_window.current_usage.input_tokens // 0) + (.context_window.current_usage.cache_creation_input_tokens // 0) + (.context_window.current_usage.cache_read_input_tokens // 0)')
+context_size=$(echo "$input" | jq -r '.context_window.context_window_size // 200000')
+if [ "$current_tokens" != "null" ] && [ "$current_tokens" != "0" ] && [ "$context_size" != "0" ]; then
+    token_count=$current_tokens
+else
+    token_count=""
+fi
 
 # Set current directory for operations
 if [ -n "$current_dir" ]; then
