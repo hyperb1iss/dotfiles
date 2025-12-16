@@ -178,7 +178,7 @@ keybind = super+ctrl+left=resize_split:left,20
 keybind = super+ctrl+right=resize_split:right,20
 keybind = super+ctrl+up=resize_split:up,20
 keybind = super+ctrl+down=resize_split:down,20
-keybind = super+shift+enter=equalize_splits
+# keybind = super+shift+enter=equalize_splits  # Commented for Claude Code shift+enter
 
 # Font scaling
 keybind = super+equal=increase_font_size:1
@@ -192,3 +192,7 @@ keybind = super+shift+v=paste_from_clipboard
 
 # Quick terminal toggle (global hotkey)
 keybind = global:ctrl+grave_accent=toggle_quick_terminal
+
+# Shift+Enter for multiline input (escape + carriage return)
+keybind = shift+enter=text:\x1b\r
+
