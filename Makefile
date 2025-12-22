@@ -45,6 +45,9 @@ macos: check-state update
 	@echo "macos" > $(INSTALL_STATE_FILE)
 	$(DOTBOT) -d $(BASEDIR) -c macos.yaml
 
+private: update
+	$(DOTBOT) -d $(BASEDIR) -c private.yaml
+
 # Colors for beautiful output
 PURPLE := \033[1;35m
 PINK := \033[1;95m

@@ -1,0 +1,14 @@
+- defaults:
+    link:
+      relink: true
+
+- link:
+    ~/.claude/CLAUDE.md:
+      create: true
+      path: ~/dev/dotfiles-private/ai/AGENTS.md
+      if: '[ -f ~/dev/dotfiles-private/ai/AGENTS.md ]'
+    ~/.codex/AGENTS.md:
+      create: true
+      path: ~/dev/dotfiles-private/ai/AGENTS.md
+      if: '[ -f ~/dev/dotfiles-private/ai/AGENTS.md ]'
+
