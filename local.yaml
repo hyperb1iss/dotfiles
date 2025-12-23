@@ -75,6 +75,7 @@
 - shell:
     - mkdir -p ~/.claude
 - link:
+    ~/.claude/settings.json: claude/settings.json
     ~/.claude/statusline-command.sh: claude/statusline-command.sh
 
 - shell:
