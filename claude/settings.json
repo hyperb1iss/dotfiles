@@ -1,22 +1,9 @@
 {
   "$schema": "https://json.schemastore.org/claude-code-settings.json",
   "permissions": {
-    "allow": [
-      "mcp__archon",
-      "mcp__context7",
-      "mcp__next-devtools",
-      "mcp__sibyl",
-      "Bash(sibyl:*)"
-    ],
-    "deny": [
-      "Bash(git push:*)"
-    ],
-    "ask": [
-      "Bash(kubectl delete:*)",
-      "Bash(kubectl exec:*)",
-      "Bash(argocd:*)",
-      "Bash(rm:*)"
-    ]
+    "allow": ["mcp__archon", "mcp__context7", "mcp__next-devtools", "mcp__sibyl", "Bash(sibyl:*)"],
+    "deny": ["Bash(git push:*)"],
+    "ask": ["Bash(kubectl delete:*)", "Bash(kubectl exec:*)", "Bash(argocd:*)", "Bash(rm:*)"]
   },
   "statusLine": {
     "type": "command",
