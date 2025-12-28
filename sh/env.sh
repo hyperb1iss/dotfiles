@@ -43,6 +43,10 @@ PATH_COMPONENTS+="${PATH}"
 PATH_TEMP=$(echo -n "${PATH_COMPONENTS}" | tr -s ':')
 export PATH="${PATH_TEMP}"
 
+# proto - multi-language version manager
+export PROTO_HOME="$HOME/.proto"
+export PATH="$PROTO_HOME/shims:$PROTO_HOME/bin:$PATH"
+
 # FZF Configuration
 export FZF_DEFAULT_OPTS="--height 40% --layout=reverse --border --preview 'bat --color=always --style=numbers --line-range=:500 {}'"
 
