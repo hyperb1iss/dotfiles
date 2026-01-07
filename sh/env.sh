@@ -47,6 +47,19 @@ export PATH="${PATH_TEMP}"
 export PROTO_HOME="$HOME/.proto"
 export PATH="$PROTO_HOME/shims:$PROTO_HOME/bin:$PATH"
 
+# Activate proto for version detection (respects .nvmrc, .prototools, etc.)
+if command -v proto &>/dev/null; then
+  eval "$(proto activate zsh 2>/dev/null)"
+fi
+
+# Add npm global binaries from proto-managed node
+# Resolves the active node version's bin dir for tools like codex, claude
+if [[ -L "$PROTO_HOME/bin/node" ]]; then
+  _node_bin_dir=$(dirname "$(readlink "$PROTO_HOME/bin/node")")
+  export PATH="$_node_bin_dir:$PATH"
+  unset _node_bin_dir
+fi
+
 # FZF Configuration
 export FZF_DEFAULT_OPTS="--height 40% --layout=reverse --border --preview 'bat --color=always --style=numbers --line-range=:500 {}'"
 
