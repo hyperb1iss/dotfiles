@@ -20,8 +20,14 @@
           sudo add-apt-repository -y ppa:longsleep/golang-backports
           sudo add-apt-repository -y ppa:git-core/ppa
           sudo add-apt-repository -y ppa:openjdk-r/ppa
+          sudo add-apt-repository -y ppa:zhangsongcui3371/fastfetch
           sudo apt update
           grep -v '^#\|^$' packages.txt | xargs sudo apt install -y
+          # Install modern CLI tools via cargo (cleaner than apt for Rust tools)
+          if command -v cargo >/dev/null 2>&1; then
+            echo "Installing Rust CLI tools..."
+            grep -v '^#\|^$' cargo-tools.txt | xargs cargo install
+          fi
         fi
       stderr: true
       stdout: true

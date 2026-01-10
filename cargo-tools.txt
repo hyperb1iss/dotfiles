@@ -1,0 +1,13 @@
+# Modern CLI tools installed via cargo
+# These replace traditional Unix tools with better defaults
+#
+# Usage: cargo install $(grep -v '^#\|^$' cargo-tools.txt | tr '\n' ' ')
+
+bat          # cat with syntax highlighting
+fd-find      # find replacement
+ripgrep      # grep replacement
+lsd          # ls replacement
+git-delta    # git pager with syntax highlighting
+procs        # ps replacement
+zoxide       # cd replacement (smart directory jumper)
+starship     # cross-shell prompt

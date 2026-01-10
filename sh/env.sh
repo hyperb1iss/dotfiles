@@ -48,8 +48,8 @@ export PROTO_HOME="$HOME/.proto"
 export PATH="$PROTO_HOME/shims:$PROTO_HOME/bin:$PATH"
 
 # Activate proto for version detection (respects .nvmrc, .prototools, etc.)
-if command -v proto &>/dev/null; then
-  eval "$(proto activate zsh 2>/dev/null)"
+if command -v proto &> /dev/null; then
+  eval "$(proto activate zsh 2> /dev/null)"
 fi
 
 # Add npm global binaries from proto-managed node
