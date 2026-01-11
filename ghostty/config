@@ -196,3 +196,9 @@ keybind = global:ctrl+grave_accent=toggle_quick_terminal
 # Shift+Enter for multiline input (escape + carriage return)
 keybind = shift+enter=text:\x1b\r
 
+# ─────────────────────────────────────────────────────────────────────────────
+# Auto updates
+# ─────────────────────────────────────────────────────────────────────────────
+auto-update-channel = tip
+
+
