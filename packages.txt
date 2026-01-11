@@ -1,7 +1,7 @@
 # Basic development tools
 build-essential
-cargo
 cmake
+rustup
 curl
 git-core
 golang-go
