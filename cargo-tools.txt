@@ -10,4 +10,5 @@ lsd          # ls replacement
 git-delta    # git pager with syntax highlighting
 procs        # ps replacement
 zoxide       # cd replacement (smart directory jumper)
+btop         # awesome system monitor
 starship     # cross-shell prompt
