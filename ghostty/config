@@ -3,12 +3,8 @@
 # ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
 # ─────────────────────────────────────────────────────────────────────────────
-# Typography
+# Typography (font-family set in platform-specific configs)
 # ─────────────────────────────────────────────────────────────────────────────
-font-family = PragmataPro Mono Liga
-font-family-bold = PragmataPro Mono Liga
-font-family-italic = PragmataPro Mono Liga
-font-family-bold-italic = PragmataPro Mono Liga
 font-style-bold = Bold
 font-style-italic = Italic
 font-style-bold-italic = Bold Italic
@@ -200,5 +196,11 @@ keybind = shift+enter=text:\x1b\r
 # Auto updates
 # ─────────────────────────────────────────────────────────────────────────────
 auto-update-channel = tip
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Platform-specific configs (fonts, etc.)
+# ─────────────────────────────────────────────────────────────────────────────
+config-file = ?macos.conf
+config-file = ?linux.conf
 
 
