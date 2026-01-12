@@ -33,6 +33,25 @@
               grep -v '^#\|^$' cargo-tools.txt | sed 's/#.*//' | xargs cargo install
             fi
           fi
+
+          # Install Docker Engine from official apt repository
+          if ! command -v docker >/dev/null 2>&1; then
+            echo "🐳 Installing Docker Engine..."
+            # Remove conflicting packages
+            sudo apt remove -y docker.io docker-compose docker-compose-v2 docker-doc podman-docker containerd runc 2>/dev/null || true
+            # Add Docker's official GPG key
+            sudo install -m 0755 -d /etc/apt/keyrings
+            sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+            sudo chmod a+r /etc/apt/keyrings/docker.asc
+            # Add the repository to apt sources
+            CODENAME=$(. /etc/os-release && echo "${UBUNTU_CODENAME:-$VERSION_CODENAME}")
+            printf '%s\n' "Types: deb" "URIs: https://download.docker.com/linux/ubuntu" "Suites: $CODENAME" "Components: stable" "Signed-By: /etc/apt/keyrings/docker.asc" | sudo tee /etc/apt/sources.list.d/docker.sources
+            sudo apt update
+            sudo apt install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+            # Add current user to docker group for non-root access
+            sudo usermod -aG docker "$USER"
+            echo "✅ Docker installed. Log out and back in for group changes to take effect."
+          fi
         fi
       stderr: true
       stdout: true
