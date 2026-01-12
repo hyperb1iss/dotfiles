@@ -1,7 +1,7 @@
 # Modern CLI tools installed via cargo
 # These replace traditional Unix tools with better defaults
 #
-# Usage: cargo install $(grep -v '^#\|^$' cargo-tools.txt | tr '\n' ' ')
+# Usage: grep -v '^#\|^$' cargo-tools.txt | sed 's/#.*//' | xargs cargo install
 
 bat          # cat with syntax highlighting
 fd-find      # find replacement

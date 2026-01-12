@@ -26,12 +26,12 @@
           if command -v rustup >/dev/null 2>&1; then
             echo "Installing Rust stable toolchain..."
             rustup toolchain install stable
-            source "$HOME/.cargo/env"
-          fi
-          # Install modern CLI tools via cargo
-          if command -v cargo >/dev/null 2>&1; then
-            echo "Installing Rust CLI tools..."
-            grep -v '^#\|^$' cargo-tools.txt | xargs cargo install
+            # Source cargo env AND install tools in same subshell so PATH persists
+            if [ -f "$HOME/.cargo/env" ]; then
+              source "$HOME/.cargo/env"
+              echo "📦 Installing Rust CLI tools..."
+              grep -v '^#\|^$' cargo-tools.txt | sed 's/#.*//' | xargs cargo install
+            fi
           fi
         fi
       stderr: true

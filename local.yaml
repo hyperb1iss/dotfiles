@@ -9,7 +9,6 @@
 
 - link:
     ~/.bashrc.local: bash/bashrc.local
-    ~/.rc.local: bash/rc.local
     ~/.config/lsd: lsd
     ~/.config/bat: bat
     ~/.fonts:
@@ -28,11 +27,18 @@
     - chmod +x ~/bin/repo
 
 - shell:
-    - rustup toolchain install stable
-
-- shell:
-    - cargo install git-delta
-    - cargo install lsd
+    - command: |
+        # Install Rust toolchain and CLI tools
+        rustup toolchain install stable
+        # Add cargo to PATH (apt rustup doesn't create ~/.cargo/env)
+        export PATH="$HOME/.cargo/bin:$PATH"
+        if command -v cargo &> /dev/null; then
+          echo "📦 Installing Rust CLI tools from cargo-tools.txt..."
+          grep -v '^#\|^$' cargo-tools.txt | sed 's/#.*//' | xargs cargo install
+        fi
+      stderr: true
+      stdout: true
+      description: "Installing Rust toolchain + CLI tools"
 
 - shell:
     - mkdir -p ~/.config/fastfetch
@@ -50,7 +56,6 @@
     ~/.config/procs/config.toml: procs/config.toml
 
 - shell:
-    - cargo install starship
     - mkdir -p ~/.config/starship
 - link:
     ~/.config/starship.toml: starship/starship.toml
@@ -73,6 +78,28 @@
       description: Installing fzf from source
 
 - shell:
+    - command: |
+        # Install proto version manager if not present
+        if ! command -v proto &> /dev/null; then
+          echo "✨ Installing proto version manager..."
+          curl -fsSL https://moonrepo.dev/install/proto.sh | bash -s -- --yes
+          export PROTO_HOME="$HOME/.proto"
+          export PATH="$PROTO_HOME/shims:$PROTO_HOME/bin:$PATH"
+        fi
+        # Install node and npm via proto
+        if command -v proto &> /dev/null; then
+          echo "📦 Setting up node and npm via proto..."
+          proto install node lts
+          proto install npm
+          # Pin versions globally (writes to ~/.prototools)
+          proto pin node lts
+          proto pin npm bundled
+        fi
+      stderr: true
+      stdout: true
+      description: "Installing proto + node/npm"
+
+- shell:
     - mkdir -p ~/.claude
 - link:
     ~/.claude/settings.json: claude/settings.json
@@ -83,3 +110,10 @@
 - link:
     ~/.config/atuin/config.toml: atuin/config.toml
     ~/.config/atuin/themes/silkcircuit.toml: atuin/themes/silkcircuit.toml
+
+- shell:
+    - mkdir -p ~/.config/fontconfig
+    - mkdir -p ~/.config/ghostty
+- link:
+    ~/.config/fontconfig/fonts.conf: fonts/fonts.conf
+    ~/.config/ghostty/linux.conf: ghostty/linux.conf
