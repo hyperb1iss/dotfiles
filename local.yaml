@@ -20,6 +20,11 @@
     ~/bin: bin
 
 - shell:
+    - command: bat cache --build
+      description: "Rebuilding bat theme cache"
+      stdout: true
+
+- shell:
     - fc-cache -f
 
 - shell:
