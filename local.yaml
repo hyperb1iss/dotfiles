@@ -117,3 +117,8 @@
 - link:
     ~/.config/fontconfig/fonts.conf: fonts/fonts.conf
     ~/.config/ghostty/linux.conf: ghostty/linux.conf
+
+- shell:
+    - mkdir -p ~/.proto
+- link:
+    ~/.proto/.prototools: proto/.prototools
