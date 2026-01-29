@@ -1,0 +1,8 @@
+# ~/.bash_profile
+# Login shell initialization for bash on macOS
+# Sources ~/.bashrc.local for all shell configurations
+
+# Source .bashrc.local if it exists
+if [[ -f ~/.bashrc.local ]]; then
+  source ~/.bashrc.local
+fi

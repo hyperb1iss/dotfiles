@@ -49,7 +49,11 @@ export PATH="$PROTO_HOME/shims:$PROTO_HOME/bin:$PATH"
 
 # Activate proto for version detection (respects .nvmrc, .prototools, etc.)
 if command -v proto &> /dev/null; then
-  eval "$(proto activate zsh 2> /dev/null)"
+  if [[ -n "$ZSH_VERSION" ]]; then
+    eval "$(proto activate zsh 2> /dev/null)"
+  elif [[ -n "$BASH_VERSION" ]]; then
+    eval "$(proto activate bash 2> /dev/null)"
+  fi
 fi
 
 # Add npm global binaries from proto-managed node

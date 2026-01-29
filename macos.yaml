@@ -5,6 +5,7 @@
 - clean: ["~"]
 
 - link:
+    ~/.bash_profile: bash/bash_profile
     ~/.bashrc.local: bash/bashrc.local
     ~/.rc.local: bash/rc.local
     ~/.config/lsd: lsd
