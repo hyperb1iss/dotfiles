@@ -82,7 +82,7 @@ fi
 # Install cargo packages if cargo is available
 if command -v cargo >/dev/null 2>&1; then
   echo "Installing useful cargo packages..."
-  cargo install --quiet git-delta lsd macchina || echo "⚠️  Some cargo packages failed to install"
+  cargo install --quiet git-delta || echo "⚠️  Some cargo packages failed to install"
 else
   echo "⚠️  cargo not available, skipping cargo package installation"
 fi

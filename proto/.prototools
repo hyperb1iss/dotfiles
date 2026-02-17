@@ -1,6 +1,7 @@
 moon = "2.0.0-beta.1"
 proto = "0.54.1"
 pnpm = "10.28.1"
+node = "24.13.1"
 
 [settings]
 auto-install = true

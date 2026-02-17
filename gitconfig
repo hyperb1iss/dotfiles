@@ -70,11 +70,23 @@
 	plus-style = syntax "#2a3a2a"        # dark green background
 	plus-emph-style = syntax "#2a5a2a"   # darker green for emphasis
 
+[push]
+	autoSetupRemote = true
+	default = current
+
+[rebase]
+	autoSquash = true
+	autoStash = true
+
+[fetch]
+	prune = true
+
 [merge]
 	conflictstyle = zdiff3
 
 [diff]
 	colorMoved = default
+	algorithm = histogram
 [filter "lfs"]
 	required = true
 	clean = git-lfs clean -- %f

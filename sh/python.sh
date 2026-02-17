@@ -88,40 +88,19 @@ function ptd() {
   pytest -v --log-cli-level=DEBUG --tb=short "$@"
 }
 
-# Run black formatter on directory or file
-function black() {
-  if [[ -z "$1" ]]; then
-    command black .
-  else
-    command black "$@"
-  fi
+# Modern Python tooling (Astral stack: uv, ruff, ty)
+
+# Lint with ruff (replaces flake8, pylint, isort)
+function lint() {
+  ruff check "${@:-.}"
 }
 
-# Run isort on directory or file
-function isort() {
-  if [[ -z "$1" ]]; then
-    command isort .
-  else
-    command isort "$@"
-  fi
+# Format with ruff (replaces black + isort)
+function fmt() {
+  ruff format "${@:-.}"
 }
 
-# Run flake8 on directory or file
-function flake() {
-  if [[ -z "$1" ]]; then
-    flake8 .
-  else
-    flake8 "$@"
-  fi
-}
-
-# Format code with black and isort
-function format() {
-  if [[ -z "$1" ]]; then
-    black .
-    isort .
-  else
-    black "$@"
-    isort "$@"
-  fi
+# Lint + format in one pass
+function fix() {
+  ruff check --fix "${@:-.}" && ruff format "${@:-.}"
 }

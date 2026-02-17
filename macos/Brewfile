@@ -30,7 +30,7 @@ brew "mas"                   # Mac App Store command line interface
 brew "ncdu"                  # NCurses Disk Usage
 brew "neovim"                # Ambitious Vim-fork focused on extensibility and agility
 brew "ninja"                 # Small build system for use with gyp or CMake
-brew "node"                  # Platform for Node.js development
+# Node managed by proto — see proto/.prototools
 brew "openjdk"               # Latest Java Development Kit
 brew "p7zip"                 # 7-Zip (high compression file archiver) implementation
 brew "procs"                 # Modern replacement for ps
@@ -52,7 +52,7 @@ brew "zsh"                   # UNIX shell
 brew "zsh-autosuggestions"   # Fish-like fast/unobtrusive autosuggestions for zsh
 brew "zsh-completions"       # Additional completion definitions for zsh
 brew "zsh-syntax-highlighting" # Fish shell like syntax highlighting for zsh
-brew "nvm"                   # Node Version Manager
+# nvm removed — proto is SSOT for Node versions
 
 # Development
 cask "android-studio"        # Android IDE

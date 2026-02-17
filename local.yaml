@@ -28,7 +28,7 @@
     - fc-cache -f
 
 - shell:
-    - curl http://storage.googleapis.com/git-repo-downloads/repo > ~/bin/repo
+    - curl https://storage.googleapis.com/git-repo-downloads/repo > ~/bin/repo
     - chmod +x ~/bin/repo
 
 - shell:

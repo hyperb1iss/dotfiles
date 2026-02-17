@@ -43,7 +43,24 @@ PATH_COMPONENTS+="${PATH}"
 PATH_TEMP=$(echo -n "${PATH_COMPONENTS}" | tr -s ':')
 export PATH="${PATH_TEMP}"
 
-# proto - multi-language version manager
+# FZF configuration handled by sh/fzf.sh — no duplicate here
+
+# Source private environment variables if they exist
+# shellcheck source=/home/bliss/dev/dotfiles-private/env/private.sh
+safe_source ~/dev/dotfiles-private/env/private.sh
+
+# pnpm global bin
+if [[ "$OSTYPE" == "darwin"* ]]; then
+  export PNPM_HOME="$HOME/Library/pnpm"
+else
+  export PNPM_HOME="$HOME/.local/share/pnpm"
+fi
+case ":$PATH:" in
+  *":$PNPM_HOME:"*) ;;
+  *) export PATH="$PNPM_HOME:$PATH" ;;
+esac
+
+# proto - multi-language version manager (last = highest priority, overrides homebrew/pnpm/system)
 export PROTO_HOME="$HOME/.proto"
 export PATH="$PROTO_HOME/shims:$PROTO_HOME/bin:$PATH"
 
@@ -55,18 +72,3 @@ if command -v proto &> /dev/null; then
     eval "$(proto activate bash 2> /dev/null)"
   fi
 fi
-
-# Add npm global binaries from proto-managed node
-# Resolves the active node version's bin dir for tools like codex, claude
-if [[ -L "$PROTO_HOME/bin/node" ]]; then
-  _node_bin_dir=$(dirname "$(readlink "$PROTO_HOME/bin/node")")
-  export PATH="$_node_bin_dir:$PATH"
-  unset _node_bin_dir
-fi
-
-# FZF Configuration
-export FZF_DEFAULT_OPTS="--height 40% --layout=reverse --border --preview 'bat --color=always --style=numbers --line-range=:500 {}'"
-
-# Source private environment variables if they exist
-# shellcheck source=/home/bliss/dev/dotfiles-private/env/private.sh
-safe_source ~/dev/dotfiles-private/env/private.sh

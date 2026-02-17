@@ -70,13 +70,15 @@ function safe_source() {
   return 1
 }
 
-# 2. History configuration
+# 2. History configuration (bash-specific; zsh history is in zshrc)
 #-------------------------------------------------
-HISTSIZE=50000
-HISTFILESIZE=50000
-HISTCONTROL=ignoreboth:erasedups
-HISTTIMEFORMAT="%F %T "
-HISTIGNORE="ls:ll:cd:pwd:clear:history:fg:bg:jobs"
+if is_bash; then
+  HISTSIZE=50000
+  HISTFILESIZE=50000
+  HISTCONTROL=ignoreboth:erasedups
+  HISTTIMEFORMAT="%F %T "
+  HISTIGNORE="ls:ll:cd:pwd:clear:history:fg:bg:jobs"
+fi
 
 # 3. Load all utility scripts with consistent error handling
 #-------------------------------------------------
