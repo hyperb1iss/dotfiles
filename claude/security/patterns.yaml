@@ -1,0 +1,303 @@
+# ============================================================================
+# Claude Code Security Patterns - Single Source of Truth
+# ============================================================================
+#
+# This file defines all dangerous patterns that should be blocked or require
+# explicit user confirmation. Used by the PreToolUse damage-control hook.
+#
+# Pattern Types:
+#   - block: Immediately reject with exit code 2 (hard block)
+#   - ask: Return JSON asking for user confirmation
+#   - allow: Explicitly permit (overrides block patterns)
+#
+# Regex patterns use Python re module syntax.
+# ============================================================================
+
+version: "1.0"
+
+# ============================================================================
+# PROTECTED PATHS - Files/directories with restricted access
+# ============================================================================
+paths:
+  # Zero access - never read, write, or execute anything here
+  zero_access:
+    - "~/.ssh"
+    - "~/.gnupg"
+    - "~/.aws/credentials"
+    - "~/.config/gcloud"
+    - "~/.azure"
+    - "~/.kube/config"
+    - "**/.env"
+    - "**/.env.*"
+    - "**/secrets/**"
+    - "**/*.pem"
+    - "**/*.key"
+    - "**/id_rsa*"
+    - "**/id_ed25519*"
+
+  # Read-only - can read but never modify
+  read_only:
+    - "/etc/**"
+    - "~/.bashrc"
+    - "~/.zshrc"
+    - "~/.profile"
+    - "~/.gitconfig"
+
+  # No delete - can read/write but never delete
+  no_delete:
+    - ".claude/hooks/**"
+    - ".claude/settings*.json"
+    - ".git/**"
+
+# ============================================================================
+# BASH COMMAND PATTERNS
+# ============================================================================
+bash:
+  # Hard blocks - these NEVER execute
+  block:
+    # --- Filesystem Destruction ---
+    - pattern: '\brm\s+(-[rRfv]+\s+)*/'
+      reason: "Blocked: rm with absolute root path"
+    - pattern: '\brm\s+-[rRf]*[rR][rRf]*\s'
+      reason: "Blocked: recursive rm requires confirmation"
+      action: ask  # Downgrade to ask instead of hard block
+    - pattern: '\bsudo\s+rm\b'
+      reason: "Blocked: sudo rm is extremely dangerous"
+    - pattern: '>\s*/dev/sd[a-z]'
+      reason: "Blocked: direct disk write"
+    - pattern: '\bdd\s+.*of=/dev/'
+      reason: "Blocked: dd to device"
+    - pattern: '\bmkfs\b'
+      reason: "Blocked: filesystem format"
+    - pattern: '\bshred\b'
+      reason: "Blocked: secure delete"
+
+    # --- Shell Bombs & Exploits ---
+    - pattern: ':\(\)\s*\{.*:\|:.*&.*\}\s*;'
+      reason: "Blocked: fork bomb detected"
+    - pattern: '\$\(.*\)\s*\|\s*bash'
+      reason: "Blocked: piped execution from subshell"
+    - pattern: 'curl.*\|\s*(ba)?sh'
+      reason: "Blocked: curl pipe to shell"
+    - pattern: 'wget.*\|\s*(ba)?sh'
+      reason: "Blocked: wget pipe to shell"
+
+    # --- Git Destruction (CRITICAL) ---
+    - pattern: '\bgit\s+push\b'
+      reason: "Blocked: git push requires explicit approval"
+    - pattern: '\bgit\s+push\s+--force'
+      reason: "Blocked: force push can destroy remote history"
+    - pattern: '\bgit\s+push\s+-f\b'
+      reason: "Blocked: force push can destroy remote history"
+    - pattern: '\bgit\s+reset\s+--hard'
+      reason: "Blocked: hard reset destroys uncommitted work"
+    - pattern: '\bgit\s+clean\s+-f'
+      reason: "Blocked: clean -f permanently deletes untracked files"
+    - pattern: '\bgit\s+checkout\s+--\s'
+      reason: "Blocked: checkout -- discards uncommitted changes"
+    - pattern: '\bgit\s+restore\s+(?!--staged)[^\s]'
+      reason: "Blocked: restore without --staged discards changes"
+    - pattern: '\bgit\s+stash\s+(drop|clear)'
+      reason: "Blocked: stash drop/clear permanently loses stashed work"
+    - pattern: '\bgit\s+branch\s+-D'
+      reason: "Blocked: branch -D force deletes without merge check"
+    - pattern: '\bgit\s+rebase\s+-i'
+      reason: "Blocked: interactive rebase requires terminal"
+    - pattern: '\bgit\s+filter-branch'
+      reason: "Blocked: filter-branch rewrites history"
+    - pattern: '\bgit\s+reflog\s+expire'
+      reason: "Blocked: reflog expire removes recovery points"
+
+    # --- Docker Destruction ---
+    - pattern: '\bdocker\s+system\s+prune'
+      reason: "Blocked: docker system prune removes all unused data"
+    - pattern: '\bdocker\s+volume\s+prune'
+      reason: "Blocked: docker volume prune removes all unused volumes"
+    - pattern: '\bdocker\s+rm\s+-f'
+      reason: "Blocked: docker rm -f force removes containers"
+    - pattern: '\bdocker-compose\s+down\s+-v'
+      reason: "Blocked: docker-compose down -v removes volumes"
+    - pattern: '\bdocker\s+rmi\s+-f'
+      reason: "Blocked: docker rmi -f force removes images"
+
+    # --- Kubernetes Destruction ---
+    - pattern: '\bkubectl\s+delete\s+(namespace|ns)\b'
+      reason: "Blocked: kubectl delete namespace destroys everything in it"
+    - pattern: '\bkubectl\s+delete\s+.*--all'
+      reason: "Blocked: kubectl delete --all is mass deletion"
+    - pattern: '\bkubectl\s+drain\b'
+      reason: "Blocked: kubectl drain evicts all pods from node"
+    - pattern: '\bhelm\s+uninstall\b'
+      reason: "Blocked: helm uninstall removes release"
+    - pattern: '\bkubectl\s+.*--force'
+      reason: "Blocked: kubectl --force bypasses safety checks"
+
+    # --- Cloud Provider Destruction ---
+    # AWS
+    - pattern: '\baws\s+.*terminate-instances'
+      reason: "Blocked: aws terminate-instances destroys EC2s"
+    - pattern: '\baws\s+.*delete-db-instance'
+      reason: "Blocked: aws delete-db-instance destroys RDS"
+    - pattern: '\baws\s+s3\s+rm\s+.*--recursive'
+      reason: "Blocked: aws s3 rm --recursive mass deletes"
+    - pattern: '\baws\s+.*delete-stack'
+      reason: "Blocked: aws delete-stack destroys CloudFormation"
+    # GCP
+    - pattern: '\bgcloud\s+.*instances\s+delete'
+      reason: "Blocked: gcloud instances delete destroys VMs"
+    - pattern: '\bgcloud\s+.*sql\s+instances\s+delete'
+      reason: "Blocked: gcloud sql instances delete destroys databases"
+    - pattern: '\bgsutil\s+rm\s+-r'
+      reason: "Blocked: gsutil rm -r recursive delete"
+    # Azure
+    - pattern: '\baz\s+vm\s+delete'
+      reason: "Blocked: az vm delete destroys VMs"
+    - pattern: '\baz\s+group\s+delete'
+      reason: "Blocked: az group delete destroys resource groups"
+
+    # --- Database Destruction ---
+    - pattern: '\bDROP\s+(DATABASE|TABLE|SCHEMA)\b'
+      reason: "Blocked: DROP destroys database objects"
+      flags: "IGNORECASE"
+    - pattern: '\bTRUNCATE\s+TABLE\b'
+      reason: "Blocked: TRUNCATE removes all data"
+      flags: "IGNORECASE"
+    - pattern: '\bDELETE\s+FROM\s+\w+\s*;'
+      reason: "Blocked: DELETE without WHERE removes all rows"
+      flags: "IGNORECASE"
+    - pattern: '\bdropdb\b'
+      reason: "Blocked: dropdb destroys PostgreSQL database"
+    - pattern: '\bmongosh?.*dropDatabase'
+      reason: "Blocked: MongoDB dropDatabase"
+    - pattern: '\bredis-cli.*FLUSHALL'
+      reason: "Blocked: Redis FLUSHALL removes all data"
+    - pattern: '\bredis-cli.*FLUSHDB'
+      reason: "Blocked: Redis FLUSHDB removes database"
+
+    # --- Infrastructure as Code ---
+    - pattern: '\bterraform\s+destroy'
+      reason: "Blocked: terraform destroy removes infrastructure"
+    - pattern: '\bpulumi\s+destroy'
+      reason: "Blocked: pulumi destroy removes infrastructure"
+
+    # --- System Destruction ---
+    - pattern: '\bsudo\s+.*\bshutdown\b'
+      reason: "Blocked: shutdown command"
+    - pattern: '\bsudo\s+.*\breboot\b'
+      reason: "Blocked: reboot command"
+    - pattern: '\bsystemctl\s+(stop|disable|mask)\b'
+      reason: "Blocked: systemctl stop/disable/mask"
+    - pattern: '\blaunchctl\s+(unload|remove)\b'
+      reason: "Blocked: launchctl unload/remove"
+    - pattern: '\bchmod\s+777\b'
+      reason: "Blocked: chmod 777 is insecure"
+    - pattern: '\bchown\s+-R\s+.*/'
+      reason: "Blocked: recursive chown on root paths"
+
+  # Require confirmation - user must approve
+  ask:
+    - pattern: '\brm\s'
+      reason: "rm command requires confirmation"
+    - pattern: '\bkubectl\s+delete\b'
+      reason: "kubectl delete requires confirmation"
+    - pattern: '\bkubectl\s+exec\b'
+      reason: "kubectl exec requires confirmation"
+    - pattern: '\bkubectl\s+apply\b'
+      reason: "kubectl apply modifies cluster state"
+    - pattern: '\bkubectl\s+scale\b'
+      reason: "kubectl scale changes replica count"
+    - pattern: '\bargocd\b'
+      reason: "ArgoCD operations require confirmation"
+    - pattern: '\bdocker\s+(stop|kill|rm)\b'
+      reason: "Docker container operations require confirmation"
+    - pattern: '\bdocker-compose\s+(down|stop)\b'
+      reason: "Docker Compose operations require confirmation"
+    - pattern: '\bnpm\s+publish\b'
+      reason: "npm publish requires confirmation"
+    - pattern: '\bcargo\s+publish\b'
+      reason: "cargo publish requires confirmation"
+    - pattern: '\bpip\s+install\b(?!.*-r\s+requirements)'
+      reason: "pip install requires confirmation (use -r requirements.txt)"
+    - pattern: '\bnpx\b'
+      reason: "npx executes remote packages - requires confirmation"
+    - pattern: '\bDELETE\s+FROM\s+\w+\s+WHERE\b'
+      reason: "DELETE with WHERE requires confirmation"
+      flags: "IGNORECASE"
+    - pattern: '\bUPDATE\s+\w+\s+SET\b'
+      reason: "UPDATE requires confirmation"
+      flags: "IGNORECASE"
+
+  # Explicitly allowed - bypass ask patterns
+  allow:
+    - pattern: '\brm\s+(-[rRfv]+\s+)*/tmp/'
+      reason: "rm in /tmp is safe"
+    - pattern: '\brm\s+(-[rRfv]+\s+)*/var/tmp/'
+      reason: "rm in /var/tmp is safe"
+    - pattern: '\bgit\s+restore\s+--staged'
+      reason: "restore --staged only unstages, doesn't discard"
+    - pattern: '\bgit\s+checkout\s+-b\b'
+      reason: "checkout -b creates new branch"
+    - pattern: '\bgit\s+checkout\s+--orphan'
+      reason: "checkout --orphan creates orphan branch"
+    - pattern: '\bgit\s+clean\s+-n'
+      reason: "clean -n is dry-run"
+    - pattern: '\bgit\s+clean\s+--dry-run'
+      reason: "clean --dry-run is safe"
+    - pattern: '\bkubectl\s+delete\s+pod\b.*--dry-run'
+      reason: "kubectl delete --dry-run is safe"
+    - pattern: '\bterraform\s+destroy\s+.*-target'
+      reason: "terraform destroy -target is scoped"
+    - pattern: '\bhelm\s+uninstall\s+.*--dry-run'
+      reason: "helm uninstall --dry-run is safe"
+
+# ============================================================================
+# EDIT TOOL PATTERNS - File modification protection
+# ============================================================================
+edit:
+  block:
+    - pattern: '/etc/'
+      reason: "Blocked: cannot edit system files"
+    - pattern: '\.env$'
+      reason: "Blocked: cannot edit .env files (secrets)"
+    - pattern: '\.env\.'
+      reason: "Blocked: cannot edit .env.* files (secrets)"
+    - pattern: '/\.ssh/'
+      reason: "Blocked: cannot edit SSH directory"
+    - pattern: '/\.gnupg/'
+      reason: "Blocked: cannot edit GPG directory"
+    - pattern: '/\.aws/'
+      reason: "Blocked: cannot edit AWS credentials"
+
+  ask:
+    - pattern: '\.claude/settings'
+      reason: "Claude settings modification requires confirmation"
+    - pattern: 'package\.json$'
+      reason: "package.json modification requires confirmation"
+    - pattern: 'Cargo\.toml$'
+      reason: "Cargo.toml modification requires confirmation"
+    - pattern: 'pyproject\.toml$'
+      reason: "pyproject.toml modification requires confirmation"
+
+# ============================================================================
+# WRITE TOOL PATTERNS - File creation protection
+# ============================================================================
+write:
+  block:
+    - pattern: '/etc/'
+      reason: "Blocked: cannot write to system directories"
+    - pattern: '/\.ssh/'
+      reason: "Blocked: cannot write to SSH directory"
+    - pattern: '/\.gnupg/'
+      reason: "Blocked: cannot write to GPG directory"
+    - pattern: '\.env$'
+      reason: "Blocked: cannot create .env files directly"
+
+  ask:
+    - pattern: '\.sh$'
+      reason: "Shell script creation requires confirmation"
+    - pattern: 'Makefile'
+      reason: "Makefile creation requires confirmation"
+    - pattern: 'Dockerfile'
+      reason: "Dockerfile creation requires confirmation"
+    - pattern: '\.github/'
+      reason: "GitHub workflow creation requires confirmation"

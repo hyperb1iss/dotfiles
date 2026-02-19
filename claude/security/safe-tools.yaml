@@ -1,0 +1,494 @@
+# ============================================================================
+# Claude Code Safe Tools - Comprehensive Allow List
+# ============================================================================
+#
+# These are tools/commands that are generally safe and shouldn't require
+# confirmation for most development workflows.
+#
+# Format: Claude Code permission rule syntax
+# Usage: Copy desired rules to ~/.claude/settings.json under permissions.allow
+# ============================================================================
+
+version: "1.0"
+
+# ============================================================================
+# BASH COMMANDS - Read-only and safe development operations
+# ============================================================================
+bash:
+  # ---------------------------------------------------------------------------
+  # Filesystem - Read Operations
+  # ---------------------------------------------------------------------------
+  filesystem_read:
+    - "Bash(ls:*)"
+    - "Bash(find:*)"
+    - "Bash(tree:*)"
+    - "Bash(cat:*)"
+    - "Bash(head:*)"
+    - "Bash(tail:*)"
+    - "Bash(wc:*)"
+    - "Bash(file:*)"
+    - "Bash(stat:*)"
+    - "Bash(du:*)"
+    - "Bash(df:*)"
+    - "Bash(readlink:*)"
+    - "Bash(realpath:*)"
+    - "Bash(basename:*)"
+    - "Bash(dirname:*)"
+    - "Bash(pwd:*)"
+    - "Bash(test:*)"        # [ ] and test commands
+    - "Bash([:*)"           # [ condition ]
+
+  # ---------------------------------------------------------------------------
+  # Search Tools
+  # ---------------------------------------------------------------------------
+  search:
+    - "Bash(grep:*)"
+    - "Bash(egrep:*)"
+    - "Bash(fgrep:*)"
+    - "Bash(rg:*)"          # ripgrep
+    - "Bash(ag:*)"          # silver searcher
+    - "Bash(ack:*)"
+    - "Bash(fd:*)"          # fd-find
+    - "Bash(fzf:*)"
+    - "Bash(locate:*)"
+    - "Bash(which:*)"
+    - "Bash(whereis:*)"
+    - "Bash(type:*)"
+    - "Bash(command -v:*)"
+
+  # ---------------------------------------------------------------------------
+  # Git - Read Operations (Safe)
+  # ---------------------------------------------------------------------------
+  git_read:
+    - "Bash(git status:*)"
+    - "Bash(git log:*)"
+    - "Bash(git diff:*)"
+    - "Bash(git show:*)"
+    - "Bash(git branch:*)"        # includes -l, -a, -r (list operations)
+    - "Bash(git branch -l:*)"
+    - "Bash(git branch -a:*)"
+    - "Bash(git branch -r:*)"
+    - "Bash(git branch --list:*)"
+    - "Bash(git remote:*)"
+    - "Bash(git remote -v:*)"
+    - "Bash(git config --list:*)"
+    - "Bash(git config --get:*)"
+    - "Bash(git config -l:*)"
+    - "Bash(git blame:*)"
+    - "Bash(git shortlog:*)"
+    - "Bash(git describe:*)"
+    - "Bash(git rev-parse:*)"
+    - "Bash(git rev-list:*)"
+    - "Bash(git ls-files:*)"
+    - "Bash(git ls-tree:*)"
+    - "Bash(git cat-file:*)"
+    - "Bash(git tag:*)"           # list tags (no -d)
+    - "Bash(git tag -l:*)"
+    - "Bash(git stash list:*)"
+    - "Bash(git worktree list:*)"
+    - "Bash(git reflog:*)"        # reading reflog is safe
+    - "Bash(git --version:*)"
+    - "Bash(git --no-pager:*)"
+
+  # ---------------------------------------------------------------------------
+  # Git - Safe Write Operations
+  # ---------------------------------------------------------------------------
+  git_write_safe:
+    - "Bash(git add:*)"           # staging is safe
+    - "Bash(git commit:*)"        # committing is safe (local)
+    - "Bash(git fetch:*)"         # fetching is safe
+    - "Bash(git pull --ff-only:*)" # fast-forward only is safe
+    - "Bash(git stash:*)"         # stashing is safe (recoverable)
+    - "Bash(git checkout -b:*)"   # creating branch is safe
+    - "Bash(git switch -c:*)"     # creating branch is safe
+    - "Bash(git switch:*)"        # switching branches is safe
+    - "Bash(git restore --staged:*)" # unstaging is safe
+    - "Bash(git worktree add:*)"  # adding worktree is safe
+
+  # ---------------------------------------------------------------------------
+  # Node.js / JavaScript Ecosystem
+  # ---------------------------------------------------------------------------
+  node:
+    - "Bash(node:*)"
+    - "Bash(node --version:*)"
+    - "Bash(npm run:*)"
+    - "Bash(npm test:*)"
+    - "Bash(npm run test:*)"
+    - "Bash(npm run build:*)"
+    - "Bash(npm run lint:*)"
+    - "Bash(npm run dev:*)"
+    - "Bash(npm run start:*)"
+    - "Bash(npm list:*)"
+    - "Bash(npm ls:*)"
+    - "Bash(npm outdated:*)"
+    - "Bash(npm view:*)"
+    - "Bash(npm --version:*)"
+    - "Bash(pnpm run:*)"
+    - "Bash(pnpm test:*)"
+    - "Bash(pnpm build:*)"
+    - "Bash(pnpm lint:*)"
+    - "Bash(pnpm dev:*)"
+    - "Bash(pnpm start:*)"
+    - "Bash(pnpm list:*)"
+    - "Bash(pnpm ls:*)"
+    - "Bash(pnpm outdated:*)"
+    - "Bash(pnpm --version:*)"
+    - "Bash(yarn run:*)"
+    - "Bash(yarn test:*)"
+    - "Bash(yarn build:*)"
+    - "Bash(yarn lint:*)"
+    - "Bash(yarn --version:*)"
+    - "Bash(bun run:*)"
+    - "Bash(bun test:*)"
+    - "Bash(bun build:*)"
+    - "Bash(bun --version:*)"
+    - "Bash(deno run:*)"
+    - "Bash(deno test:*)"
+    - "Bash(deno lint:*)"
+    - "Bash(deno fmt:*)"
+    - "Bash(deno --version:*)"
+    - "Bash(tsc:*)"               # TypeScript compiler
+    - "Bash(tsx:*)"               # TypeScript execute
+    - "Bash(eslint:*)"
+    - "Bash(prettier:*)"
+    - "Bash(biome:*)"
+    - "Bash(vitest:*)"
+    - "Bash(jest:*)"
+    - "Bash(playwright:*)"
+
+  # ---------------------------------------------------------------------------
+  # Python Ecosystem
+  # ---------------------------------------------------------------------------
+  python:
+    - "Bash(python:*)"
+    - "Bash(python3:*)"
+    - "Bash(python --version:*)"
+    - "Bash(python3 --version:*)"
+    - "Bash(pytest:*)"
+    - "Bash(ruff:*)"
+    - "Bash(ruff check:*)"
+    - "Bash(ruff format:*)"
+    - "Bash(mypy:*)"
+    - "Bash(ty:*)"                # Astral type checker
+    - "Bash(pyright:*)"
+    - "Bash(black:*)"
+    - "Bash(isort:*)"
+    - "Bash(flake8:*)"
+    - "Bash(pylint:*)"
+    - "Bash(uv:*)"                # Astral package manager
+    - "Bash(uv run:*)"
+    - "Bash(uv pip list:*)"
+    - "Bash(uv pip show:*)"
+    - "Bash(uv sync:*)"
+    - "Bash(uv lock:*)"
+    - "Bash(uv --version:*)"
+    - "Bash(poetry run:*)"
+    - "Bash(poetry show:*)"
+    - "Bash(poetry --version:*)"
+    - "Bash(pip list:*)"
+    - "Bash(pip show:*)"
+    - "Bash(pip --version:*)"
+    - "Bash(pdm run:*)"
+    - "Bash(pdm list:*)"
+    - "Bash(hatch run:*)"
+
+  # ---------------------------------------------------------------------------
+  # Rust Ecosystem
+  # ---------------------------------------------------------------------------
+  rust:
+    - "Bash(cargo:*)"
+    - "Bash(cargo build:*)"
+    - "Bash(cargo test:*)"
+    - "Bash(cargo check:*)"
+    - "Bash(cargo clippy:*)"
+    - "Bash(cargo fmt:*)"
+    - "Bash(cargo run:*)"
+    - "Bash(cargo doc:*)"
+    - "Bash(cargo tree:*)"
+    - "Bash(cargo search:*)"
+    - "Bash(cargo --version:*)"
+    - "Bash(rustc --version:*)"
+    - "Bash(rustup show:*)"
+    - "Bash(rustup --version:*)"
+
+  # ---------------------------------------------------------------------------
+  # Go Ecosystem
+  # ---------------------------------------------------------------------------
+  go:
+    - "Bash(go build:*)"
+    - "Bash(go test:*)"
+    - "Bash(go run:*)"
+    - "Bash(go fmt:*)"
+    - "Bash(go vet:*)"
+    - "Bash(go mod tidy:*)"
+    - "Bash(go mod download:*)"
+    - "Bash(go list:*)"
+    - "Bash(go version:*)"
+    - "Bash(golangci-lint:*)"
+
+  # ---------------------------------------------------------------------------
+  # Shell / Scripts
+  # ---------------------------------------------------------------------------
+  shell:
+    - "Bash(shellcheck:*)"
+    - "Bash(shfmt:*)"
+    - "Bash(bash -n:*)"           # syntax check only
+    - "Bash(zsh -n:*)"            # syntax check only
+    - "Bash(echo:*)"
+    - "Bash(printf:*)"
+
+  # ---------------------------------------------------------------------------
+  # Text Processing (Safe)
+  # ---------------------------------------------------------------------------
+  text:
+    - "Bash(sort:*)"
+    - "Bash(uniq:*)"
+    - "Bash(cut:*)"
+    - "Bash(tr:*)"
+    - "Bash(awk:*)"
+    - "Bash(sed -n:*)"            # print only, no modification
+    - "Bash(jq:*)"
+    - "Bash(yq:*)"
+    - "Bash(xq:*)"
+    - "Bash(diff:*)"
+    - "Bash(comm:*)"
+    - "Bash(paste:*)"
+    - "Bash(column:*)"
+    - "Bash(fmt:*)"
+    - "Bash(fold:*)"
+    - "Bash(expand:*)"
+    - "Bash(unexpand:*)"
+    - "Bash(nl:*)"                # number lines
+    - "Bash(tac:*)"
+    - "Bash(rev:*)"
+    - "Bash(md5:*)"
+    - "Bash(sha256sum:*)"
+    - "Bash(shasum:*)"
+    - "Bash(base64:*)"
+
+  # ---------------------------------------------------------------------------
+  # System Info (Read-only)
+  # ---------------------------------------------------------------------------
+  system_info:
+    - "Bash(uname:*)"
+    - "Bash(whoami:*)"
+    - "Bash(id:*)"
+    - "Bash(groups:*)"
+    - "Bash(hostname:*)"
+    - "Bash(date:*)"
+    - "Bash(cal:*)"
+    - "Bash(uptime:*)"
+    - "Bash(env:*)"
+    - "Bash(printenv:*)"
+    - "Bash(set:*)"               # in read context
+    - "Bash(locale:*)"
+    - "Bash(sw_vers:*)"           # macOS version
+    - "Bash(system_profiler:*)"   # macOS system info
+    - "Bash(sysctl:*)"
+    - "Bash(vm_stat:*)"
+    - "Bash(top -l 1:*)"          # single snapshot
+    - "Bash(ps:*)"
+    - "Bash(pgrep:*)"
+    - "Bash(lsof:*)"
+    - "Bash(netstat:*)"
+    - "Bash(ss:*)"
+    - "Bash(ifconfig:*)"
+    - "Bash(ip:*)"
+
+  # ---------------------------------------------------------------------------
+  # Archive Inspection (Read-only)
+  # ---------------------------------------------------------------------------
+  archives:
+    - "Bash(tar -tf:*)"           # list contents
+    - "Bash(tar -tvf:*)"          # list verbose
+    - "Bash(tar --list:*)"
+    - "Bash(unzip -l:*)"          # list contents
+    - "Bash(zipinfo:*)"
+    - "Bash(gzip -l:*)"           # list
+    - "Bash(zcat:*)"
+    - "Bash(zless:*)"
+    - "Bash(bzcat:*)"
+    - "Bash(xzcat:*)"
+
+  # ---------------------------------------------------------------------------
+  # Version Managers
+  # ---------------------------------------------------------------------------
+  version_managers:
+    - "Bash(proto:*)"             # moonrepo proto
+    - "Bash(proto list:*)"
+    - "Bash(proto status:*)"
+    - "Bash(proto --version:*)"
+    - "Bash(asdf:*)"
+    - "Bash(asdf list:*)"
+    - "Bash(asdf current:*)"
+    - "Bash(mise:*)"
+    - "Bash(mise list:*)"
+    - "Bash(mise current:*)"
+    - "Bash(nvm list:*)"
+    - "Bash(fnm list:*)"
+    - "Bash(rbenv versions:*)"
+    - "Bash(pyenv versions:*)"
+
+  # ---------------------------------------------------------------------------
+  # Build Tools
+  # ---------------------------------------------------------------------------
+  build:
+    - "Bash(make:*)"
+    - "Bash(cmake:*)"
+    - "Bash(ninja:*)"
+    - "Bash(meson:*)"
+    - "Bash(moon:*)"              # moonrepo
+    - "Bash(moon run:*)"
+    - "Bash(moon check:*)"
+    - "Bash(moon --version:*)"
+    - "Bash(turbo:*)"
+    - "Bash(turbo run:*)"
+    - "Bash(nx:*)"
+    - "Bash(nx run:*)"
+    - "Bash(bazel build:*)"
+    - "Bash(bazel test:*)"
+    - "Bash(bazel query:*)"
+    - "Bash(just:*)"              # justfile runner
+    - "Bash(task:*)"              # taskfile runner
+
+  # ---------------------------------------------------------------------------
+  # Documentation / Markdown
+  # ---------------------------------------------------------------------------
+  docs:
+    - "Bash(mdbook:*)"
+    - "Bash(vitepress:*)"
+    - "Bash(docusaurus:*)"
+    - "Bash(mkdocs:*)"
+    - "Bash(man:*)"
+    - "Bash(tldr:*)"
+    - "Bash(cheat:*)"
+
+  # ---------------------------------------------------------------------------
+  # Miscellaneous Safe Tools
+  # ---------------------------------------------------------------------------
+  misc:
+    - "Bash(xargs:*)"
+    - "Bash(time:*)"
+    - "Bash(timeout:*)"
+    - "Bash(tee:*)"
+    - "Bash(touch:*)"             # creating empty files is safe
+    - "Bash(mkdir:*)"             # creating directories is safe
+    - "Bash(ln -s:*)"             # symlinks are generally safe
+    - "Bash(sleep:*)"
+    - "Bash(true:*)"
+    - "Bash(false:*)"
+    - "Bash(seq:*)"
+    - "Bash(yes:*)"
+    - "Bash(pbcopy:*)"            # macOS clipboard
+    - "Bash(pbpaste:*)"           # macOS clipboard
+    - "Bash(open:*)"              # macOS open
+    - "Bash(code:*)"              # VS Code
+    - "Bash(cursor:*)"            # Cursor editor
+    - "Bash(nvim:*)"              # Neovim
+    - "Bash(vim:*)"
+    - "Bash(fastfetch:*)"
+    - "Bash(neofetch:*)"
+    - "Bash(btop:*)"
+    - "Bash(htop:*)"
+
+  # ---------------------------------------------------------------------------
+  # Sibyl (Your Knowledge Graph)
+  # ---------------------------------------------------------------------------
+  sibyl:
+    - "Bash(sibyl:*)"
+    - "Bash(sibyl search:*)"
+    - "Bash(sibyl task:*)"
+    - "Bash(sibyl add:*)"
+
+  # ---------------------------------------------------------------------------
+  # Container Read Operations
+  # ---------------------------------------------------------------------------
+  containers_read:
+    - "Bash(docker ps:*)"
+    - "Bash(docker images:*)"
+    - "Bash(docker logs:*)"
+    - "Bash(docker inspect:*)"
+    - "Bash(docker stats:*)"
+    - "Bash(docker top:*)"
+    - "Bash(docker version:*)"
+    - "Bash(docker info:*)"
+    - "Bash(docker-compose ps:*)"
+    - "Bash(docker-compose logs:*)"
+    - "Bash(docker-compose config:*)"
+    - "Bash(podman ps:*)"
+    - "Bash(podman images:*)"
+    - "Bash(podman logs:*)"
+
+  # ---------------------------------------------------------------------------
+  # Kubernetes Read Operations
+  # ---------------------------------------------------------------------------
+  k8s_read:
+    - "Bash(kubectl get:*)"
+    - "Bash(kubectl describe:*)"
+    - "Bash(kubectl logs:*)"
+    - "Bash(kubectl top:*)"
+    - "Bash(kubectl config view:*)"
+    - "Bash(kubectl config get-contexts:*)"
+    - "Bash(kubectl config current-context:*)"
+    - "Bash(kubectl version:*)"
+    - "Bash(kubectl api-resources:*)"
+    - "Bash(kubectl explain:*)"
+    - "Bash(helm list:*)"
+    - "Bash(helm status:*)"
+    - "Bash(helm get:*)"
+    - "Bash(helm show:*)"
+    - "Bash(helm search:*)"
+    - "Bash(helm version:*)"
+
+# ============================================================================
+# WEB FETCH - Trusted Domains
+# ============================================================================
+web:
+  - "WebFetch(domain:github.com)"
+  - "WebFetch(domain:raw.githubusercontent.com)"
+  - "WebFetch(domain:api.github.com)"
+  - "WebFetch(domain:docs.github.com)"
+  - "WebFetch(domain:npmjs.com)"
+  - "WebFetch(domain:pypi.org)"
+  - "WebFetch(domain:crates.io)"
+  - "WebFetch(domain:docs.rs)"
+  - "WebFetch(domain:pkg.go.dev)"
+  - "WebFetch(domain:rubygems.org)"
+  - "WebFetch(domain:hex.pm)"
+  - "WebFetch(domain:docs.anthropic.com)"
+  - "WebFetch(domain:claude.ai)"
+  - "WebFetch(domain:code.claude.com)"
+  - "WebFetch(domain:platform.claude.com)"
+  - "WebFetch(domain:developer.mozilla.org)"
+  - "WebFetch(domain:nodejs.org)"
+  - "WebFetch(domain:typescriptlang.org)"
+  - "WebFetch(domain:react.dev)"
+  - "WebFetch(domain:nextjs.org)"
+  - "WebFetch(domain:vuejs.org)"
+  - "WebFetch(domain:svelte.dev)"
+  - "WebFetch(domain:astro.build)"
+  - "WebFetch(domain:tailwindcss.com)"
+  - "WebFetch(domain:rust-lang.org)"
+  - "WebFetch(domain:go.dev)"
+  - "WebFetch(domain:python.org)"
+  - "WebFetch(domain:docs.python.org)"
+  - "WebFetch(domain:kubernetes.io)"
+  - "WebFetch(domain:docker.com)"
+  - "WebFetch(domain:terraform.io)"
+  - "WebFetch(domain:stackoverflow.com)"
+
+# ============================================================================
+# WEB SEARCH
+# ============================================================================
+search:
+  - "WebSearch"
+
+# ============================================================================
+# MCP SERVERS - Your Approved Servers
+# ============================================================================
+mcp:
+  - "mcp__context7"
+  - "mcp__archon"
+  - "mcp__sibyl"
+  - "mcp__next-devtools"
+  - "mcp__codex-cli"
