@@ -21,6 +21,16 @@
     ~/.gitconfig: gitconfig
     # Fastfetch configuration (Windows path)
     ~/AppData/Roaming/fastfetch/config.jsonc: fastfetch/config.jsonc
+    # Claude Code configuration
+    ~/.claude/settings.json: claude/settings.json
+    ~/.claude/statusline-command.sh: claude/statusline-command.sh
+    # Claude Code / Codex agent files (from dotfiles-private)
+    ~/.claude/CLAUDE.md:
+      path: ~/dev/dotfiles-private/ai/AGENTS.md
+      if: "[ -f ~/dev/dotfiles-private/ai/AGENTS.md ]"
+    ~/.codex/AGENTS.md:
+      path: ~/dev/dotfiles-private/ai/AGENTS.md
+      if: "[ -f ~/dev/dotfiles-private/ai/AGENTS.md ]"
 
 - shell:
     # Ensure fastfetch config directory exists on Windows
