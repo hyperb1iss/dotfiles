@@ -57,6 +57,7 @@ gimp-devel
 blender
 
 # System utilities
+btop
 ca-certificates
 gnupg
 gperf
