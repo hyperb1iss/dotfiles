@@ -1,0 +1,428 @@
+// ── SilkCircuit Neon — Desktop Widget Stylesheet ───────────────
+// Aesthetic: Cinematic neon HUD. Deep blacks, electric accents,
+// dramatic scale contrasts. Not a dashboard — a presence.
+
+// ── Palette ────────────────────────────────────────────────────
+$electric-purple: #e135ff;
+$neon-cyan: #80ffea;
+$coral: #ff6ac1;
+$success-green: #50fa7b;
+$error-red: #ff6363;
+$pink-soft: #ff99ff;
+
+$bg-void: #050410;
+$bg-base: #0c0a14;
+$bg-surface: #14101e;
+$fg: #f8f8f2;
+$fg-dim: #d4c4e8;
+$fg-muted: #8878a8;
+$fg-ghost: #5a4d73;
+
+// Glass
+$bg-glass: rgba($bg-void, 0.92);
+$border-glow: rgba($electric-purple, 0.22);
+
+// ── Typography ─────────────────────────────────────────────────
+// Orbitron — geometric sci-fi display. Clock heroes, big numbers.
+$font-hero: "Orbitron", "Cantarell", sans-serif;
+// Comfortaa — rounded geometric sans. Labels, descriptions, UI.
+$font-display: "Comfortaa", "Cantarell", sans-serif;
+// PragmataPro — sharp mono. Data values, speeds, percentages.
+$font-data: "PragmataProLiga Nerd Font", "PragmataPro Nerd Font", "FantasqueSansM Nerd Font Mono", monospace;
+
+// ── Reset ──────────────────────────────────────────────────────
+* {
+  all: unset;
+  font-family: $font-display;
+  font-weight: 400;
+  color: $fg;
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// WIDGET CONTAINER
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+.sc-widget {
+  background: linear-gradient(
+    170deg,
+    rgba(12, 8, 20, 0.94) 0%,
+    rgba(5, 4, 14, 0.96) 40%,
+    rgba(10, 6, 18, 0.94) 100%
+  );
+  border-radius: 18px;
+  padding: 20px 22px;
+  border: 1px solid $border-glow;
+  min-width: 280px;
+  box-shadow:
+    0 0 40px rgba($electric-purple, 0.06),
+    0 12px 40px rgba(0, 0, 0, 0.6),
+    inset 0 1px 0 rgba($fg, 0.02);
+}
+
+.sc-widget-title {
+  font-family: $font-display;
+  font-size: 10px;
+  font-weight: 600;
+  color: $electric-purple;
+  letter-spacing: 4px;
+  margin-bottom: 8px;
+  opacity: 0.6;
+}
+
+.sc-separator {
+  background: linear-gradient(
+    90deg,
+    rgba($electric-purple, 0.0) 0%,
+    rgba($electric-purple, 0.18) 30%,
+    rgba($neon-cyan, 0.12) 70%,
+    rgba($electric-purple, 0.0) 100%
+  );
+  min-height: 1px;
+  margin-top: 4px;
+  margin-bottom: 4px;
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// CLOCK
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+.sc-clock {
+  padding: 28px 32px 24px;
+}
+
+.sc-clock-button {
+  padding: 0;
+  border-radius: 12px;
+
+  &:hover {
+    background-color: rgba($neon-cyan, 0.04);
+  }
+}
+
+.sc-clock-time {
+  font-family: $font-hero;
+  font-size: 64px;
+  font-weight: 700;
+  color: $neon-cyan;
+  letter-spacing: 2px;
+  text-shadow:
+    0 0 60px rgba($neon-cyan, 0.35),
+    0 0 120px rgba($neon-cyan, 0.1);
+}
+
+.sc-clock-seconds {
+  font-family: $font-hero;
+  font-size: 11px;
+  color: $fg-ghost;
+  margin-top: -4px;
+  letter-spacing: 2px;
+}
+
+.sc-clock-date {
+  font-family: $font-display;
+  font-size: 15px;
+  font-weight: 600;
+  color: $coral;
+  margin-top: 8px;
+  text-shadow: 0 0 20px rgba($coral, 0.2);
+}
+
+// ── Calendar ───────────────────────────────────────────────────
+.sc-calendar {
+  background-color: rgba($bg-surface, 0.7);
+  border-radius: 14px;
+  padding: 14px;
+  margin-top: 12px;
+  font-family: $font-data;
+  font-size: 12px;
+  color: $fg-dim;
+  border: 1px solid rgba($electric-purple, 0.1);
+
+  &:selected {
+    background-color: $electric-purple;
+    color: $bg-void;
+    border-radius: 6px;
+  }
+
+  &.header {
+    color: $neon-cyan;
+    font-weight: 700;
+    font-family: $font-hero;
+  }
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// WEATHER
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+.sc-weather {
+  padding: 20px 24px 16px;
+}
+
+.sc-weather-glyph {
+  font-size: 48px;
+}
+
+.sc-weather-temp {
+  font-family: $font-hero;
+  font-size: 34px;
+  font-weight: 700;
+  color: $fg;
+  letter-spacing: 1px;
+  text-shadow: 0 0 30px rgba($fg, 0.1);
+}
+
+.sc-weather-desc {
+  font-family: $font-display;
+  font-size: 14px;
+  font-weight: 600;
+  color: $success-green;
+  text-shadow: 0 0 16px rgba($success-green, 0.2);
+  margin-top: 2px;
+}
+
+.sc-weather-details {
+  font-family: $font-data;
+  font-size: 11px;
+  color: $fg-muted;
+  margin-top: 6px;
+  letter-spacing: 0.3px;
+}
+
+.sc-weather-city {
+  font-family: $font-display;
+  font-size: 9px;
+  color: $fg-ghost;
+  letter-spacing: 3px;
+  margin-top: 6px;
+  text-transform: uppercase;
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// SYSTEM MONITOR
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+.sc-sysmon {
+  padding: 18px 22px;
+}
+
+// ── Hero numbers (CPU + Temp) ──────────────────────────────────
+.sc-hero-row {
+  margin-bottom: 6px;
+  padding: 4px 0;
+}
+
+.sc-hero-block {
+  padding: 0 24px;
+}
+
+.sc-hero-divider {
+  min-width: 1px;
+  min-height: 48px;
+  background: linear-gradient(
+    180deg,
+    rgba($electric-purple, 0.0) 0%,
+    rgba($electric-purple, 0.3) 50%,
+    rgba($electric-purple, 0.0) 100%
+  );
+}
+
+.sc-hero-number {
+  font-family: $font-hero;
+  font-size: 36px;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+.sc-glow-cyan {
+  color: $neon-cyan;
+  text-shadow:
+    0 0 40px rgba($neon-cyan, 0.3),
+    0 0 80px rgba($neon-cyan, 0.08);
+}
+
+.sc-glow-coral {
+  color: $coral;
+  text-shadow:
+    0 0 40px rgba($coral, 0.3),
+    0 0 80px rgba($coral, 0.08);
+}
+
+.sc-hero-suffix {
+  font-family: $font-hero;
+  font-size: 16px;
+  font-weight: 700;
+  margin-top: 8px;
+}
+
+.sc-hero-unit {
+  font-family: $font-display;
+  font-size: 9px;
+  font-weight: 600;
+  color: $fg-ghost;
+  letter-spacing: 3px;
+  margin-top: -2px;
+}
+
+// ── Info rows (freq, load, uptime) ─────────────────────────────
+.sc-info-row {
+  min-height: 20px;
+  padding: 1px 0;
+}
+
+.sc-info-label {
+  font-family: $font-display;
+  font-size: 10px;
+  color: $fg-ghost;
+  letter-spacing: 2px;
+}
+
+.sc-info-value {
+  font-family: $font-data;
+  font-size: 12px;
+  color: $fg-dim;
+}
+
+// ── Stat blocks (RAM, Swap, Disk) ──────────────────────────────
+.sc-stat-block {
+  padding: 2px 0;
+}
+
+.sc-stat-label {
+  font-family: $font-display;
+  font-size: 10px;
+  font-weight: 700;
+  color: $fg-muted;
+  letter-spacing: 2px;
+}
+
+.sc-stat-value {
+  font-family: $font-data;
+  font-size: 12px;
+  color: $fg-dim;
+}
+
+// ── GPU ────────────────────────────────────────────────────────
+.sc-gpu-stats {
+  font-family: $font-data;
+  font-size: 11px;
+  color: $coral;
+  text-shadow: 0 0 12px rgba($coral, 0.15);
+}
+
+// ── Network ────────────────────────────────────────────────────
+.sc-net-value {
+  font-family: $font-data;
+  font-size: 12px;
+  color: $success-green;
+  text-shadow: 0 0 12px rgba($success-green, 0.15);
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// PROGRESS BARS
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+.sc-bar {
+  min-height: 4px;
+  border-radius: 2px;
+
+  trough {
+    min-height: 4px;
+    border-radius: 2px;
+    background-color: rgba($fg-ghost, 0.1);
+  }
+
+  highlight {
+    min-height: 4px;
+    border-radius: 2px;
+  }
+
+  slider {
+    min-width: 0;
+    min-height: 0;
+    background-color: rgba(0, 0, 0, 0);
+    border: none;
+  }
+}
+
+.sc-bar-cyan highlight {
+  background: linear-gradient(90deg, rgba($neon-cyan, 0.4) 0%, $neon-cyan 100%);
+  box-shadow: 0 0 8px rgba($neon-cyan, 0.3);
+}
+
+.sc-bar-coral highlight {
+  background: linear-gradient(90deg, rgba($coral, 0.4) 0%, $coral 100%);
+  box-shadow: 0 0 8px rgba($coral, 0.3);
+}
+
+.sc-bar-purple highlight {
+  background: linear-gradient(90deg, rgba($electric-purple, 0.4) 0%, $electric-purple 100%);
+  box-shadow: 0 0 8px rgba($electric-purple, 0.3);
+}
+
+.sc-bar-green highlight {
+  background: linear-gradient(90deg, rgba($success-green, 0.4) 0%, $success-green 100%);
+  box-shadow: 0 0 8px rgba($success-green, 0.3);
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// MEDIA PLAYER
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+.sc-media {
+  padding: 18px 22px;
+}
+
+.sc-media-player {
+  padding: 12px;
+  border-radius: 14px;
+  background: linear-gradient(
+    150deg,
+    rgba($electric-purple, 0.06) 0%,
+    rgba($bg-void, 0.4) 100%
+  );
+  border: 1px solid rgba($electric-purple, 0.08);
+}
+
+.sc-media-art {
+  border-radius: 10px;
+  min-width: 72px;
+  min-height: 72px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+}
+
+.sc-media-title {
+  font-family: $font-display;
+  font-size: 14px;
+  font-weight: 700;
+  color: $fg;
+}
+
+.sc-media-artist {
+  font-family: $font-display;
+  font-size: 12px;
+  font-weight: 500;
+  color: $coral;
+  text-shadow: 0 0 10px rgba($coral, 0.15);
+}
+
+.sc-media-controls {
+  margin-top: 6px;
+}
+
+.sc-media-btn {
+  font-size: 14px;
+  padding: 4px 10px;
+  border-radius: 10px;
+  color: $fg-ghost;
+
+  &:hover {
+    background-color: rgba($neon-cyan, 0.08);
+    color: $neon-cyan;
+  }
+}
+
+.sc-media-btn-play {
+  font-size: 20px;
+  color: $neon-cyan;
+  padding: 4px 14px;
+  text-shadow: 0 0 16px rgba($neon-cyan, 0.3);
+
+  &:hover {
+    background-color: rgba($neon-cyan, 0.12);
+  }
+}

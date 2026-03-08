@@ -51,6 +51,9 @@ tig
 
 # Desktop/Wayland utilities
 wl-clipboard
+gtk4-layer-shell
+dart-sass
+python-psutil
 
 # Creative tools
 gimp-devel

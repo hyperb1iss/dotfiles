@@ -123,4 +123,4 @@
 	# Compact log for quick overview
 	lgs = log --graph --pretty=format:'%C(201)%h%Creset %C(149)%s%Creset %C(243)(%cr)%Creset' --abbrev-commit
 [include]
-	path = /Users/bliss/.config/silkcircuit/gitconfig
+	path = ~/.config/silkcircuit/gitconfig

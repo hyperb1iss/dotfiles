@@ -158,6 +158,31 @@
     ~/.config/blender/5.0/scripts/startup/print3d_defaults.py: blender/startup/print3d_defaults.py
 
 - shell:
+    - mkdir -p ~/.config/ignis/modules
+    - mkdir -p ~/.config/systemd/user
+- link:
+    ~/.config/ignis/config.py: ignis/config.py
+    ~/.config/ignis/style.scss: ignis/style.scss
+    ~/.config/ignis/modules/__init__.py: ignis/modules/__init__.py
+    ~/.config/ignis/modules/clock.py: ignis/modules/clock.py
+    ~/.config/ignis/modules/weather.py: ignis/modules/weather.py
+    ~/.config/ignis/modules/sysmon.py: ignis/modules/sysmon.py
+    ~/.config/ignis/modules/media.py: ignis/modules/media.py
+    ~/.config/systemd/user/ignis.service: ignis/ignis.service
+- shell:
+    - command: |
+        # Enable Ignis desktop widgets on login
+        if command -v ignis >/dev/null 2>&1; then
+          systemctl --user daemon-reload
+          systemctl --user enable ignis.service 2>/dev/null || true
+          echo "Ignis desktop widgets enabled"
+        else
+          echo "Ignis not installed — run: paru -S python-ignis"
+        fi
+      stdout: true
+      description: "Enabling Ignis desktop widgets"
+
+- shell:
     - mkdir -p ~/.config/containers
 - link:
     ~/.config/containers/storage.conf: containers/storage.conf
