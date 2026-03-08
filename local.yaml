@@ -1,6 +1,7 @@
 - defaults:
     link:
       relink: true
+      force: true
 
 - clean: ["~"]
 
@@ -66,16 +67,30 @@
     ~/.config/starship.toml: starship/starship.toml
 
 - shell:
-    - mkdir -p "$HOME/Library/Application Support/com.mitchellh.ghostty"
+    - command: |
+        # Only create Ghostty macOS config dir on macOS
+        if [ "$(uname)" = "Darwin" ]; then
+          mkdir -p "$HOME/Library/Application Support/com.mitchellh.ghostty"
+        fi
+      quiet: true
 - link:
-    ~/Library/Application Support/com.mitchellh.ghostty/config: ghostty/config
+    ~/Library/Application Support/com.mitchellh.ghostty/config:
+      path: ghostty/config
+      if: '[ "$(uname)" = "Darwin" ]'
 
 - shell:
-    - command: mkdir -p ~/dev/go && GOPATH=~/dev/go go install github.com/junegunn/fzf@latest
+    - command: |
+        # Install fzf - prefer package manager, fall back to go install
+        if command -v fzf >/dev/null 2>&1; then
+          echo "fzf already installed"
+        elif command -v go >/dev/null 2>&1; then
+          mkdir -p ~/dev/go && GOPATH=~/dev/go go install github.com/junegunn/fzf@latest
+        else
+          echo "Warning: fzf not found and go not available, skipping fzf install"
+        fi
       stderr: true
       stdout: true
-      quiet: false
-      description: Installing fzf from source
+      description: Installing fzf
 
 - shell:
     - command: |

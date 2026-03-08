@@ -1,4 +1,4 @@
-BASEDIR=$(shell cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+BASEDIR=$(CURDIR)
 DOTBOT=$(BASEDIR)/dotbot/bin/dotbot
 INSTALL_STATE_FILE=$(BASEDIR)/.install_state
 
@@ -32,21 +32,21 @@ check-state:
 minimal: TYPE=minimal
 minimal: check-state update
 	@echo "minimal" > $(INSTALL_STATE_FILE)
-	$(DOTBOT) -d $(BASEDIR) -c minimal.yaml
+	SHELL=/bin/bash $(DOTBOT) -d $(BASEDIR) -c minimal.yaml
 
 full: TYPE=full
 full: check-state update
 	@echo "full" > $(INSTALL_STATE_FILE)
-	sudo $(DOTBOT) -d $(BASEDIR) -c system.yaml
-	$(DOTBOT) -d $(BASEDIR) -c local.yaml
+	sudo SHELL=/bin/bash $(DOTBOT) -d $(BASEDIR) -c system.yaml
+	SHELL=/bin/bash $(DOTBOT) -d $(BASEDIR) -c local.yaml
 
 macos: TYPE=macos
 macos: check-state update
 	@echo "macos" > $(INSTALL_STATE_FILE)
-	$(DOTBOT) -d $(BASEDIR) -c macos.yaml
+	SHELL=/bin/bash $(DOTBOT) -d $(BASEDIR) -c macos.yaml
 
 private: update
-	$(DOTBOT) -d $(BASEDIR) -c private.yaml
+	SHELL=/bin/bash $(DOTBOT) -d $(BASEDIR) -c private.yaml
 
 # Colors for beautiful output
 PURPLE := \033[1;35m

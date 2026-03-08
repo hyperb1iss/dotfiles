@@ -18,6 +18,7 @@ rustup
 tmux
 tree
 wget
+fzf
 zoxide
 zsh
 zsh-autosuggestions
@@ -38,7 +39,6 @@ jq
 yq
 lazygit
 meld
-shellcheck
 tig
 
 # System utilities
@@ -75,17 +75,15 @@ lib32-gcc-libs
 libxml2
 libxslt
 mesa
-ncurses
 perl-xml-simple
 repo
 unzip
 xorgproto
-zlib
+zlib-ng-compat
 
 # Archive utilities
 p7zip
 zip
-unzip
 xz
 lzop
 lrzip
