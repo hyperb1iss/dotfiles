@@ -31,7 +31,7 @@ def clock_widget() -> widgets.Box:
                             css_classes=["sc-clock-time"],
                             label=utils.Poll(
                                 1_000,
-                                lambda self: datetime.datetime.now().strftime("%H:%M"),
+                                lambda self: datetime.datetime.now().strftime("%-I:%M"),
                             ).bind("output"),
                         ),
                         # Seconds — small mono accent
@@ -39,7 +39,9 @@ def clock_widget() -> widgets.Box:
                             css_classes=["sc-clock-seconds"],
                             label=utils.Poll(
                                 1_000,
-                                lambda self: datetime.datetime.now().strftime(":%S"),
+                                lambda self: datetime.datetime.now().strftime(
+                                ":%S %p"
+                            ),
                             ).bind("output"),
                         ),
                         # Date — clean sans
