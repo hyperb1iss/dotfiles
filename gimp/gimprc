@@ -14,6 +14,7 @@
 (import-raw-plug-in "${gimp_plug_in_dir}/plug-ins/file-raw-placeholder/file-raw-placeholder")
 (monitor-xresolution 105)
 (monitor-yresolution 107)
+(show-welcome-dialog no)
 (fill-options
     (style fg-color)
     (custom-style solid-color)

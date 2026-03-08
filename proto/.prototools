@@ -3,6 +3,8 @@ proto = "0.54.1"
 pnpm = "10.28.1"
 node = "24.13.1"
 npm = "11.11.0"
+uv = "0.9.30"
+python = "3.13.12"
 
 [settings]
 auto-install = true
