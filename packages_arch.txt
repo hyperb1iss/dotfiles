@@ -32,9 +32,16 @@ lld
 llvm
 shellcheck
 
-# Development utilities
-docker
+# Container tools
+podman
+podman-docker
+podman-compose
+buildah
+skopeo
 docker-compose
+lazydocker
+
+# Development utilities
 jq
 yq
 lazygit
@@ -92,9 +99,6 @@ bzip2
 # Kubernetes tools
 kubectl
 kubectx
-# kubernetes-tools
 k9s
 helm
 kustomize
-# kind
-minikube

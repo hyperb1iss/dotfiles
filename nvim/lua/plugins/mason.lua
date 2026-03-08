@@ -2,42 +2,45 @@
 
 ---@type LazySpec
 return {
-  -- use mason-lspconfig to configure LSP installations
+  -- mason.nvim v2 handles ensure_installed natively
+  {
+    "williamboman/mason.nvim",
+    opts = {
+      ensure_installed = {
+        -- LSP servers
+        "lua-language-server",
+        "typescript-language-server",
+        "eslint-lsp",
+        "biome",
+        "vue-language-server",
+        "html-lsp",
+        "css-lsp",
+        "json-lsp",
+        "tailwindcss-language-server",
+        "graphql-language-service-cli",
+        -- Formatters and linters
+        "stylua",
+        "prettier",
+        "prettierd",
+        "markdownlint",
+        "yamllint",
+      },
+    },
+  },
+  -- use mason-lspconfig to auto-install LSP servers when configured
   {
     "williamboman/mason-lspconfig.nvim",
     -- overrides `require("mason-lspconfig").setup(...)`
     opts = {
-      ensure_installed = {
-        "lua_ls",
-        -- TypeScript/JavaScript language servers
-        "ts_ls", -- TypeScript Language Server (previously typescript-language-server)
-        "eslint", -- ESLint language server
-        "biome", -- Biome - Fast formatter and linter for JS/TS
-        "volar", -- Vue language server (if you work with Vue)
-        -- Other useful language servers
-        "html",
-        "cssls",
-        "jsonls",
-        "tailwindcss",
-        "graphql",
-      },
+      automatic_installation = true,
     },
   },
-  -- use mason-null-ls to configure Formatters/Linter installation for null-ls sources
+  -- use mason-null-ls for automatic null-ls source installation
   {
     "jay-babu/mason-null-ls.nvim",
     -- overrides `require("mason-null-ls").setup(...)`
     opts = {
-      ensure_installed = {
-        "stylua",
-        -- TypeScript/JavaScript formatters and linters
-        "biome", -- Biome for formatting and linting
-        "prettier", -- Code formatter for JS/TS/CSS/HTML/JSON/etc
-        "prettierd", -- Faster prettier daemon
-        -- Additional tools
-        "markdownlint",
-        "yamllint",
-      },
+      automatic_installation = true,
     },
   },
   {

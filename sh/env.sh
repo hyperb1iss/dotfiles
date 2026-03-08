@@ -71,6 +71,11 @@ case ":$PATH:" in
   *) export PATH="$PNPM_HOME:$PATH" ;;
 esac
 
+# Podman - set DOCKER_HOST so Docker Compose v2 talks to the Podman socket
+if [ -z "$DOCKER_HOST" ] && [ -S "${XDG_RUNTIME_DIR:-/run/user/$(id -u)}/podman/podman.sock" ]; then
+  export DOCKER_HOST="unix://${XDG_RUNTIME_DIR:-/run/user/$(id -u)}/podman/podman.sock"
+fi
+
 # proto - multi-language version manager (last = highest priority, overrides homebrew/pnpm/system)
 export PROTO_HOME="$HOME/.proto"
 export PATH="$PROTO_HOME/shims:$PROTO_HOME/bin:$PATH"

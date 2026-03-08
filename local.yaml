@@ -131,9 +131,27 @@
     - mkdir -p ~/.config/ghostty
 - link:
     ~/.config/fontconfig/fonts.conf: fonts/fonts.conf
+    ~/.config/ghostty/config: ghostty/config
     ~/.config/ghostty/linux.conf: ghostty/linux.conf
 
 - shell:
     - mkdir -p ~/.proto
 - link:
     ~/.proto/.prototools: proto/.prototools
+
+- shell:
+    - mkdir -p ~/.config/containers
+- link:
+    ~/.config/containers/storage.conf: containers/storage.conf
+    ~/.config/containers/containers.conf: containers/containers.conf
+
+- shell:
+    - command: |
+        # Enable rootless Podman socket for Docker Compose compatibility
+        if command -v podman >/dev/null 2>&1; then
+          systemctl --user enable --now podman.socket 2>/dev/null || true
+          echo "Podman socket enabled at $XDG_RUNTIME_DIR/podman/podman.sock"
+        fi
+      stderr: true
+      stdout: true
+      description: "Enabling rootless Podman socket"
