@@ -155,3 +155,4 @@ auto-update-channel = tip
 # ─────────────────────────────────────────────────────────────────────────────
 config-file = ?macos.conf
 config-file = ?linux.conf
+config-file = ?hyperia.conf
