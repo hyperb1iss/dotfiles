@@ -27,13 +27,11 @@ return {
       },
     },
   },
-  -- use mason-lspconfig to auto-install LSP servers when configured
+  -- mason-lspconfig bridges mason and lspconfig
+  -- NOTE: automatic_installation disabled — mason.nvim v2 handles ensure_installed natively
   {
     "williamboman/mason-lspconfig.nvim",
-    -- overrides `require("mason-lspconfig").setup(...)`
-    opts = {
-      automatic_installation = true,
-    },
+    opts = {},
   },
   -- use mason-null-ls for automatic null-ls source installation
   {
