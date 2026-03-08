@@ -1,5 +1,4 @@
 -- AstroUI configuration for SilkCircuit theme
--- Place this in your ~/.config/nvim/lua/plugins/astroui.lua
 
 return {
   "AstroNvim/astroui",
