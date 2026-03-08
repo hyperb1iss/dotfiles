@@ -135,9 +135,27 @@
     ~/.config/ghostty/linux.conf: ghostty/linux.conf
 
 - shell:
+    - description: Link host-specific Ghostty config
+      command: |
+        if [ "$(hostname)" = "hyperia" ] && [ -f ghostty/hyperia.conf ]; then
+          ln -sf "$(pwd)/ghostty/hyperia.conf" ~/.config/ghostty/hyperia.conf
+        fi
+
+- shell:
     - mkdir -p ~/.proto
 - link:
     ~/.proto/.prototools: proto/.prototools
+
+- shell:
+    - mkdir -p ~/.config/GIMP/3.2/palettes
+- link:
+    ~/.config/GIMP/3.2/gimprc: gimp/gimprc
+    ~/.config/GIMP/3.2/palettes/SilkCircuit.gpl: gimp/palettes/SilkCircuit.gpl
+
+- shell:
+    - mkdir -p ~/.config/blender/5.0/scripts/startup
+- link:
+    ~/.config/blender/5.0/scripts/startup/print3d_defaults.py: blender/startup/print3d_defaults.py
 
 - shell:
     - mkdir -p ~/.config/containers

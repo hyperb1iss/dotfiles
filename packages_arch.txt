@@ -42,11 +42,19 @@ docker-compose
 lazydocker
 
 # Development utilities
+github-cli
 jq
 yq
 lazygit
 meld
 tig
+
+# Desktop/Wayland utilities
+wl-clipboard
+
+# Creative tools
+gimp-devel
+blender
 
 # System utilities
 ca-certificates

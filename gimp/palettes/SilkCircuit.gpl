@@ -1,0 +1,39 @@
+GIMP Palette
+Name: SilkCircuit Neon
+Columns: 6
+#
+# Core SilkCircuit design system colors
+225  53 255	Electric Purple
+128 255 234	Neon Cyan
+255 106 193	Coral
+241 250 140	Electric Yellow
+ 80 250 123	Success Green
+255  99  99	Error Red
+#
+# Extended palette — darks
+ 13  13  26	Void
+ 20  15  35	Deep Space
+ 30  20  50	Midnight
+ 45  30  70	Dusk
+ 74  26  74	Shadow Purple
+#
+# Extended palette — mids
+122  45 122	Mystic Purple
+170  96 170	Soft Violet
+255 105 180	Hot Pink
+100 200 255	Sky Blue
+ 80 200 200	Teal
+#
+# Extended palette — lights
+200 180 255	Lavender
+255 200 230	Blush
+200 255 240	Mint
+255 240 200	Cream
+230 230 250	Ghost White
+#
+# Neutrals
+ 40  40  55	Dark Gray
+ 70  70  90	Mid Gray
+120 120 140	Silver
+180 180 195	Light Gray
+240 240 245	Near White
