@@ -10,7 +10,7 @@
         mkdir -p ~/.config/karabiner ~/.config/yabai ~/.config/skhd \
                  ~/.config/lsd ~/.config/nvim ~/.config/starship \
                  ~/.config/fastfetch ~/.config/procs \
-                 ~/.config/bat ~/.config/ghostty \
+                 ~/.config/ghostty \
                  ~/.config/atuin/themes \
                  ~/.tmux/plugins ~/.claude ~/.proto \
                  "$HOME/Library/Application Support/com.mitchellh.ghostty"
@@ -40,10 +40,14 @@
     ~/.config/fastfetch/config.jsonc: fastfetch/config.jsonc
     ~/.config/procs/config.toml: procs/config.toml
     ~/.config/starship.toml: starship/starship.toml
-    ~/.config/bat: bat
+    ~/.config/bat:
+      path: bat
+      force: true
     ~/Library/Application Support/com.mitchellh.ghostty/config: ghostty/config
     ~/.config/ghostty/macos.conf: ghostty/macos.conf
-    ~/.claude/settings.json: claude/settings.json
+    ~/.claude/settings.json:
+      path: claude/settings.json
+      force: true
     ~/.claude/statusline-command.sh: claude/statusline-command.sh
     ~/.config/atuin/config.toml: atuin/config.toml
     ~/.config/atuin/themes/silkcircuit.toml: atuin/themes/silkcircuit.toml
