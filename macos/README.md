@@ -8,8 +8,6 @@ This directory contains macOS-specific setup files and utilities for Stefanie's 
 - **Brewfile** - Declarative package list for `brew bundle`
 - **macos_config.sh** - Sets macOS system preferences for a developer-friendly environment
 - **karabiner.json** - Advanced keyboard customization configuration
-- **yabairc** - Tiling window manager (similar to i3/bspwm on Linux)
-- **skhdrc** - Hotkey daemon configuration for window management
 
 ## 🚀 Installation
 
@@ -54,10 +52,6 @@ make macos
    - Adds macOS-specific shell functions in `sh/macos.sh`
    - Provides convenient wrappers for macOS-specific operations
 
-6. **Window Management**
-   - Yabai tiling window manager for Linux-like window management
-   - Skhd hotkey daemon for keyboard shortcuts
-
 ## 🔍 Additional Features
 
 - **Clipboard Integration** - Enhanced clipboard utilities with pbcopy/pbpaste
@@ -72,12 +66,6 @@ make macos
   - Caps Lock acts as Escape when pressed alone, Control when held
   - Better Command+Tab management
   - Custom key combinations for improved text editing
-- **Tiling Window Management** - Yabai + skhd provide Linux-like window management:
-  - Automatic window tiling
-  - Keyboard shortcuts for window manipulation
-  - Multiple workspace support
-  - Vim-like keybindings (hjkl) for navigation
-
 ## 📝 Post-Install Tasks
 
 After installation, you might want to:
@@ -87,7 +75,6 @@ After installation, you might want to:
 3. **Configure Warp** - The lilac theme should be automatically available in Warp settings
 4. **Restart your terminal** - Some changes require a restart to take effect
 5. **Explore Karabiner Elements** - Customize your keyboard layout further
-6. **Start Yabai and SKHD services** - Enable with `brew services start yabai` and `brew services start skhd`
 
 ## 🔄 Updating
 

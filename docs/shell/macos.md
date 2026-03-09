@@ -237,42 +237,6 @@ Keyboard customization config in `macos/karabiner.json`:
 
 See the karabiner.json config for full mappings.
 
-## Yabai Window Management
-
-Tiling window manager (requires SIP disable on some macOS versions):
-
-```bash
-# Start/stop yabai
-yabai --start-service
-yabai --stop-service
-
-# Config in macos/yabairc
-```
-
-Auto-tile windows like a Linux WM. Game-changer for productivity.
-
-## skhd Hotkeys
-
-Keyboard shortcuts for Yabai and other system control:
-
-```bash
-# Start/stop skhd
-skhd --start-service
-skhd --stop-service
-
-# Config in macos/skhdrc
-```
-
-Common default bindings:
-
-- `alt + h/j/k/l` — Focus windows (vim-style)
-- `shift + alt + h/j/k/l` — Move windows
-- `alt + 1-9` — Switch to space (desktop) 1-9
-- `alt + f` — Toggle fullscreen
-- `alt + r` — Rotate window tree
-
-Check `macos/skhdrc` for full bindings.
-
 ## Pro Tips
 
 **Learn Quick Look**: `ql` is faster than opening files. Use it for quick file inspection.
@@ -284,8 +248,6 @@ Check `macos/skhdrc` for full bindings.
 **Dark mode toggle**: Map `toggle-dark-mode` to a keyboard shortcut for instant theme switching.
 
 **Flush DNS regularly**: After changing network settings or having connection issues. `flushdns` is magic.
-
-**Yabai + skhd**: If you're serious about window management, learn these. Vim-style window navigation is addictive.
 
 **Use `mas` for automation**: Script your App Store installs. Great for setting up new machines.
 

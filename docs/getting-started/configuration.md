@@ -304,20 +304,6 @@ set -g pane-active-border-style 'fg=#c792ea'
 
 ### macOS
 
-**Window Management:**
-
-Yabai and skhd configs are in `macos/`:
-
-```bash
-# macos/yabairc - Tiling behavior
-yabai -m config layout bsp
-yabai -m config window_gap 10
-
-# macos/skhdrc - Keyboard shortcuts
-alt - return : open -a iTerm
-alt - h : yabai -m window --focus west
-```
-
 **Homebrew:**
 
 Customize installed packages in `macos/brew.sh`:

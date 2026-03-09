@@ -7,7 +7,7 @@
 # Create all config directories up front (before linking)
 - shell:
     - command: |
-        mkdir -p ~/.config/karabiner ~/.config/yabai ~/.config/skhd \
+        mkdir -p ~/.config/karabiner \
                  ~/.config/lsd ~/.config/nvim ~/.config/starship \
                  ~/.config/fastfetch ~/.config/procs \
                  ~/.config/ghostty \
@@ -34,8 +34,6 @@
       force: true
     ~/bin: bin
     ~/.config/karabiner/karabiner.json: macos/karabiner.json
-    ~/.config/yabai/yabairc: macos/yabairc
-    ~/.config/skhd/skhdrc: macos/skhdrc
     ~/.tmux/plugins/tpm: tpm
     ~/.config/fastfetch/config.jsonc: fastfetch/config.jsonc
     ~/.config/procs/config.toml: procs/config.toml
@@ -78,13 +76,6 @@
     - command: bat cache --build
       description: Rebuilding bat theme cache
       stdout: true
-
-    - command: |
-        # Make yabai and skhd config files executable
-        chmod +x ~/.config/yabai/yabairc ~/.config/skhd/skhdrc 2>/dev/null || true
-      stderr: true
-      stdout: true
-      description: Setting config file permissions
 
     - command: |
         # Run macOS-specific setup script

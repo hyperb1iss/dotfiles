@@ -149,42 +149,6 @@ Keyboard shortcuts across all tools - organized for quick reference.
 | `Ctrl n` | Next command in history     |
 | `Tab`    | Complete / show completions |
 
-## macOS (Yabai + skhd)
-
-### Window Focus
-
-| Key     | Action             |
-| ------- | ------------------ |
-| `Alt h` | Focus left window  |
-| `Alt j` | Focus down window  |
-| `Alt k` | Focus up window    |
-| `Alt l` | Focus right window |
-
-### Window Movement
-
-| Key           | Action            |
-| ------------- | ----------------- |
-| `Shift-Alt h` | Move window left  |
-| `Shift-Alt j` | Move window down  |
-| `Shift-Alt k` | Move window up    |
-| `Shift-Alt l` | Move window right |
-
-### Space Management
-
-| Key             | Action                   |
-| --------------- | ------------------------ |
-| `Alt 1-9`       | Switch to space 1-9      |
-| `Shift-Alt 1-9` | Move window to space 1-9 |
-
-### Window Actions
-
-| Key     | Action             |
-| ------- | ------------------ |
-| `Alt f` | Toggle fullscreen  |
-| `Alt t` | Toggle float       |
-| `Alt r` | Rotate window tree |
-| `Alt m` | Toggle window zoom |
-
 ## Karabiner Elements
 
 ### Caps Lock Remapping
