@@ -44,7 +44,7 @@
       path: bat
       force: true
     ~/Library/Application Support/com.mitchellh.ghostty/config: ghostty/config
-    ~/.config/ghostty/macos.conf: ghostty/macos.conf
+    ~/Library/Application Support/com.mitchellh.ghostty/macos.conf: ghostty/macos.conf
     ~/.claude/settings.json:
       path: claude/settings.json
       force: true

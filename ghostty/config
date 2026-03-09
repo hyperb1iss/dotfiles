@@ -153,7 +153,5 @@ auto-update-channel = tip
 # ─────────────────────────────────────────────────────────────────────────────
 # Platform-specific configs (fonts, etc.)
 # ─────────────────────────────────────────────────────────────────────────────
-config-file = ?~/.config/ghostty/macos.conf
-config-file = ?~/.config/ghostty/linux.conf
-
-
+config-file = ?macos.conf
+config-file = ?linux.conf
