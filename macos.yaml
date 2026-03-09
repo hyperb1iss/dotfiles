@@ -4,31 +4,75 @@
 
 - clean: ["~"]
 
+# Create all config directories up front (before linking)
+- shell:
+    - command: |
+        mkdir -p ~/.config/karabiner ~/.config/yabai ~/.config/skhd \
+                 ~/.config/lsd ~/.config/nvim ~/.config/starship \
+                 ~/.config/fastfetch ~/.config/procs \
+                 ~/.config/bat ~/.config/ghostty \
+                 ~/.config/atuin/themes \
+                 ~/.tmux/plugins ~/.claude ~/.proto \
+                 "$HOME/Library/Application Support/com.mitchellh.ghostty"
+      stderr: true
+      stdout: true
+      description: Creating configuration directories
+
 - link:
     ~/.bash_profile: bash/bash_profile
     ~/.bashrc.local: bash/bashrc.local
-    ~/.rc.local: bash/rc.local
-    ~/.config/lsd: lsd
+    ~/.config/lsd:
+      path: lsd
+      force: true
     ~/.fonts: fonts
     ~/.gitconfig: gitconfig
     ~/.tmux.conf: tmux.conf
     ~/.dircolors: dircolors
     ~/.zshrc: zsh/zshrc
-    ~/.config/nvim: nvim
+    ~/.config/nvim:
+      path: nvim
+      force: true
     ~/bin: bin
     ~/.config/karabiner/karabiner.json: macos/karabiner.json
     ~/.config/yabai/yabairc: macos/yabairc
     ~/.config/skhd/skhdrc: macos/skhdrc
+    ~/.tmux/plugins/tpm: tpm
+    ~/.config/fastfetch/config.jsonc: fastfetch/config.jsonc
+    ~/.config/procs/config.toml: procs/config.toml
+    ~/.config/starship.toml: starship/starship.toml
+    ~/.config/bat: bat
+    ~/Library/Application Support/com.mitchellh.ghostty/config: ghostty/config
+    ~/.config/ghostty/macos.conf: ghostty/macos.conf
+    ~/.claude/settings.json: claude/settings.json
+    ~/.claude/statusline-command.sh: claude/statusline-command.sh
+    ~/.config/atuin/config.toml: atuin/config.toml
+    ~/.config/atuin/themes/silkcircuit.toml: atuin/themes/silkcircuit.toml
+    ~/.proto/.prototools: proto/.prototools
 
 - shell:
     - command: |
-        # Create necessary configuration directories
-        mkdir -p ~/.config/karabiner ~/.config/yabai ~/.config/skhd
-        # Make yabai and skhd config files executable
-        chmod +x ~/.config/yabai/yabairc ~/.config/skhd/skhdrc
+        # Install private fonts to macOS user font directory
+        if [ -d "$HOME/dev/dotfiles-private/fonts" ]; then
+          mkdir -p "$HOME/Library/Fonts"
+          find "$HOME/dev/dotfiles-private/fonts" -type f \( -name '*.ttf' -o -name '*.otf' \) -exec cp -v {} "$HOME/Library/Fonts/" \;
+          echo "✓ Private fonts installed to ~/Library/Fonts/"
+        else
+          echo "⚠️ dotfiles-private/fonts not found — skipping font install"
+        fi
       stderr: true
       stdout: true
-      description: Setting up configuration directories
+      description: Installing private fonts
+
+    - command: bat cache --build
+      description: Rebuilding bat theme cache
+      stdout: true
+
+    - command: |
+        # Make yabai and skhd config files executable
+        chmod +x ~/.config/yabai/yabairc ~/.config/skhd/skhdrc 2>/dev/null || true
+      stderr: true
+      stdout: true
+      description: Setting config file permissions
 
     - command: |
         # Run macOS-specific setup script
@@ -46,44 +90,25 @@
 
 - shell:
     - command: |
-        # Try installing starship through cargo first
-        if ! command -v starship >/dev/null 2>&1; then
-          curl -sS https://starship.rs/install.sh | sh
+        # Install proto version manager if not present
+        if ! command -v proto &> /dev/null; then
+          echo "✨ Installing proto version manager..."
+          curl -fsSL https://moonrepo.dev/install/proto.sh | bash -s -- --yes
+          export PROTO_HOME="$HOME/.proto"
+          export PATH="$PROTO_HOME/shims:$PROTO_HOME/bin:$PATH"
         fi
-        mkdir -p ~/.config/starship
+        # Install node and npm via proto
+        if command -v proto &> /dev/null; then
+          echo "📦 Setting up node and npm via proto..."
+          proto install node lts
+          proto install npm
+          proto pin node lts
+          proto pin npm bundled
+        fi
       stderr: true
       stdout: true
+      description: Installing proto + node/npm
 
-- shell:
-    - mkdir -p ~/.tmux/plugins
-- link:
-    ~/.tmux/plugins/tpm: tpm
-
-- shell:
-    - cargo install git-delta
-    - cargo install lsd
-
-- shell:
-    - command: brew install fastfetch || true
-      description: Installing fastfetch
-    - mkdir -p ~/.config/fastfetch
-- link:
-    ~/.config/fastfetch/config.jsonc: fastfetch/config.jsonc
-
-- shell:
-    - mkdir -p ~/.config/procs
-- link:
-    ~/.config/procs/config.toml: procs/config.toml
-
-- link:
-    ~/.config/starship.toml: starship/starship.toml
-
-- shell:
-    - mkdir -p ~/.warp/themes
-- link:
-    ~/.warp/themes/lilac.yaml: warp/themes/lilac.yaml
-
-- shell:
     - command: mkdir -p ~/dev/go && GOPATH=~/dev/go go install github.com/junegunn/fzf@latest
       stderr: true
       stdout: true

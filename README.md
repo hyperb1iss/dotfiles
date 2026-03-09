@@ -13,10 +13,6 @@ based in Seattle. These dotfiles create a powerful, consistent development envir
 Linux, WSL2, and Windows, with a special focus on Android development.
 
 <p align="center">
-  <img src="https://github.com/hyperb1iss/elektra/blob/main/screenshot.png" alt="Starship + Elektra" width="600" />
-</p>
-
-<p align="center">
   <img src="images/terminal-bliss.png" alt="Terminal Bliss" width="600" />
 </p>
 
@@ -55,7 +51,7 @@ Linux, WSL2, and Windows, with a special focus on Android development.
 
 | Tool                                                        | Description    | Features                                                              |
 | ----------------------------------------------------------- | -------------- | --------------------------------------------------------------------- |
-| 📊 **[Macchina](https://github.com/Macchina-CLI/macchina)** | System info    | • Custom Elektra theme<br>• Performance metrics<br>• System details   |
+| 📊 **[Fastfetch](https://github.com/fastfetch-cli/fastfetch)** | System info | • Fast system information<br>• Performance metrics<br>• Custom config |
 | 🎯 **[HyperShell](./hypershell)**                           | PowerShell env | • Modular architecture<br>• Kubernetes support<br>• Zoxide & FZF      |
 | 🔧 **[DotBot](https://github.com/anishathalye/dotbot)**     | Config manager | • Automated setup<br>• Cross-platform support<br>• Profile management |
 
@@ -72,7 +68,7 @@ dotfiles/
 ├── nvim/                # AstroNvim configuration
 ├── tmux.conf            # Tmux configuration
 ├── starship/            # Starship prompt themes
-├── elektra/             # Custom Macchina theme
+├── fastfetch/           # Fastfetch system info config
 └── bin/                 # Utility scripts
 ```
 

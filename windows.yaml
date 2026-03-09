@@ -19,8 +19,6 @@
       force: true
     # Git configuration
     ~/.gitconfig: gitconfig
-    # Warp terminal configuration
-    ~/.warp: warp
     # Fastfetch configuration (Windows path)
     ~/AppData/Roaming/fastfetch/config.jsonc: fastfetch/config.jsonc
 

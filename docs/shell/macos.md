@@ -17,7 +17,7 @@ Quick access to common apps:
 | `finder`  | Finder             |
 | `chrome`  | Google Chrome      |
 | `safari`  | Safari             |
-| `warp`    | Warp terminal      |
+| `ghostty` | Ghostty terminal   |
 
 Open apps from the command line. `code .` to open VS Code in current directory.
 

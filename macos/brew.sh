@@ -79,13 +79,7 @@ else
   echo "⚠️  rustup not found. Please install it with 'brew install rustup-init && rustup-init'"
 fi
 
-# Install cargo packages if cargo is available
-if command -v cargo >/dev/null 2>&1; then
-  echo "Installing useful cargo packages..."
-  cargo install --quiet git-delta || echo "⚠️  Some cargo packages failed to install"
-else
-  echo "⚠️  cargo not available, skipping cargo package installation"
-fi
+# git-delta and lsd are installed via Brewfile — no need for cargo duplicates
 
 # Remove outdated versions
 echo "Cleaning up..."

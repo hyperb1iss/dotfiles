@@ -66,11 +66,6 @@
     ~/.config/starship.toml: starship/starship.toml
 
 - shell:
-    - mkdir -p ~/.warp/themes
-- link:
-    ~/.warp/themes/lilac.yaml: warp/themes/lilac.yaml
-
-- shell:
     - mkdir -p "$HOME/Library/Application Support/com.mitchellh.ghostty"
 - link:
     ~/Library/Application Support/com.mitchellh.ghostty/config: ghostty/config

@@ -11,7 +11,7 @@ if is_macos; then
   alias finder='open -a "Finder"'
   alias chrome='open -a "Google Chrome"'
   alias safari='open -a "Safari"'
-  alias warp='open -a "Warp"'
+  alias ghostty='open -a "Ghostty"'
 
   # Open file/directory in Finder
   function finder() {

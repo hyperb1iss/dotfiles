@@ -183,17 +183,21 @@ hidutil property --set '{"UserKeyMapping":[{"HIDKeyboardModifierMappingSrc":0x70
 # Safari & WebKit                                                             #
 ###############################################################################
 
+# Note: Safari preferences are sandboxed in modern macOS and must be changed
+# through System Settings > Safari, or via the container path.
+SAFARI_PLIST="${HOME}/Library/Containers/com.apple.Safari/Data/Library/Preferences/com.apple.Safari"
+
 # Privacy: don't send search queries to Apple
-defaults write com.apple.Safari UniversalSearchEnabled -bool false || handle_error "Safari UniversalSearchEnabled"
-defaults write com.apple.Safari SuppressSearchSuggestions -bool true || handle_error "Safari SuppressSearchSuggestions"
+defaults write "${SAFARI_PLIST}" UniversalSearchEnabled -bool false || handle_error "Safari UniversalSearchEnabled"
+defaults write "${SAFARI_PLIST}" SuppressSearchSuggestions -bool true || handle_error "Safari SuppressSearchSuggestions"
 
 # Enable Safari's debug menu
-defaults write com.apple.Safari IncludeInternalDebugMenu -bool true || handle_error "Safari IncludeInternalDebugMenu"
+defaults write "${SAFARI_PLIST}" IncludeInternalDebugMenu -bool true || handle_error "Safari IncludeInternalDebugMenu"
 
 # Enable the Develop menu and the Web Inspector in Safari
-defaults write com.apple.Safari IncludeDevelopMenu -bool true || handle_error "Safari IncludeDevelopMenu"
-defaults write com.apple.Safari WebKitDeveloperExtrasEnabled -bool true || handle_error "Safari WebKitDeveloperExtrasEnabled"
-defaults write com.apple.Safari com.apple.Safari.ContentPageGroupIdentifier.WebKit2DeveloperExtrasEnabled -bool true || handle_error "Safari WebKit2DeveloperExtrasEnabled"
+defaults write "${SAFARI_PLIST}" IncludeDevelopMenu -bool true || handle_error "Safari IncludeDevelopMenu"
+defaults write "${SAFARI_PLIST}" WebKitDeveloperExtrasEnabled -bool true || handle_error "Safari WebKitDeveloperExtrasEnabled"
+defaults write "${SAFARI_PLIST}" com.apple.Safari.ContentPageGroupIdentifier.WebKit2DeveloperExtrasEnabled -bool true || handle_error "Safari WebKit2DeveloperExtrasEnabled"
 
 # Add a context menu item for showing the Web Inspector in web views
 defaults write NSGlobalDomain WebKitDeveloperExtras -bool true || handle_error "WebKitDeveloperExtras"

@@ -19,6 +19,7 @@ brew "git-delta"             # Syntax-highlighting pager for git
 brew "gnu-sed"               # GNU implementation of the famous stream editor
 brew "go"                    # Open source programming language
 brew "grep"                  # GNU grep, egrep and fgrep
+brew "btop"                  # Resource monitor (C++ htop/top alternative)
 brew "htop"                  # Improved top (interactive process viewer)
 brew "jq"                    # Lightweight and flexible command-line JSON processor
 brew "lazygit"               # Simple terminal UI for git commands
@@ -54,10 +55,15 @@ brew "zsh-completions"       # Additional completion definitions for zsh
 brew "zsh-syntax-highlighting" # Fish shell like syntax highlighting for zsh
 # nvm removed — proto is SSOT for Node versions
 
+# AI / Development Tools
+brew "claude-code"           # Anthropic's CLI for Claude
+brew "codex"                 # OpenAI's CLI agent
+
 # Development
 cask "android-studio"        # Android IDE
 cask "docker"                # App to build and share containerized applications
-cask "warp"                  # Modern terminal emulator
+cask "ghostty"               # GPU-accelerated terminal emulator
+cask "slack"                 # Team communication
 cask "visual-studio-code"    # Code editor
 
 # Fonts
@@ -79,7 +85,7 @@ cask "stats"                 # System monitor menubar
 cask "qlcolorcode"           # Quick Look plugin for syntax highlighting
 cask "qlmarkdown"            # Quick Look plugin for Markdown files
 cask "qlstephen"             # Quick Look plugin for plain text files without extension
-cask "quicklook-json"        # Quick Look plugin for JSON files
+# quicklook-json removed — disabled by Homebrew (2025-12-23)
 
 # Mac App Store Apps (requires `mas` to be installed)
 # mas "Amphetamine", id: 937984704        # Keep-awake utility (commented out due to download issues)
