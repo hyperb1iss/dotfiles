@@ -16,7 +16,7 @@ adjust-cursor-thickness = 2
 # ─────────────────────────────────────────────────────────────────────────────
 # Window & Transparency
 # ─────────────────────────────────────────────────────────────────────────────
-background-opacity = 0.92
+background-opacity = 0.85
 background-blur-radius = 20
 window-padding-x = 14
 window-padding-y = 10
@@ -32,71 +32,24 @@ window-inherit-working-directory = true
 window-inherit-font-size = true
 
 # ─────────────────────────────────────────────────────────────────────────────
-# Cursor — Electric purple beacon
+# Theme — SilkCircuit Neon (from ~/.config/ghostty/themes/)
 # ─────────────────────────────────────────────────────────────────────────────
-cursor-color = #e135ff
-cursor-text = #0d0d1a
+theme = silkcircuit-neon
+minimum-contrast = 1.1
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Cursor
+# ─────────────────────────────────────────────────────────────────────────────
 cursor-style = block
 cursor-style-blink = true
 cursor-opacity = 0.9
 cursor-click-to-move = true
 
 # ─────────────────────────────────────────────────────────────────────────────
-# Selection — Royal purple highlight
-# ─────────────────────────────────────────────────────────────────────────────
-selection-background = #7a2d7a
-selection-foreground = #ffffff
-
-# ─────────────────────────────────────────────────────────────────────────────
 # Splits & Focus
 # ─────────────────────────────────────────────────────────────────────────────
 unfocused-split-opacity = 0.80
-unfocused-split-fill = #0d0d1a
-split-divider-color = #4a1a4a
 focus-follows-mouse = true
-
-# ─────────────────────────────────────────────────────────────────────────────
-# SilkCircuit Neon Color Palette
-# ─────────────────────────────────────────────────────────────────────────────
-
-# Background: Deep void with silk undertones
-background = #0d0d1a
-foreground = #e8e0f0
-
-# Minimum contrast for accessibility
-minimum-contrast = 1.1
-
-# Black (0) / Bright Black (8) — Used for autosuggestions
-palette = 0=#0d0d1a
-palette = 8=#5a5478
-
-# Red (1) / Bright Red (9) — Error Red
-palette = 1=#ff6363
-palette = 9=#ff8080
-
-# Green (2) / Bright Green (10) — Success Green
-palette = 2=#50fa7b
-palette = 10=#70ff9b
-
-# Yellow (3) / Bright Yellow (11) — Electric Yellow
-palette = 3=#f1fa8c
-palette = 11=#f5fcb0
-
-# Blue (4) / Bright Blue (12) — Muted Indigo
-palette = 4=#6272a4
-palette = 12=#8292c4
-
-# Magenta (5) / Bright Magenta (13) — Electric Purple
-palette = 5=#e135ff
-palette = 13=#eb6fff
-
-# Cyan (6) / Bright Cyan (14) — Neon Cyan
-palette = 6=#80ffea
-palette = 14=#a0ffef
-
-# White (7) / Bright White (15) — Soft lavender
-palette = 7=#b8aed8
-palette = 15=#e0daf0
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Mouse & Interactions
