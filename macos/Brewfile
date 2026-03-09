@@ -57,8 +57,8 @@ brew "zsh-syntax-highlighting" # Fish shell like syntax highlighting for zsh
 
 # Development
 cask "android-studio"        # Android IDE
-cask "docker"                # App to build and share containerized applications
 cask "ghostty"               # GPU-accelerated terminal emulator
+cask "orbstack"              # Fast Docker & Linux VM runtime for macOS
 cask "slack"                 # Team communication
 cask "visual-studio-code"    # Code editor
 
@@ -90,11 +90,9 @@ cask "qlstephen"             # Quick Look plugin for plain text files without ex
 # Mac App Store Apps (requires `mas` to be installed)
 # mas "Amphetamine", id: 937984704        # Keep-awake utility (commented out due to download issues)
 
-# Kubernetes Tools
+# Kubernetes Tools (OrbStack provides Docker + K8s runtime)
 brew "kubectl"            # Kubernetes command-line tool
 brew "kubectx"            # Switch between kubectl contexts
 brew "k9s"                # Terminal UI to interact with Kubernetes
 brew "helm"               # Package manager for Kubernetes
 brew "kustomize"          # Customization of Kubernetes YAML
-brew "kind"               # Run local Kubernetes clusters using Docker
-brew "minikube"           # Run Kubernetes locally
