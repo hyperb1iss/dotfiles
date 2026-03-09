@@ -41,6 +41,7 @@ brew "rsync"                 # Utility that provides fast incremental file trans
 brew "rustup-init"           # Rust toolchain installer
 brew "shellcheck"            # Static analysis and lint tool, for (ba)sh scripts
 brew "koekeishiya/formulae/skhd"  # Simple hotkey daemon for macOS (from koekeishiya tap)
+brew "pam-reattach"          # Enable Touch ID for sudo in tmux/screen
 brew "starship"              # Cross-shell prompt
 brew "tmux"                  # Terminal multiplexer
 brew "tree"                  # Display directories as trees

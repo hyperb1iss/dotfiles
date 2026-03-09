@@ -16,6 +16,23 @@ echo "🔧 Configuring macOS settings..."
 # Close any open System Preferences panes to prevent them from overriding settings
 osascript -e 'tell application "System Preferences" to quit' || handle_error "closing System Preferences"
 
+# Enable Touch ID for sudo (survives macOS updates via sudo_local)
+# pam_reattach allows Touch ID to work inside tmux/screen/IDE terminals
+REATTACH_SO="/opt/homebrew/lib/pam/pam_reattach.so"
+DESIRED_SUDO_LOCAL="# sudo_local: Touch ID for sudo (including tmux/screen)
+auth       optional       ${REATTACH_SO}
+auth       sufficient     pam_tid.so"
+
+if [[ -f /etc/pam.d/sudo_local ]] && diff -q <(echo "${DESIRED_SUDO_LOCAL}") /etc/pam.d/sudo_local &>/dev/null; then
+  echo "✓ Touch ID for sudo already configured"
+else
+  echo "Enabling Touch ID for sudo..."
+  sudo tee /etc/pam.d/sudo_local > /dev/null << PAMEOF
+${DESIRED_SUDO_LOCAL}
+PAMEOF
+  echo "✓ Touch ID enabled for sudo (with tmux/reattach support)"
+fi
+
 # Ask for the administrator password upfront
 sudo -v || { echo "⚠️ Failed to get sudo privileges. Some settings might not be applied."; }
 
@@ -172,8 +189,12 @@ defaults write com.apple.SoftwareUpdate CriticalUpdateInstall -int 1
 # Developer settings                                                          #
 ###############################################################################
 
-# Enable developer mode (prevents "Application downloaded from Internet" warnings)
-sudo spctl --master-disable
+# Enable developer mode
+# Note: spctl --master-disable requires manual confirmation in
+# System Settings > Privacy & Security on modern macOS — can't be automated.
+# Uncomment to attempt it (will show a GUI prompt that may not work):
+# sudo spctl --master-disable
+sudo spctl developer-mode enable-terminal 2>/dev/null || handle_error "enabling developer mode"
 
 # Configure key remapping for developers
 # Map Caps Lock to Escape (useful for Vim users)
