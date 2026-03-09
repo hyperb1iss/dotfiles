@@ -12,7 +12,7 @@
                  ~/.config/fastfetch ~/.config/procs \
                  ~/.config/ghostty \
                  ~/.config/atuin/themes \
-                 ~/.tmux/plugins ~/.claude ~/.proto \
+                 ~/.tmux/plugins ~/.claude ~/.codex ~/.proto \
                  "$HOME/Library/Application Support/com.mitchellh.ghostty"
       stderr: true
       stdout: true
@@ -52,6 +52,14 @@
     ~/.config/atuin/config.toml: atuin/config.toml
     ~/.config/atuin/themes/silkcircuit.toml: atuin/themes/silkcircuit.toml
     ~/.proto/.prototools: proto/.prototools
+    ~/.claude/AGENTS.md:
+      create: true
+      path: ~/dev/dotfiles-private/ai/AGENTS.md
+      if: "[ -f ~/dev/dotfiles-private/ai/AGENTS.md ]"
+    ~/.codex/AGENTS.md:
+      create: true
+      path: ~/dev/dotfiles-private/ai/AGENTS.md
+      if: "[ -f ~/dev/dotfiles-private/ai/AGENTS.md ]"
 
 - shell:
     - command: |
