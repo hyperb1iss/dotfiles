@@ -1,59 +1,48 @@
--- You can also add or configure plugins by creating files in this `plugins/` folder
--- Here are some examples:
-
 ---@type LazySpec
 return {
-
-  -- == Examples of Adding Plugins ==
 
   -- Claude Code AI assistant plugin
   {
     "greggh/claude-code.nvim",
     dependencies = {
-      "nvim-lua/plenary.nvim", -- Required for git operations
+      "nvim-lua/plenary.nvim",
     },
     event = "VeryLazy",
     config = function()
       require("claude-code").setup {
-        -- Terminal window settings
         window = {
-          split_ratio = 0.4, -- 40% of screen for the terminal window
-          position = "botright", -- Bottom right position
-          enter_insert = true, -- Enter insert mode when opening Claude Code
-          hide_numbers = true, -- Hide line numbers in the terminal window
-          hide_signcolumn = true, -- Hide the sign column in the terminal window
+          split_ratio = 0.4,
+          position = "botright",
+          enter_insert = true,
+          hide_numbers = true,
+          hide_signcolumn = true,
         },
-        -- File refresh settings
         refresh = {
-          enable = true, -- Enable file change detection
-          updatetime = 100, -- updatetime when Claude Code is active (milliseconds)
-          timer_interval = 1000, -- How often to check for file changes (milliseconds)
-          show_notifications = true, -- Show notification when files are reloaded
+          enable = true,
+          updatetime = 100,
+          timer_interval = 1000,
+          show_notifications = true,
         },
-        -- Git project settings
         git = {
-          use_git_root = true, -- Set CWD to git root when opening Claude Code (if in git project)
+          use_git_root = true,
         },
-        -- Command settings
-        command = "claude", -- Command used to launch Claude Code
-        -- Command variants
+        command = "claude",
         command_variants = {
-          continue = "--continue", -- Resume the most recent conversation
-          resume = "--resume", -- Display an interactive conversation picker
-          verbose = "--verbose", -- Enable verbose logging with full turn-by-turn output
+          continue = "--continue",
+          resume = "--resume",
+          verbose = "--verbose",
         },
-        -- Keymaps
         keymaps = {
           toggle = {
-            normal = "<C-,>", -- Normal mode keymap for toggling Claude Code
-            terminal = "<C-,>", -- Terminal mode keymap for toggling Claude Code
+            normal = "<C-,>",
+            terminal = "<C-,>",
             variants = {
-              continue = "<leader>cC", -- Normal mode keymap for Claude Code with continue flag
-              verbose = "<leader>cV", -- Normal mode keymap for Claude Code with verbose flag
+              continue = "<leader>cC",
+              verbose = "<leader>cV",
             },
           },
-          window_navigation = true, -- Enable window navigation keymaps (<C-h/j/k/l>)
-          scrolling = true, -- Enable scrolling keymaps (<C-f/b>) for page up/down
+          window_navigation = true,
+          scrolling = true,
         },
       }
     end,
@@ -112,46 +101,11 @@ return {
     end,
   },
 
-  -- == Examples of Overriding Plugins ==
-
-  -- customize alpha options
-  {
-    "goolord/alpha-nvim",
-    opts = function(_, opts)
-      -- customize the dashboard header
-      opts.section.header.val = {
-        " █████  ███████ ████████ ██████   ██████",
-        "██   ██ ██         ██    ██   ██ ██    ██",
-        "███████ ███████    ██    ██████  ██    ██",
-        "██   ██      ██    ██    ██   ██ ██    ██",
-        "██   ██ ███████    ██    ██   ██  ██████",
-        " ",
-        "    ███    ██ ██    ██ ██ ███    ███",
-        "    ████   ██ ██    ██ ██ ████  ████",
-        "    ██ ██  ██ ██    ██ ██ ██ ████ ██",
-        "    ██  ██ ██  ██  ██  ██ ██  ██  ██",
-        "    ██   ████   ████   ██ ██      ██",
-      }
-      -- Apply SilkCircuit highlight groups
-      opts.section.header.opts.hl = "AlphaHeader"
-      -- For button shortcuts (like [f] for find file)
-      for _, button in ipairs(opts.section.buttons.val) do
-        button.opts.hl_shortcut = "AlphaButtonShortcut"
-      end
-      opts.section.footer.opts.hl = "AlphaFooter"
-      return opts
-    end,
-  },
-
-  -- You can disable default plugins as follows:
-  { "max397574/better-escape.nvim", enabled = false },
-
-  -- You can also easily customize additional setup of plugins that is outside of the plugin's setup call
+  -- LuaSnip with JS/JSX filetype extension
   {
     "L3MON4D3/LuaSnip",
     config = function(plugin, opts)
-      require "astronvim.plugins.configs.luasnip"(plugin, opts) -- include the default astronvim config that calls the setup call
-      -- add more custom luasnip configuration such as filetype extend or custom snippets
+      require "astronvim.plugins.configs.luasnip"(plugin, opts)
       local luasnip = require "luasnip"
       luasnip.filetype_extend("javascript", { "javascriptreact" })
     end,
@@ -160,28 +114,19 @@ return {
   {
     "windwp/nvim-autopairs",
     config = function(plugin, opts)
-      require "astronvim.plugins.configs.nvim-autopairs"(plugin, opts) -- include the default astronvim config that calls the setup call
-      -- add more custom autopairs configuration such as custom rules
+      require "astronvim.plugins.configs.nvim-autopairs"(plugin, opts)
       local npairs = require "nvim-autopairs"
       local Rule = require "nvim-autopairs.rule"
       local cond = require "nvim-autopairs.conds"
       npairs.add_rules(
         {
           Rule("$", "$", { "tex", "latex" })
-            -- don't add a pair if the next character is %
             :with_pair(cond.not_after_regex "%%")
-            -- don't add a pair if  the previous character is xxx
-            :with_pair(
-              cond.not_before_regex("xxx", 3)
-            )
-            -- don't move right when repeat character
+            :with_pair(cond.not_before_regex("xxx", 3))
             :with_move(cond.none())
-            -- don't delete if the next character is xx
             :with_del(cond.not_after_regex "xx")
-            -- disable adding a newline when you press <cr>
             :with_cr(cond.none()),
         },
-        -- disable for .vim files, but it work for another filetypes
         Rule("a", "a", "-vim")
       )
     end,
