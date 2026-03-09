@@ -55,16 +55,16 @@ brew "zsh-completions"       # Additional completion definitions for zsh
 brew "zsh-syntax-highlighting" # Fish shell like syntax highlighting for zsh
 # nvm removed — proto is SSOT for Node versions
 
-# AI / Development Tools
-brew "claude-code"           # Anthropic's CLI for Claude
-brew "codex"                 # OpenAI's CLI agent
-
 # Development
 cask "android-studio"        # Android IDE
 cask "docker"                # App to build and share containerized applications
 cask "ghostty"               # GPU-accelerated terminal emulator
 cask "slack"                 # Team communication
 cask "visual-studio-code"    # Code editor
+
+# AI Tools
+cask "claude-code"           # Anthropic's CLI for Claude
+cask "codex"                 # OpenAI's CLI agent
 
 # Fonts
 cask "font-fira-code-nerd-font"
