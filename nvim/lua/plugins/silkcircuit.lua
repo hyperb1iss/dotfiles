@@ -1,51 +1,27 @@
--- SilkCircuit theme configuration
+-- SilkCircuit theme configuration for AstroNvim
+-- Place this in your ~/.config/nvim/lua/plugins/silkcircuit.lua
+
 return {
-  {
-    dir = "~/dev/silkcircuit-nvim",
-    name = "silkcircuit",
-    lazy = false,
-    priority = 1000,
-    config = function()
-      require("silkcircuit").setup {
-        -- Enable all features
-        terminal_colors = true,
-        compile = false, -- Disable compilation for development
+  "hyperb1iss/silkcircuit-nvim",
+  lazy = false,
+  priority = 1000,
+  config = function()
+    require("silkcircuit").setup({
+      transparent = false,
+      terminal_colors = true,
+      dim_inactive = false,
 
-        -- Enable all integrations
-        integrations = {
-          aerial = true,
-          alpha = true,
-          cmp = true,
-          dap = true,
-          dap_ui = true,
-          gitsigns = true,
-          illuminate = true,
-          indent_blankline = true,
-          markdown = true,
-          mason = true,
-          native_lsp = { enabled = true },
-          neotree = true,
-          notify = true,
-          semantic_tokens = true,
-          snacks = true,
-          symbols_outline = true,
-          telescope = true,
-          treesitter = true,
-          rainbow_delimiters = true,
-          ufo = true,
-          which_key = true,
-          window_picker = true,
-        },
-
-        -- Style customizations
-        styles = {
-          comments = { italic = true },
-          keywords = { bold = true },
-          functions = { bold = true, italic = true },
-          strings = { italic = true },
-          variables = {},
-        },
-      }
-    end,
-  },
+      styles = {
+        comments = { italic = true },
+        keywords = { italic = false, bold = true },
+        functions = { bold = true, italic = true },
+        variables = {},
+        operators = {},
+        booleans = { bold = true },
+        strings = { italic = true },
+        types = { bold = true },
+        constants = { bold = true },
+      },
+    })
+  end,
 }
