@@ -43,21 +43,21 @@ function has_command() {
 }
 
 # Installation type detection
+DOTFILES_INSTALLATION_TYPE="unknown"
+if [[ -r "${HOME}/dev/dotfiles/.install_state" ]]; then
+  IFS= read -r DOTFILES_INSTALLATION_TYPE < "${HOME}/dev/dotfiles/.install_state"
+fi
+
 function get_installation_type() {
-  local install_state_file="${HOME}/dev/dotfiles/.install_state"
-  if [[ -f "${install_state_file}" ]]; then
-    cat "${install_state_file}"
-  else
-    echo "unknown"
-  fi
+  printf '%s\n' "${DOTFILES_INSTALLATION_TYPE}"
 }
 
 function is_minimal() {
-  [[ "$(get_installation_type)" = "minimal" ]]
+  [[ "${DOTFILES_INSTALLATION_TYPE}" = "minimal" ]]
 }
 
 function is_full() {
-  [[ "$(get_installation_type)" = "full" ]]
+  [[ "${DOTFILES_INSTALLATION_TYPE}" = "full" ]]
 }
 
 # Safe source function that doesn't break on errors
@@ -94,10 +94,14 @@ safe_source ~/.rc.local
 # Shell-specific prompt initialization (e.g., Starship)
 # will be handled in their respective rc files (zshrc, bashrc.local).
 
-# 6. Show inspiration (only in interactive shells with full installation)
+# 6. Inspiration helper (opt-in for interactive shells)
 #-------------------------------------------------
-if [[ $- == *i* ]] && is_full; then
+function show_inspiration() {
   if has_command python3 && [[ -f ~/dev/dotfiles/inspiration/inspiration.py ]]; then
     python3 ~/dev/dotfiles/inspiration/inspiration.py
   fi
+}
+
+if [[ $- == *i* ]] && is_full && [[ "${SHOW_SHELL_INSPIRATION:-0}" = "1" ]]; then
+  show_inspiration
 fi

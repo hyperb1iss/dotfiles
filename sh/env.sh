@@ -26,8 +26,14 @@ elif has_command bat; then
 fi
 
 # HOSTNAME
-HOSTNAME=$(hostname)
-export HOSTNAME
+if [[ -n "${HOSTNAME:-}" ]]; then
+  export HOSTNAME
+elif [[ -n "${HOST:-}" ]]; then
+  export HOSTNAME="${HOST}"
+else
+  HOSTNAME=$(hostname)
+  export HOSTNAME
+fi
 
 # PATH configuration - separate declaration and assignment to avoid masking return values
 PATH_COMPONENTS=""
@@ -39,8 +45,13 @@ PATH_COMPONENTS+="${HOME}/bin:"
 [[ -d /snap/bin ]] && PATH_COMPONENTS+="/snap/bin:"
 PATH_COMPONENTS+="${PATH}"
 
-# Properly separate declaration and assignment
-PATH_TEMP=$(echo -n "${PATH_COMPONENTS}" | tr -s ':')
+# Collapse repeated path separators without spawning subprocesses
+PATH_TEMP="${PATH_COMPONENTS}"
+while [[ "${PATH_TEMP}" == *::* ]]; do
+  PATH_TEMP=${PATH_TEMP//::/:}
+done
+PATH_TEMP=${PATH_TEMP#:}
+PATH_TEMP=${PATH_TEMP%:}
 export PATH="${PATH_TEMP}"
 
 # FZF configuration handled by sh/fzf.sh — no duplicate here

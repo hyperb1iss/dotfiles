@@ -2,7 +2,13 @@
 
 # Use modern completion system
 autoload -Uz compinit
-compinit
+zcompdump_path="${ZDOTDIR:-${HOME}}/.zcompdump"
+if [[ -s "${zcompdump_path}" ]]; then
+  compinit -C -d "${zcompdump_path}"
+else
+  compinit -d "${zcompdump_path}"
+fi
+unset zcompdump_path
 
 # Basic completion settings with enhanced colors
 zstyle ':completion:*' auto-description 'specify: %d'
@@ -100,4 +106,3 @@ zstyle ':fzf-tab:*' fzf-flags \
 
 # Use tmux popup if available (comment out if not using tmux)
 # zstyle ':fzf-tab:*' fzf-command ftb-tmux-popup
-

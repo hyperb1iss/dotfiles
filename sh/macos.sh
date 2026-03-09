@@ -321,52 +321,29 @@ if is_macos; then
   }
 
   # Modified PATH for macOS to include Homebrew
-  arch=$(uname -m) || true
-  if [[ "${arch}" == "arm64" ]]; then
-    # M1/M2 Mac
-    export PATH="/opt/homebrew/bin:/opt/homebrew/sbin:${PATH}"
-  else
-    # Intel Mac
-    export PATH="/usr/local/bin:/usr/local/sbin:${PATH}"
+  brew_prefix=""
+  if [[ -d /opt/homebrew/bin ]]; then
+    brew_prefix="/opt/homebrew"
+  elif [[ -d /usr/local/bin ]]; then
+    brew_prefix="/usr/local"
+  fi
+
+  if [[ -n "${brew_prefix}" ]]; then
+    export PATH="${brew_prefix}/bin:${brew_prefix}/sbin:${PATH}"
   fi
 
   # Homebrew's default Python is already properly linked, no manual PATH needed
 
-  # Configure zsh and bash completions for Homebrew packages
-  if has_command brew; then
-    FPATH="$(brew --prefix)/share/zsh/site-functions:${FPATH}"
-
-    if is_zsh; then
-      # ZSH completions
-      FPATH="$(brew --prefix)/share/zsh-completions:${FPATH}"
-      brew_prefix=$(brew --prefix) || true
-      if [[ -d "${brew_prefix}/share/zsh/site-functions" ]]; then
-        FPATH="${brew_prefix}/share/zsh/site-functions:${FPATH}"
-      fi
-    elif is_bash; then
-      # Bash completions
-      brew_prefix=$(brew --prefix) || true
-      if [[ -r "${brew_prefix}/etc/profile.d/bash_completion.sh" ]]; then
-        source "${brew_prefix}/etc/profile.d/bash_completion.sh"
-      else
-        for COMPLETION in "${brew_prefix}/etc/bash_completion.d/"*; do
-          # shellcheck disable=SC1090
-          [[ -r "${COMPLETION}" ]] && source "${COMPLETION}"
-        done
-      fi
-    fi
-  fi
-
-  # Initialize zsh-autosuggestions if installed through Homebrew
-  if is_zsh; then
-    brew_prefix=$(brew --prefix) || true
-    if [[ -f "${brew_prefix}/share/zsh-autosuggestions/zsh-autosuggestions.zsh" ]]; then
-      source "${brew_prefix}/share/zsh-autosuggestions/zsh-autosuggestions.zsh"
-    fi
-
-    # Initialize syntax highlighting if installed through Homebrew
-    if [[ -f "${brew_prefix}/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh" ]]; then
-      source "${brew_prefix}/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
+  # Configure bash completions for Homebrew packages.
+  # Zsh completions are added before compinit in zshrc.
+  if [[ -n "${brew_prefix}" ]] && is_bash; then
+    if [[ -r "${brew_prefix}/etc/profile.d/bash_completion.sh" ]]; then
+      source "${brew_prefix}/etc/profile.d/bash_completion.sh"
+    else
+      for COMPLETION in "${brew_prefix}/etc/bash_completion.d/"*; do
+        # shellcheck disable=SC1090
+        [[ -r "${COMPLETION}" ]] && source "${COMPLETION}"
+      done
     fi
   fi
 fi

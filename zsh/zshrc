@@ -22,8 +22,27 @@ HISTSIZE=50000
 export SAVEHIST=50000
 HISTFILE=~/.zsh_history
 
+# Source critical environment and common functions before completions and plugins.
+source "${HOME}/dev/dotfiles/sh/shell-common.sh" # Source this first for helper functions
+source "${HOME}/dev/dotfiles/sh/env.sh"          # Then source env for PATH and other vars
+source "${HOME}/dev/dotfiles/sh/terminal.sh"     # Source terminal title management
+
+# Add Homebrew completion directories before compinit without shelling out to brew.
+if is_macos; then
+  if [[ -d /opt/homebrew/share/zsh/site-functions ]]; then
+    fpath=(/opt/homebrew/share/zsh/site-functions /opt/homebrew/share/zsh-completions ${fpath})
+  elif [[ -d /usr/local/share/zsh/site-functions ]]; then
+    fpath=(/usr/local/share/zsh/site-functions /usr/local/share/zsh-completions ${fpath})
+  fi
+fi
+
 # Source custom configurations
 source ~/dev/dotfiles/zsh/completion.zsh
+
+# Set initial terminal title for interactive, non-minimal Zsh sessions
+if is_zsh && [[ $- == *i* ]] && ! is_minimal; then
+  set_terminal_title
+fi
 
 # ZINIT - Zsh Plugin Manager
 ZINIT_HOME="${XDG_DATA_HOME:-${HOME}/.local/share}/zinit/zinit.git"
@@ -32,17 +51,6 @@ if [[ ! -d "${ZINIT_HOME}" ]]; then
   git clone https://github.com/zdharma-continuum/zinit.git "${ZINIT_HOME}"
 fi
 source "${ZINIT_HOME}/zinit.zsh"
-
-# Source critical environment and common functions BEFORE Zinit plugins
-# This ensures PATH is set for plugins (like Starship) and helpers are available.
-source "${HOME}/dev/dotfiles/sh/shell-common.sh" # Source this first for helper functions
-source "${HOME}/dev/dotfiles/sh/env.sh"          # Then source env for PATH and other vars
-source "${HOME}/dev/dotfiles/sh/terminal.sh"     # Source terminal title management
-
-# Set initial terminal title for interactive, non-minimal Zsh sessions
-if is_zsh && [[ $- == *i* ]] && ! is_minimal; then
-  set_terminal_title
-fi
 
 # Load plugins with Zinit
 # Using 'light' for faster loading without reporting/investigation
@@ -73,8 +81,9 @@ bindkey '^P' history-substring-search-up
 bindkey '^N' history-substring-search-down
 
 # Initialize Starship prompt
-zinit ice atload"eval \"\$(starship init zsh)\""
-zinit light starship/starship
+if command -v starship &>/dev/null; then
+  eval "$(starship init zsh)"
+fi
 
 # Add other plugins here, e.g.:
 # zinit light zdharma-continuum/fast-syntax-highlighting # Alternative syntax highlighting
@@ -86,7 +95,7 @@ zinit light starship/starship
 # Load our own shell scripts using Zinit
 # Loop through sh/*.sh files and load them as snippets, excluding common/env.
 for script_file in "${HOME}/dev/dotfiles/sh/"*.sh; do
-  script_basename=$(basename "${script_file}")
+  script_basename="${script_file##*/}"
   if [[ "${script_basename}" == "shell-common.sh" ||
     "${script_basename}" == "env.sh" ||
     "${script_basename}" == "terminal.sh" ]]; then
