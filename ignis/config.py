@@ -2,26 +2,45 @@
 
 import os
 
-from ignis.app import IgnisApp
-
-from ignis import widgets
+from ignis import utils, widgets
+from ignis.css_manager import CssManager, CssInfoPath
 
 from modules.clock import clock_widget
 from modules.media import media_widget
 from modules.sysmon import sysmon_widget
 from modules.weather import weather_widget
 
-app = IgnisApp.get_default()
-
-# Load SilkCircuit stylesheet (apply_css handles SCSS compilation)
+# Load SilkCircuit stylesheet (SCSS → CSS compilation via sass)
 style_path = os.path.join(os.path.dirname(__file__), "style.scss")
 if os.path.exists(style_path):
-    app.apply_css(style_path)
+    CssManager.get_default().apply_css(
+        CssInfoPath(
+            name="silkcircuit",
+            path=style_path,
+            compiler_function=lambda path: utils.sass_compile(path=path),
+        )
+    )
+
+
+def _primary_monitor() -> int:
+    """Find the primary monitor — widest landscape display wins."""
+    best, best_width = 0, 0
+    for i in range(utils.get_n_monitors()):
+        mon = utils.get_monitor(i)
+        if mon:
+            geo = mon.get_geometry()
+            if geo.width > best_width:
+                best, best_width = i, geo.width
+    return best
+
+
+PRIMARY = _primary_monitor()
 
 
 # ── Top-right: Clock + Weather ──────────────────────────────────
 widgets.Window(
     namespace="sc-clock-weather",
+    monitor=PRIMARY,
     anchor=["top", "right"],
     exclusivity="normal",
     layer="bottom",
@@ -41,6 +60,7 @@ widgets.Window(
 # ── Bottom-right: System Monitor ────────────────────────────────
 widgets.Window(
     namespace="sc-sysmon",
+    monitor=PRIMARY,
     anchor=["bottom", "right"],
     exclusivity="normal",
     layer="bottom",
@@ -53,6 +73,7 @@ widgets.Window(
 # ── Bottom-left: Media Player ───────────────────────────────────
 widgets.Window(
     namespace="sc-media",
+    monitor=PRIMARY,
     anchor=["bottom", "left"],
     exclusivity="normal",
     layer="bottom",

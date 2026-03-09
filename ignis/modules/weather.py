@@ -104,21 +104,38 @@ def _get(w, key, fallback=""):
     return w.get(key, fallback) if isinstance(w, dict) else fallback
 
 
+def _stat_column(label: str, css_value: str, poll, formatter) -> widgets.Box:
+    """Single stat column: label on top, value below."""
+    return widgets.Box(
+        css_classes=["sc-weather-stat"],
+        vertical=True,
+        halign="center",
+        child=[
+            widgets.Label(
+                css_classes=["sc-weather-stat-label"],
+                label=label,
+            ),
+            widgets.Label(
+                css_classes=["sc-weather-stat-value", css_value],
+                label=poll.bind("output", formatter),
+            ),
+        ],
+    )
+
+
 def weather_widget() -> widgets.Box:
     _cache = dict(_EMPTY)
     _lock = threading.Lock()
-    _first = [True]  # mutable flag for closure
+    _first = [True]
 
     def _poll_weather(self) -> dict:
         if _first[0]:
-            # First fetch: synchronous so widget populates immediately
             _first[0] = False
             result = _fetch_weather_sync()
             with _lock:
                 _cache.update(result)
             return dict(result)
 
-        # Subsequent fetches: background thread to avoid blocking GTK
         def _bg():
             result = _fetch_weather_sync()
             with _lock:
@@ -133,46 +150,62 @@ def weather_widget() -> widgets.Box:
     return widgets.Box(
         css_classes=["sc-widget", "sc-weather"],
         vertical=True,
-        spacing=6,
+        spacing=4,
         child=[
-            # ── Glyph + Temp hero ───────────────────────────────
-            widgets.Box(
-                spacing=16,
+            # ── Glyph — massive cinematic presence ────────────
+            widgets.Label(
+                css_classes=["sc-weather-glyph"],
                 halign="center",
-                child=[
-                    widgets.Label(
-                        css_classes=["sc-weather-glyph"],
-                        label=poll.bind("output", lambda w: _get(w, "glyph", "☀")),
-                    ),
-                    widgets.Label(
-                        css_classes=["sc-weather-temp"],
-                        label=poll.bind(
-                            "output",
-                            lambda w: f"{_get(w, 'temp', '--')}°",
-                        ),
-                    ),
-                ],
+                label=poll.bind("output", lambda w: _get(w, "glyph", "☀")),
             ),
-            # ── Description ─────────────────────────────────────
+            # ── Hero temperature ──────────────────────────────
+            widgets.Label(
+                css_classes=["sc-weather-temp"],
+                halign="center",
+                label=poll.bind(
+                    "output",
+                    lambda w: f"{_get(w, 'temp', '--')}°",
+                ),
+            ),
+            # ── Condition description ─────────────────────────
             widgets.Label(
                 css_classes=["sc-weather-desc"],
                 halign="center",
                 label=poll.bind("output", lambda w: _get(w, "description", "")),
             ),
-            # ── Details line ────────────────────────────────────
-            widgets.Label(
-                css_classes=["sc-weather-details"],
+            # ── Separator ─────────────────────────────────────
+            widgets.Box(css_classes=["sc-separator"]),
+            # ── Stats row — feels / humidity / wind ───────────
+            widgets.Box(
+                css_classes=["sc-weather-stats-row"],
                 halign="center",
-                label=poll.bind(
-                    "output",
-                    lambda w: (
-                        f"Feels {_get(w, 'feels_like', '--')}°  ·  "
-                        f"{_get(w, 'humidity', '--')}% humid  ·  "
-                        f"{_get(w, 'wind', '--')} mph"
+                homogeneous=True,
+                child=[
+                    _stat_column(
+                        "FEELS",
+                        "sc-stat-cyan",
+                        poll,
+                        lambda w: f"{_get(w, 'feels_like', '--')}°",
                     ),
-                ),
+                    widgets.Box(css_classes=["sc-weather-stat-divider"]),
+                    _stat_column(
+                        "HUMID",
+                        "sc-stat-coral",
+                        poll,
+                        lambda w: f"{_get(w, 'humidity', '--')}%",
+                    ),
+                    widgets.Box(css_classes=["sc-weather-stat-divider"]),
+                    _stat_column(
+                        "WIND",
+                        "sc-stat-green",
+                        poll,
+                        lambda w: f"{_get(w, 'wind', '--')}",
+                    ),
+                ],
             ),
-            # ── City ────────────────────────────────────────────
+            # ── Separator ─────────────────────────────────────
+            widgets.Box(css_classes=["sc-separator"]),
+            # ── City ──────────────────────────────────────────
             widgets.Label(
                 css_classes=["sc-weather-city"],
                 halign="center",

@@ -26,23 +26,45 @@ def clock_widget() -> widgets.Box:
                 child=widgets.Box(
                     vertical=True,
                     child=[
-                        # Time — big display font
-                        widgets.Label(
-                            css_classes=["sc-clock-time"],
-                            label=utils.Poll(
-                                1_000,
-                                lambda self: datetime.datetime.now().strftime("%-I:%M"),
-                            ).bind("output"),
-                        ),
-                        # Seconds — small mono accent
-                        widgets.Label(
-                            css_classes=["sc-clock-seconds"],
-                            label=utils.Poll(
-                                1_000,
-                                lambda self: datetime.datetime.now().strftime(
-                                ":%S %p"
-                            ),
-                            ).bind("output"),
+                        # Time row — hours:minutes + seconds + AM/PM inline
+                        widgets.Box(
+                            halign="center",
+                            child=[
+                                widgets.Label(
+                                    css_classes=["sc-clock-time"],
+                                    label=utils.Poll(
+                                        1_000,
+                                        lambda self: datetime.datetime.now().strftime(
+                                            "%-I:%M"
+                                        ),
+                                    ).bind("output"),
+                                ),
+                                widgets.Box(
+                                    css_classes=["sc-clock-suffix"],
+                                    vertical=True,
+                                    valign="center",
+                                    child=[
+                                        widgets.Label(
+                                            css_classes=["sc-clock-seconds"],
+                                            label=utils.Poll(
+                                                1_000,
+                                                lambda self: datetime.datetime.now().strftime(
+                                                    "%S"
+                                                ),
+                                            ).bind("output"),
+                                        ),
+                                        widgets.Label(
+                                            css_classes=["sc-clock-ampm"],
+                                            label=utils.Poll(
+                                                1_000,
+                                                lambda self: datetime.datetime.now().strftime(
+                                                    "%p"
+                                                ),
+                                            ).bind("output"),
+                                        ),
+                                    ],
+                                ),
+                            ],
                         ),
                         # Date — clean sans
                         widgets.Label(

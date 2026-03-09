@@ -44,18 +44,20 @@ $font-data: "PragmataProLiga Nerd Font", "PragmataPro Nerd Font", "FantasqueSans
 .sc-widget {
   background: linear-gradient(
     170deg,
-    rgba(12, 8, 20, 0.94) 0%,
-    rgba(5, 4, 14, 0.96) 40%,
-    rgba(10, 6, 18, 0.94) 100%
+    rgba(12, 8, 20, 0.72) 0%,
+    rgba(5, 4, 14, 0.78) 40%,
+    rgba(10, 6, 18, 0.72) 100%
   );
   border-radius: 18px;
   padding: 20px 22px;
-  border: 1px solid $border-glow;
+  border: 1px solid rgba($electric-purple, 0.28);
   min-width: 280px;
   box-shadow:
-    0 0 40px rgba($electric-purple, 0.06),
-    0 12px 40px rgba(0, 0, 0, 0.6),
-    inset 0 1px 0 rgba($fg, 0.02);
+    0 0 60px rgba($electric-purple, 0.08),
+    0 0 120px rgba($neon-cyan, 0.03),
+    0 16px 48px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 rgba($fg, 0.04),
+    inset 0 -1px 0 rgba($electric-purple, 0.06);
 }
 
 .sc-widget-title {
@@ -100,7 +102,7 @@ $font-data: "PragmataProLiga Nerd Font", "PragmataPro Nerd Font", "FantasqueSans
 .sc-clock-time {
   font-family: $font-hero;
   font-size: 64px;
-  font-weight: 700;
+  font-weight: 900;
   color: $neon-cyan;
   letter-spacing: 2px;
   text-shadow:
@@ -108,18 +110,32 @@ $font-data: "PragmataProLiga Nerd Font", "PragmataPro Nerd Font", "FantasqueSans
     0 0 120px rgba($neon-cyan, 0.1);
 }
 
+.sc-clock-suffix {
+  margin-left: 8px;
+  margin-top: 6px;
+}
+
 .sc-clock-seconds {
   font-family: $font-hero;
-  font-size: 11px;
+  font-size: 14px;
+  font-weight: 700;
   color: $fg-ghost;
-  margin-top: -4px;
   letter-spacing: 2px;
+}
+
+.sc-clock-ampm {
+  font-family: $font-hero;
+  font-size: 12px;
+  font-weight: 900;
+  color: $electric-purple;
+  letter-spacing: 3px;
+  text-shadow: 0 0 20px rgba($electric-purple, 0.3);
 }
 
 .sc-clock-date {
   font-family: $font-display;
   font-size: 15px;
-  font-weight: 600;
+  font-weight: 700;
   color: $coral;
   margin-top: 8px;
   text-shadow: 0 0 20px rgba($coral, 0.2);
@@ -153,45 +169,93 @@ $font-data: "PragmataProLiga Nerd Font", "PragmataPro Nerd Font", "FantasqueSans
 // WEATHER
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 .sc-weather {
-  padding: 20px 24px 16px;
+  padding: 18px 22px 14px;
 }
 
 .sc-weather-glyph {
-  font-size: 48px;
+  font-size: 40px;
+  margin-bottom: 0;
 }
 
 .sc-weather-temp {
   font-family: $font-hero;
   font-size: 34px;
-  font-weight: 700;
+  font-weight: 900;
   color: $fg;
   letter-spacing: 1px;
-  text-shadow: 0 0 30px rgba($fg, 0.1);
+  text-shadow:
+    0 0 30px rgba($fg, 0.12),
+    0 0 60px rgba($neon-cyan, 0.05);
 }
 
 .sc-weather-desc {
   font-family: $font-display;
-  font-size: 14px;
-  font-weight: 600;
+  font-size: 13px;
+  font-weight: 700;
   color: $success-green;
   text-shadow: 0 0 16px rgba($success-green, 0.2);
-  margin-top: 2px;
+  margin-top: 1px;
+  margin-bottom: 2px;
 }
 
-.sc-weather-details {
-  font-family: $font-data;
-  font-size: 11px;
-  color: $fg-muted;
-  margin-top: 6px;
-  letter-spacing: 0.3px;
+// ── Stats row ────────────────────────────────────────────────
+.sc-weather-stats-row {
+  padding: 4px 0 2px;
+}
+
+.sc-weather-stat {
+  padding: 0 8px;
+}
+
+.sc-weather-stat-label {
+  font-family: $font-display;
+  font-size: 8px;
+  font-weight: 700;
+  color: $fg-ghost;
+  letter-spacing: 2px;
+  margin-bottom: 1px;
+}
+
+.sc-weather-stat-value {
+  font-family: $font-hero;
+  font-size: 14px;
+  font-weight: 900;
+  letter-spacing: 1px;
+}
+
+.sc-stat-cyan {
+  color: $neon-cyan;
+  text-shadow: 0 0 16px rgba($neon-cyan, 0.25);
+}
+
+.sc-stat-coral {
+  color: $coral;
+  text-shadow: 0 0 16px rgba($coral, 0.25);
+}
+
+.sc-stat-green {
+  color: $success-green;
+  text-shadow: 0 0 16px rgba($success-green, 0.25);
+}
+
+.sc-weather-stat-divider {
+  min-width: 1px;
+  min-height: 22px;
+  background: linear-gradient(
+    180deg,
+    rgba($electric-purple, 0.0) 0%,
+    rgba($electric-purple, 0.25) 50%,
+    rgba($electric-purple, 0.0) 100%
+  );
 }
 
 .sc-weather-city {
   font-family: $font-display;
   font-size: 9px;
+  font-weight: 700;
   color: $fg-ghost;
-  letter-spacing: 3px;
-  margin-top: 6px;
+  letter-spacing: 4px;
+  margin-top: 2px;
   text-transform: uppercase;
 }
 
