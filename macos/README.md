@@ -66,6 +66,7 @@ make macos
   - Caps Lock acts as Escape when pressed alone, Control when held
   - Better Command+Tab management
   - Custom key combinations for improved text editing
+
 ## 📝 Post-Install Tasks
 
 After installation, you might want to:

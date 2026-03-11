@@ -1,16 +1,19 @@
 # 🌠 Stefanie's Dotfiles
 
 <p align="center">
-  <img src="https://img.shields.io/badge/OS-Linux%20%7C%20macOS%20%7C%20Windows%20%7C%20WSL2-informational?style=for-the-badge&logo=windows&logoColor=white&color=ff00ff">
-  <img src="https://img.shields.io/badge/Shell-Bash%20%7C%20Zsh-informational?style=for-the-badge&logo=gnu-bash&logoColor=white&color=b300ff">
-  <img src="https://img.shields.io/badge/Editor-AstroNvim-informational?style=for-the-badge&logo=neovim&logoColor=white&color=9933ff">
-  <img src="https://img.shields.io/badge/Prompt-Starship-informational?style=for-the-badge&logo=starship&logoColor=white&color=00ffff">
-  <img src="https://img.shields.io/badge/Terminal-Tmux-informational?style=for-the-badge&logo=tmux&logoColor=white&color=33ffcc">
+  <img src="https://img.shields.io/badge/OS-macOS%20%7C%20Linux%20%7C%20WSL2-informational?style=for-the-badge&logo=apple&logoColor=white&color=ff00ff">
+  <img src="https://img.shields.io/badge/Shell-Zsh%20%7C%20Bash-informational?style=for-the-badge&logo=gnu-bash&logoColor=white&color=b300ff">
+  <img src="https://img.shields.io/badge/Editor-AstroNvim%20v5-informational?style=for-the-badge&logo=neovim&logoColor=white&color=9933ff">
+  <img src="https://img.shields.io/badge/Theme-SilkCircuit-informational?style=for-the-badge&logo=neovim&logoColor=white&color=e135ff">
+  <img src="https://img.shields.io/badge/Terminal-Ghostty%20%7C%20Tmux-informational?style=for-the-badge&logo=ghostty&logoColor=white&color=00ffff">
+  <img src="https://img.shields.io/badge/Prompt-Starship-informational?style=for-the-badge&logo=starship&logoColor=white&color=33ffcc">
 </p>
 
 Hey there! Welcome to my personal dotfiles repository! I'm **Stefanie Jane**, aka **hyperb1iss**—a creative technologist
-based in Seattle. These dotfiles create a powerful, consistent development environment that works seamlessly across
-Linux, WSL2, and Windows, with a special focus on Android development.
+based in Seattle. These dotfiles create a powerful, beautiful development environment with a macOS-first focus that also
+works seamlessly across Linux and WSL2. Everything is tied together by the
+[SilkCircuit](https://github.com/hyperb1iss/silkcircuit-nvim) color theme—a cyberpunk-inspired aesthetic with neon
+purples, electric cyans, and blazing pinks that flows through every tool.
 
 <p align="center">
   <img src="images/terminal-bliss.png" alt="Terminal Bliss" width="600" />
@@ -18,58 +21,74 @@ Linux, WSL2, and Windows, with a special focus on Android development.
 
 ## 🌟 Core Features
 
-| Feature                    | Description                                                                                                                                                                          |
-| -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| 🐚 **Shell Environment**   | • Unified Bash & Zsh configuration<br>• Smart shell detection and adaptation<br>• Enhanced history with timestamps<br>• Modern CLI tools integration<br>• Cross-platform consistency |
-| 📱 **Android Development** | • Complete AOSP build environment<br>• Smart device management<br>• Optimized build commands<br>• Comprehensive udev rules<br>• Quick navigation system                              |
-| 🖥️ **Terminal Setup**      | • Custom Tmux configuration<br>• Starship prompt with Git integration<br>• Modern CLI replacements<br>• Fuzzy finding and completion<br>• Directory jumping                          |
-| 🪟 **WSL2 Integration**    | • Seamless Windows/Linux operation<br>• Path conversion utilities<br>• File system integration<br>• Shared Git configuration<br>• Backup tools                                       |
-| 🎨 **Theming**             | • SilkCircuit custom color scheme<br>• SilkCircuit Starship theme<br>• Consistent cross-tool styling<br>• Beautiful CLI visuals<br>• Neon magenta & electric cyan accents            |
-| 🛠️ **Development Tools**   | • AstroNvim + Avante.nvim AI assistant<br>• Git workflow enhancements<br>• Docker & Kubernetes management<br>• Build automation<br>• Performance optimizations                       |
+| Feature                  | Description                                                                                                                                                                                            |
+| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 🐚 **Shell Environment** | • Zsh with Zinit plugin management & Bash fallback<br>• Atuin-powered shell history with cross-machine sync<br>• 28 modular shell scripts with 100+ aliases<br>• Smart platform detection & adaptation |
+| 🖥️ **Terminal Setup**    | • Ghostty terminal with SilkCircuit theme<br>• Tmux multiplexer with custom keybindings<br>• Starship prompt with gradient theme<br>• FZF-powered fuzzy finding everywhere                             |
+| 🤖 **AI Integration**    | • Claude Code CLI for terminal AI pair programming<br>• Avante.nvim for in-editor Claude assistance<br>• Custom Claude Code status line & security hooks                                               |
+| 🎨 **SilkCircuit Theme** | • [silkcircuit-nvim](https://github.com/hyperb1iss/silkcircuit-nvim) Neovim colorscheme<br>• Consistent theming across Neovim, Git, Starship, Tmux, Ghostty, Bat, Delta, Atuin, FZF, and more          |
+| 🛠️ **Development Tools** | • AstroNvim v5 with full LSP for 11+ languages<br>• Proto version manager (Node, Rust, pnpm)<br>• Git workflow enhancements with Delta diffs<br>• Docker & Kubernetes management                       |
+| 🌐 **Cross-Platform**    | • macOS-first with Homebrew & DotBot automation<br>• Linux (Ubuntu/Arch) full desktop & minimal server profiles<br>• WSL2 with seamless path conversion<br>• Windows PowerShell via HyperShell modules |
 
 ## 🔧 Tool Suite
 
 ### 📊 Core Development
 
-| Tool                                        | Description          | Features                                                                      |
-| ------------------------------------------- | -------------------- | ----------------------------------------------------------------------------- |
-| 🚀 **[Starship](https://starship.rs/)**     | Cross-shell prompt   | • SilkCircuit theme<br>• Git status integration<br>• Context-aware display    |
-| 📝 **[AstroNvim](https://astronvim.com/)**  | Neovim configuration | • IDE-like features<br>• Avante.nvim AI assistant<br>• SilkCircuit theme      |
-| 🖥️ **[Tmux](https://github.com/tmux/tmux)** | Terminal multiplexer | • Custom key bindings<br>• SilkCircuit color scheme<br>• Session management   |
-| ✨ **[shellint](./bin/shellint)**           | Shell script linter  | • Shellcheck integration<br>• Auto-fixing capabilities<br>• Format with shfmt |
+| Tool                                                                 | Description          | Features                                                                    |
+| -------------------------------------------------------------------- | -------------------- | --------------------------------------------------------------------------- |
+| 📝 **[AstroNvim v5](https://astronvim.com/)**                        | Neovim configuration | • IDE-like features<br>• Avante.nvim AI assistant<br>• SilkCircuit theme    |
+| 👻 **[Ghostty](https://ghostty.org/)**                               | Terminal emulator    | • GPU-accelerated<br>• SilkCircuit theme<br>• Native macOS/Linux            |
+| 🚀 **[Starship](https://starship.rs/)**                              | Cross-shell prompt   | • SilkCircuit gradient theme<br>• Git status integration<br>• Context-aware |
+| 🖥️ **[Tmux](https://github.com/tmux/tmux)**                          | Terminal multiplexer | • Custom key bindings<br>• SilkCircuit color scheme<br>• Session management |
+| 🤖 **[Claude Code](https://docs.anthropic.com/en/docs/claude-code)** | AI pair programmer   | • Custom status line<br>• Security hooks<br>• Project-aware assistance      |
 
 ### 🎯 Modern CLI Tools
 
-| Tool                                                    | Description   | Features                                                          |
-| ------------------------------------------------------- | ------------- | ----------------------------------------------------------------- |
-| 🌳 **[FZF](https://github.com/junegunn/fzf)**           | Fuzzy finder  | • File searching<br>• History exploration<br>• Command completion |
-| 📂 **[LSDeluxe](https://github.com/Peltoche/lsd)**      | Modern ls     | • Icon support<br>• SilkCircuit colors<br>• Tree view             |
-| 🎨 **[Bat](https://github.com/sharkdp/bat)**            | Enhanced cat  | • Syntax highlighting<br>• SilkCircuit theme<br>• Line numbering  |
-| 🔍 **[Ripgrep](https://github.com/BurntSushi/ripgrep)** | Fast searcher | • Code searching<br>• Regular expressions<br>• Ignore rules       |
+| Tool                                                    | Description     | Features                                                              |
+| ------------------------------------------------------- | --------------- | --------------------------------------------------------------------- |
+| 🌳 **[FZF](https://github.com/junegunn/fzf)**           | Fuzzy finder    | • File searching<br>• History exploration<br>• Command completion     |
+| 📂 **[LSDeluxe](https://github.com/Peltoche/lsd)**      | Modern ls       | • Icon support<br>• SilkCircuit colors<br>• Tree view                 |
+| 🎨 **[Bat](https://github.com/sharkdp/bat)**            | Enhanced cat    | • Syntax highlighting<br>• SilkCircuit theme<br>• Line numbering      |
+| 🔍 **[Ripgrep](https://github.com/BurntSushi/ripgrep)** | Fast searcher   | • Code searching<br>• Regular expressions<br>• Ignore rules           |
+| 🔀 **[Delta](https://github.com/dandavison/delta)**     | Git diff viewer | • Syntax highlighting<br>• Side-by-side diffs<br>• SilkCircuit theme  |
+| ⏪ **[Atuin](https://atuin.sh/)**                       | Shell history   | • SQLite-backed<br>• Cross-machine sync<br>• Per-directory filtering  |
+| 📌 **[Zoxide](https://github.com/ajeetdsouza/zoxide)**  | Smart cd        | • Learns your habits<br>• Fuzzy matching<br>• Instant directory jumps |
+| 🔧 **[Proto](https://moonrepo.dev/proto)**              | Version manager | • Node, Rust, pnpm versions<br>• Auto .prototools detection<br>• Fast |
 
 ### 🖼️ System & Customization
 
-| Tool                                                        | Description    | Features                                                              |
-| ----------------------------------------------------------- | -------------- | --------------------------------------------------------------------- |
-| 📊 **[Fastfetch](https://github.com/fastfetch-cli/fastfetch)** | System info | • Fast system information<br>• Performance metrics<br>• Custom config |
-| 🎯 **[HyperShell](./hypershell)**                           | PowerShell env | • Modular architecture<br>• Kubernetes support<br>• Zoxide & FZF      |
-| 🔧 **[DotBot](https://github.com/anishathalye/dotbot)**     | Config manager | • Automated setup<br>• Cross-platform support<br>• Profile management |
+| Tool                                                           | Description    | Features                                                              |
+| -------------------------------------------------------------- | -------------- | --------------------------------------------------------------------- |
+| 📊 **[Fastfetch](https://github.com/fastfetch-cli/fastfetch)** | System info    | • Fast system information<br>• Performance metrics<br>• Custom config |
+| ✨ **[shellint](./bin/shellint)**                              | Shell linter   | • Shellcheck integration<br>• Auto-fixing<br>• Format with shfmt      |
+| 🔧 **[DotBot](https://github.com/anishathalye/dotbot)**        | Config manager | • Automated setup<br>• Cross-platform support<br>• Profile management |
 
 ## 📁 Repository Structure
 
 ```
 dotfiles/
-├── zsh/                  # Zsh configuration
-├── bash/                 # Bash configuration
-├── sh/                   # Shared shell utilities
-│   ├── android.sh       # Android development tools
-│   └── shell-utils.sh   # Common shell functions
-├── hypershell/          # Windows PowerShell environment
-├── nvim/                # AstroNvim configuration
-├── tmux.conf            # Tmux configuration
-├── starship/            # Starship prompt themes
-├── fastfetch/           # Fastfetch system info config
-└── bin/                 # Utility scripts
+├── nvim/                 # AstroNvim v5 configuration (→ ~/.config/nvim)
+│   └── lua/plugins/      #   Plugin configs (silkcircuit, avante, treesitter, …)
+├── zsh/                  # Zsh configuration (zshrc + completion)
+├── bash/                 # Bash configuration (profile + bashrc.local)
+├── sh/                   # 28 modular shell scripts (git, docker, k8s, macos, …)
+├── bin/                  # Utility scripts (shellint, diskclean, repo, …)
+├── ghostty/              # Ghostty terminal config (macOS + Linux)
+├── starship/             # Starship prompt with SilkCircuit gradient
+├── tmux.conf             # Tmux multiplexer configuration
+├── atuin/                # Atuin shell history + SilkCircuit theme
+├── gitconfig             # Git config with SilkCircuit colors + Delta
+├── proto/                # Proto version manager (.prototools)
+├── claude/               # Claude Code settings, status line, security hooks
+├── bat/                  # Bat syntax highlighting themes
+├── lsd/                  # LSDeluxe file listing config
+├── procs/                # Procs process viewer config
+├── fastfetch/            # Fastfetch system info display
+├── macos/                # macOS setup (Brewfile, system prefs, Karabiner)
+├── hypershell/           # Windows PowerShell modules
+├── docs/                 # VitePress documentation site
+├── Makefile              # Install, lint, and format targets
+└── *.yaml                # DotBot install manifests (macos, local, system, …)
 ```
 
 ## 🔤 Installing Nerd Fonts
@@ -124,7 +143,7 @@ git clone https://github.com/hyperb1iss/dotfiles.git $env:USERPROFILE\dev\dotfil
 
 # Install as administrator
 cd $env:USERPROFILE\dev\dotfiles
-.\install.bat
+.\install.ps1
 ```
 
 ## 🚀 Deep Dive
@@ -239,13 +258,20 @@ dstop container   # Stop containers
 
 ### 🤖 AI Integration
 
-The environment includes advanced AI coding assistance through **Avante.nvim**, providing:
+The environment includes AI coding assistance at two levels:
 
-- **Claude Integration**: Configured with Claude Sonnet 4 for intelligent code suggestions
-- **Interactive Sidebar**: Right-positioned AI assistant with rounded borders
-- **Smart Diff Resolution**: Intelligent conflict resolution with keyboard shortcuts
-- **Navigation**: Easy movement between AI suggestions and code changes
-- **Manual Control**: Auto-suggestions disabled for better control over AI assistance
+**[Claude Code CLI](https://docs.anthropic.com/en/docs/claude-code)** — Terminal AI pair programming:
+
+- Custom SilkCircuit status line showing git, language versions, and context
+- Security hooks for safe command execution
+- Project-aware assistance with custom AGENTS.md configuration
+- Integrated directly into the terminal workflow
+
+**[Avante.nvim](https://github.com/yetone/avante.nvim)** — In-editor AI assistance:
+
+- Configured with Claude Sonnet 4 for intelligent code suggestions
+- Interactive sidebar with diff-based edits and conflict resolution
+- Context-aware suggestions within your Neovim editing session
 
 ### 🎨 Theming System - SilkCircuit
 
@@ -262,17 +288,24 @@ The environment features the custom **SilkCircuit** color scheme, a cyberpunk-in
 |      ![Red](https://placehold.co/50x30/ff5555/ff5555.png)       | **Red**            | `#ff5555` | Deleted files, errors                   |
 |     ![Purple](https://placehold.co/50x30/c792ea/c792ea.png)     | **Purple**         | `#c792ea` | Keywords, tmux accents                  |
 
-The SilkCircuit theme is consistently applied across the entire environment:
+The SilkCircuit theme is powered by [**silkcircuit-nvim**](https://github.com/hyperb1iss/silkcircuit-nvim)—a standalone
+Neovim colorscheme plugin with 5 variants (neon, vibrant, soft, glow, dawn), 30+ plugin integrations, and WCAG AA
+accessibility compliance. It's loaded as a local plugin from `~/dev/silkcircuit-nvim` and also provides extras for
+environment-wide theming.
 
-- **Neovim** - Full theme integration with 30+ plugin support
+The theme is consistently applied across the entire environment:
+
+- **Neovim** - Full theme via silkcircuit-nvim with 30+ plugin support
+- **Ghostty** - Terminal emulator with SilkCircuit colors
 - **Git** - Custom log formatting with `silkcircuit` pretty format
-- **Starship Prompt** - SilkCircuit theme with gradient effects
+- **Starship Prompt** - SilkCircuit gradient theme with powerline segments
+- **Tmux** - Status bar with purple and pink accents
+- **Atuin** - Shell history UI themed with SilkCircuit palette
+- **FZF / fzf-tab** - Fuzzy finder with SilkCircuit color scheme
 - **LSDeluxe** - File type colors matching the theme
 - **Bat** - Custom SilkCircuit.tmTheme for syntax highlighting
-- **Tmux** - Status bar with purple and pink accents
 - **Delta** - Git diff viewer with themed colors
-
-The theme provides a striking cyberpunk aesthetic with excellent contrast and readability across all tools.
+- **Claude Code** - Custom status line with SilkCircuit RGB colors
 
 ## 🔄 Updating
 
@@ -283,7 +316,7 @@ cd ~/dev/dotfiles
 git pull
 make  # For Linux/WSL2
 # Or
-.\install.bat  # For Windows (run as administrator)
+.\install.ps1  # For Windows (run as administrator)
 ```
 
 ## 🤝 Contributing
@@ -299,13 +332,15 @@ Got ideas for improvements? Found a bug? Feel free to:
 
 If you like these dotfiles, you might be interested in some of my other projects:
 
+- [silkcircuit-nvim](https://github.com/hyperb1iss/silkcircuit-nvim): The cyberpunk Neovim colorscheme that powers this
+  environment — 5 variants, 30+ integrations, extras for terminals, Git, VSCode, and more
 - [git-iris](https://github.com/hyperb1iss/git-iris): AI-accelerated git workflow tool
+- [contexter](https://github.com/hyperb1iss/contexter): Chrome extension and CLI for quickly copying code into LLMs
 - [signalrgb-homeassistant](https://github.com/hyperb1iss/signalrgb-homeassistant): SignalRGB integration for Home
   Assistant
 - [signalrgb-python](https://github.com/hyperb1iss/signalrgb-python): Python API client for SignalRGB Pro
 - [hyper-light-card](https://github.com/hyperb1iss/hyper-light-card): Custom card for controlling SignalRGB through Home
   Assistant
-- [contexter](https://github.com/hyperb1iss/contexter): Chrome extension and CLI for quickly copying code into LLMs
 - [aeonsync](https://github.com/hyperb1iss/aeonsync): An rsync backup tool for developers
 
 ## 📜 License

@@ -60,7 +60,7 @@ bash:
       reason: "Blocked: rm with absolute root path"
     - pattern: '\brm\s+-[rRf]*[rR][rRf]*\s'
       reason: "Blocked: recursive rm requires confirmation"
-      action: ask  # Downgrade to ask instead of hard block
+      action: ask # Downgrade to ask instead of hard block
     - pattern: '\bsudo\s+rm\b'
       reason: "Blocked: sudo rm is extremely dangerous"
     - pattern: '>\s*/dev/sd[a-z]'
@@ -255,7 +255,7 @@ bash:
 # ============================================================================
 edit:
   block:
-    - pattern: '/etc/'
+    - pattern: "/etc/"
       reason: "Blocked: cannot edit system files"
     - pattern: '\.env$'
       reason: "Blocked: cannot edit .env files (secrets)"
@@ -283,7 +283,7 @@ edit:
 # ============================================================================
 write:
   block:
-    - pattern: '/etc/'
+    - pattern: "/etc/"
       reason: "Blocked: cannot write to system directories"
     - pattern: '/\.ssh/'
       reason: "Blocked: cannot write to SSH directory"
@@ -295,9 +295,9 @@ write:
   ask:
     - pattern: '\.sh$'
       reason: "Shell script creation requires confirmation"
-    - pattern: 'Makefile'
+    - pattern: "Makefile"
       reason: "Makefile creation requires confirmation"
-    - pattern: 'Dockerfile'
+    - pattern: "Dockerfile"
       reason: "Dockerfile creation requires confirmation"
     - pattern: '\.github/'
       reason: "GitHub workflow creation requires confirmation"

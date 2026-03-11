@@ -10,11 +10,15 @@ complete terminal experience designed to make you faster, smarter, and genuinely
 
 This dotfiles collection provides a complete development environment:
 
-- **24 modular shell scripts** with 100+ aliases and functions
-- **AstroNvim configuration** with LSP, AI assistance, and custom plugins
-- **SilkCircuit theme** applied consistently across all tools
-- **Modern CLI replacements** for classic Unix tools
-- **Cross-platform support** for macOS, Linux, and WSL2
+- **28 modular shell scripts** with 100+ aliases and functions
+- **AstroNvim v5 configuration** with LSP, AI assistance, and custom plugins
+- **[SilkCircuit theme](https://github.com/hyperb1iss/silkcircuit-nvim)** applied consistently across all tools — a
+  standalone Neovim colorscheme with extras for terminal emulators, Git, and more
+- **Ghostty terminal** with SilkCircuit theme and Atuin-powered shell history
+- **Modern CLI replacements** for classic Unix tools (lsd, bat, fd, ripgrep, zoxide, delta, procs)
+- **Claude Code CLI** integration with custom status line and security hooks
+- **Proto version manager** for Node.js, Rust, and pnpm
+- **Cross-platform support** with a macOS-first focus, plus Linux and WSL2
 
 ## Design Philosophy
 

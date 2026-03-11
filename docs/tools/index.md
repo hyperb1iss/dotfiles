@@ -7,20 +7,37 @@ and modern features.
 
 ## The Modern CLI Stack
 
-| Classic | Modern      | Why Upgrade                                      |
-| ------- | ----------- | ------------------------------------------------ |
-| `ls`    | **lsd**     | Icons, colors, tree view, git integration        |
-| `cat`   | **bat**     | Syntax highlighting, line numbers, git diff      |
-| `find`  | **fd**      | 5x faster, respects .gitignore, regex by default |
-| `grep`  | **ripgrep** | 10x faster, smart defaults, beautiful output     |
-| `cd`    | **zoxide**  | Learns your habits, fuzzy matching               |
-| `ps`    | **procs**   | Human-readable, colorful, tree view              |
-| `diff`  | **delta**   | Syntax highlighting, side-by-side, git aware     |
-| `top`   | **htop**    | Interactive, better UI, easier to read           |
+| Classic   | Modern      | Why Upgrade                                       |
+| --------- | ----------- | ------------------------------------------------- |
+| `ls`      | **lsd**     | Icons, colors, tree view, git integration         |
+| `cat`     | **bat**     | Syntax highlighting, line numbers, git diff       |
+| `find`    | **fd**      | 5x faster, respects .gitignore, regex by default  |
+| `grep`    | **ripgrep** | 10x faster, smart defaults, beautiful output      |
+| `cd`      | **zoxide**  | Learns your habits, fuzzy matching                |
+| `ps`      | **procs**   | Human-readable, colorful, tree view               |
+| `diff`    | **delta**   | Syntax highlighting, side-by-side, git aware      |
+| `top`     | **htop**    | Interactive, better UI, easier to read            |
+| `history` | **atuin**   | SQLite-backed, cross-machine sync, per-dir        |
+| `nvm`     | **proto**   | Multi-language version manager, fast, declarative |
 
 All tools are pre-configured with the SilkCircuit theme and sensible defaults.
 
 ## Tool Highlights
+
+### Ghostty Terminal
+
+The primary terminal emulator, [Ghostty](https://ghostty.org/) is GPU-accelerated and native on both macOS and Linux.
+Configured with SilkCircuit colors and platform-specific settings in `ghostty/`.
+
+### Atuin Shell History
+
+[Atuin](https://atuin.sh/) replaces standard shell history with a SQLite-backed, searchable database featuring
+cross-machine sync, per-directory filtering, and a SilkCircuit-themed UI (`atuin/themes/silkcircuit.toml`).
+
+### Proto Version Manager
+
+[Proto](https://moonrepo.dev/proto) manages language runtime versions declaratively via `.prototools`. Currently pins
+Node.js, pnpm, Rust, and moon. Auto-detects version files and integrates with the shell PATH.
 
 ### [Starship Prompt](./starship)
 
@@ -170,10 +187,13 @@ Each tool is configured in the dotfiles:
 
 | Tool         | Config Location                     | Purpose                |
 | ------------ | ----------------------------------- | ---------------------- |
-| **lsd**      | `lsd/config.yaml`                   | Display settings       |
-| **bat**      | `bat/config`, `bat/themes/`         | Theme, syntax settings |
+| **Ghostty**  | `ghostty/config`, `ghostty/*.conf`  | Terminal emulator      |
 | **Starship** | `starship/starship.toml`            | Prompt customization   |
 | **Tmux**     | `tmux.conf`                         | Key bindings, theme    |
+| **Atuin**    | `atuin/`, `atuin/themes/`           | Shell history, theme   |
+| **Proto**    | `proto/.prototools`                 | Language versions      |
+| **lsd**      | `lsd/config.yaml`                   | Display settings       |
+| **bat**      | `bat/config`, `bat/themes/`         | Theme, syntax settings |
 | **Delta**    | `gitconfig` (delta section)         | Git diff styling       |
 | **procs**    | `procs/config.toml`                 | Process display        |
 | **FZF**      | `sh/fzf.sh`, `sh/env.sh` (ENV vars) | Defaults, key bindings |

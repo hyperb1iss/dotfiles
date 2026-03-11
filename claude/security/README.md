@@ -1,6 +1,7 @@
 # Claude Code Security Module
 
-Defense-in-depth protection for Claude Code. Blocks dangerous commands and protects sensitive files via PreToolUse hooks.
+Defense-in-depth protection for Claude Code. Blocks dangerous commands and protects sensitive files via PreToolUse
+hooks.
 
 ## Quick Install
 
@@ -14,17 +15,19 @@ python3 ~/dev/dotfiles/claude/security/install.py --project
 
 ## What It Does
 
-This module intercepts Claude Code tool calls **before execution** and evaluates them against configurable security patterns. It provides three levels of protection:
+This module intercepts Claude Code tool calls **before execution** and evaluates them against configurable security
+patterns. It provides three levels of protection:
 
-| Action | Behavior | Exit Code |
-|--------|----------|-----------|
-| **block** | Immediately reject, command never runs | 2 |
-| **ask** | Prompt user for confirmation | 0 + JSON |
-| **allow** | Proceed normally | 0 |
+| Action    | Behavior                               | Exit Code |
+| --------- | -------------------------------------- | --------- |
+| **block** | Immediately reject, command never runs | 2         |
+| **ask**   | Prompt user for confirmation           | 0 + JSON  |
+| **allow** | Proceed normally                       | 0         |
 
 ## Protected Operations
 
 ### Git (Critical)
+
 - `git push` - Always blocked (you push manually)
 - `git push --force` - History destruction
 - `git reset --hard` - Destroys uncommitted work
@@ -35,12 +38,14 @@ This module intercepts Claude Code tool calls **before execution** and evaluates
 - `git branch -D` - Force delete without merge check
 
 ### Filesystem
+
 - `rm -rf /` - Root deletion
 - `sudo rm` - Privileged deletion
 - `dd` to devices - Disk destruction
 - `chmod 777` - Insecure permissions
 
 ### Containers & Orchestration
+
 - `docker system prune` - Removes all unused data
 - `docker-compose down -v` - Volume destruction
 - `kubectl delete namespace` - Entire namespace deletion
@@ -48,11 +53,13 @@ This module intercepts Claude Code tool calls **before execution** and evaluates
 - `helm uninstall` - Release removal
 
 ### Cloud Providers
+
 - AWS: `terminate-instances`, `delete-db-instance`, `s3 rm --recursive`
 - GCP: `instances delete`, `sql instances delete`, `gsutil rm -r`
 - Azure: `vm delete`, `group delete`
 
 ### Databases
+
 - `DROP DATABASE/TABLE` - Schema destruction
 - `TRUNCATE TABLE` - Data loss
 - `DELETE FROM ... ;` (no WHERE) - Full table wipe
@@ -60,6 +67,7 @@ This module intercepts Claude Code tool calls **before execution** and evaluates
 - `dropDatabase` - MongoDB destruction
 
 ### Infrastructure
+
 - `terraform destroy` - Infrastructure teardown
 - `pulumi destroy` - Infrastructure teardown
 
@@ -97,28 +105,29 @@ python3 install.py --list-safe-tools
 
 ### Dangerous Patterns (patterns.yaml)
 
-Edit `patterns.yaml` to customize what gets blocked or requires confirmation. This is the **single source of truth** for security patterns.
+Edit `patterns.yaml` to customize what gets blocked or requires confirmation. This is the **single source of truth** for
+security patterns.
 
 ### Safe Tools (safe-tools.yaml)
 
 Edit `safe-tools.yaml` to customize what's auto-allowed. Includes **300+ rules** organized by category:
 
-| Category | Examples |
-|----------|----------|
+| Category            | Examples                                  |
+| ------------------- | ----------------------------------------- |
 | **Filesystem Read** | ls, find, tree, cat, head, tail, wc, stat |
-| **Search** | grep, rg, fd, ag, ack, fzf, locate |
-| **Git Read** | status, log, diff, show, branch, blame |
-| **Git Safe Write** | add, commit, fetch, stash, checkout -b |
-| **Node.js** | npm/pnpm/yarn run, test, build, lint |
-| **Python** | pytest, ruff, mypy, uv, poetry |
-| **Rust** | cargo build, test, check, clippy, fmt |
-| **Go** | go build, test, run, fmt, vet |
-| **Build Tools** | make, moon, turbo, nx, just |
-| **Containers Read** | docker ps, images, logs, inspect |
-| **K8s Read** | kubectl get, describe, logs, top |
-| **System Info** | uname, whoami, ps, top, env |
-| **Web Domains** | github.com, npmjs.com, docs.* |
-| **MCP Servers** | context7, sibyl, archon |
+| **Search**          | grep, rg, fd, ag, ack, fzf, locate        |
+| **Git Read**        | status, log, diff, show, branch, blame    |
+| **Git Safe Write**  | add, commit, fetch, stash, checkout -b    |
+| **Node.js**         | npm/pnpm/yarn run, test, build, lint      |
+| **Python**          | pytest, ruff, mypy, uv, poetry            |
+| **Rust**            | cargo build, test, check, clippy, fmt     |
+| **Go**              | go build, test, run, fmt, vet             |
+| **Build Tools**     | make, moon, turbo, nx, just               |
+| **Containers Read** | docker ps, images, logs, inspect          |
+| **K8s Read**        | kubectl get, describe, logs, top          |
+| **System Info**     | uname, whoami, ps, top, env               |
+| **Web Domains**     | github.com, npmjs.com, docs.\*            |
+| **MCP Servers**     | context7, sibyl, archon                   |
 
 ### Pattern Syntax
 
@@ -195,32 +204,37 @@ This module provides **defense in depth** with multiple layers:
 3. **CLAUDE.md (Instructions)**: Document rules Claude should follow
 4. **Git/Backups (Recovery)**: Time Machine, git reflog for recovery
 
-⚠️ **Important**: Hooks are the most reliable enforcement mechanism. There have been [reported issues](https://github.com/anthropics/claude-code/issues/6699) with `deny` rules being bypassed, so hooks are the primary defense.
+⚠️ **Important**: Hooks are the most reliable enforcement mechanism. There have been
+[reported issues](https://github.com/anthropics/claude-code/issues/6699) with `deny` rules being bypassed, so hooks are
+the primary defense.
 
 ## Troubleshooting
 
 ### Check if hooks are active
+
 ```bash
 claude /hooks
 ```
 
 ### Test a pattern manually
+
 ```bash
 echo '{"tool_name": "Bash", "tool_input": {"command": "rm -rf /"}}' | python3 damage-control.py
 ```
 
 ### Debug mode
+
 ```bash
 claude --debug
 ```
 
 ### Common Issues
 
-| Issue | Solution |
-|-------|----------|
-| Hook not triggering | Check `matcher` matches tool name exactly |
-| PyYAML not found | `pip install pyyaml` or patterns will use basic parser |
-| Permission denied | Ensure `damage-control.py` is executable |
+| Issue               | Solution                                               |
+| ------------------- | ------------------------------------------------------ |
+| Hook not triggering | Check `matcher` matches tool name exactly              |
+| PyYAML not found    | `pip install pyyaml` or patterns will use basic parser |
+| Permission denied   | Ensure `damage-control.py` is executable               |
 
 ## Sources & Credits
 

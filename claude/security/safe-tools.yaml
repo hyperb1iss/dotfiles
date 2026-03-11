@@ -35,8 +35,8 @@ bash:
     - "Bash(basename:*)"
     - "Bash(dirname:*)"
     - "Bash(pwd:*)"
-    - "Bash(test:*)"        # [ ] and test commands
-    - "Bash([:*)"           # [ condition ]
+    - "Bash(test:*)" # [ ] and test commands
+    - "Bash([:*)" # [ condition ]
 
   # ---------------------------------------------------------------------------
   # Search Tools
@@ -45,10 +45,10 @@ bash:
     - "Bash(grep:*)"
     - "Bash(egrep:*)"
     - "Bash(fgrep:*)"
-    - "Bash(rg:*)"          # ripgrep
-    - "Bash(ag:*)"          # silver searcher
+    - "Bash(rg:*)" # ripgrep
+    - "Bash(ag:*)" # silver searcher
     - "Bash(ack:*)"
-    - "Bash(fd:*)"          # fd-find
+    - "Bash(fd:*)" # fd-find
     - "Bash(fzf:*)"
     - "Bash(locate:*)"
     - "Bash(which:*)"
@@ -64,7 +64,7 @@ bash:
     - "Bash(git log:*)"
     - "Bash(git diff:*)"
     - "Bash(git show:*)"
-    - "Bash(git branch:*)"        # includes -l, -a, -r (list operations)
+    - "Bash(git branch:*)" # includes -l, -a, -r (list operations)
     - "Bash(git branch -l:*)"
     - "Bash(git branch -a:*)"
     - "Bash(git branch -r:*)"
@@ -82,11 +82,11 @@ bash:
     - "Bash(git ls-files:*)"
     - "Bash(git ls-tree:*)"
     - "Bash(git cat-file:*)"
-    - "Bash(git tag:*)"           # list tags (no -d)
+    - "Bash(git tag:*)" # list tags (no -d)
     - "Bash(git tag -l:*)"
     - "Bash(git stash list:*)"
     - "Bash(git worktree list:*)"
-    - "Bash(git reflog:*)"        # reading reflog is safe
+    - "Bash(git reflog:*)" # reading reflog is safe
     - "Bash(git --version:*)"
     - "Bash(git --no-pager:*)"
 
@@ -94,16 +94,16 @@ bash:
   # Git - Safe Write Operations
   # ---------------------------------------------------------------------------
   git_write_safe:
-    - "Bash(git add:*)"           # staging is safe
-    - "Bash(git commit:*)"        # committing is safe (local)
-    - "Bash(git fetch:*)"         # fetching is safe
+    - "Bash(git add:*)" # staging is safe
+    - "Bash(git commit:*)" # committing is safe (local)
+    - "Bash(git fetch:*)" # fetching is safe
     - "Bash(git pull --ff-only:*)" # fast-forward only is safe
-    - "Bash(git stash:*)"         # stashing is safe (recoverable)
-    - "Bash(git checkout -b:*)"   # creating branch is safe
-    - "Bash(git switch -c:*)"     # creating branch is safe
-    - "Bash(git switch:*)"        # switching branches is safe
+    - "Bash(git stash:*)" # stashing is safe (recoverable)
+    - "Bash(git checkout -b:*)" # creating branch is safe
+    - "Bash(git switch -c:*)" # creating branch is safe
+    - "Bash(git switch:*)" # switching branches is safe
     - "Bash(git restore --staged:*)" # unstaging is safe
-    - "Bash(git worktree add:*)"  # adding worktree is safe
+    - "Bash(git worktree add:*)" # adding worktree is safe
 
   # ---------------------------------------------------------------------------
   # Node.js / JavaScript Ecosystem
@@ -147,8 +147,8 @@ bash:
     - "Bash(deno lint:*)"
     - "Bash(deno fmt:*)"
     - "Bash(deno --version:*)"
-    - "Bash(tsc:*)"               # TypeScript compiler
-    - "Bash(tsx:*)"               # TypeScript execute
+    - "Bash(tsc:*)" # TypeScript compiler
+    - "Bash(tsx:*)" # TypeScript execute
     - "Bash(eslint:*)"
     - "Bash(prettier:*)"
     - "Bash(biome:*)"
@@ -169,13 +169,13 @@ bash:
     - "Bash(ruff check:*)"
     - "Bash(ruff format:*)"
     - "Bash(mypy:*)"
-    - "Bash(ty:*)"                # Astral type checker
+    - "Bash(ty:*)" # Astral type checker
     - "Bash(pyright:*)"
     - "Bash(black:*)"
     - "Bash(isort:*)"
     - "Bash(flake8:*)"
     - "Bash(pylint:*)"
-    - "Bash(uv:*)"                # Astral package manager
+    - "Bash(uv:*)" # Astral package manager
     - "Bash(uv run:*)"
     - "Bash(uv pip list:*)"
     - "Bash(uv pip show:*)"
@@ -232,8 +232,8 @@ bash:
   shell:
     - "Bash(shellcheck:*)"
     - "Bash(shfmt:*)"
-    - "Bash(bash -n:*)"           # syntax check only
-    - "Bash(zsh -n:*)"            # syntax check only
+    - "Bash(bash -n:*)" # syntax check only
+    - "Bash(zsh -n:*)" # syntax check only
     - "Bash(echo:*)"
     - "Bash(printf:*)"
 
@@ -246,7 +246,7 @@ bash:
     - "Bash(cut:*)"
     - "Bash(tr:*)"
     - "Bash(awk:*)"
-    - "Bash(sed -n:*)"            # print only, no modification
+    - "Bash(sed -n:*)" # print only, no modification
     - "Bash(jq:*)"
     - "Bash(yq:*)"
     - "Bash(xq:*)"
@@ -258,7 +258,7 @@ bash:
     - "Bash(fold:*)"
     - "Bash(expand:*)"
     - "Bash(unexpand:*)"
-    - "Bash(nl:*)"                # number lines
+    - "Bash(nl:*)" # number lines
     - "Bash(tac:*)"
     - "Bash(rev:*)"
     - "Bash(md5:*)"
@@ -280,13 +280,13 @@ bash:
     - "Bash(uptime:*)"
     - "Bash(env:*)"
     - "Bash(printenv:*)"
-    - "Bash(set:*)"               # in read context
+    - "Bash(set:*)" # in read context
     - "Bash(locale:*)"
-    - "Bash(sw_vers:*)"           # macOS version
-    - "Bash(system_profiler:*)"   # macOS system info
+    - "Bash(sw_vers:*)" # macOS version
+    - "Bash(system_profiler:*)" # macOS system info
     - "Bash(sysctl:*)"
     - "Bash(vm_stat:*)"
-    - "Bash(top -l 1:*)"          # single snapshot
+    - "Bash(top -l 1:*)" # single snapshot
     - "Bash(ps:*)"
     - "Bash(pgrep:*)"
     - "Bash(lsof:*)"
@@ -299,12 +299,12 @@ bash:
   # Archive Inspection (Read-only)
   # ---------------------------------------------------------------------------
   archives:
-    - "Bash(tar -tf:*)"           # list contents
-    - "Bash(tar -tvf:*)"          # list verbose
+    - "Bash(tar -tf:*)" # list contents
+    - "Bash(tar -tvf:*)" # list verbose
     - "Bash(tar --list:*)"
-    - "Bash(unzip -l:*)"          # list contents
+    - "Bash(unzip -l:*)" # list contents
     - "Bash(zipinfo:*)"
-    - "Bash(gzip -l:*)"           # list
+    - "Bash(gzip -l:*)" # list
     - "Bash(zcat:*)"
     - "Bash(zless:*)"
     - "Bash(bzcat:*)"
@@ -314,7 +314,7 @@ bash:
   # Version Managers
   # ---------------------------------------------------------------------------
   version_managers:
-    - "Bash(proto:*)"             # moonrepo proto
+    - "Bash(proto:*)" # moonrepo proto
     - "Bash(proto list:*)"
     - "Bash(proto status:*)"
     - "Bash(proto --version:*)"
@@ -337,7 +337,7 @@ bash:
     - "Bash(cmake:*)"
     - "Bash(ninja:*)"
     - "Bash(meson:*)"
-    - "Bash(moon:*)"              # moonrepo
+    - "Bash(moon:*)" # moonrepo
     - "Bash(moon run:*)"
     - "Bash(moon check:*)"
     - "Bash(moon --version:*)"
@@ -348,8 +348,8 @@ bash:
     - "Bash(bazel build:*)"
     - "Bash(bazel test:*)"
     - "Bash(bazel query:*)"
-    - "Bash(just:*)"              # justfile runner
-    - "Bash(task:*)"              # taskfile runner
+    - "Bash(just:*)" # justfile runner
+    - "Bash(task:*)" # taskfile runner
 
   # ---------------------------------------------------------------------------
   # Documentation / Markdown
@@ -371,20 +371,20 @@ bash:
     - "Bash(time:*)"
     - "Bash(timeout:*)"
     - "Bash(tee:*)"
-    - "Bash(touch:*)"             # creating empty files is safe
-    - "Bash(mkdir:*)"             # creating directories is safe
-    - "Bash(ln -s:*)"             # symlinks are generally safe
+    - "Bash(touch:*)" # creating empty files is safe
+    - "Bash(mkdir:*)" # creating directories is safe
+    - "Bash(ln -s:*)" # symlinks are generally safe
     - "Bash(sleep:*)"
     - "Bash(true:*)"
     - "Bash(false:*)"
     - "Bash(seq:*)"
     - "Bash(yes:*)"
-    - "Bash(pbcopy:*)"            # macOS clipboard
-    - "Bash(pbpaste:*)"           # macOS clipboard
-    - "Bash(open:*)"              # macOS open
-    - "Bash(code:*)"              # VS Code
-    - "Bash(cursor:*)"            # Cursor editor
-    - "Bash(nvim:*)"              # Neovim
+    - "Bash(pbcopy:*)" # macOS clipboard
+    - "Bash(pbpaste:*)" # macOS clipboard
+    - "Bash(open:*)" # macOS open
+    - "Bash(code:*)" # VS Code
+    - "Bash(cursor:*)" # Cursor editor
+    - "Bash(nvim:*)" # Neovim
     - "Bash(vim:*)"
     - "Bash(fastfetch:*)"
     - "Bash(neofetch:*)"

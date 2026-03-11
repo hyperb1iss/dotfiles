@@ -1,18 +1,19 @@
 # Neovim Configuration
 
-_AstroNvim v4 supercharged with SilkCircuit aesthetics and electric AI power_
+_AstroNvim v5 supercharged with SilkCircuit aesthetics and electric AI power_
 
 ## Overview
 
 This is a carefully crafted Neovim setup that transforms your editor into a powerful, beautiful development environment.
-Built on [AstroNvim v4](https://astronvim.com/), it combines robust LSP support, cutting-edge AI integration, and the
-stunning SilkCircuit color palette into one cohesive experience.
+Built on [AstroNvim v5](https://astronvim.com/), it combines robust LSP support, cutting-edge AI integration, and the
+stunning [SilkCircuit](https://github.com/hyperb1iss/silkcircuit-nvim) color palette into one cohesive experience.
 
 **What you get:**
 
 - **11+ languages** with full LSP support out of the box
 - **Claude AI integration** via Avante.nvim for intelligent code assistance
-- **SilkCircuit theme** - neon colors that match your terminal aesthetic
+- **[SilkCircuit theme](https://github.com/hyperb1iss/silkcircuit-nvim)** - neon colors that match your terminal
+  aesthetic (loaded from `~/dev/silkcircuit-nvim`)
 - **Modern plugin ecosystem** managed seamlessly by lazy.nvim
 - **Optimized workflow** with carefully curated keybindings and UI components
 
@@ -164,7 +165,12 @@ mappings = {
 
 ### Adjusting Colors
 
-The SilkCircuit theme is defined in `nvim/lua/plugins/silkcircuit.lua`. You can override specific highlight groups in
+The SilkCircuit theme is a standalone Neovim colorscheme plugin at
+[`~/dev/silkcircuit-nvim`](https://github.com/hyperb1iss/silkcircuit-nvim). It's loaded as a local plugin in
+`nvim/lua/community.lua` and configured in `nvim/lua/plugins/silkcircuit.lua`. The theme provides 5 variants (neon,
+vibrant, soft, glow, dawn) and 30+ plugin integrations.
+
+You can switch variants at runtime with `:SilkCircuit vibrant` or override specific highlight groups in
 `nvim/lua/polish.lua`:
 
 ```lua
