@@ -58,6 +58,9 @@ if is_macos; then
     export PATH="/usr/local/opt/python@3.13/libexec/bin:${PATH}"
   fi
 
+  # Accurate APFS disk free space (df -h lies on macOS)
+  alias diskfree='diskutil info / | grep -E "Container (Free|Total) Space"'
+
   # Flush DNS cache
   alias flushdns='sudo dscacheutil -flushcache; sudo killall -HUP mDNSResponder'
 
