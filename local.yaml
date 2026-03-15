@@ -158,16 +158,9 @@
     ~/.config/blender/5.0/scripts/startup/print3d_defaults.py: blender/startup/print3d_defaults.py
 
 - shell:
-    - mkdir -p ~/.config/ignis/modules
     - mkdir -p ~/.config/systemd/user
 - link:
-    ~/.config/ignis/config.py: ignis/config.py
-    ~/.config/ignis/style.scss: ignis/style.scss
-    ~/.config/ignis/modules/__init__.py: ignis/modules/__init__.py
-    ~/.config/ignis/modules/clock.py: ignis/modules/clock.py
-    ~/.config/ignis/modules/weather.py: ignis/modules/weather.py
-    ~/.config/ignis/modules/sysmon.py: ignis/modules/sysmon.py
-    ~/.config/ignis/modules/media.py: ignis/modules/media.py
+    ~/.config/ignis: ignis
     ~/.config/systemd/user/ignis.service: ignis/ignis.service
 - shell:
     - command: |

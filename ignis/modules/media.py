@@ -1,17 +1,59 @@
-"""MPRIS media player desktop widget."""
+"""MPRIS media player desktop widget — adaptive album art colors."""
 
-from ignis.services.mpris import MprisPlayer, MprisService
+import threading
+
+from gi.repository import Gdk, GLib, Gtk
 from ignis import widgets
+from ignis.services.mpris import MprisPlayer, MprisService
+
+from modules.colors import AlbumPalette, extract
 
 mpris = MprisService.get_default()
+_player_id = 0
 
 
 def _player_widget(player: MprisPlayer) -> widgets.Box:
-    """Single player display with art, info, and controls."""
-    return widgets.Box(
-        css_classes=["sc-media-player"],
+    """Single player display with colors that adapt to album art."""
+    global _player_id
+    cls_id = f"sc-dyn-{_player_id}"
+    _player_id += 1
+
+    # Per-player CSS provider for dynamic palette
+    provider = Gtk.CssProvider()
+    display = Gdk.Display.get_default()
+    Gtk.StyleContext.add_provider_for_display(
+        display, provider, Gtk.STYLE_PROVIDER_PRIORITY_USER
+    )
+    provider.load_from_string(AlbumPalette.default().css(cls_id))
+
+    # Version counter prevents stale extractions from overwriting newer ones
+    version = [0]
+
+    def _apply_colors(art_url: str):
+        version[0] += 1
+        ver = version[0]
+
+        def _extract():
+            palette = extract(art_url)
+            GLib.idle_add(lambda: ver == version[0] and provider.load_from_string(palette.css(cls_id)))
+
+        threading.Thread(target=_extract, daemon=True).start()
+
+    def _on_art_changed(*_args):
+        if player.art_url:
+            _apply_colors(player.art_url)
+        else:
+            provider.load_from_string(AlbumPalette.default().css(cls_id))
+
+    player.connect("notify::art-url", _on_art_changed)
+
+    def _on_closed(*_args):
+        Gtk.StyleContext.remove_provider_for_display(display, provider)
+        box.unparent()
+
+    box = widgets.Box(
+        css_classes=["sc-media-player", cls_id],
         spacing=14,
-        setup=lambda self: player.connect("closed", lambda x: self.unparent()),
         child=[
             # Album art
             widgets.Picture(
@@ -72,6 +114,14 @@ def _player_widget(player: MprisPlayer) -> widgets.Box:
             ),
         ],
     )
+
+    player.connect("closed", _on_closed)
+
+    # Extract colors for current art (if any)
+    if player.art_url:
+        _apply_colors(player.art_url)
+
+    return box
 
 
 def media_widget() -> widgets.Box:

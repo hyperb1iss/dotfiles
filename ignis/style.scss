@@ -440,6 +440,7 @@ $font-data: "PragmataProLiga Nerd Font", "PragmataPro Nerd Font", "FantasqueSans
     rgba($bg-void, 0.4) 100%
   );
   border: 1px solid rgba($electric-purple, 0.08);
+  transition: 500ms ease-in-out;
 }
 
 .sc-media-art {
@@ -447,6 +448,7 @@ $font-data: "PragmataProLiga Nerd Font", "PragmataPro Nerd Font", "FantasqueSans
   min-width: 72px;
   min-height: 72px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+  transition: 500ms ease-in-out;
 }
 
 .sc-media-title {
@@ -462,6 +464,7 @@ $font-data: "PragmataProLiga Nerd Font", "PragmataPro Nerd Font", "FantasqueSans
   font-weight: 500;
   color: $coral;
   text-shadow: 0 0 10px rgba($coral, 0.15);
+  transition: 500ms ease-in-out;
 }
 
 .sc-media-controls {
@@ -473,6 +476,7 @@ $font-data: "PragmataProLiga Nerd Font", "PragmataPro Nerd Font", "FantasqueSans
   padding: 4px 10px;
   border-radius: 10px;
   color: $fg-ghost;
+  transition: 200ms ease-in-out;
 
   &:hover {
     background-color: rgba($neon-cyan, 0.08);
@@ -485,6 +489,7 @@ $font-data: "PragmataProLiga Nerd Font", "PragmataPro Nerd Font", "FantasqueSans
   color: $neon-cyan;
   padding: 4px 14px;
   text-shadow: 0 0 16px rgba($neon-cyan, 0.3);
+  transition: 300ms ease-in-out;
 
   &:hover {
     background-color: rgba($neon-cyan, 0.12);
