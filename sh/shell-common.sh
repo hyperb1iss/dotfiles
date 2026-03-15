@@ -95,6 +95,7 @@ safe_source ~/.rc.local
 # will be handled in their respective rc files (zshrc, bashrc.local).
 
 # 6. Inspiration helper (opt-in for interactive shells)
+#    Set DOTFILES_NO_INSPIRATION=1 to disable
 #-------------------------------------------------
 function show_inspiration() {
   if has_command python3 && [[ -f ~/dev/dotfiles/inspiration/inspiration.py ]]; then
@@ -102,6 +103,6 @@ function show_inspiration() {
   fi
 }
 
-if [[ $- == *i* ]] && is_full && [[ "${SHOW_SHELL_INSPIRATION:-0}" = "1" ]]; then
+if [[ $- == *i* ]] && is_full && [[ "${SHOW_SHELL_INSPIRATION:-0}" = "1" ]] && [[ -z "${DOTFILES_NO_INSPIRATION:-}" ]]; then
   show_inspiration
 fi
