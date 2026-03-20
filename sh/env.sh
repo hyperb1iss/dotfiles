@@ -80,6 +80,9 @@ fi
 export PROTO_HOME="$HOME/.proto"
 export PATH="$PROTO_HOME/shims:$PROTO_HOME/bin:$PATH"
 
+# claude code
+export CLAUDE_CODE_EFFORT_LEVEL=max
+
 # Activate proto for version detection (respects .nvmrc, .prototools, etc.)
 if command -v proto &> /dev/null; then
   if [[ -n "$ZSH_VERSION" ]]; then
