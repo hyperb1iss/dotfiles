@@ -83,6 +83,15 @@ export PATH="$PROTO_HOME/shims:$PROTO_HOME/bin:$PATH"
 # claude code
 export CLAUDE_CODE_EFFORT_LEVEL=max
 
+# npm global bin — proto shims don't cover `npm install -g` binaries,
+# so resolve the active node version's bin dir without spawning node
+if [[ -d "$PROTO_HOME/tools/node" ]]; then
+  _node_ver="$(proto bin node 2>/dev/null)"
+  _node_ver="${_node_ver%/bin/node}"
+  [[ -d "$_node_ver/bin" ]] && export PATH="$_node_ver/bin:$PATH"
+  unset _node_ver
+fi
+
 # Activate proto for version detection (respects .nvmrc, .prototools, etc.)
 if command -v proto &> /dev/null; then
   if [[ -n "$ZSH_VERSION" ]]; then
