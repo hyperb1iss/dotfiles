@@ -66,6 +66,7 @@ clipboard-write = allow
 clipboard-trim-trailing-spaces = true
 clipboard-paste-protection = true
 clipboard-paste-bracketed-safe = true
+app-notifications = no-clipboard-copy
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Hyperlinks & URLs
@@ -76,7 +77,7 @@ link-url = true
 # Shell Integration
 # ─────────────────────────────────────────────────────────────────────────────
 shell-integration = detect
-shell-integration-features = cursor,sudo,title,no-ssh-terminfo
+shell-integration-features = cursor,sudo,title
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Scrollback & Performance (50MB buffer)
