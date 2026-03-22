@@ -1,0 +1,3 @@
+# NVMe has near-zero seek time — 8MB default read-ahead wastes memory
+# 128KB is plenty for sequential access without polluting page cache
+ACTION=="add|change", KERNEL=="nvme[0-9]*n[0-9]*", ATTR{queue/read_ahead_kb}="128"
