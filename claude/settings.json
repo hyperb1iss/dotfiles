@@ -8,14 +8,49 @@
       "mcp__sibyl",
       "Bash(sibyl:*)"
     ],
-    "deny": [
-      "Bash(git push:*)"
-    ],
+    "deny": [],
     "ask": [
       "Bash(kubectl delete:*)",
       "Bash(kubectl exec:*)",
       "Bash(argocd:*)",
-      "Bash(rm:*)"
+      "Bash(rm:*)",
+      "Bash(git push:*)"
+    ]
+  },
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "startup",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 /Users/bliss/.claude/hooks/sibyl/session-start.py",
+            "timeout": 10
+          }
+        ]
+      },
+      {
+        "matcher": "resume",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 /Users/bliss/.claude/hooks/sibyl/session-start.py",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "matcher": ".*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 /Users/bliss/.claude/hooks/sibyl/user-prompt-submit.py",
+            "timeout": 5
+          }
+        ]
+      }
     ]
   },
   "statusLine": {
@@ -39,23 +74,26 @@
     "skill-creator@claude-plugins-official": true,
     "feature-dev@claude-plugins-official": true,
     "hyperskills@hyperb1iss": true,
-    "astral@astral-sh": true
+    "astral@astral-sh": true,
+    "moonrepo@hyperb1iss-skills": true,
+    "supabase@claude-plugins-official": true,
+    "terraform@claude-plugins-official": true,
+    "netlify-skills@claude-plugins-official": true
   },
   "extraKnownMarketplaces": {
     "hyperb1iss": {
       "source": {
-        "source": "git",
-        "url": "git@github.com:hyperb1iss/hyperskills.git"
+        "source": "github",
+        "repo": "hyperb1iss/hyperskills"
       }
     },
-    "astral-sh": {
+    "hyperb1iss-skills": {
       "source": {
         "source": "github",
-        "repo": "astral-sh/claude-code-plugins"
+        "repo": "hyperb1iss/moonrepo-skill"
       }
     }
   },
   "alwaysThinkingEnabled": true,
-  "skipDangerousModePermissionPrompt": true,
-  "effortLevel": "high"
+  "skipDangerousModePermissionPrompt": true
 }

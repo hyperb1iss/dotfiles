@@ -5,6 +5,7 @@ node = "24.13.1"
 npm = "11.11.0"
 uv = "0.9.30"
 python = "3.13.12"
+rust = "stable"
 
 [settings]
 auto-install = true

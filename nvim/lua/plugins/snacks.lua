@@ -37,9 +37,7 @@ return {
     indent = {
       enabled = true,
       scope = {
-        enabled = true,
-        char = "│",
-        hl = "SnacksIndentScope",
+        enabled = false, -- disabled: crashes on Neovim 0.12 treesitter API changes
       },
     },
     input = { enabled = true },
@@ -59,7 +57,7 @@ return {
     },
     profiler = { enabled = true },
     quickfile = { enabled = true },
-    scope = { enabled = true },
+    scope = { enabled = false }, -- disabled: crashes on Neovim 0.12 treesitter API changes
     scroll = {
       enabled = false,
     },

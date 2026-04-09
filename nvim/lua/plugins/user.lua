@@ -65,7 +65,6 @@ return {
   -- Rainbow brackets/delimiters (colors provided by SilkCircuit theme integration)
   {
     "HiPhish/rainbow-delimiters.nvim",
-    dependencies = "nvim-treesitter/nvim-treesitter",
     event = "User AstroFile",
     config = function()
       local rainbow_delimiters = require "rainbow-delimiters"
