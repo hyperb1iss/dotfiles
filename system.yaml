@@ -8,8 +8,11 @@
 - link:
     /lib/udev/rules.d/60-android.rules: rules.d/60-android.rules
     /lib/udev/rules.d/60-nvme-readahead.rules: rules.d/60-nvme-readahead.rules
+    /lib/udev/rules.d/70-audio-power.rules: rules.d/70-audio-power.rules
     /etc/sysctl.d/50-inotify.conf: sysctl.d/50-inotify.conf
+    /etc/sysctl.d/80-desktop.conf: sysctl.d/80-desktop.conf
     /etc/sysctl.d/90-network.conf: sysctl.d/90-network.conf
+    /etc/tmpfiles.d/80-desktop.conf: tmpfiles.d/80-desktop.conf
 
 - shell:
     - command: |

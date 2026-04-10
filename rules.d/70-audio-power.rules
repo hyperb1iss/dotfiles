@@ -1,0 +1,10 @@
+# Keep USB audio devices always-on (disable autosuspend)
+#
+# USB autosuspend saves power by putting idle devices to sleep.
+# For audio interfaces, the wakeup latency adds ms-scale delay
+# to the first audio callback after idle — audible as clicks/gaps.
+#
+# ID_USB_INTERFACES contains all USB interface class descriptors.
+# Class 01 = Audio. Matching at device level ensures power/control
+# is on the correct sysfs node.
+ACTION=="add", SUBSYSTEM=="usb", ENV{ID_USB_INTERFACES}=="*:01*", TEST=="power/control", ATTR{power/control}="on"

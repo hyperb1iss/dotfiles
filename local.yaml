@@ -176,6 +176,13 @@
       description: "Enabling Ignis desktop widgets"
 
 - shell:
+    - mkdir -p ~/.config/pipewire/pipewire.conf.d
+    - mkdir -p ~/.config/pipewire/pipewire-pulse.conf.d
+- link:
+    ~/.config/pipewire/pipewire.conf.d/10-low-latency.conf: pipewire/pipewire.conf.d/10-low-latency.conf
+    ~/.config/pipewire/pipewire-pulse.conf.d/10-low-latency.conf: pipewire/pipewire-pulse.conf.d/10-low-latency.conf
+
+- shell:
     - mkdir -p ~/.config/containers
 - link:
     ~/.config/containers/storage.conf: containers/storage.conf
