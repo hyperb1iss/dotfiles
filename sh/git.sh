@@ -34,6 +34,8 @@ alias gst='git status'
 alias gsw='git switch'
 alias gswc='git switch -c'
 alias gig='git iris gen -a --no-verify'
+alias 'gig!'='git iris gen -a --no-verify --amend'
+alias 'gcoma!!'='git commit -v -a --amend --no-verify'
 
 # ─────────────────────────────────────────────────────────────
 # Core Functions
@@ -42,6 +44,60 @@ alias gig='git iris gen -a --no-verify'
 # Get current branch name
 function git_current_branch() {
   git branch --show-current 2> /dev/null
+}
+
+# Smart push: origin HEAD:<branch> --no-verify with safety guards
+#   gpn       → push current branch to origin (no-verify)
+#   gpn -f    → force push with --force-with-lease
+#   gpn -u    → set upstream and push
+function gpn() {
+  __sc_init_colors
+  local force=0 set_upstream=0
+
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      -f | --force) force=1 ;;
+      -u | --set-upstream) set_upstream=1 ;;
+      -h | --help)
+        echo "Usage: gpn [-f|--force] [-u|--set-upstream]"
+        echo "  Push HEAD:<branch> to origin with --no-verify"
+        return 0
+        ;;
+      *)
+        sc_error "Unknown flag: $1"
+        return 1
+        ;;
+    esac
+    shift
+  done
+
+  local branch
+  branch=$(git branch --show-current 2> /dev/null)
+
+  if [[ -z "${branch}" ]]; then
+    sc_error "Detached HEAD — switch to a branch first"
+    return 1
+  fi
+
+  if ! git remote | grep -qx origin; then
+    sc_error "No 'origin' remote found"
+    return 1
+  fi
+
+  local cmd=(git push)
+
+  if [[ ${set_upstream} -eq 1 ]]; then
+    cmd+=(--set-upstream)
+  fi
+
+  cmd+=(origin "HEAD:${branch}" --no-verify)
+
+  if [[ ${force} -eq 1 ]]; then
+    cmd+=(--force-with-lease)
+  fi
+
+  sc_info "Pushing ${SC_CYAN}${branch}${SC_RESET} to origin${force:+ ${SC_YELLOW}(force)${SC_RESET}}"
+  "${cmd[@]}"
 }
 
 # ─────────────────────────────────────────────────────────────
@@ -107,13 +163,16 @@ function glog() {
   git log --graph --color=always \
     --format="%C(#ff6ac1)%h%C(reset) %C(#80ffea)%d%C(reset) %s %C(#8b91b1)%cr%C(reset)" "$@" \
     | fzf --ansi --no-sort --reverse --tac --toggle-sort=\` \
-      --header="⚡ Git Log Browser" \
+      --header="⚡ Git Log — Enter: show commit, Ctrl-Y: copy hash" \
       --prompt="commit ▸ " \
+      --preview 'grep -o "[a-f0-9]\{7,\}" <<< {} | head -1 | xargs git show --color=always --stat' \
+      --preview-window=right:50% \
       --bind "ctrl-m:execute:
                 (grep -o '[a-f0-9]\{7\}' | head -1 |
                 xargs -I % sh -c 'git show --color=always % | ${PAGER}') << 'FZF-EOF'
                 {}
-FZF-EOF"
+FZF-EOF" \
+      --bind 'ctrl-y:execute-silent(grep -o "[a-f0-9]\{7,\}" <<< {} | head -1 | pbcopy)+abort'
 }
 
 # Interactive git stash operations

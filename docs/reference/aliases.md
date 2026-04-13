@@ -28,7 +28,8 @@ Quick reference for every alias - organized by category for fast scanning.
 | `gcom!`  | `git commit -v --amend`           | Amend last commit with editor     |
 | `gcomn!` | `git commit -v --no-edit --amend` | Amend last commit without editing |
 | `gcoma`  | `git commit -v -a`                | Commit all changes with preview   |
-| `gcoma!` | `git commit -v -a --amend`        | Amend with all changes            |
+| `gcoma!`  | `git commit -v -a --amend`           | Amend with all changes              |
+| `gcoma!!` | `git commit -v -a --amend --no-verify` | Amend all changes, skip hooks    |
 | `gcomm`  | `git commit -m`                   | Commit with message               |
 
 ### Remote Operations
@@ -47,7 +48,8 @@ Quick reference for every alias - organized by category for fast scanning.
 
 | Alias   | Command                                             | Description                  |
 | ------- | --------------------------------------------------- | ---------------------------- |
-| `gig`   | `git iris gen -a --no-verify --preset conventional` | Generate conventional commit |
+| `gig`   | `git iris gen -a --no-verify`                       | Generate commit with git-iris |
+| `gig!`  | `git iris gen -a --no-verify --amend`               | Amend commit with git-iris    |
 | `iris`  | `git iris`                                          | Git Iris CLI                 |
 | `irisg` | `git iris gen`                                      | Generate commit message      |
 | `irisp` | `git iris pr`                                       | Generate PR description      |
@@ -164,7 +166,7 @@ Quick reference for every alias - organized by category for fast scanning.
 | `cb`     | `cargo build`  | Build Rust project  |
 | `ct`     | `cargo test`   | Test Rust project   |
 | `cf`     | `cargo fmt`    | Format Rust code    |
-| `cc`     | `cargo clippy` | Lint Rust code      |
+| `cclip`  | `cargo clippy` | Lint Rust code      |
 | `cbench` | `cargo bench`  | Benchmark Rust code |
 
 ## Node.js
@@ -192,6 +194,16 @@ Quick reference for every alias - organized by category for fast scanning.
 | ----- | ------------------- | ------------------------- |
 | `cc`  | `claude`            | Claude Code CLI           |
 | `ccc` | `claude --continue` | Continue previous session |
+
+## Homebrew (macOS)
+
+| Alias   | Command              | Description          |
+| ------- | -------------------- | -------------------- |
+| `bi`    | `brew install`       | Install formula      |
+| `bic`   | `brew install --cask`| Install cask app     |
+| `bls`   | `brew list`          | List installed       |
+| `bsr`   | `brew search`        | Search formulae      |
+| `binfo` | `brew info`          | Show formula info    |
 
 ## Zsh
 

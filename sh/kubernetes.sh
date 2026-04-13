@@ -82,6 +82,67 @@ function khelp() {
 EOF
 }
 
+# ─────────────────────────────────────────────────────────────
+# k9c — Interactive k9s cluster picker
+# ─────────────────────────────────────────────────────────────
+
+function k9c() {
+  if ! has_command k9s; then
+    echo "k9c: k9s is not installed" >&2
+    return 1
+  fi
+
+  if ! has_command fzf; then
+    echo "k9c: fzf is required" >&2
+    return 1
+  fi
+
+  local ctx
+  ctx=$(kubectl config get-contexts -o name 2> /dev/null \
+    | fzf --height 40% --reverse \
+      --header="⚡ Select cluster for k9s" \
+      --prompt="cluster ▸ " \
+      --preview 'kubectl --context {} cluster-info 2>/dev/null | head -5 || echo "unreachable"') || return 0
+
+  if [[ -n "${ctx}" ]]; then
+    k9s --context "${ctx}"
+  fi
+}
+
+# ─────────────────────────────────────────────────────────────
+# sopse — Interactive SOPS encrypted file editor
+# ─────────────────────────────────────────────────────────────
+
+function sopse() {
+  if ! has_command sops; then
+    echo "sopse: sops is not installed" >&2
+    return 1
+  fi
+
+  if ! has_command fzf; then
+    echo "sopse: fzf is required" >&2
+    return 1
+  fi
+
+  local search_root="${1:-.}"
+  local file
+  file=$(find "${search_root}" \
+    -type f \( -name '*.enc.*' -o -name '*.enc' -o -name '*.encrypted.*' \) \
+    -not -path '*/.git/*' \
+    -not -path '*/node_modules/*' \
+    -not -path '*/.venv/*' \
+    -not -path '*/vendor/*' \
+    2> /dev/null \
+    | fzf --height 50% --reverse \
+      --header="⚡ Select encrypted file to edit" \
+      --prompt="sops ▸ " \
+      --preview 'head -20 {}') || return 0
+
+  if [[ -n "${file}" ]]; then
+    sops "${file}"
+  fi
+}
+
 # Create kubeconfig directory if it doesn't exist
 mkdir -p "${KUBE_CONFIG_DIR:-${HOME}/.kube/configs}"
 

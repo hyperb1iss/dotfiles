@@ -21,14 +21,7 @@ function take() {
   mkdir -p "$@" && cd "${@:$#}" || return
 }
 
-# Interactive directory navigation using fzf
-function fcd() {
-  local dir
-  dir=$(find "${1:-.}" -path '*/\.*' -prune -o -type d -print 2> /dev/null | fzf +m) || return
-  if [[ -n "${dir}" ]]; then
-    cd "${dir}" || return
-  fi
-}
+# NOTE: fcd is defined in fzf.sh with fd + fzf integration
 
 # Show directory size in human readable format
 function duh() {

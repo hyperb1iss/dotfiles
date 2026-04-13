@@ -42,7 +42,7 @@ alias cr='cargo run'
 alias cb='cargo build'
 alias ct='cargo test'
 alias cf='cargo fmt'
-alias cc='cargo clippy'
+alias cclip='cargo clippy'
 alias cbench='cargo bench'
 
 # Helper to add dependencies using cargo-add (from cargo-edit)

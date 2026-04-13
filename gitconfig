@@ -124,3 +124,9 @@
 	lgs = log --graph --pretty=format:'%C(201)%h%Creset %C(149)%s%Creset %C(243)(%cr)%Creset' --abbrev-commit
 [include]
 	path = ~/.config/silkcircuit/gitconfig
+[credential "https://github.com"]
+	helper = 
+	helper = !/opt/homebrew/bin/gh auth git-credential
+[credential "https://gist.github.com"]
+	helper = 
+	helper = !/opt/homebrew/bin/gh auth git-credential

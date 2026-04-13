@@ -100,31 +100,7 @@ if has_command fzf; then
     fi
   }
 
-  # Interactive git add with multi-select support
-  function gadd() {
-    local files
-    files=$(git status -s | fzf -m \
-      --header 'Tab to select multiple files, Enter to add' \
-      --preview 'git diff --color=always {2}' \
-      --bind 'tab:toggle-out' \
-      --bind 'shift-tab:toggle-in' \
-      | awk '{print $2}') || return
-    if [[ -n "${files}" ]]; then
-      # shellcheck disable=SC2086
-      echo "${files}" | xargs git add && git status -s
-    fi
-  }
-
-  # Interactive git checkout branch
-  function gco() {
-    local branches branch
-    branches=$(git branch --all | grep -v HEAD) || return
-    if [[ -n "${branches}" ]]; then
-      # shellcheck disable=SC2086,SC2046
-      branch=$(echo "${branches}" | fzf -d $((2 + $(wc -l <<< "${branches}"))) +m --preview 'git log --color=always {}') || return
-      git checkout "$(echo "${branch}" | sed "s/.* //" | sed "s#remotes/[^/]*/##")"
-    fi
-  }
+  # NOTE: gadd and gco are defined in git.sh with SilkCircuit styling
 
   # Interactive history search
   function fh() {

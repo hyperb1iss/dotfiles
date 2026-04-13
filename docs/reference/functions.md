@@ -16,6 +16,14 @@ Every shell function organized by category - comprehensive reference with descri
 | `grebase`            | Interactive rebase helper with fzf selection     |
 | `gstatus`            | Enhanced status output (grouped by type)         |
 
+### Git Push
+
+| Function | Description                                             |
+| -------- | ------------------------------------------------------- |
+| `gpn`    | Smart push: `HEAD:<branch>` to origin with `--no-verify` |
+|          | `gpn -f` — force push with `--force-with-lease`        |
+|          | `gpn -u` — set upstream and push                       |
+
 ### Git Utilities
 
 | Function | Description                             |
@@ -55,10 +63,11 @@ Every shell function organized by category - comprehensive reference with descri
 
 ### Smart Navigation
 
-| Function | Description                               |
-| -------- | ----------------------------------------- |
-| `fcd`    | Interactive directory navigation with fzf |
-| `zp`     | Zoxide with pushd/popd semantics          |
+| Function | Description                                  |
+| -------- | -------------------------------------------- |
+| `dev`    | Interactive project picker for ~/dev/ (fzf)  |
+| `fcd`    | Interactive directory navigation with fzf    |
+| `zp`     | Zoxide with pushd/popd semantics             |
 |          | `zp <query>` - Jump and push to stack     |
 |          | `zp -p/--pop` - Pop from stack            |
 |          | `zp -l/--list` - List directory stack     |
@@ -104,11 +113,13 @@ Every shell function organized by category - comprehensive reference with descri
 
 ## Kubernetes
 
-| Function  | Description                    |
-| --------- | ------------------------------ |
-| `kconfig` | Switch kubeconfig file         |
-| `klogs`   | Quick pod logs with follow     |
-| `khelp`   | Kubernetes commands cheatsheet |
+| Function  | Description                                    |
+| --------- | ---------------------------------------------- |
+| `kconfig` | Switch kubeconfig file                         |
+| `klogs`   | Quick pod logs with follow                     |
+| `khelp`   | Kubernetes commands cheatsheet                 |
+| `k9c`     | Interactive k9s cluster picker (fzf + kubectx) |
+| `sopse`   | Interactive SOPS encrypted file editor (fzf)   |
 
 ## TypeScript & Monorepo
 
@@ -285,6 +296,12 @@ Multiple screenshot functions for various capture modes (see source for details)
 | `fenv`    | Search environment variables       |
 | `frg`     | Ripgrep search with file opening   |
 | `fdocker` | Docker container selector and exec |
+
+## Homebrew
+
+| Function | Description                                          |
+| -------- | ---------------------------------------------------- |
+| `bup`    | Brew update + upgrade with preview before confirming |
 
 ## Shell Utilities
 
