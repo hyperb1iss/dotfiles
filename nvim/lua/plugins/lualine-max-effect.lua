@@ -3,6 +3,8 @@
 -- Use this for a fully-featured, visually rich statusline experience
 
 return {
+  { "rebelot/heirline.nvim", enabled = false },
+  {
   "nvim-lualine/lualine.nvim",
   dependencies = { "silkcircuit" },
   event = "VeryLazy",
@@ -216,4 +218,5 @@ return {
       },
     }
   end,
+  },
 }

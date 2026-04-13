@@ -1,8 +1,7 @@
--- SilkCircuit theme configuration for AstroNvim
--- Place this in your ~/.config/nvim/lua/plugins/silkcircuit.lua
-
 return {
   "hyperb1iss/silkcircuit",
+  dir = "~/dev/silkcircuit-nvim",
+  name = "silkcircuit",
   lazy = false,
   priority = 1000,
   config = function()

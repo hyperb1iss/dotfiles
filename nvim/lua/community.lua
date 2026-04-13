@@ -6,7 +6,6 @@
 return {
   "AstroNvim/astrocommunity",
   { import = "astrocommunity.colorscheme.catppuccin" },
-  { dir = "~/dev/silkcircuit-nvim", name = "silkcircuit" }, -- Add SilkCircuit theme
   { import = "astrocommunity.pack.lua" },
   { import = "astrocommunity.pack.rust" },
   { import = "astrocommunity.pack.typescript" }, -- TypeScript/JavaScript support

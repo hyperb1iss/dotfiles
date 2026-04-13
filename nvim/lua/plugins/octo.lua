@@ -9,25 +9,19 @@ return {
   cmd = "Octo",
   event = { { event = "BufReadCmd", pattern = "octo://*" } },
   opts = {
-    -- Use telescope for picker
     picker = "telescope",
-    -- Enable builtin viewer
     enable_builtin = true,
-    -- Default to projects view
     default_to_projects_v2 = true,
-    -- Always use local files for reviews
+    suppress_missing_scope = {
+      projects_v2 = true,
+    },
     always_select_remote_on_create = false,
-    -- Snippet engine
     snippet_context_lines = 4,
-    -- GitHub CLI command
     gh_cmd = "gh",
-    -- Timeout for requests
     timeout = 5000,
-    -- UI customization
     ui = {
       use_signcolumn = true,
     },
-    -- Issue/PR templates
     issues = {
       order_by = {
         field = "UPDATED_AT",
@@ -41,12 +35,10 @@ return {
       },
       always_select_remote_on_create = false,
     },
-    -- File panel configuration
     file_panel = {
       size = 10,
       use_icons = true,
     },
-    -- Mappings
     mappings_disable_default = false,
     mappings = {
       issue = {
