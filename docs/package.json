@@ -11,9 +11,15 @@
     "lint:fix": "prettier --write \"**/*.md\"",
     "format": "pnpm lint:fix"
   },
+  "pnpm": {
+    "overrides": {
+      "rollup": ">=4.59.0",
+      "picomatch": ">=4.0.4"
+    }
+  },
   "devDependencies": {
-    "mermaid": "^11.12.1",
-    "prettier": "^3.7.1",
-    "vitepress": "^2.0.0-alpha.15"
+    "mermaid": "^11.14.0",
+    "prettier": "^3.8.2",
+    "vitepress": "^2.0.0-alpha.17"
   }
 }

@@ -146,16 +146,39 @@ function sopse() {
 # Create kubeconfig directory if it doesn't exist
 mkdir -p "${KUBE_CONFIG_DIR:-${HOME}/.kube/configs}"
 
-# Add kubectl completion
-if has_command kubectl; then
-  # shellcheck disable=SC1090
+function __dotfiles_load_kubectl_completion() {
+  local kubectl_path cache_dir cache_file completion_shell
+
+  kubectl_path=$(command -v kubectl 2> /dev/null) || return 0
+  cache_dir="${XDG_CACHE_HOME:-${HOME}/.cache}/dotfiles"
+  mkdir -p "${cache_dir}"
+
   if is_zsh; then
-    source <(kubectl completion zsh) 2> /dev/null || true
-    compdef k=kubectl
+    completion_shell="zsh"
+    cache_file="${cache_dir}/kubectl-completion.zsh"
   elif is_bash; then
-    source <(kubectl completion bash) 2> /dev/null || true
-    complete -o default -F __start_kubectl k
+    completion_shell="bash"
+    cache_file="${cache_dir}/kubectl-completion.bash"
+  else
+    return 0
   fi
+
+  if [[ ! -s "${cache_file}" || "${kubectl_path}" -nt "${cache_file}" ]]; then
+    kubectl completion "${completion_shell}" > "${cache_file}" 2> /dev/null || return 0
+  fi
+
+  # shellcheck disable=SC1090
+  source "${cache_file}" || return 0
+
+  if is_zsh; then
+    (( ${+functions[compdef]} )) && compdef k=kubectl
+  elif is_bash; then
+    declare -F __start_kubectl > /dev/null && complete -o default -F __start_kubectl k
+  fi
+}
+
+if has_command kubectl; then
+  __dotfiles_load_kubectl_completion
 fi
 
 # Initialize krew path if installed

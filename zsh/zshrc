@@ -146,11 +146,3 @@ alias -s git='git clone'
 
 # pnpm PATH handled in env.sh (unified PATH construction)
 safe_source "${HOME}/.ghcup/env"
-
-# pnpm
-export PNPM_HOME="/Users/bliss/Library/pnpm"
-case ":$PATH:" in
-  *":$PNPM_HOME:"*) ;;
-  *) export PATH="$PNPM_HOME:$PATH" ;;
-esac
-# pnpm end

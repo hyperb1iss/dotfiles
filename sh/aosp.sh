@@ -217,13 +217,26 @@ alias goout='cd ${OUT:-.}'
 # Environment variables
 export ANDROID_JACK_VM_ARGS="-Dfile.encoding=UTF-8 -XX:+TieredCompilation -Xmx4g"
 
-# Initialize repo completion for both shells
-if [[ -f ~/bin/repo ]]; then
-  repo_completion=$(~/bin/repo --help | grep -A 1 "Shell completion" | tail -1) || true
+function __dotfiles_load_repo_completion() {
+  local repo_path cache_dir cache_file
 
-  if is_zsh; then
-    eval "${repo_completion}"
-  else
-    eval "${repo_completion}"
+  repo_path="${HOME}/bin/repo"
+  [[ -x "${repo_path}" ]] || return 0
+
+  cache_dir="${XDG_CACHE_HOME:-${HOME}/.cache}/dotfiles"
+  cache_file="${cache_dir}/repo-completion.sh"
+  mkdir -p "${cache_dir}"
+
+  # Cache an empty file when repo does not advertise shell completion so we
+  # don't keep paying the startup cost to discover that.
+  if [[ ! -e "${cache_file}" || "${repo_path}" -nt "${cache_file}" ]]; then
+    sed -n '/Shell completion/{n;p;q;}' < <("${repo_path}" --help 2> /dev/null) > "${cache_file}"
   fi
-fi
+
+  [[ -s "${cache_file}" ]] || return 0
+
+  # shellcheck disable=SC1090
+  source "${cache_file}" || true
+}
+
+__dotfiles_load_repo_completion

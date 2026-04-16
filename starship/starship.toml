@@ -19,15 +19,7 @@ $directory\
 $git_branch\
 $git_status\
 [](bg:#d060d0 fg:#a040a0)\
-$nodejs\
 $python\
-$rust\
-$golang\
-$java\
-$kotlin\
-$gradle\
-$c\
-$lua\
 $docker_context\
 $kubernetes\
 [](bg:#ff69b4 fg:#d060d0)\
@@ -125,13 +117,13 @@ format = "[$all_status]($style)"
 symbol = " "
 style = "bold fg:#FFEEFF bg:#d060d0"
 format = "[ $symbol($version) ]($style)"
-disabled = false
+disabled = true
 
 # Python module with enhanced foreground color
 [python]
 symbol = " "
 style = "bold fg:#FFEEFF bg:#d060d0"
-format = "[ $symbol(${virtualenv}) ]($style)"
+format = '([ $symbol($virtualenv) ]($style))'
 detect_extensions = ["py"]
 detect_files = [
   "requirements.txt",
@@ -147,49 +139,49 @@ disabled = false
 symbol = "󱘗 "
 style = "bold fg:#FFEEFF bg:#d060d0"
 format = "[ $symbol($version) ]($style)"
-disabled = false
+disabled = true
 
 # Go module
 [golang]
 symbol = "󰟓 "
 style = "bold fg:#FFEEFF bg:#d060d0"
 format = "[ $symbol($version) ]($style)"
-disabled = false
+disabled = true
 
 # Java module
 [java]
 symbol = "󰬷 "
 style = "bold fg:#FFEEFF bg:#d060d0"
 format = "[ $symbol($version) ]($style)"
-disabled = false
+disabled = true
 
 # Kotlin module
 [kotlin]
 symbol = "󱈙 "
 style = "bold fg:#FFEEFF bg:#d060d0"
 format = "[ $symbol($version) ]($style)"
-disabled = false
+disabled = true
 
 # Gradle module
 [gradle]
 symbol = "󱎐 "
 style = "bold fg:#FFEEFF bg:#d060d0"
 format = "[ $symbol($version) ]($style)"
-disabled = false
+disabled = true
 
 # C module
 [c]
 symbol = "󰙱 "
 style = "bold fg:#FFEEFF bg:#d060d0"
 format = "[ $symbol($version) ]($style)"
-disabled = false
+disabled = true
 
 # Lua module
 [lua]
 symbol = "󰢱 "
 style = "bold fg:#FFEEFF bg:#d060d0"
 format = "[ $symbol($version) ]($style)"
-disabled = false
+disabled = true
 
 # Docker context
 [docker_context]
@@ -241,7 +233,7 @@ style = "bold red"
 [package]
 symbol = "󰏗 "
 style = "bold fg:#FF6666"
-disabled = false
+disabled = true
 
 # Shell indicator
 [shell]
