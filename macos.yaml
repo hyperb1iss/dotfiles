@@ -43,9 +43,6 @@
       force: true
     ~/Library/Application Support/com.mitchellh.ghostty/config: ghostty/config
     ~/Library/Application Support/com.mitchellh.ghostty/macos.conf: ghostty/macos.conf
-    ~/.claude/settings.json:
-      path: claude/settings.json
-      force: true
     ~/.claude/statusline-command.sh: claude/statusline-command.sh
     ~/.config/atuin/config.toml: atuin/config.toml
     ~/.config/atuin/themes/silkcircuit.toml: atuin/themes/silkcircuit.toml
