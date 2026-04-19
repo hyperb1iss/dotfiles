@@ -135,10 +135,18 @@ keybind = super+equal=increase_font_size:1
 keybind = super+minus=decrease_font_size:1
 keybind = super+0=reset_font_size
 
-# Utilities
-keybind = super+k=clear_screen
+# Clipboard — Mac-style (Super = Cmd, Ctrl+C still sends SIGINT)
+keybind = super+c=copy_to_clipboard
+keybind = super+v=paste_from_clipboard
 keybind = super+shift+c=copy_to_clipboard
 keybind = super+shift+v=paste_from_clipboard
+
+# Selection & editing
+keybind = super+a=select_all
+
+# Utilities
+keybind = super+k=clear_screen
+keybind = super+n=new_window
 
 # Quick terminal toggle (global hotkey)
 keybind = global:ctrl+grave_accent=toggle_quick_terminal
