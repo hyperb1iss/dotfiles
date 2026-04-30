@@ -1,6 +1,6 @@
 # Shell Environment
 
-_27 modular scripts. 100+ aliases. Infinite power._
+_28 modular scripts. 100+ aliases. Infinite power._
 
 ## Architecture
 
@@ -12,6 +12,7 @@ sh/
 ├── shell-common.sh     # Core utilities & platform detection
 ├── env.sh              # Environment & PATH management
 ├── terminal.sh         # Terminal title magic
+├── ai.sh               # Claude and Codex shortcuts
 ├── git.sh              # Git aliases & worktree manager
 ├── docker.sh           # Docker utilities
 ├── kubernetes.sh       # K8s shortcuts

@@ -188,12 +188,13 @@ Quick reference for every alias - organized by category for fast scanning.
 | `java21`   | `setjdk 21`          | Switch to Java 21            |
 | `javalist` | `list_java_versions` | List available Java versions |
 
-## Claude Code
+## AI CLIs
 
-| Alias | Command             | Description               |
-| ----- | ------------------- | ------------------------- |
-| `cc`  | `claude`            | Claude Code CLI           |
-| `ccc` | `claude --continue` | Continue previous session |
+| Alias     | Command                   | Description                                          |
+| --------- | ------------------------- | ---------------------------------------------------- |
+| `cc`      | `claude`                  | Claude Code CLI                                      |
+| `ccc`     | `claude --continue`       | Continue previous session                            |
+| `goblinz` | `codex -m gpt-5.5 --yolo` | Launch GPT-5.5 Codex with the creature filter removed |
 
 ## Homebrew (macOS)
 
