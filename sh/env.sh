@@ -81,8 +81,8 @@ export PROTO_HOME="$HOME/.proto"
 export PATH="$PROTO_HOME/shims:$PROTO_HOME/bin:$PATH"
 
 # claude code
-export CLAUDE_CODE_EFFORT_LEVEL=max
-export CLAUDE_CODE_DISABLE_ADAPTIVE_THINKING=true
+#export CLAUDE_CODE_EFFORT_LEVEL=max
+#export CLAUDE_CODE_DISABLE_ADAPTIVE_THINKING=true
 
 # npm global bin — proto shims don't cover `npm install -g` binaries,
 # so resolve the active node version's bin dir without spawning node
