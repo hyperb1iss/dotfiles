@@ -22,6 +22,3 @@ software-properties-common
 build-essential
 pkg-config
 python-is-python3
-
-# Kubernetes tools (minimal set)
-kubectl
