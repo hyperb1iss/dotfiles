@@ -1,0 +1,33 @@
+# Build toolchain priority — local ananicy-cpp override.
+# Managed in dotfiles: ananicy.d/99-build-toolchain.rules
+#
+# CachyOS's ananicy ruleset classifies terminal emulators and shells as
+# Doc-View (nice -4). Every process spawned from a shell inherits that nice
+# value, so by default `cargo build` and friends run at -4 and out-prioritize
+# normal desktop work. These rules pull the native build toolchain to
+# Heavy_CPU (00-types.types: nice 9, best-effort ionice 7) so compiles use
+# idle CPU freely but yield the moment something interactive needs it.
+#
+# Kept at the top level of /etc/ananicy.d/ (not under 00-default/) so the
+# cachyos-ananicy-rules package can't clobber it on update.
+
+# Rust
+{ "name": "rustc", "type": "Heavy_CPU" }
+{ "name": "cargo", "type": "Heavy_CPU" }
+
+# C / C++ — build scripts and cc-rs pull these in for crates with native deps
+{ "name": "cc", "type": "Heavy_CPU" }
+{ "name": "cc1", "type": "Heavy_CPU" }
+{ "name": "cc1plus", "type": "Heavy_CPU" }
+{ "name": "gcc", "type": "Heavy_CPU" }
+{ "name": "g++", "type": "Heavy_CPU" }
+{ "name": "c++", "type": "Heavy_CPU" }
+{ "name": "clang", "type": "Heavy_CPU" }
+{ "name": "clang++", "type": "Heavy_CPU" }
+
+# Linkers
+{ "name": "ld", "type": "Heavy_CPU" }
+{ "name": "ld.bfd", "type": "Heavy_CPU" }
+{ "name": "ld.lld", "type": "Heavy_CPU" }
+{ "name": "lld", "type": "Heavy_CPU" }
+{ "name": "mold", "type": "Heavy_CPU" }

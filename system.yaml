@@ -13,6 +13,9 @@
     /etc/sysctl.d/80-desktop.conf: sysctl.d/80-desktop.conf
     /etc/sysctl.d/90-network.conf: sysctl.d/90-network.conf
     /etc/tmpfiles.d/80-desktop.conf: tmpfiles.d/80-desktop.conf
+    /etc/ananicy.d/99-build-toolchain.rules:
+      path: ananicy.d/99-build-toolchain.rules
+      if: '[ -d /etc/ananicy.d ]'
 
 - shell:
     - command: |
