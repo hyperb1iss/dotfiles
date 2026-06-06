@@ -82,6 +82,25 @@ function start_sudo_keepalive() {
   trap 'kill "${SUDO_KEEPALIVE_PID}" 2>/dev/null || true' EXIT
 }
 
+function ensure_zshrc_link() {
+  local backup_path
+  local link_path="${HOME}/.zshrc"
+  local target_path="${DOTFILES_DIR}/zsh/zshrc"
+
+  if [[ -L "${link_path}" && "$(readlink "${link_path}")" == "${target_path}" ]]; then
+    return 0
+  fi
+
+  if [[ -e "${link_path}" || -L "${link_path}" ]]; then
+    backup_path="${link_path}.pre-dotfiles.$(date +%Y%m%d%H%M%S)"
+    print_step "Backing up existing ~/.zshrc to ${backup_path}"
+    mv "${link_path}" "${backup_path}"
+  fi
+
+  print_step "Linking ~/.zshrc to dotfiles"
+  ln -s "${target_path}" "${link_path}"
+}
+
 # Detect if running on macOS
 if [[ "${OSTYPE}" != "darwin"* ]]; then
   echo "❌ This script is only for macOS systems."
@@ -167,15 +186,11 @@ if ! command -v go &>/dev/null; then
   brew install go
 fi
 
+ensure_zshrc_link
+
 # Run the installation
 print_step "Running macOS installation..."
 make macos
-
-# Create zsh setup if it doesn't exist
-if [[ ! -f ~/.zshrc ]]; then
-  print_step "Setting up Zsh configuration..."
-  ln -sf "${DOTFILES_DIR}/zsh/zshrc" ~/.zshrc
-fi
 
 print_step "Setting Zsh as default shell..."
 if [[ "${SHELL}" != "$(command -v zsh)" ]]; then

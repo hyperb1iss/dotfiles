@@ -31,6 +31,19 @@
       stderr: true
       stdout: true
       description: Creating configuration directories
+    - command: |
+        zshrc_target="$HOME/dev/dotfiles/zsh/zshrc"
+        zshrc_link="$HOME/.zshrc"
+        if [ -e "$zshrc_link" ] || [ -L "$zshrc_link" ]; then
+          if [ "$(readlink "$zshrc_link" 2>/dev/null || true)" != "$zshrc_target" ]; then
+            backup_path="${zshrc_link}.pre-dotfiles.$(date +%Y%m%d%H%M%S)"
+            mv "$zshrc_link" "$backup_path"
+            echo "Backed up existing ~/.zshrc to $backup_path"
+          fi
+        fi
+      stderr: true
+      stdout: true
+      description: Preparing Zsh configuration link
 
 - link:
     ~/.bash_profile: bash/bash_profile
@@ -41,7 +54,9 @@
     ~/.fonts: fonts
     ~/.gitconfig: gitconfig
     ~/.tmux.conf: tmux.conf
-    ~/.zshrc: zsh/zshrc
+    ~/.zshrc:
+      path: zsh/zshrc
+      force: true
     ~/.config/nvim:
       path: nvim
       force: true
