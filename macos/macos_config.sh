@@ -18,9 +18,43 @@ diagnose_sudo_failure() {
   if [[ -n "${reattach_path}" && ! -f "${reattach_path}" ]]; then
     echo "⚠️ sudo appears to reference a missing pam_reattach module:"
     echo "   ${reattach_path}"
-    echo "   Remove that line from /etc/pam.d/sudo_local from an admin/root shell,"
-    echo "   then rerun make macos."
+    echo "   Boot into Recovery, open Terminal, and run:"
+    echo "   rm '/Volumes/Macintosh HD - Data/private/etc/pam.d/sudo_local'"
+    echo "   Then reboot and rerun make macos."
   fi
+}
+
+repair_stale_sudo_local() {
+  local reattach_path
+  local backup_path
+  local sudo_local="/etc/pam.d/sudo_local"
+  local tmp_path
+
+  reattach_path="$(awk '/pam_reattach\.so/ { print $NF; exit }' "${sudo_local}" 2>/dev/null || true)"
+  if [[ -z "${reattach_path}" || -f "${reattach_path}" ]]; then
+    return 1
+  fi
+
+  if [[ "$(id -u)" != "0" ]]; then
+    return 1
+  fi
+
+  backup_path="${sudo_local}.bak.$(date +%Y%m%d%H%M%S)"
+  tmp_path="$(mktemp)"
+
+  if ! cp -p "${sudo_local}" "${backup_path}" ||
+    ! awk '!/pam_reattach\.so/' "${sudo_local}" >"${tmp_path}" ||
+    ! cat "${tmp_path}" >"${sudo_local}"; then
+    rm -f "${tmp_path}"
+    echo "❌ Failed to repair ${sudo_local}"
+    exit 1
+  fi
+  rm -f "${tmp_path}"
+
+  echo "✓ Removed stale pam_reattach entry from ${sudo_local}"
+  echo "  Backup saved to ${backup_path}"
+  echo "  Reboot if sudo still errors, then rerun make macos as bliss."
+  exit 0
 }
 
 request_sudo() {
@@ -53,6 +87,8 @@ run_sudo() {
 }
 
 echo "🔧 Configuring macOS settings..."
+
+repair_stale_sudo_local
 
 # Close any open System Preferences panes to prevent them from overriding settings
 osascript -e 'tell application "System Preferences" to quit' || handle_error "closing System Preferences"

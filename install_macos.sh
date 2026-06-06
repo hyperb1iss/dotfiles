@@ -16,12 +16,46 @@ function diagnose_sudo_failure() {
   if [[ -n "${reattach_path}" && ! -f "${reattach_path}" ]]; then
     echo "❌ sudo is blocked by a stale pam_reattach entry:"
     echo "   ${reattach_path}"
-    echo "   Remove that line from /etc/pam.d/sudo_local from an admin/root shell,"
-    echo "   then rerun the installer."
+    echo "   Boot into Recovery, open Terminal, and run:"
+    echo "   rm '/Volumes/Macintosh HD - Data/private/etc/pam.d/sudo_local'"
+    echo "   Then reboot and rerun the installer."
   else
     echo "❌ Administrator sudo access is required for Homebrew setup."
     echo "   Make sure the bliss account is an Administrator, then rerun the installer."
   fi
+}
+
+function repair_stale_sudo_local() {
+  local reattach_path
+  local backup_path
+  local sudo_local="/etc/pam.d/sudo_local"
+  local tmp_path
+
+  reattach_path="$(awk '/pam_reattach\.so/ { print $NF; exit }' "${sudo_local}" 2>/dev/null || true)"
+  if [[ -z "${reattach_path}" || -f "${reattach_path}" ]]; then
+    return 1
+  fi
+
+  if [[ "$(id -u)" != "0" ]]; then
+    return 1
+  fi
+
+  backup_path="${sudo_local}.bak.$(date +%Y%m%d%H%M%S)"
+  tmp_path="$(mktemp)"
+
+  if ! cp -p "${sudo_local}" "${backup_path}" ||
+    ! awk '!/pam_reattach\.so/' "${sudo_local}" >"${tmp_path}" ||
+    ! cat "${tmp_path}" >"${sudo_local}"; then
+    rm -f "${tmp_path}"
+    echo "❌ Failed to repair ${sudo_local}"
+    exit 1
+  fi
+  rm -f "${tmp_path}"
+
+  echo "✓ Removed stale pam_reattach entry from ${sudo_local}"
+  echo "  Backup saved to ${backup_path}"
+  echo "  Reboot if sudo still errors, then rerun the installer as bliss."
+  exit 0
 }
 
 function require_sudo() {
@@ -55,6 +89,8 @@ if [[ "${OSTYPE}" != "darwin"* ]]; then
 fi
 
 print_step "Welcome to Stefanie's dotfiles installation for macOS!"
+
+repair_stale_sudo_local || true
 
 # Install command line tools if needed
 if ! xcode-select -p &>/dev/null; then
