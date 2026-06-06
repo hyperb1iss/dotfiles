@@ -89,8 +89,21 @@
       description: Installing Homebrew packages
 
     - command: |
+        if command -v bat >/dev/null 2>&1; then
+          bat cache --build
+        else
+          echo "Warning: bat not found, skipping theme cache rebuild"
+        fi
+      description: Rebuilding bat theme cache
+      stdout: true
+
+    - command: |
         # Set up macOS-specific configurations
-        ./macos/macos_config.sh
+        if command -v brew >/dev/null 2>&1; then
+          ./macos/macos_config.sh
+        else
+          echo "Warning: Homebrew not found, skipping macOS settings"
+        fi
       stderr: true
       stdout: true
       description: Configuring macOS settings
@@ -116,8 +129,16 @@
       stdout: true
       description: Installing proto + node/npm
 
-    - command: mkdir -p ~/dev/go && GOPATH=~/dev/go go install github.com/junegunn/fzf@latest
+    - command: |
+        # Prefer the Homebrew fzf, fall back to Go only when needed.
+        if command -v fzf >/dev/null 2>&1; then
+          echo "fzf already installed"
+        elif command -v go >/dev/null 2>&1; then
+          mkdir -p ~/dev/go && GOPATH=~/dev/go go install github.com/junegunn/fzf@latest
+        else
+          echo "Warning: fzf not found and go not available, skipping fzf install"
+        fi
       stderr: true
       stdout: true
       quiet: false
-      description: Installing fzf from source
+      description: Installing fzf

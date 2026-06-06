@@ -11,37 +11,101 @@ handle_error() {
   echo "Continuing with next setting..."
 }
 
+diagnose_sudo_failure() {
+  local reattach_path
+
+  reattach_path="$(awk '/pam_reattach\.so/ { print $NF; exit }' /etc/pam.d/sudo_local 2>/dev/null || true)"
+  if [[ -n "${reattach_path}" && ! -f "${reattach_path}" ]]; then
+    echo "⚠️ sudo appears to reference a missing pam_reattach module:"
+    echo "   ${reattach_path}"
+    echo "   Remove that line from /etc/pam.d/sudo_local from an admin/root shell,"
+    echo "   then rerun make macos."
+  fi
+}
+
+request_sudo() {
+  if sudo -n -v 2>/dev/null; then
+    SUDO_AVAILABLE=true
+    return 0
+  fi
+
+  echo "Requesting administrator privileges for macOS settings..."
+  if [[ -r /dev/tty ]] && sudo -v </dev/tty; then
+    SUDO_AVAILABLE=true
+    return 0
+  fi
+
+  SUDO_AVAILABLE=false
+  echo "⚠️ Failed to get sudo privileges. Privileged settings will be skipped."
+  diagnose_sudo_failure
+  return 1
+}
+
+run_sudo() {
+  local description="$1"
+  shift
+
+  if [[ "${SUDO_AVAILABLE}" == "true" ]]; then
+    sudo "$@" || handle_error "${description}"
+  else
+    handle_error "${description} (sudo unavailable)"
+  fi
+}
+
 echo "🔧 Configuring macOS settings..."
 
 # Close any open System Preferences panes to prevent them from overriding settings
 osascript -e 'tell application "System Preferences" to quit' || handle_error "closing System Preferences"
 
+SUDO_AVAILABLE=false
+request_sudo
+
 # Enable Touch ID for sudo (survives macOS updates via sudo_local)
 # pam_reattach allows Touch ID to work inside tmux/screen/IDE terminals
-REATTACH_SO="/opt/homebrew/lib/pam/pam_reattach.so"
-DESIRED_SUDO_LOCAL="# sudo_local: Touch ID for sudo (including tmux/screen)
-auth       optional       ${REATTACH_SO}
+if command -v brew >/dev/null 2>&1; then
+  BREW_PREFIX="$(brew --prefix 2>/dev/null || true)"
+fi
+
+if [[ -z "${BREW_PREFIX}" && "$(uname -m)" == "arm64" ]]; then
+  BREW_PREFIX="/opt/homebrew"
+elif [[ -z "${BREW_PREFIX}" ]]; then
+  BREW_PREFIX="/usr/local"
+fi
+
+REATTACH_SO="${BREW_PREFIX}/lib/pam/pam_reattach.so"
+DESIRED_SUDO_LOCAL="# sudo_local: Touch ID for sudo"
+
+if [[ -f "${REATTACH_SO}" ]]; then
+  DESIRED_SUDO_LOCAL="${DESIRED_SUDO_LOCAL} (including tmux/screen)
+auth       optional       ${REATTACH_SO}"
+else
+  echo "⚠️ pam_reattach not found, configuring Touch ID without tmux/screen reattach"
+fi
+
+DESIRED_SUDO_LOCAL="${DESIRED_SUDO_LOCAL}
 auth       sufficient     pam_tid.so"
 
-if [[ -f /etc/pam.d/sudo_local ]] && diff -q <(echo "${DESIRED_SUDO_LOCAL}") /etc/pam.d/sudo_local &>/dev/null; then
+if [[ "${SUDO_AVAILABLE}" != "true" ]]; then
+  echo "⚠️ Skipping Touch ID for sudo setup because sudo is unavailable"
+elif [[ -f /etc/pam.d/sudo_local ]] && diff -q <(printf '%s\n' "${DESIRED_SUDO_LOCAL}") /etc/pam.d/sudo_local &>/dev/null; then
   echo "✓ Touch ID for sudo already configured"
 else
   echo "Enabling Touch ID for sudo..."
-  sudo tee /etc/pam.d/sudo_local > /dev/null << PAMEOF
-${DESIRED_SUDO_LOCAL}
-PAMEOF
-  echo "✓ Touch ID enabled for sudo (with tmux/reattach support)"
+  if printf '%s\n' "${DESIRED_SUDO_LOCAL}" | sudo tee /etc/pam.d/sudo_local >/dev/null; then
+    echo "✓ Touch ID enabled for sudo"
+  else
+    handle_error "enabling Touch ID for sudo"
+  fi
 fi
 
-# Ask for the administrator password upfront
-sudo -v || { echo "⚠️ Failed to get sudo privileges. Some settings might not be applied."; }
-
 # Keep-alive: update existing `sudo` time stamp until script has finished
-while true; do
-  sudo -n true
-  sleep 60
-  kill -0 "$$" || exit
-done 2>/dev/null &
+if [[ "${SUDO_AVAILABLE}" == "true" ]]; then
+  while true; do
+    sudo -n true
+    sleep 60
+    kill -0 "$$" || exit
+  done 2>/dev/null &
+fi
 
 ###############################################################################
 # General UI/UX                                                               #
@@ -50,7 +114,7 @@ done 2>/dev/null &
 # Hostname configuration removed as requested by user
 
 # Disable the sound effects on boot
-sudo nvram SystemAudioVolume=" " || handle_error "setting boot sound"
+run_sudo "setting boot sound" nvram SystemAudioVolume=" "
 
 # Set sidebar icon size to medium
 defaults write NSGlobalDomain NSTableViewDefaultSizeMode -int 2 || handle_error "NSTableViewDefaultSizeMode"
@@ -194,7 +258,7 @@ defaults write com.apple.SoftwareUpdate CriticalUpdateInstall -int 1
 # System Settings > Privacy & Security on modern macOS — can't be automated.
 # Uncomment to attempt it (will show a GUI prompt that may not work):
 # sudo spctl --master-disable
-sudo spctl developer-mode enable-terminal 2>/dev/null || handle_error "enabling developer mode"
+run_sudo "enabling developer mode" spctl developer-mode enable-terminal
 
 # Configure key remapping for developers
 # Map Caps Lock to Escape (useful for Vim users)

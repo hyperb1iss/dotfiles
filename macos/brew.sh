@@ -6,6 +6,48 @@ set -e # Exit on error
 
 echo "🍺 Setting up Homebrew for macOS..."
 
+diagnose_sudo_failure() {
+  local reattach_path
+
+  reattach_path="$(awk '/pam_reattach\.so/ { print $NF; exit }' /etc/pam.d/sudo_local 2>/dev/null || true)"
+  if [[ -n "${reattach_path}" && ! -f "${reattach_path}" ]]; then
+    echo "❌ sudo is blocked by a stale pam_reattach entry:"
+    echo "   ${reattach_path}"
+    echo "   Remove that line from /etc/pam.d/sudo_local from an admin/root shell,"
+    echo "   then rerun make macos."
+  else
+    echo "❌ Administrator sudo access is required for Homebrew setup."
+    echo "   Make sure the bliss account is an Administrator, then rerun make macos."
+  fi
+}
+
+require_sudo() {
+  if sudo -n -v 2>/dev/null; then
+    return 0
+  fi
+
+  echo "Requesting administrator privileges for Homebrew setup..."
+  if [[ -r /dev/tty ]] && sudo -v </dev/tty; then
+    return 0
+  fi
+
+  diagnose_sudo_failure
+  exit 1
+}
+
+start_sudo_keepalive() {
+  while true; do
+    sudo -n true
+    sleep 60
+    kill -0 "$$" || exit
+  done 2>/dev/null &
+  SUDO_KEEPALIVE_PID=$!
+  trap 'kill "${SUDO_KEEPALIVE_PID}" 2>/dev/null || true' EXIT
+}
+
+require_sudo
+start_sudo_keepalive
+
 # Install Homebrew if it's not installed
 if ! command -v brew >/dev/null 2>&1; then
   echo "Installing Homebrew..."
