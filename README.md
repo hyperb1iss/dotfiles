@@ -74,13 +74,12 @@ dotfiles/
 ├── sh/                   # 28 modular shell scripts (git, docker, k8s, macos, …)
 ├── bin/                  # Utility scripts (shellint, diskclean, repo, …)
 ├── ghostty/              # Ghostty terminal config (macOS + Linux)
-├── starship/             # Starship prompt with SilkCircuit gradient
+├── modules-load.d/       # Kernel modules loaded at boot (tcp_bbr)
 ├── tmux.conf             # Tmux multiplexer configuration
 ├── atuin/                # Atuin shell history + SilkCircuit theme
 ├── gitconfig             # Git config with SilkCircuit colors + Delta
 ├── proto/                # Proto version manager (.prototools)
 ├── claude/               # Claude Code settings, status line, security hooks
-├── bat/                  # Bat syntax highlighting themes
 ├── lsd/                  # LSDeluxe file listing config
 ├── procs/                # Procs process viewer config
 ├── fastfetch/            # Fastfetch system info display

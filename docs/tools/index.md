@@ -188,12 +188,12 @@ Each tool is configured in the dotfiles:
 | Tool         | Config Location                     | Purpose                |
 | ------------ | ----------------------------------- | ---------------------- |
 | **Ghostty**  | `ghostty/config`, `ghostty/*.conf`  | Terminal emulator      |
-| **Starship** | `starship/starship.toml`            | Prompt customization   |
+| **Starship** | `silkcircuit: extras/starship/`     | Prompt customization   |
 | **Tmux**     | `tmux.conf`                         | Key bindings, theme    |
 | **Atuin**    | `atuin/`, `atuin/themes/`           | Shell history, theme   |
 | **Proto**    | `proto/.prototools`                 | Language versions      |
 | **lsd**      | `lsd/config.yaml`                   | Display settings       |
-| **bat**      | `bat/config`, `bat/themes/`         | Theme, syntax settings |
+| **bat**      | `silkcircuit: extras/bat/`          | Theme, syntax settings |
 | **Delta**    | `gitconfig` (delta section)         | Git diff styling       |
 | **procs**    | `procs/config.toml`                 | Process display        |
 | **FZF**      | `sh/fzf.sh`, `sh/env.sh` (ENV vars) | Defaults, key bindings |

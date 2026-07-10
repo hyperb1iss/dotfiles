@@ -88,11 +88,12 @@ cached_eval starship starship-init.zsh starship init zsh --print-full-init
 # zinit light zdharma-continuum/fast-syntax-highlighting # Alternative syntax highlighting
 # zinit light romkatv/powerlevel10k # If you want Zinit to manage P10k
 
-# Source shell-common.sh directly to make its functions globally available
-# before Zinit compiles other snippets that depend on them.
-
-# Load our own shell scripts using Zinit
-# Loop through sh/*.sh files and load them as snippets, excluding common/env.
+# Load our own shell modules by sourcing them directly. They used to go
+# through `zinit snippet`, but zinit copies local snippets into its cache
+# and never invalidates them — interactive shells were running months-old
+# module code while the repo moved on. Direct sourcing is a few ms (the
+# expensive tool inits inside are mtime-cached via cached_eval) and what
+# you edit is what runs.
 for script_file in "${HOME}/dev/dotfiles/sh/"*.sh; do
   script_basename="${script_file##*/}"
   if [[ "${script_basename}" == "shell-common.sh" ||
@@ -100,8 +101,7 @@ for script_file in "${HOME}/dev/dotfiles/sh/"*.sh; do
     "${script_basename}" == "terminal.sh" ]]; then
     continue # Skip common, env, and terminal scripts as they are sourced directly
   fi
-  zinit ice lucid wait"0"
-  zinit snippet "${script_file}"
+  source "${script_file}"
 done
 
 # Command not found handler
@@ -111,7 +111,8 @@ elif [[ -f /etc/zsh_command_not_found ]]; then
   source /etc/zsh_command_not_found
 fi
 
-# Development alias for clearing Zinit cache and reloading shell
+# Update Zinit-managed plugins (shell modules are sourced directly, so
+# repo edits apply on the next shell — no cache to refresh)
 alias zzz='zinit update'
 
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

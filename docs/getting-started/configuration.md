@@ -182,7 +182,7 @@ Delta is configured in `gitconfig` as the default pager. Customize in `~/.gitcon
 
 ## Starship Prompt
 
-The configuration lives at `starship/starship.toml`.
+The configuration lives in the SilkCircuit repo (`~/dev/silkcircuit/extras/starship/starship.toml`) and is installed by its installer.
 
 ### Common Customizations
 
@@ -474,7 +474,7 @@ Quick reference for where everything lives:
 | Zsh                | `~/dev/dotfiles/zsh/zshrc`              |
 | Shell scripts      | `~/dev/dotfiles/sh/*.sh`                |
 | Neovim             | `~/dev/dotfiles/nvim/`                  |
-| Starship           | `~/dev/dotfiles/starship/starship.toml` |
+| Starship           | `~/dev/silkcircuit/extras/starship/` |
 | Tmux               | `~/dev/dotfiles/tmux.conf`              |
 | Git                | `~/dev/dotfiles/gitconfig`              |
 | Git Iris           | `.git-iris.yaml` (per-project)          |

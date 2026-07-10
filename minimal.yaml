@@ -6,13 +6,24 @@
 
 - link:
     ~/.bashrc.local: bash/bashrc.local
-    ~/.rc.local: bash/rc.local
-    ~/.dircolors:
     ~/.gitconfig:
     ~/.tmux.conf:
     ~/.zshrc: zsh/zshrc
     ~/.config/nvim: nvim
     ~/bin: bin
+
+- shell:
+    - command: |
+        # SilkCircuit theming (starship, dircolors, bat, git colors) is
+        # owned by its own repo + installer, same as the full profile
+        if [ ! -d ~/dev/silkcircuit ]; then
+          echo "🔮 Cloning SilkCircuit theme repo..."
+          git clone https://github.com/hyperb1iss/silkcircuit ~/dev/silkcircuit
+        fi
+        (cd ~/dev/silkcircuit && ./install.sh -y)
+      stderr: true
+      stdout: true
+      description: "Installing SilkCircuit themes"
 
 - shell:
     - command: |
@@ -45,13 +56,9 @@
 
 - shell:
     - command: |
-        # Try installing starship through cargo first
+        # Starship binary (config comes from the SilkCircuit installer above)
         if ! command -v starship >/dev/null 2>&1; then
           curl -sS https://starship.rs/install.sh | sh -s -- --yes
         fi
-        mkdir -p ~/.config/starship
       stderr: true
       stdout: true
-
-- link:
-    ~/.config/starship.toml: starship/starship.toml

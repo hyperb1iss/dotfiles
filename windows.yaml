@@ -9,8 +9,8 @@
 - clean: ["~"]
 
 - link:
-    # Starship prompt configuration
-    ~/.config/starship.toml: starship/starship.toml
+    # Starship prompt config comes from the SilkCircuit repo
+    # (clone https://github.com/hyperb1iss/silkcircuit and run install.ps1)
     # Neovim configuration
     ~/AppData/Local/nvim: nvim
     # PowerShell profile

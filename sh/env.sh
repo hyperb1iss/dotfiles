@@ -3,7 +3,9 @@
 # Shell-agnostic environment setup for both bash and zsh
 
 # Ensure LS_COLORS is set if dircolors exists
-if has_command dircolors; then
+# (~/.dircolors is installed by the SilkCircuit installer; minimal boxes
+# may not have it, so don't spray errors at every startup)
+if has_command dircolors && [[ -f ~/.dircolors ]]; then
   eval "$(dircolors -b ~/.dircolors)" || true
 fi
 

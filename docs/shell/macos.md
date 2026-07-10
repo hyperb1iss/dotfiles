@@ -14,7 +14,6 @@ Quick access to common apps:
 | `subl`    | Sublime Text       |
 | `preview` | Preview.app        |
 | `xcode`   | Xcode              |
-| `finder`  | Finder             |
 | `chrome`  | Google Chrome      |
 | `safari`  | Safari             |
 | `ghostty` | Ghostty terminal   |

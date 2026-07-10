@@ -22,6 +22,9 @@
                  /etc/ananicy.d/99-build-toolchain.rules; do
           [ -L "$f" ] && rm -f "$f"
         done
+        # Retired no-op rule (set the kernel-default 128KB readahead) —
+        # may exist as a real file from a pre-symlink install
+        rm -f /etc/udev/rules.d/60-nvme-readahead.rules
         install -m0644 rules.d/60-android.rules rules.d/70-audio-power.rules /etc/udev/rules.d/
         install -m0644 sysctl.d/80-desktop.conf sysctl.d/90-network.conf /etc/sysctl.d/
         install -m0644 tmpfiles.d/80-desktop.conf /etc/tmpfiles.d/

@@ -81,10 +81,6 @@
       stdout: true
       description: Installing private fonts
 
-    - command: bat cache --build
-      description: Rebuilding bat theme cache
-      stdout: true
-
     - command: |
         # Run macOS-specific setup script
         ./macos/brew.sh

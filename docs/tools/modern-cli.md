@@ -101,7 +101,7 @@ bat --diff file.ts
 
 ### Configuration
 
-The SilkCircuit theme is in `/Users/bliss/dev/dotfiles/bat/themes/`:
+The SilkCircuit theme ships from `~/dev/silkcircuit/extras/bat/themes/` (installed by the SilkCircuit installer):
 
 ```bash
 # Set default theme

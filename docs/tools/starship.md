@@ -58,7 +58,7 @@ The SilkCircuit theme uses a progressive gradient from deep purple to hot pink:
 
 ## Configuration
 
-Located at `/Users/bliss/dev/dotfiles/starship/starship.toml`
+Located at `~/dev/silkcircuit/extras/starship/starship.toml` — installed to `~/.config/starship.toml` by the SilkCircuit installer
 
 ### Common Customizations
 

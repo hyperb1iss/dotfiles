@@ -34,6 +34,10 @@ function rust_env_init() {
   fi
 }
 
+# Homebrew rustup doesn't shim toolchain binaries into ~/.cargo/bin the
+# way the official installer does, so macOS needs the PATH fix at load.
+# Linux gets ~/.cargo/bin from env.sh and skips the rustup spawn.
+is_macos && rust_env_init
 
 # Aliases for common Cargo commands
 alias cr='cargo run'
