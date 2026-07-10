@@ -185,6 +185,7 @@
     - mkdir -p ~/.config/containers
 - link:
     ~/.config/containers/storage.conf: containers/storage.conf
+    ~/.config/containers/storage.conf.d: containers/storage.conf.d
     ~/.config/containers/containers.conf: containers/containers.conf
 
 - shell:
