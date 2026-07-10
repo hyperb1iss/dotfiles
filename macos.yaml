@@ -4,6 +4,18 @@
 
 - clean: ["~"]
 
+- shell:
+    - command: |
+        # SilkCircuit theme assets live in their own repo — configs below
+        # link into ~/dev/silkcircuit/extras rather than carrying copies.
+        if [ ! -d ~/dev/silkcircuit ]; then
+          echo "🔮 Cloning SilkCircuit theme repo..."
+          git clone https://github.com/hyperb1iss/silkcircuit ~/dev/silkcircuit
+        fi
+      stderr: true
+      stdout: true
+      description: "Ensuring SilkCircuit theme repo"
+
 # Create all config directories up front (before linking)
 - shell:
     - command: |
@@ -27,7 +39,7 @@
     ~/.fonts: fonts
     ~/.gitconfig: gitconfig
     ~/.tmux.conf: tmux.conf
-    ~/.dircolors: dircolors
+    ~/.dircolors: ~/dev/silkcircuit/extras/dircolors
     ~/.zshrc: zsh/zshrc
     ~/.config/nvim:
       path: nvim
@@ -37,10 +49,11 @@
     ~/.tmux/plugins/tpm: tpm
     ~/.config/fastfetch/config.jsonc: fastfetch/config.jsonc
     ~/.config/procs/config.toml: procs/config.toml
-    ~/.config/starship.toml: starship/starship.toml
+    ~/.config/starship.toml: ~/dev/silkcircuit/extras/starship/starship.toml
     ~/.config/bat:
-      path: bat
+      path: ~/dev/silkcircuit/extras/bat
       force: true
+    ~/.config/ghostty/themes: ~/dev/silkcircuit/extras/ghostty
     ~/Library/Application Support/com.mitchellh.ghostty/config: ghostty/config
     ~/Library/Application Support/com.mitchellh.ghostty/macos.conf: ghostty/macos.conf
     ~/.claude/statusline-command.sh: claude/statusline-command.sh

@@ -8,14 +8,26 @@
 - shell:
     - if [ -d ~/dev/dotfiles-private ]; then ln -sf ~/dev/dotfiles-private/fonts/Pragmata\ Pro fonts/;fi
 
+- shell:
+    - command: |
+        # SilkCircuit theme assets live in their own repo — configs below
+        # link into ~/dev/silkcircuit/extras rather than carrying copies.
+        if [ ! -d ~/dev/silkcircuit ]; then
+          echo "🔮 Cloning SilkCircuit theme repo..."
+          git clone https://github.com/hyperb1iss/silkcircuit ~/dev/silkcircuit
+        fi
+      stderr: true
+      stdout: true
+      description: "Ensuring SilkCircuit theme repo"
+
 - link:
     ~/.bashrc.local: bash/bashrc.local
     ~/.config/lsd: lsd
-    ~/.config/bat: bat
+    ~/.config/bat: ~/dev/silkcircuit/extras/bat
     ~/.fonts:
     ~/.gitconfig:
     ~/.tmux.conf:
-    ~/.dircolors:
+    ~/.dircolors: ~/dev/silkcircuit/extras/dircolors
     ~/.zshrc: zsh/zshrc
     ~/.config/nvim: nvim
     ~/bin: bin
@@ -61,10 +73,8 @@
 - link:
     ~/.config/procs/config.toml: procs/config.toml
 
-- shell:
-    - mkdir -p ~/.config/starship
 - link:
-    ~/.config/starship.toml: starship/starship.toml
+    ~/.config/starship.toml: ~/dev/silkcircuit/extras/starship/starship.toml
 
 - shell:
     - command: |
@@ -132,6 +142,16 @@
     ~/.config/fontconfig/fonts.conf: fonts/fonts.conf
     ~/.config/ghostty/config: ghostty/config
     ~/.config/ghostty/linux.conf: ghostty/linux.conf
+    ~/.config/ghostty/themes: ~/dev/silkcircuit/extras/ghostty
+
+- shell:
+    - command: |
+        # gtk-custom-css points here; default to the neon variant but leave
+        # machine-local choices (e.g. glow to match auto/theme.ghostty) alone
+        if [ ! -e ~/.config/ghostty/silkcircuit.css ]; then
+          ln -s ~/dev/silkcircuit/extras/ghostty/silkcircuit-neon.css ~/.config/ghostty/silkcircuit.css
+        fi
+      description: "Linking Ghostty SilkCircuit CSS"
 
 - shell:
     - description: Link host-specific Ghostty config
