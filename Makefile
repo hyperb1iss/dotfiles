@@ -4,9 +4,10 @@ INSTALL_STATE_FILE=$(BASEDIR)/.install_state
 
 default:
 	@echo "Available installation options:"
-	@echo "  make full   - Full desktop environment installation"
+	@echo "  make full    - Full desktop environment installation"
 	@echo "  make minimal - Minimal server installation"
-	@echo "  make macos  - macOS environment installation"
+	@echo "  make macos   - macOS environment installation"
+	@echo "  make private - Apply private overlay (dotfiles-private)"
 	@echo ""
 	@echo "Other commands:"
 	@echo "  make update - Update submodules"
@@ -17,8 +18,7 @@ default:
 	fi
 
 update:
-	cd $(BASEDIR)
-	git submodule update --init --recursive
+	git -C $(BASEDIR) submodule update --init --recursive
 
 check-state:
 	@if [ -f $(INSTALL_STATE_FILE) ]; then \
@@ -144,4 +144,4 @@ format-footer:
 	@echo "$(GREEN)$(CHECK)$(RESET) $(BOLD)All formatting completed!$(RESET)"
 	@echo ""
 
-.PHONY: default update check-state minimal full macos lint lint-header lint-shell lint-yaml lint-lua lint-json lint-markdown lint-footer format format-header format-shell format-yaml format-lua format-json format-markdown format-footer
+.PHONY: default update check-state minimal full macos private lint lint-header lint-shell lint-yaml lint-lua lint-json lint-markdown lint-footer format format-header format-shell format-prettier format-lua format-footer

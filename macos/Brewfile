@@ -41,6 +41,8 @@ brew "rustup-init"           # Rust toolchain installer
 brew "shellcheck"            # Static analysis and lint tool, for (ba)sh scripts
 brew "pam-reattach"          # Enable Touch ID for sudo in tmux/screen
 brew "starship"              # Cross-shell prompt
+brew "atuin"                 # Shell history with sync
+brew "eza"                   # Modern ls (completion previews use it)
 brew "tmux"                  # Terminal multiplexer
 brew "tree"                  # Display directories as trees
 brew "unzip"                 # Extraction utility for .zip compressed archives

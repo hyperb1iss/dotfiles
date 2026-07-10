@@ -11,3 +11,4 @@ git-delta    # git pager with syntax highlighting
 procs        # ps replacement
 zoxide       # cd replacement (smart directory jumper)
 starship     # cross-shell prompt
+atuin        # shell history with sync + fuzzy search

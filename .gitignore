@@ -12,3 +12,5 @@ node_modules
 docs/.vitepress/cache
 docs/.vitepress/dist
 __pycache__
+elektra/
+fonts/Neue Machina*

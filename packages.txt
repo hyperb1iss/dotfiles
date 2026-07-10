@@ -40,7 +40,6 @@ u-boot-tools
 adb
 default-jdk
 fastboot
-libncurses5-dev
 libgl1-mesa-dev
 libswitch-perl
 libx11-dev
