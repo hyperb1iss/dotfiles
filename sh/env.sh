@@ -115,10 +115,8 @@ if [[ -d "$PROTO_HOME/tools/node" ]]; then
 fi
 
 # Activate proto for version detection (respects .nvmrc, .prototools, etc.)
-if command -v proto &> /dev/null; then
-  if [[ -n "$ZSH_VERSION" ]]; then
-    eval "$(proto activate zsh 2> /dev/null)"
-  elif [[ -n "$BASH_VERSION" ]]; then
-    eval "$(proto activate bash 2> /dev/null)"
-  fi
+if [[ -n "$ZSH_VERSION" ]]; then
+  cached_eval proto proto-activate.zsh proto activate zsh
+elif [[ -n "$BASH_VERSION" ]]; then
+  cached_eval proto proto-activate.bash proto activate bash
 fi

@@ -50,15 +50,16 @@ if has_command fzf; then
   # Initialize shell completion and key bindings
   # Note: We unbind Ctrl+R in zsh to let Atuin handle history search
   if is_bash; then
-    eval "$(fzf --bash)" || true
+    cached_eval fzf fzf-init.bash fzf --bash
   elif is_zsh; then
-    eval "$(fzf --zsh)" || true
+    cached_eval fzf fzf-init.zsh fzf --zsh
     # Unbind Ctrl+R so Atuin can use it for history search
     # fzf still provides Ctrl+T (files) and Alt+C (cd)
+    # This is the ONLY atuin init — zshrc defines the autosuggest
+    # strategy but must not init again (double subprocess, ^R races)
     if command -v atuin &> /dev/null; then
       bindkey -r '^R'
-      # Re-init Atuin to reclaim Ctrl+R after fzf tried to take it
-      eval "$(atuin init zsh --disable-up-arrow)"
+      cached_eval atuin atuin-init.zsh atuin init zsh --disable-up-arrow
     fi
   fi
 

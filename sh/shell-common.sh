@@ -4,6 +4,28 @@
 # Canonical dotfiles location — modules and colors.sh sourcing rely on it
 export DOTFILES="${DOTFILES:-$HOME/dev/dotfiles}"
 
+# Cache a tool's init-script output and source it, regenerating when the
+# tool binary is newer than the cache. Each eval'd `tool init <shell>`
+# spawn costs 10-50ms of startup; this makes them one-time costs.
+# Usage: cached_eval <tool> <cache-name> <command...>
+function cached_eval() {
+  local tool="$1" cache_name="$2"
+  shift 2
+  local tool_path cache_dir cache_file
+  tool_path=$(command -v "${tool}" 2> /dev/null) || return 0
+  cache_dir="${XDG_CACHE_HOME:-${HOME}/.cache}/dotfiles"
+  [[ -d "${cache_dir}" ]] || mkdir -p "${cache_dir}"
+  cache_file="${cache_dir}/${cache_name}"
+  if [[ ! -s "${cache_file}" || "${tool_path}" -nt "${cache_file}" ]]; then
+    "$@" > "${cache_file}" 2> /dev/null || {
+      rm -f "${cache_file}"
+      return 0
+    }
+  fi
+  # shellcheck disable=SC1090
+  source "${cache_file}"
+}
+
 # 1. Core utilities - Load first
 #-------------------------------------------------
 

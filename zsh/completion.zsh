@@ -1,25 +1,38 @@
 # Completion settings
 
-# Use modern completion system
+# Use modern completion system with a daily staleness window: the fast
+# -C path (skip the security scan) only while the dump is under 24h old,
+# a full compinit otherwise — so newly installed tools' completions show
+# up within a day instead of never. `refresh-completions` forces it now.
 autoload -Uz compinit
 zcompdump_path="${ZDOTDIR:-${HOME}}/.zcompdump"
-if [[ -s "${zcompdump_path}" ]]; then
+if [[ -n "${zcompdump_path}"(#qN.mh-24) ]]; then
   compinit -C -d "${zcompdump_path}"
 else
   compinit -d "${zcompdump_path}"
 fi
+
+# Bytecode-compile the dump in the background when it changed
+{
+  if [[ -s "${zcompdump_path}" && (! -s "${zcompdump_path}.zwc" || "${zcompdump_path}" -nt "${zcompdump_path}.zwc") ]]; then
+    zcompile "${zcompdump_path}"
+  fi
+} &!
 unset zcompdump_path
+
+function refresh-completions() {
+  local dump="${ZDOTDIR:-${HOME}}/.zcompdump"
+  rm -f "${dump}" "${dump}.zwc"
+  compinit -d "${dump}"
+  echo "✓ completions rebuilt"
+}
 
 # Basic completion settings with enhanced colors
 zstyle ':completion:*' auto-description 'specify: %d'
-zstyle ':completion:*' completer _expand _complete _correct _approximate
 zstyle ':completion:*' group-name ''
 zstyle ':completion:*' list-prompt %SAt %p: Hit TAB for more, or the character to insert%s
 
-# Enhanced list colors for file completions based on file types
-zstyle ':completion:*' list-colors 'di=01;34:ln=01;36:so=01;35:pi=33:ex=01;32:bd=33;01:cd=33;01:su=37;41:sg=30;43:tw=30;42:ow=34;42:st=37;44:mi=05;37;41:or=05;37;41:fi=00'
-
-# Matcher settings for case-insensitive completion
+# Case-insensitive completion plus substring/separator matching
 zstyle ':completion:*' matcher-list 'm:{a-z}={A-Z}' 'm:{a-zA-Z}={A-Za-z}' 'r:|[._-]=* r:|=* l:|=*'
 zstyle ':completion:*' menu select=long
 zstyle ':completion:*' select-prompt %SScrolling active: current selection at %p%s
@@ -33,9 +46,6 @@ fi
 
 # Enable extended globbing for more powerful pattern matching
 setopt extended_glob
-
-# Allow for case-insensitive completions
-zstyle ':completion:*' matcher-list 'm:{a-z}={A-Z}'
 
 # Enable path expansion (e.g., ~/ expands to the home directory)
 zstyle ':completion:*' expand 'yes'
@@ -53,10 +63,8 @@ zstyle ':completion:*' list-colors ${(s.:.)LS_COLORS}: \
   'ex=01;32' 'su=37;41' 'sg=30;43' 'tw=30;42' \
   'ow=34;42' 'st=37;44'
 
-# Enhancing colors for descriptions, messages, and warnings
-zstyle ':completion:*:descriptions' format '%B%F{blue}%d%b%f'
-zstyle ':completion:*:messages' format '%B%F{yellow}%d%b%f'
-zstyle ':completion:*:warnings' format '%B%F{red}%d%b%f'
+# Descriptions/messages/warnings formats live in the fzf-tab section
+# below with SilkCircuit colors
 
 # Enable automatic correction of commands (but not arguments)
 setopt correct

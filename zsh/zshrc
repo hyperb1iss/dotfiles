@@ -64,9 +64,10 @@ zinit light Aloxaf/fzf-tab
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 # Atuin replaces Ctrl+R with a full-screen fuzzy search UI
 # Features: SQLite backend, directory filtering, cross-machine sync, stats
+# The actual `atuin init` happens once in sh/fzf.sh (after fzf's bindings,
+# so atuin wins ^R) — initializing here too would double the subprocess
+# spawn and race the keybinds.
 if command -v atuin &>/dev/null; then
-  eval "$(atuin init zsh)"
-
   # Custom strategy for zsh-autosuggestions using Atuin's per-directory history
   _zsh_autosuggest_strategy_atuin() {
     suggestion=$(atuin search --cmd-only --limit 1 --search-mode prefix -- "$1" 2>/dev/null)
@@ -80,10 +81,8 @@ fi
 bindkey '^P' history-substring-search-up
 bindkey '^N' history-substring-search-down
 
-# Initialize Starship prompt
-if command -v starship &>/dev/null; then
-  eval "$(starship init zsh)"
-fi
+# Initialize Starship prompt (cached — regenerates when the binary updates)
+cached_eval starship starship-init.zsh starship init zsh --print-full-init
 
 # Add other plugins here, e.g.:
 # zinit light zdharma-continuum/fast-syntax-highlighting # Alternative syntax highlighting
