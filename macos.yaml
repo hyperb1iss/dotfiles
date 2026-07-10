@@ -6,15 +6,17 @@
 
 - shell:
     - command: |
-        # SilkCircuit theme assets live in their own repo — configs below
-        # link into ~/dev/silkcircuit/extras rather than carrying copies.
+        # SilkCircuit theming is owned by its own repo + installer, which
+        # detects apps and copies themes into place (bat, starship, ghostty,
+        # dircolors, git include, k9s, and friends).
         if [ ! -d ~/dev/silkcircuit ]; then
           echo "🔮 Cloning SilkCircuit theme repo..."
           git clone https://github.com/hyperb1iss/silkcircuit ~/dev/silkcircuit
         fi
+        (cd ~/dev/silkcircuit && ./install.sh -y)
       stderr: true
       stdout: true
-      description: "Ensuring SilkCircuit theme repo"
+      description: "Installing SilkCircuit themes"
 
 # Create all config directories up front (before linking)
 - shell:
@@ -39,7 +41,6 @@
     ~/.fonts: fonts
     ~/.gitconfig: gitconfig
     ~/.tmux.conf: tmux.conf
-    ~/.dircolors: ~/dev/silkcircuit/extras/dircolors
     ~/.zshrc: zsh/zshrc
     ~/.config/nvim:
       path: nvim
@@ -49,11 +50,8 @@
     ~/.tmux/plugins/tpm: tpm
     ~/.config/fastfetch/config.jsonc: fastfetch/config.jsonc
     ~/.config/procs/config.toml: procs/config.toml
-    ~/.config/starship.toml: ~/dev/silkcircuit/extras/starship/starship.toml
-    ~/.config/bat:
-      path: ~/dev/silkcircuit/extras/bat
-      force: true
-    ~/.config/ghostty/themes: ~/dev/silkcircuit/extras/ghostty
+    # starship, bat, dircolors, and ghostty themes are installed by the
+    # SilkCircuit installer above
     ~/Library/Application Support/com.mitchellh.ghostty/config: ghostty/config
     ~/Library/Application Support/com.mitchellh.ghostty/macos.conf: ghostty/macos.conf
     ~/.claude/statusline-command.sh: claude/statusline-command.sh
@@ -110,13 +108,13 @@
           export PROTO_HOME="$HOME/.proto"
           export PATH="$PROTO_HOME/shims:$PROTO_HOME/bin:$PATH"
         fi
-        # Install node and npm via proto
+        # Install node and npm via proto — versions are pinned by the
+        # tracked proto/.prototools; running `proto pin` here would write
+        # through the ~/.proto/.prototools symlink and dirty the repo
         if command -v proto &> /dev/null; then
           echo "📦 Setting up node and npm via proto..."
-          proto install node lts
+          proto install node
           proto install npm
-          proto pin node lts
-          proto pin npm bundled
         fi
       stderr: true
       stdout: true

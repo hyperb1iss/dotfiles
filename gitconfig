@@ -49,9 +49,10 @@
 	process = git-lfs filter-process
 
 # All SilkCircuit theming (colors, delta, pretty formats, log aliases)
-# lives in the silkcircuit repo — cloned by the install profiles
+# lives in the silkcircuit repo; its installer copies the include target
+# here and keeps it fresh on every dotfiles install run
 [include]
-	path = ~/dev/silkcircuit/extras/gitconfig
+	path = ~/.config/silkcircuit/gitconfig
 
 [credential "https://github.com"]
 	helper =

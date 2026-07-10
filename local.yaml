@@ -10,39 +10,39 @@
 
 - shell:
     - command: |
-        # SilkCircuit theme assets live in their own repo — configs below
-        # link into ~/dev/silkcircuit/extras rather than carrying copies.
+        # SilkCircuit theming is owned by its own repo + installer, which
+        # detects apps and copies themes into place (bat, starship, ghostty,
+        # dircolors, git include, k9s, and friends).
         if [ ! -d ~/dev/silkcircuit ]; then
           echo "🔮 Cloning SilkCircuit theme repo..."
           git clone https://github.com/hyperb1iss/silkcircuit ~/dev/silkcircuit
         fi
+        (cd ~/dev/silkcircuit && ./install.sh -y)
       stderr: true
       stdout: true
-      description: "Ensuring SilkCircuit theme repo"
+      description: "Installing SilkCircuit themes"
 
 - link:
     ~/.bashrc.local: bash/bashrc.local
     ~/.config/lsd: lsd
-    ~/.config/bat: ~/dev/silkcircuit/extras/bat
     ~/.fonts:
     ~/.gitconfig:
     ~/.tmux.conf:
-    ~/.dircolors: ~/dev/silkcircuit/extras/dircolors
     ~/.zshrc: zsh/zshrc
     ~/.config/nvim: nvim
     ~/bin: bin
 
 - shell:
-    - command: bat cache --build
-      description: "Rebuilding bat theme cache"
-      stdout: true
-
-- shell:
     - fc-cache -f
 
 - shell:
-    - curl https://storage.googleapis.com/git-repo-downloads/repo > ~/bin/repo
-    - chmod +x ~/bin/repo
+    - command: |
+        # repo may already come from the system package manager
+        if ! command -v repo >/dev/null 2>&1; then
+          curl -fsSL https://storage.googleapis.com/git-repo-downloads/repo > ~/bin/repo
+          chmod +x ~/bin/repo
+        fi
+      description: "Installing repo tool if missing"
 
 - shell:
     - command: |
@@ -51,8 +51,22 @@
         # Add cargo to PATH (apt rustup doesn't create ~/.cargo/env)
         export PATH="$HOME/.cargo/bin:$PATH"
         if command -v cargo &> /dev/null; then
-          echo "📦 Installing Rust CLI tools from cargo-tools.txt..."
-          grep -v '^#\|^$' cargo-tools.txt | sed 's/#.*//' | xargs cargo install
+          # Skip tools the system package manager already provides —
+          # on Arch everything here ships via pacman, so this compiles
+          # nothing; it's the fallback path for apt-based systems
+          grep -v '^#\|^$' cargo-tools.txt | sed 's/#.*//' | awk '{print $1}' |
+            while read -r crate; do
+              case "${crate}" in
+                fd-find) bin=fd ;;
+                ripgrep) bin=rg ;;
+                git-delta) bin=delta ;;
+                *) bin="${crate}" ;;
+              esac
+              if ! command -v "${bin}" >/dev/null 2>&1; then
+                echo "📦 cargo install ${crate}"
+                cargo install "${crate}"
+              fi
+            done
         fi
       stderr: true
       stdout: true
@@ -73,8 +87,7 @@
 - link:
     ~/.config/procs/config.toml: procs/config.toml
 
-- link:
-    ~/.config/starship.toml: ~/dev/silkcircuit/extras/starship/starship.toml
+# starship.toml is installed by the SilkCircuit installer above
 
 - shell:
     - command: |
@@ -111,14 +124,13 @@
           export PROTO_HOME="$HOME/.proto"
           export PATH="$PROTO_HOME/shims:$PROTO_HOME/bin:$PATH"
         fi
-        # Install node and npm via proto
+        # Install node and npm via proto — versions are pinned by the
+        # tracked proto/.prototools; running `proto pin` here would write
+        # through the ~/.proto/.prototools symlink and dirty the repo
         if command -v proto &> /dev/null; then
           echo "📦 Setting up node and npm via proto..."
-          proto install node lts
+          proto install node
           proto install npm
-          # Pin versions globally (writes to ~/.prototools)
-          proto pin node lts
-          proto pin npm bundled
         fi
       stderr: true
       stdout: true
@@ -142,14 +154,14 @@
     ~/.config/fontconfig/fonts.conf: fonts/fonts.conf
     ~/.config/ghostty/config: ghostty/config
     ~/.config/ghostty/linux.conf: ghostty/linux.conf
-    ~/.config/ghostty/themes: ~/dev/silkcircuit/extras/ghostty
 
 - shell:
     - command: |
         # gtk-custom-css points here; default to the neon variant but leave
-        # machine-local choices (e.g. glow to match auto/theme.ghostty) alone
+        # machine-local choices (e.g. glow to match auto/theme.ghostty) alone.
+        # The variants themselves are copied in by the SilkCircuit installer.
         if [ ! -e ~/.config/ghostty/silkcircuit.css ]; then
-          ln -s ~/dev/silkcircuit/extras/ghostty/silkcircuit-neon.css ~/.config/ghostty/silkcircuit.css
+          ln -s ~/.config/ghostty/themes/silkcircuit-neon.css ~/.config/ghostty/silkcircuit.css
         fi
       description: "Linking Ghostty SilkCircuit CSS"
 
