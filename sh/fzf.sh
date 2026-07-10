@@ -102,17 +102,20 @@ if has_command fzf; then
 
   # NOTE: gadd and gco are defined in git.sh with SilkCircuit styling
 
-  # Interactive history search
+  # Interactive history search — loads the pick into the edit buffer
+  # (zsh) or history recall (bash) instead of blind-executing it
   function fh() {
     local cmd
     if is_zsh; then
       cmd=$(history -n -r 1 | fzf +s --tac) || return
+      # shellcheck disable=SC2154
+      [[ -n "${cmd}" ]] && print -z "${cmd}"
     else
       cmd=$(history | fzf +s --tac | sed 's/ *[0-9]* *//') || return
-    fi
-    if [[ -n "${cmd}" ]]; then
-      # shellcheck disable=SC2154
-      print -z "${cmd}"
+      if [[ -n "${cmd}" ]]; then
+        history -s "${cmd}"
+        echo "${cmd}  ← recall with ↑"
+      fi
     fi
   }
 

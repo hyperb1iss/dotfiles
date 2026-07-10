@@ -1,6 +1,9 @@
 # shell-common.sh
 # Common shell configurations for both bash and zsh
 
+# Canonical dotfiles location — modules and colors.sh sourcing rely on it
+export DOTFILES="${DOTFILES:-$HOME/dev/dotfiles}"
+
 # 1. Core utilities - Load first
 #-------------------------------------------------
 

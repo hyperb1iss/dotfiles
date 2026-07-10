@@ -259,24 +259,23 @@ function bandwidth() {
 }
 
 # Show WiFi information (macOS specific)
+# (the old airport binary was removed in macOS 14 Sonoma; BSSID is no
+# longer exposed without elevated privileges, so it's not shown)
 if is_macos; then
   function wifi() {
     echo -e "${SC_PURPLE}${SC_BOLD}⚡ WiFi Information${SC_RESET}"
     echo ""
 
-    local ssid
-    ssid=$(/System/Library/PrivateFrameworks/Apple80211.framework/Versions/Current/Resources/airport -I | grep " SSID" | awk '{print $2}')
-    local bssid
-    bssid=$(/System/Library/PrivateFrameworks/Apple80211.framework/Versions/Current/Resources/airport -I | grep " BSSID" | awk '{print $2}')
-    local channel
-    channel=$(/System/Library/PrivateFrameworks/Apple80211.framework/Versions/Current/Resources/airport -I | grep "channel" | awk '{print $2}')
-    local signal
-    signal=$(/System/Library/PrivateFrameworks/Apple80211.framework/Versions/Current/Resources/airport -I | grep "agrCtlRSSI" | awk '{print $2}')
-    local noise
-    noise=$(/System/Library/PrivateFrameworks/Apple80211.framework/Versions/Current/Resources/airport -I | grep "agrCtlNoise" | awk '{print $2}')
+    local sp_info
+    sp_info=$(system_profiler SPAirPortDataType 2> /dev/null)
+
+    local ssid channel signal noise
+    ssid=$(echo "${sp_info}" | awk '/Current Network Information:/ {getline; sub(/^[ \t]+/, ""); sub(/:$/, ""); print; exit}')
+    channel=$(echo "${sp_info}" | awk '/Channel:/ {print $2; exit}')
+    signal=$(echo "${sp_info}" | awk '/Signal \/ Noise:/ {print $4; exit}')
+    noise=$(echo "${sp_info}" | awk '/Signal \/ Noise:/ {print $7; exit}')
 
     [[ -n "${ssid}" ]] && echo -e "${SC_CYAN}•${SC_RESET} Network: ${SC_YELLOW}${ssid}${SC_RESET}"
-    [[ -n "${bssid}" ]] && echo -e "${SC_CYAN}•${SC_RESET} BSSID: ${SC_GRAY}${bssid}${SC_RESET}"
     [[ -n "${channel}" ]] && echo -e "${SC_CYAN}•${SC_RESET} Channel: ${SC_PINK}${channel}${SC_RESET}"
 
     if [[ -n "${signal}" ]]; then
@@ -296,9 +295,9 @@ if is_macos; then
     [[ -n "${noise}" ]] && echo -e "${SC_CYAN}•${SC_RESET} Noise: ${SC_GRAY}${noise} dBm${SC_RESET}"
 
     # If no info was printed, show a message
-    if [[ -z "${ssid}" ]] && [[ -z "${bssid}" ]] && [[ -z "${channel}" ]]; then
+    if [[ -z "${ssid}" ]] && [[ -z "${channel}" ]]; then
       echo -e "${SC_GRAY}• No WiFi connection detected or unable to access WiFi info${SC_RESET}"
-      echo -e "  ${SC_GRAY}→ Try:${SC_RESET} ${SC_PINK}networksetup -getairportnetwork en0${SC_RESET}"
+      echo -e "  ${SC_GRAY}→ Try:${SC_RESET} ${SC_PINK}wdutil info${SC_RESET}"
     fi
   }
 fi

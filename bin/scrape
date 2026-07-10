@@ -1,4 +1,4 @@
-#/bin/sh
+#!/bin/sh
 
 wget --recursive ${comment# self-explanatory} \
   --no-parent ${comment# will not crawl links in folders above the base of the URL} \

@@ -7,7 +7,7 @@ has_command zoxide || return 0
 
 # Initialize the directory stack file
 ZP_STACK_FILE="${ZP_STACK_FILE:-$HOME/.zp_stack}"
-touch "$ZP_STACK_FILE"
+[[ -f "$ZP_STACK_FILE" ]] || touch "$ZP_STACK_FILE"
 
 function zp() {
   case "$1" in

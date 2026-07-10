@@ -1,6 +1,9 @@
 # kubernetes.sh
 # Streamlined Kubernetes shell utilities with focus on k9s
 
+# Skip entire module if not in full installation
+is_minimal && return 0
+
 # Essential aliases
 alias k='kubectl'
 alias kx='kubectx'
@@ -143,8 +146,6 @@ function sopse() {
   fi
 }
 
-# Create kubeconfig directory if it doesn't exist
-mkdir -p "${KUBE_CONFIG_DIR:-${HOME}/.kube/configs}"
 
 function __dotfiles_load_kubectl_completion() {
   local kubectl_path cache_dir cache_file completion_shell

@@ -34,8 +34,6 @@ function rust_env_init() {
   fi
 }
 
-# Initialize Rust environment on module load
-rust_env_init
 
 # Aliases for common Cargo commands
 alias cr='cargo run'

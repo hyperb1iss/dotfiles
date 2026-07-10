@@ -450,12 +450,8 @@ function gstatus() {
   fi
 }
 
-# Initialize git completion
-if is_zsh; then
-  # ZSH completion
-  fpath=(~/.zsh/completion "${fpath[@]}")
-elif is_bash; then
-  # Bash completion
+# Initialize git completion (zsh ships git completion via compinit)
+if is_bash; then
   if [[ -f /usr/share/bash-completion/completions/git ]]; then
     source /usr/share/bash-completion/completions/git
   fi

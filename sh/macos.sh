@@ -8,7 +8,6 @@ if is_macos; then
   alias subl='open -a "Sublime Text"'
   alias preview='open -a "Preview"'
   alias xcode='open -a "Xcode"'
-  alias finder='open -a "Finder"'
   alias chrome='open -a "Google Chrome"'
   alias safari='open -a "Safari"'
   alias ghostty='open -a "Ghostty"'
@@ -79,22 +78,16 @@ if is_macos; then
   }
 
   # Show current wifi network
+  # (the old airport binary was removed in macOS 14 Sonoma)
   function wifi-name() {
-    local airport_info
-    airport_info=$(/System/Library/PrivateFrameworks/Apple80211.framework/Versions/Current/Resources/airport -I) || true
-    echo "${airport_info}" | awk '/ SSID/ {print $2}'
+    local iface
+    iface=$(route -n get default 2> /dev/null | awk '/interface:/ {print $2}')
+    ipconfig getsummary "${iface:-en0}" 2> /dev/null | awk -F ' SSID : ' '/ SSID : / {print $2}'
   }
 
   # List all connected devices (USB, Thunderbolt, etc)
   function list-devices() {
     system_profiler SPUSBDataType SPBluetoothDataType SPThunderboltDataType
-  }
-
-  # Get battery status
-  function battery() {
-    local batt_info
-    batt_info=$(pmset -g batt) || true
-    echo "${batt_info}" | grep -o "[0-9]*%"
   }
 
   # Easy way to extract disk images

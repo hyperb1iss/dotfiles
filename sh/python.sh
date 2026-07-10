@@ -90,13 +90,13 @@ function ptd() {
 
 # Modern Python tooling (Astral stack: uv, ruff, ty)
 
-# Lint with ruff (replaces flake8, pylint, isort)
-function lint() {
+# Lint with ruff (rlint — pnpm owns the bare `lint` alias in typescript.sh)
+function rlint() {
   ruff check "${@:-.}"
 }
 
-# Format with ruff (replaces black + isort)
-function fmt() {
+# Format with ruff (rfmt — prettier owns the bare `fmt` alias in typescript.sh)
+function rfmt() {
   ruff format "${@:-.}"
 }
 

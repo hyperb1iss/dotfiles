@@ -31,17 +31,6 @@ function extract() {
   fi
 }
 
-# Interactive history search
-function fh() {
-  if is_zsh; then
-    # shellcheck disable=SC1090,SC2046,SC2086
-    eval "$(fc -l 1 | fzf +s --tac | sed 's/ *[0-9]* *//')"
-  else
-    # shellcheck disable=SC1090,SC2046,SC2086
-    eval "$(history | fzf +s --tac | sed 's/ *[0-9]* *//')"
-  fi
-}
-
 # Find process by name
 function psg() {
   pgrep -f -a "$@"
