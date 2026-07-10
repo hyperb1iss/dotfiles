@@ -83,6 +83,15 @@
       stdout: true
       description: "Configuring container registry defaults"
     - command: |
+        # Quiet the podman-docker "Emulate Docker CLI" banner
+        if [ ! -f /etc/containers/nodocker ]; then
+          touch /etc/containers/nodocker
+          echo "Silenced podman-docker emulation banner"
+        fi
+      stderr: true
+      stdout: true
+      description: "Silencing podman-docker banner"
+    - command: |
         # Install Kind for Kubernetes local clusters (not in official repos)
         if ! command -v kind >/dev/null 2>&1; then
           echo "Installing kind from GitHub releases..."
