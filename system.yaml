@@ -3,19 +3,35 @@
       relink: true
       force: true
 
-- clean: ["~"]
-
-- link:
-    /lib/udev/rules.d/60-android.rules: rules.d/60-android.rules
-    /lib/udev/rules.d/60-nvme-readahead.rules: rules.d/60-nvme-readahead.rules
-    /lib/udev/rules.d/70-audio-power.rules: rules.d/70-audio-power.rules
-    /etc/sysctl.d/50-inotify.conf: sysctl.d/50-inotify.conf
-    /etc/sysctl.d/80-desktop.conf: sysctl.d/80-desktop.conf
-    /etc/sysctl.d/90-network.conf: sysctl.d/90-network.conf
-    /etc/tmpfiles.d/80-desktop.conf: tmpfiles.d/80-desktop.conf
-    /etc/ananicy.d/99-build-toolchain.rules:
-      path: ananicy.d/99-build-toolchain.rules
-      if: '[ -d /etc/ananicy.d ]'
+- shell:
+    - command: |
+        # System config ships as real files, never symlinks: /home is a
+        # separate btrfs subvolume that isn't mounted when systemd-sysctl
+        # and early udev run, so symlinks into the repo dangle at boot and
+        # every setting silently fails. Re-run `make full` after editing.
+        #
+        # Remove dangling-at-boot symlinks from previous installs first so
+        # install(1) can't write through them into the repo.
+        for f in /lib/udev/rules.d/60-android.rules \
+                 /lib/udev/rules.d/60-nvme-readahead.rules \
+                 /lib/udev/rules.d/70-audio-power.rules \
+                 /etc/sysctl.d/50-inotify.conf \
+                 /etc/sysctl.d/80-desktop.conf \
+                 /etc/sysctl.d/90-network.conf \
+                 /etc/tmpfiles.d/80-desktop.conf \
+                 /etc/ananicy.d/99-build-toolchain.rules; do
+          [ -L "$f" ] && rm -f "$f"
+        done
+        install -m0644 rules.d/60-android.rules rules.d/70-audio-power.rules /etc/udev/rules.d/
+        install -m0644 sysctl.d/80-desktop.conf sysctl.d/90-network.conf /etc/sysctl.d/
+        install -m0644 tmpfiles.d/80-desktop.conf /etc/tmpfiles.d/
+        install -m0644 modules-load.d/bbr.conf /etc/modules-load.d/
+        if [ -d /etc/ananicy.d ]; then
+          install -m0644 ananicy.d/*.rules /etc/ananicy.d/
+        fi
+      stderr: true
+      stdout: true
+      description: "Installing system config as real files"
 
 - shell:
     - command: |
@@ -30,17 +46,13 @@
           sudo add-apt-repository -y ppa:git-core/ppa
           sudo add-apt-repository -y ppa:zhangsongcui3371/fastfetch
           sudo apt update
-          grep -v '^#\|^$' packages.txt | xargs sudo apt install -y
-          # Install stable Rust toolchain via rustup (never use apt's cargo/rustc)
-          if command -v rustup >/dev/null 2>&1; then
-            echo "Installing Rust stable toolchain..."
-            rustup toolchain install stable
-            if [ -f "$HOME/.cargo/env" ]; then
-              source "$HOME/.cargo/env"
-              echo "Installing Rust CLI tools..."
-              grep -v '^#\|^$' cargo-tools.txt | sed 's/#.*//' | xargs cargo install
-            fi
-          fi
+          # Per-package so one unavailable name can't sink the whole batch
+          # (kubectl-on-noble class of failure)
+          grep -v '^#\|^$' packages.txt | while read -r pkg; do
+            sudo apt install -y --no-install-recommends "$pkg" || echo "⚠ skipped: $pkg"
+          done
+          # Rust toolchain + cargo tools are user-scope: local.yaml handles
+          # them so they land in ~/.cargo, not /root/.cargo.
 
           # Install Podman on Ubuntu/Debian (if not using Arch)
           if ! command -v podman >/dev/null 2>&1; then
@@ -110,8 +122,3 @@
       stderr: true
       stdout: true
       description: "Installing Kind for local Kubernetes clusters"
-
-- shell:
-    - mkdir -p ~/.config/fastfetch
-- link:
-    ~/.config/fastfetch/config.jsonc: fastfetch/config.jsonc

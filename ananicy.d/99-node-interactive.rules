@@ -1,0 +1,9 @@
+# Node runs dev servers and editor language servers on this machine.
+# CachyOS's shipped ruleset (00-default) classifies node as BG_CPUIO —
+# nice 16 with idle io AND idle cpu scheduling — which starves Vite/Next
+# dev servers and LSPs the moment anything else wants CPU. IN_DIFF resets
+# node to neutral (nice 0, best-effort io).
+#
+# Kept at the top level of /etc/ananicy.d/ so it loads after 00-default
+# and the cachyos-ananicy-rules package can't clobber it on update.
+{ "name": "node", "type": "IN_DIFF" }

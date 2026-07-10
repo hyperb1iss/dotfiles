@@ -31,3 +31,27 @@
 { "name": "ld.lld", "type": "Heavy_CPU" }
 { "name": "lld", "type": "Heavy_CPU" }
 { "name": "mold", "type": "Heavy_CPU" }
+
+# Build drivers and caches
+{ "name": "make", "type": "Heavy_CPU" }
+{ "name": "gmake", "type": "Heavy_CPU" }
+{ "name": "ninja", "type": "Heavy_CPU" }
+{ "name": "samu", "type": "Heavy_CPU" }
+{ "name": "cmake", "type": "Heavy_CPU" }
+{ "name": "sccache", "type": "Heavy_CPU" }
+{ "name": "ccache", "type": "Heavy_CPU" }
+
+# Assembler / archiver
+{ "name": "as", "type": "Heavy_CPU" }
+{ "name": "ar", "type": "Heavy_CPU" }
+
+# Go toolchain (comm names of the tool binaries)
+{ "name": "compile", "type": "Heavy_CPU" }
+{ "name": "link", "type": "Heavy_CPU" }
+{ "name": "asm", "type": "Heavy_CPU" }
+{ "name": "cgo", "type": "Heavy_CPU" }
+
+# Zig and JS-native compilers
+{ "name": "zig", "type": "Heavy_CPU" }
+{ "name": "esbuild", "type": "Heavy_CPU" }
+{ "name": "swc", "type": "Heavy_CPU" }
