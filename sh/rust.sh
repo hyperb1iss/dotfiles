@@ -6,39 +6,6 @@
 # Skip entire module if not in full installation
 is_minimal && return 0
 
-# Initialize Rust environment for Homebrew rustup
-function rust_env_init() {
-  if has_command rustup; then
-    # Get the active toolchain and ensure it's in PATH
-    local active_toolchain
-    active_toolchain=$(rustup show active-toolchain 2> /dev/null | cut -d' ' -f1) || true
-
-    if [[ -n "${active_toolchain}" ]]; then
-      local toolchain_bin="${HOME}/.rustup/toolchains/${active_toolchain}/bin"
-      if [[ -d "${toolchain_bin}" ]]; then
-        # Add toolchain bin to PATH if not already present
-        case ":${PATH}:" in
-          *":${toolchain_bin}:"*) ;;
-          *) export PATH="${toolchain_bin}:${PATH}" ;;
-        esac
-      fi
-    fi
-
-    # Ensure ~/.cargo/bin is in PATH for installed packages
-    if [[ -d "${HOME}/.cargo/bin" ]]; then
-      case ":${PATH}:" in
-        *":${HOME}/.cargo/bin:"*) ;;
-        *) export PATH="${HOME}/.cargo/bin:${PATH}" ;;
-      esac
-    fi
-  fi
-}
-
-# Homebrew rustup doesn't shim toolchain binaries into ~/.cargo/bin the
-# way the official installer does, so macOS needs the PATH fix at load.
-# Linux gets ~/.cargo/bin from env.sh and skips the rustup spawn.
-is_macos && rust_env_init
-
 # Aliases for common Cargo commands
 alias cr='cargo run'
 alias cb='cargo build'

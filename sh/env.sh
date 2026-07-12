@@ -122,3 +122,12 @@ if [[ -n "$ZSH_VERSION" ]]; then
 elif [[ -n "$BASH_VERSION" ]]; then
   cached_eval proto proto-activate.bash proto activate bash
 fi
+
+# Homebrew installs rustup keg-only, so expose its toolchain proxies directly.
+if is_macos; then
+  if [[ -d /opt/homebrew/opt/rustup/bin ]]; then
+    export PATH="/opt/homebrew/opt/rustup/bin:$PATH"
+  elif [[ -d /usr/local/opt/rustup/bin ]]; then
+    export PATH="/usr/local/opt/rustup/bin:$PATH"
+  fi
+fi
