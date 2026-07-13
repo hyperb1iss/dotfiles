@@ -77,7 +77,7 @@ link-url = true
 # Shell Integration
 # ─────────────────────────────────────────────────────────────────────────────
 shell-integration = detect
-shell-integration-features = cursor,sudo,title
+shell-integration-features = cursor,sudo,title,ssh-terminfo,ssh-env
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Scrollback & Performance (50MB buffer)
