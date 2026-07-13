@@ -11,3 +11,11 @@
       create: true
       path: ~/dev/dotfiles-private/ai/AGENTS.md
       if: "[ -f ~/dev/dotfiles-private/ai/AGENTS.md ]"
+
+- shell:
+    - command: |
+        if [ -x "$HOME/dev/dotfiles-private/scripts/nova.sh" ]; then
+          make -C "$HOME/dev/dotfiles-private" install
+        fi
+      description: Installing private commands
+      stdout: true
