@@ -178,11 +178,10 @@ FZF-EOF" \
 # Interactive git stash operations
 function gstash() {
   __sc_init_colors
-  local cmd="git stash list"
   local preview="git stash show -p {1} --color=always"
   local selection stash_id
 
-  selection=$(eval "${cmd}" \
+  selection=$(git stash list \
     | fzf --height 60% --reverse \
       --header="⚡ Select stash entry" \
       --prompt="stash ▸ " \

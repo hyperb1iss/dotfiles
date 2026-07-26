@@ -36,6 +36,8 @@ function dev() {
   fi
 
   local project
+  # The preview script is deliberately single-quoted: fzf expands it per row.
+  # shellcheck disable=SC2016
   project=$(command ls -1 "${dev_root}" \
     | fzf --height 60% --reverse \
       --header="⚡ ~/dev/ projects" \

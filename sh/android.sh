@@ -30,7 +30,7 @@ fi
 # Find the latest installed NDK version
 if [[ -n "${ANDROID_HOME:-}" && -d "${ANDROID_HOME}/ndk" ]]; then
   # Get the newest NDK version directory
-  NDK_VERSION=$(ls -1 "${ANDROID_HOME}/ndk" 2> /dev/null | sort -V | tail -1)
+  NDK_VERSION=$(find "${ANDROID_HOME}/ndk" -maxdepth 1 -mindepth 1 -type d -exec basename {} \; 2> /dev/null | sort -V | tail -1)
   if [[ -n "${NDK_VERSION}" ]]; then
     export ANDROID_NDK_HOME="${ANDROID_HOME}/ndk/${NDK_VERSION}"
     export ANDROID_NDK="${ANDROID_NDK_HOME}" # Some tools use this
@@ -59,7 +59,7 @@ if [[ -n "${ANDROID_HOME:-}" ]]; then
 
   # CMake (find latest version)
   if [[ -d "${ANDROID_HOME}/cmake" ]]; then
-    CMAKE_VERSION=$(ls -1 "${ANDROID_HOME}/cmake" 2> /dev/null | sort -V | tail -1)
+    CMAKE_VERSION=$(find "${ANDROID_HOME}/cmake" -maxdepth 1 -mindepth 1 -type d -exec basename {} \; 2> /dev/null | sort -V | tail -1)
     if [[ -n "${CMAKE_VERSION}" && -d "${ANDROID_HOME}/cmake/${CMAKE_VERSION}/bin" ]]; then
       export PATH="${ANDROID_HOME}/cmake/${CMAKE_VERSION}/bin:${PATH}"
     fi

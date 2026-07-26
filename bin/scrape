@@ -1,12 +1,40 @@
 #!/bin/sh
+#
+# Mirror a website to the current directory.
+#
+# Usage: scrape https://example.com/some/path
+#
+# The flags below used to carry inline `${comment# ...}` annotations, which is
+# a parameter-expansion trick rather than a real comment: every one of them
+# expanded an unset variable, so the flags were also silently subject to word
+# splitting. The explanations live here instead.
+#
+#   --recursive              follow links
+#   --no-parent              never crawl above the base of the URL
+#   --convert-links          rewrite links on the domain to relative, others absolute
+#   --random-wait --wait 3   throttle so the host does not ban you
+#   --no-http-keep-alive     ditto
+#   --no-host-directories    do not nest output under a domain-name folder
+#   --execute robots=off     ignore robots.txt
+#   --user-agent=Mozilla/5.0 present as a browser
+#   --level=inf --accept '*' do not stop at 5 levels or common file types
+#   --reject "index.html*"   drop directory indexes; omit for an exact mirror
+#   --cut-dirs=0             strip N leading path components; 0 keeps the whole domain
 
-wget --recursive ${comment# self-explanatory} \
-  --no-parent ${comment# will not crawl links in folders above the base of the URL} \
-  --convert-links ${comment# convert links with the domain name to relative and uncrawled to absolute} \
-  --random-wait --wait 3 --no-http-keep-alive ${comment# do not get banned} \
-  --no-host-directories ${comment# do not create folders with the domain name} \
-  --execute robots=off --user-agent=Mozilla/5.0 ${comment# I AM A HUMAN!!!} \
-  --level=inf --accept '*' ${comment# do not limit to 5 levels or common file formats} \
-  --reject="index.html*" ${comment# use this option if you need an exact mirror} \
-  --cut-dirs=0 ${comment# replace 0 with the number of folders in the path, 0 for the whole domain} \
-  $1
+set -eu
+
+if [ "$#" -ne 1 ]; then
+  echo "usage: ${0##*/} URL" >&2
+  exit 2
+fi
+
+wget --recursive \
+  --no-parent \
+  --convert-links \
+  --random-wait --wait 3 --no-http-keep-alive \
+  --no-host-directories \
+  --execute robots=off --user-agent=Mozilla/5.0 \
+  --level=inf --accept '*' \
+  --reject "index.html*" \
+  --cut-dirs=0 \
+  "$1"
