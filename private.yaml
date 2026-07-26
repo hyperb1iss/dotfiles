@@ -3,14 +3,28 @@
       relink: true
 
 - link:
-    ~/.claude/AGENTS.md:
+    # AGENTS.md is the canonical name at the source; Claude Code reads CLAUDE.md
+    ~/.claude/CLAUDE.md:
       create: true
+      force: true
       path: ~/dev/dotfiles-private/ai/AGENTS.md
       if: "[ -f ~/dev/dotfiles-private/ai/AGENTS.md ]"
     ~/.codex/AGENTS.md:
       create: true
+      force: true
       path: ~/dev/dotfiles-private/ai/AGENTS.md
       if: "[ -f ~/dev/dotfiles-private/ai/AGENTS.md ]"
+
+- shell:
+    - command: |
+        # Superseded by ~/.claude/CLAUDE.md; leaving it would load the same
+        # instructions twice
+        if [ -L "$HOME/.claude/AGENTS.md" ]; then
+          rm "$HOME/.claude/AGENTS.md"
+          echo "Removed superseded ~/.claude/AGENTS.md link"
+        fi
+      description: Retiring the old Claude agent file link
+      stdout: true
 
 - shell:
     - command: |

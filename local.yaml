@@ -137,9 +137,14 @@
       description: "Installing proto + node/npm"
 
 - shell:
-    - mkdir -p ~/.claude
+    - mkdir -p ~/.claude ~/.agents/skills
 - link:
     ~/.claude/statusline-command.sh: claude/statusline-command.sh
+    # ~/.agents/skills is the source of truth for agent skills. Codex scans it
+    # natively; Claude Code reaches it through this link.
+    ~/.claude/skills:
+      path: ~/.agents/skills
+      force: true
 - shell:
     # Claude Code owns settings.json, so merge in the statusLine key rather than
     # linking the whole file

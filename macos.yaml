@@ -27,10 +27,21 @@
                  ~/.config/ghostty \
                  ~/.config/atuin/themes \
                  ~/.tmux/plugins ~/.claude ~/.codex ~/.proto \
+                 ~/.agents/skills \
                  "$HOME/Library/Application Support/com.mitchellh.ghostty"
       stderr: true
       stdout: true
       description: Creating configuration directories
+    - command: |
+        # Superseded by ~/.claude/CLAUDE.md; leaving it would load the same
+        # instructions twice
+        if [ -L "$HOME/.claude/AGENTS.md" ]; then
+          rm "$HOME/.claude/AGENTS.md"
+          echo "Removed superseded ~/.claude/AGENTS.md link"
+        fi
+      stderr: true
+      stdout: true
+      description: Retiring the old Claude agent file link
     - command: |
         zshrc_target="$HOME/dev/dotfiles/zsh/zshrc"
         zshrc_link="$HOME/.zshrc"
@@ -73,14 +84,22 @@
     ~/.config/atuin/config.toml: atuin/config.toml
     ~/.config/atuin/themes/silkcircuit.toml: atuin/themes/silkcircuit.toml
     ~/.proto/.prototools: proto/.prototools
-    ~/.claude/AGENTS.md:
+    # AGENTS.md is the canonical name at the source; Claude Code reads CLAUDE.md
+    ~/.claude/CLAUDE.md:
       create: true
+      force: true
       path: ~/dev/dotfiles-private/ai/AGENTS.md
       if: "[ -f ~/dev/dotfiles-private/ai/AGENTS.md ]"
     ~/.codex/AGENTS.md:
       create: true
+      force: true
       path: ~/dev/dotfiles-private/ai/AGENTS.md
       if: "[ -f ~/dev/dotfiles-private/ai/AGENTS.md ]"
+    # ~/.agents/skills is the source of truth for agent skills. Codex scans it
+    # natively; Claude Code reaches it through this link.
+    ~/.claude/skills:
+      path: ~/.agents/skills
+      force: true
 
 - shell:
     # Claude Code owns settings.json, so merge in the statusLine key rather than
