@@ -171,14 +171,12 @@ else
   git pull
 fi
 
-# Install or update Dotbot submodule
-if [[ ! -d "dotbot" ]]; then
-  print_step "Installing Dotbot..."
-  git submodule update --init --recursive
-else
-  print_step "Updating Dotbot..."
-  git submodule update --remote dotbot
-fi
+# Sync the Dotbot submodule to the pinned commit. --remote used to be used
+# here, but it tracks the upstream branch tip and silently drifts off the pin;
+# --recursive is required either way, since Dotbot vendors pyyaml as a nested
+# submodule and fails to import yaml when it is left unsynced.
+print_step "Syncing Dotbot..."
+git submodule update --init --recursive
 
 # Ensure Go is installed for fzf
 if ! command -v go &>/dev/null; then
