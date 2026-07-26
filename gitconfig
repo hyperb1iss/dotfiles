@@ -5,8 +5,10 @@
 	cookiefile = ~/.gitcookies
 [core]
 	autocrlf = input
-	# Speed up status/diff in big repos
-	fsmonitor = true
+	# fsmonitor only pays off past ~50k files; below that the per-repo daemon's
+	# cold handshake (~0.8s) stalls starship's git_status past its 500ms timeout.
+	# Enable per-repo (git config core.fsmonitor true) if a repo that big shows up.
+	fsmonitor = false
 	untrackedCache = true
 [init]
 	defaultBranch = main

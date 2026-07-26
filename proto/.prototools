@@ -1,11 +1,12 @@
-moon = "2.2.1"
-proto = "0.54.1"
+# Every tool pinned here loads its plugin on each `proto activate` (every cd),
+# so keep this list to tools proto actually manages. rust lives in rustup and
+# the proto self-pin kept going stale, so both were dropped.
+moon = "2.2.6"
 node = "24.13.1"
 npm = "11.11.0"
 uv = "0.9.30"
 python = "3.13.12"
-rust = "stable"
-pnpm = "11.5.0"
+pnpm = "11.7.0"
 zig = "0.15.2"
 
 [settings]
