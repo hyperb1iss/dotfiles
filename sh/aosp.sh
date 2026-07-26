@@ -36,7 +36,8 @@ alias envsetup='set_android_env'
 function mka() {
   local start_time cores make_args status
   start_time=$(date +%s)
-  cores=$(grep -c ^processor /proc/cpuinfo)
+  # /proc/cpuinfo does not exist on macOS and this module is not platform-gated
+  cores=$(nproc 2> /dev/null || sysctl -n hw.ncpu 2> /dev/null || echo 4)
 
   echo "Building with ${cores} cores..."
 

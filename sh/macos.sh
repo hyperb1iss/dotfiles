@@ -50,12 +50,11 @@ if is_macos; then
   # Open current directory in VSCode
   alias vsc='code .'
 
-  # Add Homebrew's unversioned Python symlinks to PATH
-  if [[ -d /opt/homebrew/opt/python@3.13/libexec/bin ]]; then
-    export PATH="/opt/homebrew/opt/python@3.13/libexec/bin:${PATH}"
-  elif [[ -d /usr/local/opt/python@3.13/libexec/bin ]]; then
-    export PATH="/usr/local/opt/python@3.13/libexec/bin:${PATH}"
-  fi
+  # Homebrew's unversioned Python symlinks used to be prepended here, pinned to
+  # python@3.13. The pin went stale (this box has python@3.14), so the branch
+  # never fired -- and repointing it would have been worse than leaving it
+  # broken, since prepending shadows proto's python shim. proto is the source
+  # of truth for Python versions, exactly as it is for Node.
 
   # Accurate APFS disk free space (df -h lies on macOS)
   alias diskfree='diskutil info / | grep -E "Container (Free|Total) Space"'

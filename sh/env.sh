@@ -5,13 +5,25 @@
 # Ensure LS_COLORS is set if dircolors exists
 # (~/.dircolors is installed by the SilkCircuit installer; minimal boxes
 # may not have it, so don't spray errors at every startup)
-if has_command dircolors && [[ -f ~/.dircolors ]]; then
-  eval "$(dircolors -b ~/.dircolors)" || true
+# Homebrew's coreutils installs GNU dircolors as `gdircolors`, so probe both
+# names -- checking only `dircolors` meant LS_COLORS was empty on every macOS
+# shell, silently disabling the SilkCircuit ls/completion colours.
+if [[ -f ~/.dircolors ]]; then
+  if has_command dircolors; then
+    eval "$(dircolors -b ~/.dircolors)" || true
+  elif has_command gdircolors; then
+    eval "$(gdircolors -b ~/.dircolors)" || true
+  fi
 fi
 
 # Development tool configurations
 export USE_CCACHE=1
-export CCACHE_EXEC=/usr/bin/ccache
+# Resolve ccache rather than hardcoding /usr/bin/ccache, which does not exist
+# on Homebrew installs.
+if has_command ccache; then
+  CCACHE_EXEC="$(command -v ccache)"
+  export CCACHE_EXEC
+fi
 
 # Development paths
 export GOPATH=~/dev/go

@@ -96,11 +96,13 @@ zstyle ':completion:*:descriptions' format $'\e[38;2;128;255;234m── %d ─�
 zstyle ':completion:*:messages' format $'\e[38;2;241;250;140m%d\e[0m'
 zstyle ':completion:*:warnings' format $'\e[38;2;255;99;99mNo matches for: %d\e[0m'
 
-# Preview directory contents with eza (fallback to ls)
-zstyle ':fzf-tab:complete:cd:*' fzf-preview 'eza -1 --color=always --icons $realpath 2>/dev/null || ls -1 $realpath'
+# Preview directory contents with lsd (fallback to ls). This used to call eza,
+# which is not installed anywhere in this setup -- lsd is the ls replacement
+# the rest of the repo standardizes on, and the only one with config here.
+zstyle ':fzf-tab:complete:cd:*' fzf-preview 'lsd -1 --color=always --icon=always $realpath 2>/dev/null || ls -1 $realpath'
 
 # Preview files with bat (fallback to cat)
-zstyle ':fzf-tab:complete:*:*' fzf-preview 'bat --color=always --style=numbers --line-range=:100 $realpath 2>/dev/null || cat $realpath 2>/dev/null || eza -1 --color=always $realpath 2>/dev/null'
+zstyle ':fzf-tab:complete:*:*' fzf-preview 'bat --color=always --style=numbers --line-range=:100 $realpath 2>/dev/null || cat $realpath 2>/dev/null || lsd -1 --color=always $realpath 2>/dev/null'
 
 # Switch groups with < and >
 zstyle ':fzf-tab:*' switch-group '<' '>'

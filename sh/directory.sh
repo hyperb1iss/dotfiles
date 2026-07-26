@@ -25,7 +25,9 @@ function take() {
 
 # Show directory size in human readable format
 function duh() {
-  du -h --max-depth=1 "${1:-.}" | sort -hr
+  # -d 1 is the portable spelling; --max-depth is GNU-only and BSD du
+  # (macOS) rejects it outright.
+  du -h -d 1 "${1:-.}" | sort -hr
 }
 
 # Quick find files in current directory
