@@ -32,7 +32,7 @@ New-Alias -Name wget -Value Invoke-WebRequest -Force
 New-Alias -Name pkill -Value Stop-Process -Force
 New-Alias -Name ifconfig -Value ipconfig -Force
 
-# Clear screen with startup banner
+# Clear screen while respecting the daily startup banner cadence
 function Clear-Host-Custom {
     Clear-Host
     Show-HyperShellStartup
@@ -43,4 +43,4 @@ Set-Alias -Name clear -Value Clear-Host-Custom
 function Get-History-Custom {
     Get-History | Select-Object -Property CommandLine
 }
-Set-Alias -Name history -Value Get-History-Custom 
+Set-Alias -Name history -Value Get-History-Custom

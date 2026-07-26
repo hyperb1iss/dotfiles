@@ -3,7 +3,7 @@
 # Import essential modules
 Import-Module PSReadLine
 Import-Module posh-git
-Import-Module Terminal-Icons
+if (Get-Module -ListAvailable -Name Terminal-Icons) { Import-Module Terminal-Icons -ErrorAction SilentlyContinue }
 
 # Configure PSReadLine for Linux-style keybindings
 Set-PSReadLineOption -EditMode Emacs
