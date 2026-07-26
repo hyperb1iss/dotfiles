@@ -22,7 +22,6 @@ choco upgrade -y `
     vscode `
     nodejs `
     python `
-    rust `
     fzf `
     ripgrep `
     bat `
@@ -47,6 +46,36 @@ choco upgrade -y `
     delta `
     zoxide
 
+# ── Rust ─────────────────────────────────────────────────────────────────────
+# Rust comes from rustup, never Chocolatey.
+#
+# Chocolatey's `rust` package drops a GNU-host toolchain into
+# C:\ProgramData\chocolatey\bin, which lives in the *system* PATH. Windows
+# evaluates system PATH before user PATH, and ~\.cargo\bin is in the user
+# PATH, so the Chocolatey copy shadows rustup no matter what Add-ToPath does
+# further down this script. Projects then build against a mingw linker and
+# fail with "cannot execute 'ld'", or hit E0514 rustc-mismatch errors against
+# artifacts an earlier rustup build left in target/.
+#
+# rustup is also the only installer that honours a repo's rust-toolchain.toml,
+# which several projects here pin.
+if (Test-Path "C:\ProgramData\chocolatey\lib\rust") {
+    Write-Host "Removing Chocolatey's rust package (it shadows rustup)..." -ForegroundColor Yellow
+    choco uninstall rust -y
+}
+
+if (!(Get-Command rustup -ErrorAction SilentlyContinue)) {
+    Write-Host "Installing rustup (MSVC host)..." -ForegroundColor Yellow
+    $rustupInit = Join-Path $env:TEMP "rustup-init.exe"
+    Invoke-WebRequest -Uri "https://win.rustup.rs/x86_64" -OutFile $rustupInit
+    & $rustupInit -y --default-host x86_64-pc-windows-msvc --default-toolchain stable
+    Remove-Item $rustupInit -Force -ErrorAction SilentlyContinue
+}
+else {
+    Write-Host "Updating rustup..." -ForegroundColor Yellow
+    rustup self update
+    rustup update stable
+}
 
 # Diagnostic function
 function Test-PowerShellModules {
