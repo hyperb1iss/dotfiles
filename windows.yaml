@@ -8,6 +8,16 @@
 
 - clean: ["~"]
 
+- shell:
+    # The skills hub has to exist before Claude Code can be linked at it
+    - command:
+        powershell.exe -NoProfile -Command "[void](New-Item -ItemType Directory -Force
+        -Path $HOME/.agents/skills)"
+      stdin: true
+      stdout: true
+      stderr: true
+      description: Ensuring the ~/.agents skills hub exists
+
 - link:
     # Starship prompt config comes from the SilkCircuit repo
     # (clone https://github.com/hyperb1iss/silkcircuit and run install.ps1)
@@ -23,13 +33,23 @@
     ~/AppData/Roaming/fastfetch/config.jsonc: fastfetch/config.jsonc
     # Claude Code configuration
     ~/.claude/statusline-command.sh: claude/statusline-command.sh
-    # Claude Code / Codex agent files (from dotfiles-private)
+    # Claude Code / Codex agent files (from dotfiles-private).
+    # dotbot runs `if` through cmd.exe here, so the guard must be cmd syntax; a
+    # POSIX `[ -f ... ]` test always exits non-zero and skips the link in silence.
+    # force is required because both destinations start life as regular files.
     ~/.claude/CLAUDE.md:
       path: ~/dev/dotfiles-private/ai/AGENTS.md
-      if: "[ -f ~/dev/dotfiles-private/ai/AGENTS.md ]"
+      force: true
+      if: 'if exist "%USERPROFILE%\dev\dotfiles-private\ai\AGENTS.md" (exit 0) else (exit 1)'
     ~/.codex/AGENTS.md:
       path: ~/dev/dotfiles-private/ai/AGENTS.md
-      if: "[ -f ~/dev/dotfiles-private/ai/AGENTS.md ]"
+      force: true
+      if: 'if exist "%USERPROFILE%\dev\dotfiles-private\ai\AGENTS.md" (exit 0) else (exit 1)'
+    # ~/.agents/skills is the source of truth for agent skills. Codex scans it
+    # natively; Claude Code reaches it through this link.
+    ~/.claude/skills:
+      path: ~/.agents/skills
+      force: true
 
 - shell:
     # Ensure fastfetch config directory exists on Windows
