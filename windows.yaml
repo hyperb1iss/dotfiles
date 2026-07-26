@@ -43,7 +43,7 @@
 
     # Claude Code owns settings.json, so merge in the statusLine key rather than
     # linking the whole file
-    - command: pwsh -NoProfile -ExecutionPolicy Bypass -File ./hypershell/install-claude-statusline.ps1
+    - command: python ./claude/install-statusline.py
       stdin: true
       stdout: true
       stderr: true

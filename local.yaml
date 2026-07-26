@@ -140,6 +140,13 @@
     - mkdir -p ~/.claude
 - link:
     ~/.claude/statusline-command.sh: claude/statusline-command.sh
+- shell:
+    # Claude Code owns settings.json, so merge in the statusLine key rather than
+    # linking the whole file
+    - command: python3 ./claude/install-statusline.py
+      stdout: true
+      stderr: true
+      description: Wiring Claude Code status line
 
 - shell:
     - mkdir -p ~/.config/atuin/themes

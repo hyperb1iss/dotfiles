@@ -83,6 +83,14 @@
       if: "[ -f ~/dev/dotfiles-private/ai/AGENTS.md ]"
 
 - shell:
+    # Claude Code owns settings.json, so merge in the statusLine key rather than
+    # linking the whole file
+    - command: python3 ./claude/install-statusline.py
+      stdout: true
+      stderr: true
+      description: Wiring Claude Code status line
+
+- shell:
     - command: |
         # Install private fonts to macOS user font directory
         if [ -d "$HOME/dev/dotfiles-private/fonts" ]; then
