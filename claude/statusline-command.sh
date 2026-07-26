@@ -86,28 +86,40 @@ fg_white=$'\033[38;2;255;255;255m'
 reset=$'\033[0m'
 
 # Glyphs are written as escapes rather than literal characters so that editors,
-# patches, and copy-paste cannot silently strip them.
-POWERLINE_SEP_RIGHT_FILLED=$'\uE0B0'  # from left segment to next (LTR)
-POWERLINE_SEP_RIGHT_THIN=$'\uE0B1'
-POWERLINE_SEP_LEFT_FILLED=$'\uE0B2'   # from right segment to previous (RTL)
-POWERLINE_SEP_LEFT_THIN=$'\uE0B3'
+# patches, and copy-paste cannot silently strip them. These are raw UTF-8 bytes
+# because \u and \U escapes need bash 4.2 and macOS ships 3.2, where they pass
+# through as the literal text "\uE0B0".
+POWERLINE_SEP_RIGHT_FILLED=$'\xee\x82\xb0'  # U+E0B0, left segment to next (LTR)
+POWERLINE_SEP_RIGHT_THIN=$'\xee\x82\xb1'    # U+E0B1
+POWERLINE_SEP_LEFT_FILLED=$'\xee\x82\xb2'   # U+E0B2, right segment to previous
+POWERLINE_SEP_LEFT_THIN=$'\xee\x82\xb3'     # U+E0B3
 
-ICON_GIT=$'\uE725'
-ICON_BULLET=$'\u2022'
-ICON_ELLIPSIS=$'\u2026'
-ICON_MIDDOT=$'\u00B7'
+ICON_GIT=$'\xee\x9c\xa5'      # U+E725
+ICON_BULLET=$'\xe2\x80\xa2'   # U+2022
+ICON_ELLIPSIS=$'\xe2\x80\xa6' # U+2026
+ICON_MIDDOT=$'\xc2\xb7'       # U+00B7
 
-# These six sit above U+FFFF. Bash on Windows stores strings as UTF-16 and so
+# These five sit above U+FFFF. Bash on Windows stores strings as UTF-16 and so
 # measures each as two units, while the terminal draws a single cell.
-ICON_NODE=$'\U000F0399'
-ICON_K8S=$'\U000F10FE'
-ICON_MODEL=$'\U000F0B7B'
-ICON_TOKEN=$'\U000F06A9'
-ICON_CLOCK=$'\U000F144D'
+ICON_NODE=$'\xf3\xb0\x8e\x99'  # U+F0399
+ICON_K8S=$'\xf3\xb1\x83\xbe'   # U+F10FE
+ICON_MODEL=$'\xf3\xb0\xad\xbb' # U+F0B7B
+ICON_TOKEN=$'\xf3\xb0\x9a\xa9' # U+F06A9
+ICON_CLOCK=$'\xf3\xb1\x91\x8d' # U+F144D
 
 ASTRAL_ICONS="@($ICON_NODE|$ICON_K8S|$ICON_MODEL|$ICON_TOKEN|$ICON_CLOCK)"
 astral_probe="$ICON_NODE"
 astral_units=${#astral_probe}
+
+# Format the current time, result in $REPLY. printf's %()T needs bash 4.2, which
+# rules it out on macOS, so bind the cheap builtin once where it exists and pay
+# for date(1) only where it does not.
+if [ "${BASH_VERSINFO[0]:-0}" -gt 4 ] ||
+    { [ "${BASH_VERSINFO[0]:-0}" -eq 4 ] && [ "${BASH_VERSINFO[1]:-0}" -ge 2 ]; }; then
+    now_fmt() { printf -v REPLY "%($1)T" -1; }
+else
+    now_fmt() { REPLY=$(date "+$1"); }
+fi
 
 # Visible cell width of a string, result in $REPLY. Off Windows ${#s} is already
 # correct and the astral discount below is a no-op.
@@ -191,7 +203,8 @@ tech_info=""
 # the status line redraws. Cache the rendered segment per directory, since the
 # node version is the one part that varies with location.
 TECH_TTL=60
-printf -v now '%(%s)T' -1
+now_fmt %s
+now="$REPLY"
 cache_dir="${XDG_CACHE_HOME:-$HOME/.cache}/silkcircuit"
 cache_key="${dir_norm//[^a-zA-Z0-9]/_}"
 [ ${#cache_key} -gt 60 ] && cache_key="${cache_key: -60}"
@@ -271,8 +284,10 @@ if [ -n "$output_style" ] && [ "$output_style" != "default" ]; then
 fi
 
 # Time
-printf -v current_time '%(%I:%M%p)T' -1
-current_time="${current_time,,}"
+now_fmt '%I:%M%p'
+current_time="$REPLY"
+current_time="${current_time/AM/am}"
+current_time="${current_time/PM/pm}"
 current_time="${current_time#0}"
 if [ -n "$right_content" ]; then
     right_content="$right_content $ICON_CLOCK $current_time"
