@@ -1,0 +1,8 @@
+# pnpm 10+ reads overrides and build-script approval from here, not from the
+# "pnpm" field in package.json (which it now silently ignores).
+allowBuilds:
+  esbuild: true
+
+overrides:
+  esbuild: ">=0.28.1"
+  picomatch: ">=4.0.4"
