@@ -22,7 +22,6 @@
     # Fastfetch configuration (Windows path)
     ~/AppData/Roaming/fastfetch/config.jsonc: fastfetch/config.jsonc
     # Claude Code configuration
-    ~/.claude/settings.json: claude/settings.json
     ~/.claude/statusline-command.sh: claude/statusline-command.sh
     # Claude Code / Codex agent files (from dotfiles-private)
     ~/.claude/CLAUDE.md:
@@ -41,6 +40,14 @@
       stdout: true
       stderr: true
       description: Create fastfetch config directory
+
+    # Claude Code owns settings.json, so merge in the statusLine key rather than
+    # linking the whole file
+    - command: pwsh -NoProfile -ExecutionPolicy Bypass -File ./hypershell/install-claude-statusline.ps1
+      stdin: true
+      stdout: true
+      stderr: true
+      description: Wiring Claude Code status line
 
 - shell:
     # Run the Windows setup script
