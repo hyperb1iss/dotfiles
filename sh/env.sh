@@ -33,7 +33,7 @@ if is_macos; then
 
   if [[ "${_current_open_files}" != "unlimited" &&
     "${_current_open_files}" -lt "${_desired_open_files}" ]]; then
-    ulimit -Sn "${_desired_open_files}" 2>/dev/null || true
+    ulimit -Sn "${_desired_open_files}" 2> /dev/null || true
   fi
 
   unset _desired_open_files _current_open_files _hard_open_files
