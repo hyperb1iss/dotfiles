@@ -18,6 +18,27 @@ fi
 
 # Development tool configurations
 export USE_CCACHE=1
+
+# GUI terminals inherit launchd's tiny 256-file soft limit on macOS. Raise
+# the shell limit before starting watcher-heavy tools such as moon and Next.js.
+if is_macos; then
+  _desired_open_files=65536
+  _current_open_files="$(ulimit -Sn)"
+  _hard_open_files="$(ulimit -Hn)"
+
+  if [[ "${_hard_open_files}" != "unlimited" &&
+    "${_hard_open_files}" -lt "${_desired_open_files}" ]]; then
+    _desired_open_files="${_hard_open_files}"
+  fi
+
+  if [[ "${_current_open_files}" != "unlimited" &&
+    "${_current_open_files}" -lt "${_desired_open_files}" ]]; then
+    ulimit -Sn "${_desired_open_files}" 2> /dev/null || true
+  fi
+
+  unset _desired_open_files _current_open_files _hard_open_files
+fi
+
 # Resolve ccache rather than hardcoding /usr/bin/ccache, which does not exist
 # on Homebrew installs.
 if has_command ccache; then
