@@ -93,7 +93,13 @@
 # version moved to install.ps1 too, where the one administrator check lives.
 - shell:
     # Run the Windows setup script
-    - command: powershell.exe -ExecutionPolicy Bypass -File ./hypershell/setup-windows.ps1
+    # pwsh first: the setup script targets PowerShell 7 semantics, and by
+    # this point install.ps1 has already installed it from the manifest.
+    # Windows PowerShell 5.1 stays as the fallback for a bootstrap where
+    # the package tier was skipped.
+    - command:
+        where pwsh > nul 2>&1 && (pwsh -NoProfile -ExecutionPolicy Bypass -File ./hypershell/setup-windows.ps1) ||
+        powershell.exe -ExecutionPolicy Bypass -File ./hypershell/setup-windows.ps1
       stdin: true
       stdout: true
       stderr: true
