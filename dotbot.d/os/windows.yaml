@@ -100,15 +100,25 @@
       stderr: true
       description: Running Windows setup script
 
-    # Install Rust components
-    - command: rustup component add rls rust-analysis rust-src
+    # Rust components for editor tooling. rls and its rust-analysis data
+    # component were retired from rustup years ago, so asking for them
+    # fails the step and, dotbot being dotbot, the run. rust-analyzer plus
+    # the std sources it reads are the live equivalents.
+    # `where` is the cmd spelling of `command -v`: no rustup means skip,
+    # not fail, which matters on a box that never wanted Rust.
+    - command:
+        where rustup > nul 2>&1 && (rustup component add rust-src rust-analyzer || echo skipped rustup components) ||
+        echo skipped rustup, not on PATH
       stdin: true
       stdout: true
       stderr: true
       description: Installing Rust components
 
-    # Install pynvim for Neovim Python support
-    - command: pip install pynvim
+    # pynvim for Neovim's Python host. Guarded the same way: the winget
+    # Python row puts pip on PATH, but -SkipPackages and the server role
+    # are both ways to arrive here without it.
+    - command:
+        where pip > nul 2>&1 && (pip install pynvim || echo skipped pynvim) || echo skipped pynvim, pip not on PATH
       stdin: true
       stdout: true
       stderr: true
