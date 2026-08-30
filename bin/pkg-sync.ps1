@@ -1,7 +1,7 @@
 #Requires -Version 5.1
 <#
 .SYNOPSIS
-    pkg-sync.ps1 ⚡ resolve and install packages.conf on Windows
+    pkg-sync.ps1 - resolve and install packages.conf on Windows
 
 .DESCRIPTION
     The PowerShell half of bin/pkg-sync. It reads the same packages.conf
@@ -52,7 +52,7 @@ $script:ExitCode = 0
 # exit code the bash twin uses. Go straight to stderr instead.
 function Write-Fail {
     param([Parameter(Mandatory = $true)][string]$Message)
-    [Console]::Error.WriteLine("✖ pkg-sync: $Message")
+    [Console]::Error.WriteLine("[!!] pkg-sync: $Message")
     $script:ExitCode = 2
 }
 
@@ -62,7 +62,7 @@ function Get-RepoRoot {
 
 function Show-Usage {
     @'
-pkg-sync.ps1 ⚡ resolve and install packages from packages.conf
+pkg-sync.ps1 - resolve and install packages from packages.conf
 
 usage:
   pkg-sync.ps1 list [<manager>] [<role>]
@@ -198,13 +198,13 @@ function Install-WingetPackage {
             Write-Output "  winget $($wingetArgs -join ' ')"
             continue
         }
-        Write-Output "📦 winget install $id"
+        Write-Output "  winget install $id"
         & winget @wingetArgs
         # winget returns a non-zero code for "already installed" as well as
         # for a genuine failure, so the exit code only decides whether to
         # say something, never whether to stop.
         if ($LASTEXITCODE -ne 0) {
-            Write-Output "⚠ skipped: $id (winget exit $LASTEXITCODE)"
+            Write-Output "[warn] skipped: $id (winget exit $LASTEXITCODE)"
         }
     }
 }
@@ -261,11 +261,11 @@ function Invoke-Main {
     }
 
     if ($packages.Count -eq 0) {
-        Write-Output "▸ no winget packages for role $resolvedRole"
+        Write-Output ">> no winget packages for role $resolvedRole"
         return
     }
 
-    Write-Output "▸ installing winget packages for role $resolvedRole"
+    Write-Output ">> installing winget packages for role $resolvedRole"
     Install-WingetPackage -Ids $packages -WhatIfOnly:$DryRun
 }
 

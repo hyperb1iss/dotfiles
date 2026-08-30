@@ -80,6 +80,9 @@
       stderr: true
       description: Wiring Claude Code status line
 
+# Packages come from packages.conf now, resolved by bin/pkg-sync.ps1 and
+# installed by install.ps1 before this layer runs. Setting the default WSL
+# version moved to install.ps1 too, where the one administrator check lives.
 - shell:
     # Run the Windows setup script
     - command: powershell.exe -ExecutionPolicy Bypass -File ./hypershell/setup-windows.ps1
@@ -95,23 +98,9 @@
       stderr: true
       description: Installing Rust components
 
-    # Install fastfetch (silent; ignore if already present)
-    - command: powershell.exe -NoProfile -Command "winget install --id fastfetch-cli.fastfetch -e --silent; exit 0"
-      stdin: true
-      stdout: true
-      stderr: true
-      description: Installing fastfetch via winget
-
     # Install pynvim for Neovim Python support
     - command: pip install pynvim
       stdin: true
       stdout: true
       stderr: true
       description: Installing pynvim
-
-    # Set WSL 2 as the default version
-    - command: wsl --set-default-version 2
-      stdin: true
-      stdout: true
-      stderr: true
-      description: Setting WSL 2 as the default version
