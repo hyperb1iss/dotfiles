@@ -1,3 +1,7 @@
+# Private overlay: everything that reaches into ~/dev/dotfiles-private.
+#
+# The Makefile appends this layer to the composed install whenever that repo
+# is checked out, and `make private` runs it on its own.
 - defaults:
     link:
       relink: true

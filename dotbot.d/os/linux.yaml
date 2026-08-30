@@ -1,0 +1,103 @@
+# Linux layer: XDG paths, systemd wiring, and the desktop stack.
+#
+# The server role composes without this file (see the Makefile), so everything
+# here can assume a graphical Linux box. Anything a server needs belongs in
+# base.yaml or role/server.yaml instead.
+- defaults:
+    link:
+      relink: true
+      force: true
+      create: true
+
+- shell:
+    - command: |
+        # Private Pragmata Pro faces are dropped into the repo's fonts/ dir so
+        # the ~/.fonts link picks them up
+        if [ -d ~/dev/dotfiles-private ]; then
+          ln -sf ~/dev/dotfiles-private/fonts/Pragmata\ Pro fonts/
+        fi
+      description: Linking private Pragmata Pro fonts
+
+    - command: |
+        # repo may already come from the system package manager
+        if ! command -v repo >/dev/null 2>&1; then
+          curl -fsSL https://storage.googleapis.com/git-repo-downloads/repo > ~/bin/repo
+          chmod +x ~/bin/repo
+        fi
+      description: "Installing repo tool if missing"
+
+    - command: |
+        # Install Rust toolchain and CLI tools
+        rustup toolchain install stable
+        # Add cargo to PATH (apt rustup doesn't create ~/.cargo/env)
+        export PATH="$HOME/.cargo/bin:$PATH"
+        if command -v cargo &> /dev/null; then
+          # Skip tools the system package manager already provides —
+          # on Arch everything here ships via pacman, so this compiles
+          # nothing; it's the fallback path for apt-based systems
+          grep -v '^#\|^$' cargo-tools.txt | sed 's/#.*//' | awk '{print $1}' |
+            while read -r crate; do
+              case "${crate}" in
+                fd-find) bin=fd ;;
+                ripgrep) bin=rg ;;
+                git-delta) bin=delta ;;
+                *) bin="${crate}" ;;
+              esac
+              if ! command -v "${bin}" >/dev/null 2>&1; then
+                echo "📦 cargo install ${crate}"
+                cargo install "${crate}"
+              fi
+            done
+        fi
+      stderr: true
+      stdout: true
+      description: "Installing Rust toolchain + CLI tools"
+
+- link:
+    ~/.config/fontconfig/fonts.conf: fonts/fonts.conf
+    ~/.config/ghostty/config: ghostty/config
+    ~/.config/ghostty/linux.conf: ghostty/linux.conf
+    # GIMP and Blender read XDG paths on Linux only; macOS keeps both under
+    # ~/Library/Application Support, so these stay out of the desktop role
+    ~/.config/GIMP/3.2/gimprc: gimp/gimprc
+    ~/.config/GIMP/3.2/palettes/SilkCircuit.gpl: gimp/palettes/SilkCircuit.gpl
+    ~/.config/blender/5.0/scripts/startup/print3d_defaults.py: blender/startup/print3d_defaults.py
+    ~/.config/ignis: ignis
+    ~/.config/systemd/user/ignis.service: ignis/ignis.service
+    ~/.config/pipewire/pipewire.conf.d/10-low-latency.conf: pipewire/pipewire.conf.d/10-low-latency.conf
+    ~/.config/pipewire/pipewire-pulse.conf.d/10-low-latency.conf: pipewire/pipewire-pulse.conf.d/10-low-latency.conf
+    ~/.config/containers/storage.conf: containers/storage.conf
+    ~/.config/containers/storage.conf.d: containers/storage.conf.d
+    ~/.config/containers/containers.conf: containers/containers.conf
+
+- shell:
+    - command: |
+        # gtk-custom-css points here; default to the neon variant but leave
+        # machine-local choices (e.g. glow to match auto/theme.ghostty) alone.
+        # The variants themselves are copied in by the SilkCircuit installer.
+        if [ ! -e ~/.config/ghostty/silkcircuit.css ] && [ ! -L ~/.config/ghostty/silkcircuit.css ]; then
+          ln -s ~/.config/ghostty/themes/silkcircuit-neon.css ~/.config/ghostty/silkcircuit.css
+        fi
+      description: "Linking Ghostty SilkCircuit CSS"
+
+    - command: |
+        # Enable Ignis desktop widgets on login
+        if command -v ignis >/dev/null 2>&1; then
+          systemctl --user daemon-reload
+          systemctl --user enable ignis.service 2>/dev/null || true
+          echo "Ignis desktop widgets enabled"
+        else
+          echo "Ignis not installed — run: paru -S python-ignis"
+        fi
+      stdout: true
+      description: "Enabling Ignis desktop widgets"
+
+    - command: |
+        # Enable rootless Podman socket for Docker Compose compatibility
+        if command -v podman >/dev/null 2>&1; then
+          systemctl --user enable --now podman.socket 2>/dev/null || true
+          echo "Podman socket enabled at $XDG_RUNTIME_DIR/podman/podman.sock"
+        fi
+      stderr: true
+      stdout: true
+      description: "Enabling rootless Podman socket"

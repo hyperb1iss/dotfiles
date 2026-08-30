@@ -67,10 +67,15 @@ function has_command() {
   command -v "$1" > /dev/null 2>&1
 }
 
-# Installation type detection
+# Installation role detection. `make install` writes the composed role
+# (desktop or server) to .dotfiles_role; .install_state is the pre-layers
+# name, still read so a machine that has not reinstalled keeps its role.
 DOTFILES_INSTALLATION_TYPE="unknown"
-if [[ -r "${HOME}/dev/dotfiles/.install_state" ]]; then
+if [[ -r "${HOME}/dev/dotfiles/.dotfiles_role" ]]; then
+  IFS= read -r DOTFILES_INSTALLATION_TYPE < "${HOME}/dev/dotfiles/.dotfiles_role"
+elif [[ -r "${HOME}/dev/dotfiles/.install_state" ]]; then
   IFS= read -r DOTFILES_INSTALLATION_TYPE < "${HOME}/dev/dotfiles/.install_state"
+  [[ "${DOTFILES_INSTALLATION_TYPE}" = "minimal" ]] && DOTFILES_INSTALLATION_TYPE="server"
 fi
 
 function get_installation_type() {
@@ -78,11 +83,11 @@ function get_installation_type() {
 }
 
 function is_minimal() {
-  [[ "${DOTFILES_INSTALLATION_TYPE}" = "minimal" ]]
+  [[ "${DOTFILES_INSTALLATION_TYPE}" = "server" ]]
 }
 
 function is_full() {
-  [[ "${DOTFILES_INSTALLATION_TYPE}" = "full" ]]
+  [[ "${DOTFILES_INSTALLATION_TYPE}" != "server" && "${DOTFILES_INSTALLATION_TYPE}" != "unknown" ]]
 }
 
 # Safe source function that doesn't break on errors

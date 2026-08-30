@@ -1,3 +1,6 @@
+# Linux system layer: the sudo tier. Run on its own (`make system`, which
+# `make full` calls first) because dotbot inherits root's HOME here and must
+# not touch anything under the user's home directory.
 - defaults:
     link:
       relink: true
@@ -54,8 +57,8 @@
           grep -v '^#\|^$' packages.txt | while read -r pkg; do
             sudo apt install -y --no-install-recommends "$pkg" || echo "⚠ skipped: $pkg"
           done
-          # Rust toolchain + cargo tools are user-scope: local.yaml handles
-          # them so they land in ~/.cargo, not /root/.cargo.
+          # Rust toolchain + cargo tools are user-scope: the Linux layer
+          # handles them so they land in ~/.cargo, not /root/.cargo.
 
           # Install Podman on Ubuntu/Debian (if not using Arch)
           if ! command -v podman >/dev/null 2>&1; then

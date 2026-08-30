@@ -1,0 +1,57 @@
+# macOS layer: Apple-only paths plus the Homebrew tier.
+#
+# Composed after base.yaml, so SilkCircuit has already dropped its bat and
+# ghostty themes by the time brew and `bat cache --build` run here.
+- defaults:
+    link:
+      relink: true
+      force: true
+      create: true
+
+- link:
+    ~/.bash_profile: bash/bash_profile
+    ~/.config/karabiner/karabiner.json: macos/karabiner.json
+    # Ghostty on macOS reads its config out of Application Support, not XDG
+    ~/Library/Application Support/com.mitchellh.ghostty/config: ghostty/config
+    ~/Library/Application Support/com.mitchellh.ghostty/macos.conf: ghostty/macos.conf
+
+- shell:
+    - command: |
+        # Install private fonts to macOS user font directory
+        if [ -d "$HOME/dev/dotfiles-private/fonts" ]; then
+          mkdir -p "$HOME/Library/Fonts"
+          find "$HOME/dev/dotfiles-private/fonts" -type f \( -name '*.ttf' -o -name '*.otf' \) -exec cp -v {} "$HOME/Library/Fonts/" \;
+          echo "✓ Private fonts installed to ~/Library/Fonts/"
+        else
+          echo "⚠️ dotfiles-private/fonts not found — skipping font install"
+        fi
+      stderr: true
+      stdout: true
+      description: Installing private fonts
+
+    - command: |
+        # Run macOS-specific setup script
+        ./macos/brew.sh
+      stderr: true
+      stdout: true
+      description: Installing Homebrew packages
+
+    - command: |
+        if command -v bat >/dev/null 2>&1; then
+          bat cache --build
+        else
+          echo "Warning: bat not found, skipping theme cache rebuild"
+        fi
+      description: Rebuilding bat theme cache
+      stdout: true
+
+    - command: |
+        # Set up macOS-specific configurations
+        if command -v brew >/dev/null 2>&1; then
+          ./macos/macos_config.sh
+        else
+          echo "Warning: Homebrew not found, skipping macOS settings"
+        fi
+      stderr: true
+      stdout: true
+      description: Configuring macOS settings

@@ -1,29 +1,12 @@
+# Server role: headless boxes and containers.
+#
+# The Makefile composes this without the os/ layer, so a server gets base.yaml
+# plus the small package tier below and nothing that assumes a display.
 - defaults:
     link:
       relink: true
-
-- clean: ["~"]
-
-- link:
-    ~/.bashrc.local: bash/bashrc.local
-    ~/.gitconfig:
-    ~/.tmux.conf:
-    ~/.zshrc: zsh/zshrc
-    ~/.config/nvim: nvim
-    ~/bin: bin
-
-- shell:
-    - command: |
-        # SilkCircuit theming (starship, dircolors, bat, git colors) is
-        # owned by its own repo + installer, same as the full profile
-        if [ ! -d ~/dev/silkcircuit ]; then
-          echo "🔮 Cloning SilkCircuit theme repo..."
-          git clone https://github.com/hyperb1iss/silkcircuit ~/dev/silkcircuit
-        fi
-        (cd ~/dev/silkcircuit && ./install.sh -y)
-      stderr: true
-      stdout: true
-      description: "Installing SilkCircuit themes"
+      force: true
+      create: true
 
 - shell:
     - command: |
@@ -31,16 +14,18 @@
           # Arch Linux setup
           sudo pacman -Syu --noconfirm
           sudo pacman -S --needed --noconfirm $(grep -v '^#\|^$' packages_arch_minimal.txt)
-        else
+        elif command -v apt >/dev/null 2>&1; then
           # Ubuntu/Debian setup
           sudo add-apt-repository -y ppa:git-core/ppa
           sudo apt update
           grep -v '^#\|^$' packages_minimal.txt | xargs sudo apt install -y
+        else
+          echo "No supported package manager found, skipping package install"
         fi
       stderr: true
       stdout: true
+      description: Installing minimal package set
 
-- shell:
     - command: |
         if command -v update-alternatives >/dev/null 2>&1; then
           sudo update-alternatives --install /usr/bin/editor editor /usr/bin/nvim 60
@@ -48,17 +33,13 @@
         fi
       stderr: true
       stdout: true
+      description: Pointing editor alternatives at nvim
 
-- shell:
-    - mkdir -p ~/.tmux/plugins
-- link:
-    ~/.tmux/plugins/tpm: tpm
-
-- shell:
     - command: |
-        # Starship binary (config comes from the SilkCircuit installer above)
+        # Starship binary (config comes from the SilkCircuit installer in base)
         if ! command -v starship >/dev/null 2>&1; then
           curl -sS https://starship.rs/install.sh | sh -s -- --yes
         fi
       stderr: true
       stdout: true
+      description: Installing starship

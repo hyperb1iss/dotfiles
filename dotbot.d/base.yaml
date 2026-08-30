@@ -1,0 +1,58 @@
+# Base layer: what every machine gets, on every OS and in every role.
+#
+# The Makefile composes layers as a single dotbot run:
+#   base.yaml -> os/<os>.yaml -> role/<role>.yaml -> host/<host>.yaml
+# Dotbot concatenates every -c file into one task list, so base runs first and
+# anything a later layer depends on (SilkCircuit themes, the core links) is
+# already in place by the time that layer is reached.
+#
+# `defaults` replaces rather than merges, and it carries across the file
+# boundary because the configs are one list. Every layer therefore declares
+# its own defaults block instead of inheriting whatever ran before it.
+- defaults:
+    link:
+      relink: true
+      force: true
+      create: true
+
+# Exactly one clean pass for the whole composition.
+- clean: ["~"]
+
+- shell:
+    - command: |
+        # SilkCircuit theming is owned by its own repo + installer, which
+        # detects apps and copies themes into place (bat, starship, ghostty,
+        # dircolors, git include, k9s, and friends).
+        if [ ! -d ~/dev/silkcircuit ]; then
+          echo "🔮 Cloning SilkCircuit theme repo..."
+          git clone https://github.com/hyperb1iss/silkcircuit ~/dev/silkcircuit
+        fi
+        (cd ~/dev/silkcircuit && ./install.sh -y)
+      stderr: true
+      stdout: true
+      description: "Installing SilkCircuit themes"
+
+    - command: |
+        # Links force through whatever squats the path, so move a real
+        # ~/.zshrc aside rather than destroying it.
+        zshrc_target="$HOME/dev/dotfiles/zsh/zshrc"
+        zshrc_link="$HOME/.zshrc"
+        if [ -e "$zshrc_link" ] || [ -L "$zshrc_link" ]; then
+          if [ "$(readlink "$zshrc_link" 2>/dev/null || true)" != "$zshrc_target" ]; then
+            backup_path="${zshrc_link}.pre-dotfiles.$(date +%Y%m%d%H%M%S)"
+            mv "$zshrc_link" "$backup_path"
+            echo "Backed up existing ~/.zshrc to $backup_path"
+          fi
+        fi
+      stderr: true
+      stdout: true
+      description: Preparing Zsh configuration link
+
+- link:
+    ~/.bashrc.local: bash/bashrc.local
+    ~/.gitconfig: gitconfig
+    ~/.tmux.conf: tmux.conf
+    ~/.zshrc: zsh/zshrc
+    ~/.config/nvim: nvim
+    ~/bin: bin
+    ~/.tmux/plugins/tpm: tpm
