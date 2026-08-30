@@ -328,6 +328,7 @@ function Initialize-HyperShellPrompt {
 #>
 function Invoke-HyperShellPrompt {
     [CmdletBinding()]
+    [OutputType([string])]
     param()
 
     if (-not $script:HyperShellBasePrompt) {

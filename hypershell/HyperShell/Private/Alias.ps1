@@ -14,7 +14,13 @@
 # The names that survive both rules are collected here and handed to
 # Export-ModuleMember by HyperShell.psm1.
 
+# Aliases that survived the rules and will be exported.
 $script:HyperShellAlias = [System.Collections.Generic.List[string]]::new()
+
+# Every alias name the Public files asked for, registered or not. The manifest
+# has to list exactly this set, and a test asserts it, so a new alias cannot
+# quietly go missing from AliasesToExport.
+$script:HyperShellDeclaredAlias = [System.Collections.Generic.List[string]]::new()
 
 <#
 .SYNOPSIS
@@ -41,6 +47,8 @@ function Add-HyperShellAlias {
 
         [switch]$RequireCommand
     )
+
+    $script:HyperShellDeclaredAlias.Add($Name)
 
     if ($Shadow -and -not $script:HyperShellIsWindows) {
         return
