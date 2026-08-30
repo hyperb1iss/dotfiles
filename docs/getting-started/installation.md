@@ -18,7 +18,7 @@ This script automates everything:
 2. Sets up Homebrew (detects Apple Silicon vs Intel)
 3. Installs Git and other dependencies
 4. Clones the dotfiles repository to `~/dev/dotfiles`
-5. Runs the full installation via `make macos`
+5. Runs the full installation via `make macos`, an alias for `make install`
 6. Configures Zsh as your default shell
 
 ::: tip First Run If Command Line Tools aren't installed, the script will initiate the installation and exit. Complete
@@ -37,16 +37,18 @@ cd ~/dev/dotfiles
 git submodule update --init --recursive
 
 # 3. Run installation
-make macos
+make install
 ```
 
-The `macos` profile installs:
+`make install` composes `base.yaml`, `os/macos.yaml`, and `role/desktop.yaml`, which together install:
 
 - Homebrew packages via `macos/brew.sh`
 - Modern CLI tools (lsd, bat, fd, ripgrep, delta, zoxide)
 - Starship prompt
 - FZF (built from source via Go)
 - Symlinks for configs (zsh, nvim, tmux, git, starship)
+
+`make macos` is kept as an alias and does the same thing.
 
 ## Linux
 
@@ -61,15 +63,15 @@ git submodule update --init --recursive
 make full
 ```
 
-The `full` profile includes:
+`make full` runs the sudo tier first, then the composed install:
 
 - System-level configurations (requires sudo)
 - Desktop environment integrations
 - GUI tools and fonts
 - All shell utilities and CLI tools
 
-::: warning Sudo Required The `full` installation runs `sudo` for system-level changes. Review `system.yaml` first if
-you're cautious. :::
+::: warning Sudo Required The sudo tier runs as root. Review `dotbot.d/os/linux-system.yaml` first if you're cautious,
+or run `make install` on its own to skip it entirely. :::
 
 ### Minimal Server Setup
 
@@ -79,10 +81,10 @@ For headless servers or containers:
 git clone https://github.com/hyperb1iss/dotfiles.git ~/dev/dotfiles
 cd ~/dev/dotfiles
 git submodule update --init --recursive
-make minimal
+make server
 ```
 
-The `minimal` profile includes:
+The `server` role includes:
 
 - Essential shell utilities only
 - No GUI tools or desktop integrations
@@ -108,16 +110,24 @@ WSL-specific features are automatically enabled:
 - Cross-platform clipboard support
 - Browser launching from WSL
 
-## Installation Profiles
+## Installation Targets
 
-| Profile   | Command        | Use Case                         | Sudo Required |
-| --------- | -------------- | -------------------------------- | ------------- |
-| `macos`   | `make macos`   | Full macOS desktop environment   | No            |
-| `full`    | `make full`    | Full Linux/WSL desktop           | Yes           |
-| `minimal` | `make minimal` | Servers, containers, lightweight | No            |
+| Command        | Layers composed                                       | Use Case                          | Sudo Required |
+| -------------- | ----------------------------------------------------- | --------------------------------- | ------------- |
+| `make install` | `base` + `os/<uname>` + `role/desktop` + host/private | Any desktop, macOS or Linux       | No            |
+| `make server`  | `base` + `role/server` + host/private                 | Servers, containers, lightweight  | Yes, packages |
+| `make full`    | The sudo tier, then `make install`                    | Full Linux/WSL desktop            | Yes           |
+| `make system`  | `os/linux-system` only                                | System files, no home changes     | Yes           |
+| `make private` | `private` only                                        | Refresh the dotfiles-private bits | No            |
 
-::: tip Installation State The installation type is saved to `.install_state`. Mixing profiles (e.g., running `minimal`
-then `full`) will warn you to prevent conflicts. :::
+`make macos` and `make minimal` still work; they are aliases for `make install` and `make server`.
+
+::: tip Layers Compose Profiles no longer collide, so there is no state guard to fight: run `make server` on a box you
+installed as a desktop and it succeeds instead of erroring. Dotbot only adds links, so the desktop links that role no
+longer installs are left in place; remove them by hand if you want the box genuinely lean. `make install` records the
+role it used in `.dotfiles_role`, which is what the shell reads to decide whether to load the heavier modules. :::
+
+Override the detection when you need to, for example `make install ROLE=server` or `make install HOST=hyperia`.
 
 ## What Gets Installed
 
@@ -129,6 +139,10 @@ These are installed by the setup scripts:
 
 - **Homebrew** (macOS) — Via official install script
 - **cargo** (via rustup) — For Rust-based tools
+
+On Linux the package list itself is `packages.conf` at the repo root, resolved and installed by `bin/pkg-sync`. Run
+`bin/pkg-sync list apt server` to see exactly what a role gets, or add `-n` to an install to print the plan instead of
+running it.
 
 **Modern CLI Tools**
 
@@ -221,10 +235,55 @@ make update
 To re-apply configuration after updates:
 
 ```bash
-make macos  # or your installation profile
+make install  # re-run the composed install
 ```
 
 This is safe to run multiple times—it won't reinstall packages, just update symlinks and configurations.
+
+## Smoke Tests
+
+The install runs against fresh machines in CI so a broken layer shows up on a pull request instead of the next time you
+set up a box.
+
+```bash
+make smoke
+```
+
+That runs the same scripts CI does, from `.github/smoke/`. First it checks that `make -n install` composes the layers
+this OS expects, then it does a link-only pass over them: the layers go through Dotbot with `--only clean create link`
+against a temporary `HOME`, so nothing is downloaded and your real home directory is never touched. Then the container
+jobs run, if `docker` or `podman` is installed and its daemon answers. Without that it says what it skipped and still
+reports the rest.
+
+Which layers each lane composes lives in one place, `.github/smoke/layers.sh`, so the workflow and `make smoke` cannot
+disagree about what they are testing.
+
+The container jobs each build a machine from nothing. A bare `ubuntu:24.04` or `archlinux:latest` image gets the handful
+of packages an install needs to start, an unprivileged user with passwordless sudo, and a copy of the checkout at
+`~/dev/dotfiles`, which is where the shell configs expect to find it. Then:
+
+| Job                    | What it proves                                                                                     |
+| ---------------------- | -------------------------------------------------------------------------------------------------- |
+| `ubuntu-server`        | `make server` completes on Ubuntu, every link resolves, `zsh -i` and `bash -i` load their rc files |
+| `arch-server`          | The same on Arch, through pacman instead of apt                                                    |
+| `ubuntu-desktop-links` | The desktop layers plus `host/hyperia.yaml` parse and link, without installing a graphical stack   |
+
+The expected links are read out of the layer yaml as the test runs, so adding a link to `dotbot.d/` needs no bookkeeping
+anywhere else.
+
+What the matrix does not cover: the sudo tier (`make system`), Homebrew and the macOS defaults in `os/macos.yaml`, the
+private overlay, and the graphical Linux stack. The macOS job composes the layers and links them against a temporary
+`HOME` rather than installing, since a real macOS install means Homebrew and a long list of casks. Arch runs on an amd64
+image, so `make smoke` emulates it on Apple Silicon and takes noticeably longer there than the Ubuntu jobs do.
+
+`make smoke` stops at the first container job that fails. To rerun one on its own:
+
+```bash
+./.github/smoke/run-container.sh arch-server
+```
+
+Set `SMOKE_INTERACTIVE=0` to skip the interactive shell check, which is the one step that reaches the network after the
+packages land (Zinit clones its plugins on first run).
 
 ## Troubleshooting
 

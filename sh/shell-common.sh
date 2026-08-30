@@ -54,8 +54,18 @@ function is_macos() {
   [[ "${OSTYPE}" == "darwin"* ]]
 }
 
+# Read /proc/version in-shell rather than shelling out to grep. The
+# grep spawn cost 2ms of every shell start, and on macOS it paid that
+# to look for a file that cannot exist. WSL1 writes "Microsoft" in the
+# kernel string, WSL2 writes "microsoft".
 function is_wsl() {
-  grep -qi microsoft /proc/version 2> /dev/null
+  [[ -r /proc/version ]] || return 1
+  local kernel_version
+  IFS= read -r kernel_version < /proc/version 2> /dev/null || return 1
+  case "${kernel_version}" in
+    *[Mm]icrosoft*) return 0 ;;
+    *) return 1 ;;
+  esac
 }
 
 function is_linux() {
@@ -67,10 +77,26 @@ function has_command() {
   command -v "$1" > /dev/null 2>&1
 }
 
-# Installation type detection
+# Installation role detection. `make install` writes the composed role
+# (desktop or server) to .dotfiles_role; .install_state is the pre-layers
+# name, still read so a machine that has not reinstalled keeps its role.
+# The file is gitignored, so a worktree has none of its own: fall back to
+# the installed tree rather than reporting "unknown", which on a server
+# would load every module where the real shell loads a trimmed set.
 DOTFILES_INSTALLATION_TYPE="unknown"
-if [[ -r "${HOME}/dev/dotfiles/.install_state" ]]; then
-  IFS= read -r DOTFILES_INSTALLATION_TYPE < "${HOME}/dev/dotfiles/.install_state"
+for __dotfiles_state in \
+  "${DOTFILES}/.dotfiles_role" \
+  "${HOME}/dev/dotfiles/.dotfiles_role" \
+  "${DOTFILES}/.install_state" \
+  "${HOME}/dev/dotfiles/.install_state"; do
+  if [[ -r "${__dotfiles_state}" ]]; then
+    IFS= read -r DOTFILES_INSTALLATION_TYPE < "${__dotfiles_state}"
+    break
+  fi
+done
+unset __dotfiles_state
+if [[ "${DOTFILES_INSTALLATION_TYPE}" = "minimal" ]]; then
+  DOTFILES_INSTALLATION_TYPE="server"
 fi
 
 function get_installation_type() {
@@ -78,11 +104,11 @@ function get_installation_type() {
 }
 
 function is_minimal() {
-  [[ "${DOTFILES_INSTALLATION_TYPE}" = "minimal" ]]
+  [[ "${DOTFILES_INSTALLATION_TYPE}" = "server" ]]
 }
 
 function is_full() {
-  [[ "${DOTFILES_INSTALLATION_TYPE}" = "full" ]]
+  [[ "${DOTFILES_INSTALLATION_TYPE}" != "server" && "${DOTFILES_INSTALLATION_TYPE}" != "unknown" ]]
 }
 
 # Safe source function that doesn't break on errors
@@ -123,8 +149,8 @@ safe_source ~/.rc.local
 #    Set DOTFILES_NO_INSPIRATION=1 to disable
 #-------------------------------------------------
 function show_inspiration() {
-  if has_command python3 && [[ -f ~/dev/dotfiles/inspiration/inspiration.py ]]; then
-    python3 ~/dev/dotfiles/inspiration/inspiration.py
+  if has_command python3 && [[ -f "${DOTFILES}/inspiration/inspiration.py" ]]; then
+    python3 "${DOTFILES}/inspiration/inspiration.py"
   fi
 }
 

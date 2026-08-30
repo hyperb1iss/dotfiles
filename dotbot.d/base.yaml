@@ -1,0 +1,95 @@
+# Base layer: what every machine gets, on every OS and in every role.
+#
+# The Makefile composes layers as a single dotbot run:
+#   base.yaml -> os/<os>.yaml -> role/<role>.yaml -> host/<host>.yaml
+# Dotbot concatenates every -c file into one task list, so base runs first and
+# anything a later layer depends on (SilkCircuit themes, the core links) is
+# already in place by the time that layer is reached.
+#
+# `defaults` replaces rather than merges, and it carries across the file
+# boundary because the configs are one list. Every layer therefore declares
+# its own defaults block instead of inheriting whatever ran before it.
+#
+# force is per link, not global: it deletes whatever real file or directory
+# squats the link path, so it is spent only on the paths that need it (the
+# directory links, and ~/.zshrc, which gets backed up first below).
+- defaults:
+    link:
+      relink: true
+      create: true
+
+# Exactly one clean pass for the whole composition.
+- clean: ["~"]
+
+# SilkCircuit decides whether Ghostty is installed by looking for this
+# directory, and on macOS Ghostty is a cask with no binary on PATH, so the
+# directory has to exist before the installer runs or the themes never land.
+- create:
+    - ~/.config/ghostty
+
+- shell:
+    - command: |
+        # ~/.zshrc is force-linked below, so move a real one aside rather than
+        # destroying it. pwd is the repo root: dotbot chdirs to -d before
+        # running shell commands, which keeps this honest in a worktree.
+        zshrc_target="$(pwd)/zsh/zshrc"
+        zshrc_link="$HOME/.zshrc"
+        if [ -e "$zshrc_link" ] || [ -L "$zshrc_link" ]; then
+          if [ "$(readlink "$zshrc_link" 2>/dev/null || true)" != "$zshrc_target" ]; then
+            backup_path="${zshrc_link}.pre-dotfiles.$(date +%Y%m%d%H%M%S)"
+            mv "$zshrc_link" "$backup_path"
+            echo "Backed up existing ~/.zshrc to $backup_path"
+          fi
+        fi
+      stderr: true
+      stdout: true
+      description: Preparing Zsh configuration link
+
+- link:
+    ~/.bashrc.local: bash/bashrc.local
+    ~/.gitconfig: gitconfig
+    ~/.tmux.conf: tmux.conf
+    ~/.zshrc:
+      path: zsh/zshrc
+      force: true
+    ~/.config/nvim:
+      path: nvim
+      force: true
+    ~/bin: bin
+    ~/.tmux/plugins/tpm: tpm
+
+# Links first, then the theme installer. SilkCircuit does
+# `git config --global --add include.path`, which on a fresh machine would
+# create a real ~/.gitconfig before dotbot could link it and the link would
+# then refuse to clobber it. With the link already in place the installer
+# writes through it into the tracked gitconfig, which already carries the
+# include, so the step is a no-op there and idempotent on every run.
+- shell:
+    - command: |
+        # SilkCircuit theming is owned by its own repo + installer, which
+        # detects apps and copies themes into place (bat, starship, ghostty,
+        # dircolors, git include, k9s, and friends).
+        if [ ! -d ~/dev/silkcircuit ]; then
+          echo "🔮 Cloning SilkCircuit theme repo..."
+          git clone https://github.com/hyperb1iss/silkcircuit ~/dev/silkcircuit
+        fi
+        (cd ~/dev/silkcircuit && ./install.sh -y)
+      stderr: true
+      stdout: true
+      description: "Installing SilkCircuit themes"
+
+    - command: |
+        # macOS bash reaches ~/.bashrc.local through the linked
+        # ~/.bash_profile. Linux distros ship their own ~/.bashrc and never
+        # look for it, so wire the hook in once, leaving the rest of the
+        # file alone.
+        if [ "$(uname -s)" != "Darwin" ]; then
+          rc="$HOME/.bashrc"
+          [ -f "$rc" ] || : > "$rc"
+          if ! grep -q 'bashrc.local' "$rc"; then
+            printf '\n# dotfiles hook\n[ -f ~/.bashrc.local ] && . ~/.bashrc.local\n' >> "$rc"
+            echo "Wired ~/.bashrc.local into $rc"
+          fi
+        fi
+      stdout: true
+      description: Wiring ~/.bashrc.local into the login bash

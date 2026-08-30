@@ -86,9 +86,42 @@ dotfiles/
 ├── macos/                # macOS setup (Brewfile, system prefs, Karabiner)
 ├── hypershell/           # Windows PowerShell modules
 ├── docs/                 # VitePress documentation site
+├── packages.conf         # Every apt, pacman, and cargo package, by role
 ├── Makefile              # Install, lint, and format targets
-└── *.yaml                # DotBot install manifests (macos, local, system, …)
+└── dotbot.d/             # DotBot install layers
+    ├── base.yaml         #   Every machine, every OS, every role
+    ├── os/               #   macos, linux, linux-system (the sudo tier)
+    ├── role/             #   desktop, server
+    ├── host/             #   Per-machine overrides, keyed by hostname
+    └── private.yaml      #   dotfiles-private overlay
 ```
+
+### 🌊 How the layers compose
+
+Installation is one DotBot run over a stack of layers, picked for the machine you are standing on:
+
+```
+base.yaml → os/<uname>.yaml → role/<role>.yaml → host/<hostname>.yaml → private.yaml
+```
+
+The Makefile detects the OS from `uname`, defaults the role to `desktop`, and appends the host and private layers only
+when those files are actually there. Each layer answers one question, so a shared change like the SilkCircuit installer
+or the Atuin config lives in exactly one file instead of three.
+
+### 📦 One package manifest
+
+Every apt, pacman, and cargo package lives in [`packages.conf`](./packages.conf), one row per tool, carrying the name
+each manager uses and the roles it belongs to. [`bin/pkg-sync`](./bin/pkg-sync) resolves that manifest and runs the
+install, so the layers ask for a role and stay out of the package business:
+
+```bash
+bin/pkg-sync list apt server           # what a headless Ubuntu box gets
+bin/pkg-sync install pacman desktop -n # the plan, without running it
+bin/pkg-sync install desktop           # detect the manager, install for real
+```
+
+It needs bash and awk and nothing else, which is the point: it runs on a box that has not installed anything yet.
+Homebrew is the exception and keeps its own declarative manifest in [`macos/Brewfile`](./macos/Brewfile).
 
 ## 🔤 Installing Nerd Fonts
 
@@ -114,9 +147,12 @@ For WSL2 users, make sure to set the Nerd Font in your Windows Terminal settings
 # Clone the repository
 git clone https://github.com/hyperb1iss/dotfiles.git ~/dev/dotfiles
 
-# Install everything
+# Install everything, system tier included
 cd ~/dev/dotfiles
-make
+make full
+
+# Or skip the sudo tier and install just the user layers
+make install
 ```
 
 ### macOS
@@ -131,8 +167,12 @@ git clone https://github.com/hyperb1iss/dotfiles.git ~/dev/dotfiles
 
 # Install everything
 cd ~/dev/dotfiles
-make macos
+make install
 ```
+
+`make install` composes the right layers for whatever machine it runs on, so it is the one command worth remembering.
+`make macos` and `make minimal` are aliases for it and for `make server`; `make full` adds the sudo tier on Linux first.
+Headless boxes want `make server`.
 
 ### Windows
 
@@ -144,6 +184,13 @@ git clone https://github.com/hyperb1iss/dotfiles.git $env:USERPROFILE\dev\dotfil
 cd $env:USERPROFILE\dev\dotfiles
 .\install.ps1
 ```
+
+### Smoke tests
+
+Every push runs the install for real: `make server` end to end in Ubuntu and Arch containers, plus a link-only pass over
+the desktop layers on Linux and macOS. Run the same thing before you push with `make smoke`, which needs docker or
+podman for the container jobs and skips them with a note when neither is around. Details in
+[the installation guide](docs/getting-started/installation.md#smoke-tests).
 
 ## 🚀 Deep Dive
 

@@ -1,0 +1,420 @@
+#!/usr/bin/env bash
+#
+# ╭──────────────────────────────────────────────────────────────╮
+# │  pkg-sync ⚡ resolve and install packages.conf                │
+# │  Part of the SilkCircuit dotfiles ecosystem                  │
+# ╰──────────────────────────────────────────────────────────────╯
+#
+# One manifest, every package manager. The dotbot layers call this
+# instead of grepping a pile of text files, and you can call it by hand
+# to see exactly what a machine would get.
+#
+#   pkg-sync list [manager] [role]
+#   pkg-sync install [manager] [role] [--dry-run]
+#
+# Runs on a bare box: bash 3.2, awk, and nothing else. No python, no
+# jq, no network.
+
+set -eo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+REPO_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
+MANIFEST="${PKG_MANIFEST:-${REPO_ROOT}/packages.conf}"
+
+DRY_RUN=0
+
+# Managers the manifest may name. brew is listed so a stray `pkg-sync
+# install brew` gets a pointer instead of a parse error.
+MANAGERS="apt pacman cargo ppa"
+
+# ─────────────────────────────────────────────────────────────
+# Output
+# ─────────────────────────────────────────────────────────────
+err() { echo "✖ pkg-sync: $*" >&2; }
+warn() { echo "⚠ $*" >&2; }
+info() { echo "▸ $*"; }
+
+usage() {
+  cat << 'EOF'
+pkg-sync ⚡ resolve and install packages from packages.conf
+
+usage:
+  pkg-sync list [<manager>] [<role>]
+  pkg-sync install [<manager>] [<role>] [--dry-run]
+  pkg-sync roles
+
+  <manager>  apt, pacman, cargo, ppa. Detected from the box when omitted.
+  <role>     desktop or server. Defaults to .dotfiles_role, else desktop.
+
+  --dry-run, -n  print the commands instead of running them
+
+examples:
+  pkg-sync list apt server
+  pkg-sync install pacman desktop --dry-run
+  pkg-sync install                 # this box, this role, for real
+EOF
+}
+
+# ─────────────────────────────────────────────────────────────
+# Manifest parsing
+#
+# resolve <manager> <role> [with_binary]
+#   Prints one package per line, in manifest order, deduplicated.
+#   With with_binary=1 each line is "<package><TAB><binary>", which is
+#   how the cargo path learns what command a crate installs.
+# ─────────────────────────────────────────────────────────────
+resolve() {
+  awk -v manager="$1" -v role="$2" -v with_binary="${3:-0}" '
+    function die(msg) {
+      printf("pkg-sync: %s line %d: %s\n", FILENAME, FNR, msg) > "/dev/stderr"
+      exit 2
+    }
+    function has_role(scope, want) { return index("," scope ",", "," want ",") > 0 }
+    { sub(/\r$/, ""); sub(/#.*/, ""); gsub(/^[ \t]+|[ \t]+$/, "") }
+    /^$/ { next }
+    /^\[/ { next }
+    {
+      if (NF < 3) die("expected <name> <roles> <source>...")
+      name = $1
+      roles = $2
+      binary = ""
+      count = 0
+      for (i = 3; i <= NF; i++) {
+        token = $i
+        if (token ~ /^bin=/) { binary = substr(token, 5); continue }
+        scope = roles
+        at = index(token, "@")
+        if (at > 0) {
+          scope = substr(token, at + 1)
+          token = substr(token, 1, at - 1)
+        }
+        pkg = name
+        eq = index(token, "=")
+        if (eq > 0) {
+          pkg = substr(token, eq + 1)
+          token = substr(token, 1, eq - 1)
+        }
+        if (token != "apt" && token != "pacman" && token != "cargo" && token != "ppa")
+          die("unknown manager: '" token "'")
+        if (token != manager) continue
+        if (!has_role(scope, role)) continue
+        if (pkg == "") die("empty package name")
+        selected[++count] = pkg
+      }
+      if (binary == "") binary = name
+      for (i = 1; i <= count; i++) {
+        if (seen[selected[i]]++) continue
+        if (with_binary == "1") print selected[i] "\t" binary
+        else print selected[i]
+      }
+    }
+  ' "${MANIFEST}"
+}
+
+# Every role the manifest mentions, from the roles column and from any
+# @role scope on an individual source.
+manifest_roles() {
+  awk '
+    function die(msg) {
+      printf("pkg-sync: %s line %d: %s\n", FILENAME, FNR, msg) > "/dev/stderr"
+      exit 2
+    }
+    { sub(/\r$/, ""); sub(/#.*/, ""); gsub(/^[ \t]+|[ \t]+$/, "") }
+    /^$/ { next }
+    /^\[/ { next }
+    {
+      if (NF < 3) die("expected <name> <roles> <source>...")
+    }
+    {
+      n = split($2, parts, ",")
+      for (i = 1; i <= n; i++) roles[parts[i]] = 1
+      for (i = 3; i <= NF; i++) {
+        at = index($i, "@")
+        if (at == 0) continue
+        n = split(substr($i, at + 1), parts, ",")
+        for (j = 1; j <= n; j++) roles[parts[j]] = 1
+      }
+    }
+    END { for (name in roles) print name }
+  ' "${MANIFEST}" | sort
+}
+
+# ─────────────────────────────────────────────────────────────
+# Execution helpers
+# ─────────────────────────────────────────────────────────────
+
+# Print the command under --dry-run, otherwise run it.
+run() {
+  if [[ "${DRY_RUN}" -eq 1 ]]; then
+    echo "  $*"
+    return 0
+  fi
+  "$@"
+}
+
+# Containers run as root with no sudo installed, workstations run as a
+# user with sudo. Both work, and neither hard-requires the other.
+run_as_root() {
+  if [[ "$(id -u)" -eq 0 ]]; then
+    run "$@"
+  elif command -v sudo > /dev/null 2>&1; then
+    run sudo "$@"
+  else
+    err "root privileges required and sudo is missing: $*"
+    return 1
+  fi
+}
+
+# Repository metadata is best effort. One stale third-party source in
+# sources.list.d must not stop the packages from installing, which is
+# what the yaml did before pkg-sync existed. Every failure gets named.
+run_soft() {
+  if ! run_as_root "$@"; then
+    warn "continuing after failure: $*"
+  fi
+}
+
+# Read a resolved list into the global PKG_LIST array. bash 3.2 has no
+# readarray, so this is the portable spelling.
+read_list() {
+  local line
+  PKG_LIST=()
+  while IFS= read -r line; do
+    [[ -n "${line}" ]] || continue
+    PKG_LIST+=("${line}")
+  done
+}
+
+# ─────────────────────────────────────────────────────────────
+# Managers
+# ─────────────────────────────────────────────────────────────
+
+install_pacman() {
+  local role="$1" pkg
+  read_list < <(resolve pacman "${role}")
+  if [[ "${#PKG_LIST[@]}" -eq 0 ]]; then
+    info "no pacman packages for role ${role}"
+    return 0
+  fi
+
+  run_soft pacman -Syu --noconfirm
+  # pacman resolves the batch atomically, so a single unknown name sinks
+  # the whole install. Retry one at a time when that happens: same
+  # skip-with-a-warning contract as apt, and the casualty gets named.
+  if ! run_as_root pacman -S --needed --noconfirm "${PKG_LIST[@]}"; then
+    warn "batch install failed, retrying one package at a time"
+    for pkg in "${PKG_LIST[@]}"; do
+      run_as_root pacman -S --needed --noconfirm "${pkg}" || echo "⚠ skipped: ${pkg}"
+    done
+  fi
+}
+
+install_apt() {
+  local role="$1" pkg
+  local -a ppas
+
+  read_list < <(resolve ppa "${role}")
+  ppas=("${PKG_LIST[@]}")
+  read_list < <(resolve apt "${role}")
+  if [[ "${#PKG_LIST[@]}" -eq 0 && "${#ppas[@]}" -eq 0 ]]; then
+    info "no apt packages for role ${role}"
+    return 0
+  fi
+
+  run_soft apt-get update
+
+  if [[ "${#ppas[@]}" -gt 0 ]]; then
+    # add-apt-repository lives in software-properties-common, which a
+    # minimal Ubuntu image does not ship. Install it first rather than
+    # dying on a missing command.
+    if ! command -v add-apt-repository > /dev/null 2>&1; then
+      run_soft env DEBIAN_FRONTEND=noninteractive \
+        apt-get install -y --no-install-recommends software-properties-common
+    fi
+    if command -v add-apt-repository > /dev/null 2>&1 || [[ "${DRY_RUN}" -eq 1 ]]; then
+      for pkg in "${ppas[@]}"; do
+        run_soft add-apt-repository -y "${pkg}"
+      done
+      run_soft apt-get update
+    else
+      warn "add-apt-repository unavailable, skipping ${#ppas[@]} PPA(s)"
+    fi
+  fi
+
+  # Per package so one unavailable name can't sink the whole batch
+  # (the kubectl-on-noble class of failure).
+  for pkg in "${PKG_LIST[@]}"; do
+    run_as_root env DEBIAN_FRONTEND=noninteractive \
+      apt-get install -y --no-install-recommends "${pkg}" || echo "⚠ skipped: ${pkg}"
+  done
+}
+
+install_cargo() {
+  local role="$1" crate binary
+  if ! command -v cargo > /dev/null 2>&1 && [[ "${DRY_RUN}" -eq 0 ]]; then
+    warn "cargo not found, skipping crate install"
+    return 0
+  fi
+
+  # Anything the system package manager already provides is skipped, so
+  # this compiles nothing on Arch and fills the gaps on apt boxes.
+  while IFS=$'\t' read -r crate binary; do
+    [[ -n "${crate}" ]] || continue
+    if command -v "${binary}" > /dev/null 2>&1; then
+      # Silent in a real run, spelled out in a dry run so an empty plan
+      # reads as "nothing to build" instead of "nothing resolved".
+      [[ "${DRY_RUN}" -eq 1 ]] && echo "  skip ${crate}: ${binary} already on PATH"
+      continue
+    fi
+    echo "📦 cargo install ${crate}"
+    run cargo install "${crate}" || echo "⚠ skipped: ${crate}"
+  done < <(resolve cargo "${role}" 1)
+}
+
+install_ppa() {
+  local role="$1" ppa
+  read_list < <(resolve ppa "${role}")
+  if [[ "${#PKG_LIST[@]}" -eq 0 ]]; then
+    info "no PPAs for role ${role}"
+    return 0
+  fi
+  for ppa in "${PKG_LIST[@]}"; do
+    run_soft add-apt-repository -y "${ppa}"
+  done
+  run_soft apt-get update
+}
+
+# ─────────────────────────────────────────────────────────────
+# Detection
+# ─────────────────────────────────────────────────────────────
+detect_manager() {
+  if command -v pacman > /dev/null 2>&1; then
+    echo "pacman"
+  elif command -v apt-get > /dev/null 2>&1; then
+    echo "apt"
+  elif command -v brew > /dev/null 2>&1; then
+    echo "brew"
+  fi
+}
+
+detect_role() {
+  local role_file="${REPO_ROOT}/.dotfiles_role"
+  if [[ -r "${role_file}" ]]; then
+    head -n1 "${role_file}" | tr -d '[:space:]'
+  else
+    echo "desktop"
+  fi
+}
+
+is_manager() {
+  local candidate="$1" known
+  for known in ${MANAGERS} brew; do
+    [[ "${candidate}" == "${known}" ]] && return 0
+  done
+  return 1
+}
+
+# ─────────────────────────────────────────────────────────────
+# Main
+# ─────────────────────────────────────────────────────────────
+main() {
+  local command="" manager="" role="" arg
+
+  for arg in "$@"; do
+    case "${arg}" in
+      --dry-run | -n)
+        DRY_RUN=1
+        ;;
+      -h | --help)
+        usage
+        return 0
+        ;;
+      -*)
+        err "unknown option: ${arg}"
+        usage >&2
+        return 2
+        ;;
+      *)
+        if [[ -z "${command}" ]]; then
+          command="${arg}"
+        elif is_manager "${arg}" && [[ -z "${manager}" && -z "${role}" ]]; then
+          manager="${arg}"
+        elif [[ -z "${role}" ]]; then
+          role="${arg}"
+        else
+          err "unexpected argument: ${arg}"
+          return 2
+        fi
+        ;;
+    esac
+  done
+
+  if [[ ! -r "${MANIFEST}" ]]; then
+    err "manifest not found: ${MANIFEST}"
+    return 2
+  fi
+
+  case "${command}" in
+    "" | help)
+      usage
+      return 0
+      ;;
+    roles)
+      manifest_roles
+      return 0
+      ;;
+    list | install) ;;
+    *)
+      err "unknown command: ${command}"
+      usage >&2
+      return 2
+      ;;
+  esac
+
+  [[ -n "${manager}" ]] || manager="$(detect_manager)"
+  [[ -n "${role}" ]] || role="$(detect_role)"
+
+  if [[ -z "${manager}" ]]; then
+    info "no supported package manager found, skipping"
+    return 0
+  fi
+
+  if [[ "${manager}" == "brew" ]]; then
+    info "Homebrew packages live in macos/Brewfile, installed by macos/brew.sh"
+    return 0
+  fi
+
+  # Parses the manifest as a side effect, so a malformed row is caught
+  # here before anything touches the system.
+  local known_roles
+  known_roles="$(manifest_roles | tr '\n' ' ')"
+  case " ${known_roles}" in
+    *" ${role} "*) ;;
+    *)
+      err "unknown role: ${role} (manifest has: ${known_roles% })"
+      return 2
+      ;;
+  esac
+
+  # Parse the whole manifest once with the status actually checked. The
+  # install paths read their lists through process substitution, which
+  # swallows the parser's exit code, so a bad row there would truncate
+  # the list instead of failing the run. awk reads every line whatever
+  # manager it was asked about, so one pass catches all of them.
+  resolve "${manager}" "${role}" > /dev/null
+
+  if [[ "${command}" == "list" ]]; then
+    resolve "${manager}" "${role}"
+    return 0
+  fi
+
+  info "installing ${manager} packages for role ${role}"
+  case "${manager}" in
+    pacman) install_pacman "${role}" ;;
+    apt) install_apt "${role}" ;;
+    cargo) install_cargo "${role}" ;;
+    ppa) install_ppa "${role}" ;;
+  esac
+}
+
+main "$@"

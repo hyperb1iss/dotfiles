@@ -82,7 +82,7 @@ bash -c "$(curl -fsSL https://raw.githubusercontent.com/hyperb1iss/dotfiles/main
 # Manual installation
 git clone https://github.com/hyperb1iss/dotfiles.git ~/dev/dotfiles
 cd ~/dev/dotfiles
-make macos  # or: make full, make minimal
+make install  # or: make full (adds the sudo tier), make server
 ```
 
 After installation, you get:

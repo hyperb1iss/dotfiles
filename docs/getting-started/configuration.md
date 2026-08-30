@@ -4,17 +4,18 @@ Customize your environment to perfection.
 
 ## Shell Configuration
 
-### Installation Types
+### Installation Role
 
-The installation saves its type to `.install_state`:
+`make install` records the role it composed in `.dotfiles_role`:
 
 ```bash
-cat ~/dev/dotfiles/.install_state
-# Output: minimal, full, or macos
+cat ~/dev/dotfiles/.dotfiles_role
+# Output: desktop or server
 ```
 
 Scripts check this with `is_minimal` and `is_full` functions to conditionally load features. This ensures lightweight
-servers don't load desktop-specific utilities.
+servers don't load desktop-specific utilities. Machines installed before the layer split still carry the old
+`.install_state` file, which is read as a fallback until the next `make install`.
 
 ### Environment Variables
 
@@ -182,7 +183,8 @@ Delta is configured in `gitconfig` as the default pager. Customize in `~/.gitcon
 
 ## Starship Prompt
 
-The configuration lives in the SilkCircuit repo (`~/dev/silkcircuit/extras/starship/starship.toml`) and is installed by its installer.
+The configuration lives in the SilkCircuit repo (`~/dev/silkcircuit/extras/starship/starship.toml`) and is installed by
+its installer.
 
 ### Common Customizations
 
@@ -302,16 +304,35 @@ set -g pane-active-border-style 'fg=#c792ea'
 
 ## Platform-Specific Configuration
 
+### Linux
+
+**Packages:**
+
+Every apt, pacman, and cargo package lives in `packages.conf`, one row per tool:
+
+```
+# name        roles           sources
+lazygit       desktop         pacman
+ripgrep       desktop         pacman cargo bin=rg
+```
+
+A row names the package for each manager (`apt=git-core` when the names differ), which roles it belongs to, and which
+manager provides it. Check your work before touching the machine:
+
+```bash
+bin/pkg-sync list pacman desktop        # resolved names, one per line
+bin/pkg-sync install apt server -n      # the plan, without running it
+```
+
 ### macOS
 
 **Homebrew:**
 
-Customize installed packages in `macos/brew.sh`:
+Customize installed packages in `macos/Brewfile`, which `macos/brew.sh` feeds to `brew bundle`:
 
-```bash
-# Add your preferred packages
-brew install neovim
-brew install --cask visual-studio-code
+```ruby
+brew "neovim"
+cask "visual-studio-code"
 ```
 
 ### WSL2
@@ -469,17 +490,17 @@ echo $PATH | tr ':' '\n'
 
 Quick reference for where everything lives:
 
-| Component          | Configuration File                      |
-| ------------------ | --------------------------------------- |
-| Zsh                | `~/dev/dotfiles/zsh/zshrc`              |
-| Shell scripts      | `~/dev/dotfiles/sh/*.sh`                |
-| Neovim             | `~/dev/dotfiles/nvim/`                  |
-| Starship           | `~/dev/silkcircuit/extras/starship/` |
-| Tmux               | `~/dev/dotfiles/tmux.conf`              |
-| Git                | `~/dev/dotfiles/gitconfig`              |
-| Git Iris           | `.git-iris.yaml` (per-project)          |
-| Private settings   | `~/.rc.local`                           |
-| Installation state | `~/dev/dotfiles/.install_state`         |
+| Component         | Configuration File                   |
+| ----------------- | ------------------------------------ |
+| Zsh               | `~/dev/dotfiles/zsh/zshrc`           |
+| Shell scripts     | `~/dev/dotfiles/sh/*.sh`             |
+| Neovim            | `~/dev/dotfiles/nvim/`               |
+| Starship          | `~/dev/silkcircuit/extras/starship/` |
+| Tmux              | `~/dev/dotfiles/tmux.conf`           |
+| Git               | `~/dev/dotfiles/gitconfig`           |
+| Git Iris          | `.git-iris.yaml` (per-project)       |
+| Private settings  | `~/.rc.local`                        |
+| Installation role | `~/dev/dotfiles/.dotfiles_role`      |
 
 All configs are symlinked from `~/dev/dotfiles` to their expected locations (`~/.zshrc`, `~/.config/nvim`, etc.).
 

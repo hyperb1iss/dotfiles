@@ -1,0 +1,10 @@
+# hyperia: the Linux desktop. Composed automatically when `hostname -s`
+# matches this file's name.
+- defaults:
+    link:
+      relink: true
+      create: true
+
+- link:
+    # ghostty/config pulls this in via `config-file = ?hyperia.conf`
+    ~/.config/ghostty/hyperia.conf: ghostty/hyperia.conf

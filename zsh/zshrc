@@ -26,10 +26,24 @@ HISTSIZE=50000
 export SAVEHIST=50000
 HISTFILE=~/.zsh_history
 
-# Source critical environment and common functions before completions and plugins.
-source "${HOME}/dev/dotfiles/sh/shell-common.sh" # Source this first for helper functions
-source "${HOME}/dev/dotfiles/sh/env.sh"          # Then source env for PATH and other vars
-source "${HOME}/dev/dotfiles/sh/terminal.sh"     # Source terminal title management
+# sh/loader.sh owns module order for both shells. Phase one now, so
+# completions and plugins below have PATH and the helper functions;
+# phase two (dotfiles_load_modules) after the plugins are in place.
+#
+# The rc file you source is the selector for which checkout loads, so
+# derive the root from this file's own location and overwrite whatever
+# DOTFILES the environment carried in. An inherited value is never
+# trusted: shell-common exports DOTFILES, so every shell started from
+# a normal session carries the installed tree's path, and a worktree's
+# zshrc that honored it would quietly load the installed modules
+# instead of the ones under test.
+#
+# ${(%):-%x} is the file being sourced, :A resolves the ~/.zshrc
+# symlink to its target, and :h:h climbs out of zsh/ to the repo root.
+# Still exported, since modules and scripts read it.
+export DOTFILES="${${(%):-%x}:A:h:h}"
+source "${DOTFILES}/sh/loader.sh"
+dotfiles_load_core
 
 # Add Homebrew completion directories before compinit without shelling out to brew.
 if is_macos; then
@@ -41,7 +55,7 @@ if is_macos; then
 fi
 
 # Source custom configurations
-source ~/dev/dotfiles/zsh/completion.zsh
+source "${DOTFILES}/zsh/completion.zsh"
 
 # Set initial terminal title for interactive, non-minimal Zsh sessions
 if is_zsh && [[ $- == *i* ]] && ! is_minimal; then
@@ -92,21 +106,13 @@ cached_eval starship starship-init.zsh starship init zsh --print-full-init
 # zinit light zdharma-continuum/fast-syntax-highlighting # Alternative syntax highlighting
 # zinit light romkatv/powerlevel10k # If you want Zinit to manage P10k
 
-# Load our own shell modules by sourcing them directly. They used to go
-# through `zinit snippet`, but zinit copies local snippets into its cache
-# and never invalidates them — interactive shells were running months-old
+# Phase two: the rest of sh/, sourced directly. They used to go through
+# `zinit snippet`, but zinit copies local snippets into its cache and
+# never invalidates them, so interactive shells were running months-old
 # module code while the repo moved on. Direct sourcing is a few ms (the
 # expensive tool inits inside are mtime-cached via cached_eval) and what
 # you edit is what runs.
-for script_file in "${HOME}/dev/dotfiles/sh/"*.sh; do
-  script_basename="${script_file##*/}"
-  if [[ "${script_basename}" == "shell-common.sh" ||
-    "${script_basename}" == "env.sh" ||
-    "${script_basename}" == "terminal.sh" ]]; then
-    continue # Skip common, env, and terminal scripts as they are sourced directly
-  fi
-  source "${script_file}"
-done
+dotfiles_load_modules
 
 # Command not found handler
 if [[ -f /usr/share/doc/pkgfile/command-not-found.zsh ]]; then

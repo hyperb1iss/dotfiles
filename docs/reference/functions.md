@@ -18,11 +18,11 @@ Every shell function organized by category - comprehensive reference with descri
 
 ### Git Push
 
-| Function | Description                                             |
-| -------- | ------------------------------------------------------- |
+| Function | Description                                              |
+| -------- | -------------------------------------------------------- |
 | `gpn`    | Smart push: `HEAD:<branch>` to origin with `--no-verify` |
-|          | `gpn -f` — force push with `--force-with-lease`        |
-|          | `gpn -u` — set upstream and push                       |
+|          | `gpn -f` — force push with `--force-with-lease`          |
+|          | `gpn -u` — set upstream and push                         |
 
 ### Git Utilities
 
@@ -63,15 +63,15 @@ Every shell function organized by category - comprehensive reference with descri
 
 ### Smart Navigation
 
-| Function | Description                                  |
-| -------- | -------------------------------------------- |
-| `dev`    | Interactive project picker for ~/dev/ (fzf)  |
-| `fcd`    | Interactive directory navigation with fzf    |
-| `zp`     | Zoxide with pushd/popd semantics             |
-|          | `zp <query>` - Jump and push to stack     |
-|          | `zp -p/--pop` - Pop from stack            |
-|          | `zp -l/--list` - List directory stack     |
-|          | `zp -c/--clear` - Clear stack             |
+| Function | Description                                 |
+| -------- | ------------------------------------------- |
+| `dev`    | Interactive project picker for ~/dev/ (fzf) |
+| `fcd`    | Interactive directory navigation with fzf   |
+| `zp`     | Zoxide with pushd/popd semantics            |
+|          | `zp <query>` - Jump and push to stack       |
+|          | `zp -p/--pop` - Pop from stack              |
+|          | `zp -l/--list` - List directory stack       |
+|          | `zp -c/--clear` - Clear stack               |
 
 ### Bookmarks
 
@@ -307,16 +307,16 @@ Multiple screenshot functions for various capture modes (see source for details)
 
 ### Detection Functions
 
-| Function      | Description                   |
-| ------------- | ----------------------------- |
-| `is_zsh`      | Check if running in Zsh       |
-| `is_bash`     | Check if running in Bash      |
-| `is_macos`    | Check if running on macOS     |
-| `is_linux`    | Check if running on Linux     |
-| `is_wsl`      | Check if running in WSL       |
-| `has_command` | Check if command exists       |
-| `is_minimal`  | Check if minimal install mode |
-| `is_full`     | Check if full install mode    |
+| Function      | Description               |
+| ------------- | ------------------------- |
+| `is_zsh`      | Check if running in Zsh   |
+| `is_bash`     | Check if running in Bash  |
+| `is_macos`    | Check if running on macOS |
+| `is_linux`    | Check if running on Linux |
+| `is_wsl`      | Check if running in WSL   |
+| `has_command` | Check if command exists   |
+| `is_minimal`  | Check if server install   |
+| `is_full`     | Check if desktop install  |
 
 ### Helper Functions
 

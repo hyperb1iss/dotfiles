@@ -3,6 +3,12 @@
 #
 # Electric meets elegant. This is the canonical source for all
 # SilkCircuit colors across the dotfiles ecosystem.
+#
+# Nine modules source this file defensively so each stays usable on its
+# own, and the loader gets here first anyway. Skip the re-parse once
+# we're in. Deliberately not exported: a child process or a script
+# should load its own copy and re-detect its own terminal.
+[[ -n "${__SC_COLORS_LOADED:-}" ]] && return 0
 
 # ─────────────────────────────────────────────────────────────
 # Core Palette
@@ -174,3 +180,4 @@ sc_fzf_opts() {
 # Auto-initialize on source
 # ─────────────────────────────────────────────────────────────
 __sc_init_colors
+__SC_COLORS_LOADED=1

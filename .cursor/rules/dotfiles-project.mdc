@@ -40,20 +40,25 @@ alwaysApply: true
   "documentation": "document all package dependencies clearly",
   "versioning": "specify version constraints only when necessary",
   "package_files": {
-    "packages.txt": "main package list for Linux systems",
-    "packages_arch.txt": "Arch Linux specific packages", 
-    "packages_minimal.txt": "minimal set of essential packages"
+    "packages.conf": "every apt, pacman, and cargo package, one row per tool, keyed by manager and role",
+    "macos/Brewfile": "Homebrew formulae, casks, and mas entries, installed by macos/brew.sh",
+    "bin/pkg-sync": "resolves and installs packages.conf (list | install, --dry-run)"
   }
 }
 
 ## Installation and Configuration
 
 @installation_config {
-  "dotbot_files": {
-    "minimal.yaml": "basic configuration for minimal installs",
-    "system.yaml": "system-wide configuration settings", 
-    "local.yaml": "user-specific configuration and links",
-    "windows.yaml": "Windows-specific configuration"
+  "dotbot_layers": {
+    "dotbot.d/base.yaml": "every machine, every OS, every role",
+    "dotbot.d/os/macos.yaml": "macOS paths and the Homebrew tier",
+    "dotbot.d/os/linux.yaml": "XDG paths, systemd wiring, desktop stack",
+    "dotbot.d/os/linux-system.yaml": "system-wide configuration, runs under sudo",
+    "dotbot.d/role/desktop.yaml": "workstation tooling shared by macOS and Linux",
+    "dotbot.d/role/server.yaml": "headless boxes and containers",
+    "dotbot.d/host/<hostname>.yaml": "per-machine overrides",
+    "dotbot.d/private.yaml": "dotfiles-private overlay",
+    "windows.yaml": "Windows-specific configuration, driven by install.ps1"
   },
   "windows_setup": {
     "main_script": "hypershell/setup-windows.ps1",

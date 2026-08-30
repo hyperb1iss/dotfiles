@@ -1,52 +1,88 @@
-BASEDIR=$(CURDIR)
-DOTBOT=$(BASEDIR)/dotbot/bin/dotbot
-INSTALL_STATE_FILE=$(BASEDIR)/.install_state
+BASEDIR := $(CURDIR)
+DOTBOT := $(BASEDIR)/dotbot/bin/dotbot
+LAYERS := $(BASEDIR)/dotbot.d
+ROLE_FILE := $(BASEDIR)/.dotfiles_role
+
+# Layers compose instead of conflicting: base -> os -> role -> host -> private.
+# OS comes from uname, role defaults to desktop, and the host layer is picked
+# up only when dotbot.d/host/<hostname>.yaml actually exists.
+ifeq ($(shell uname -s),Darwin)
+DETECTED_OS := macos
+else
+DETECTED_OS := linux
+endif
+
+OS ?= $(DETECTED_OS)
+ROLE ?= desktop
+HOST ?= $(shell hostname -s 2>/dev/null || hostname)
+
+BASE_LAYER := $(LAYERS)/base.yaml
+OS_LAYER := $(LAYERS)/os/$(OS).yaml
+ROLE_LAYER := $(LAYERS)/role/$(ROLE).yaml
+HOST_LAYER := $(wildcard $(LAYERS)/host/$(HOST).yaml)
+PRIVATE_LAYER := $(if $(wildcard $(HOME)/dev/dotfiles-private),$(LAYERS)/private.yaml,)
+
+# The server role skips the os layer on purpose: os/linux.yaml is the graphical
+# stack (ghostty, pipewire, ignis, containers) and headless boxes want none of
+# it. Desktops get the full stack.
+ifeq ($(ROLE),server)
+LAYER_CONFIGS := $(BASE_LAYER) $(ROLE_LAYER) $(HOST_LAYER) $(PRIVATE_LAYER)
+else
+LAYER_CONFIGS := $(BASE_LAYER) $(OS_LAYER) $(ROLE_LAYER) $(HOST_LAYER) $(PRIVATE_LAYER)
+endif
 
 default:
+	@echo "Detected: os=$(OS) role=$(ROLE) host=$(HOST)"
+	@echo ""
 	@echo "Available installation options:"
-	@echo "  make full    - Full desktop environment installation"
-	@echo "  make minimal - Minimal server installation"
-	@echo "  make macos   - macOS environment installation"
+	@echo "  make install - Compose the layers for this machine (default)"
+	@echo "  make server  - Minimal headless install (alias: make minimal)"
+	@echo "  make full    - System tier under sudo, then the composed install"
+	@echo "  make macos   - Alias for make install (macOS is auto-detected)"
+	@echo "  make system  - System tier only (Linux, sudo)"
 	@echo "  make private - Apply private overlay (dotfiles-private)"
 	@echo ""
 	@echo "Other commands:"
-	@echo "  make update - Update submodules"
-	@if [ -f $(INSTALL_STATE_FILE) ]; then \
-		echo "Current installation type: $$(cat $(INSTALL_STATE_FILE))"; \
-	else \
-		echo "No previous installation detected"; \
-	fi
+	@echo "  make update  - Update submodules"
+	@echo "  make smoke   - Run the CI install smoke matrix on this machine"
+	@echo ""
+	@echo "Layers for this machine:"
+	@for layer in $(LAYER_CONFIGS); do echo "  $$layer"; done
 
 update:
 	git -C $(BASEDIR) submodule update --init --recursive
 
-check-state:
-	@if [ -f $(INSTALL_STATE_FILE) ]; then \
-		if [ "$$(cat $(INSTALL_STATE_FILE))" != "$(TYPE)" ]; then \
-			echo "Error: Attempting to install $(TYPE) over existing $$(cat $(INSTALL_STATE_FILE)) installation."; \
-			echo "Please backup and remove ~/.* files before changing installation type."; \
-			exit 1; \
-		fi \
+install: update
+	SHELL=/bin/bash $(DOTBOT) -d $(BASEDIR) -c $(LAYER_CONFIGS)
+	@printf '%s\n' "$(ROLE)" > $(ROLE_FILE)
+
+# Thin aliases so muscle memory and the docs keep working.
+macos: install
+
+server:
+	@$(MAKE) ROLE=server install
+
+minimal: server
+
+system:
+	@if [ "$(DETECTED_OS)" != "linux" ]; then \
+		echo "make system is Linux only; skipping on $(DETECTED_OS)"; \
+	else \
+		sudo SHELL=/bin/bash $(DOTBOT) -d $(BASEDIR) -c $(LAYERS)/os/linux-system.yaml; \
 	fi
 
-minimal: TYPE=minimal
-minimal: check-state update
-	@echo "minimal" > $(INSTALL_STATE_FILE)
-	SHELL=/bin/bash $(DOTBOT) -d $(BASEDIR) -c minimal.yaml
-
-full: TYPE=full
-full: check-state update
-	@echo "full" > $(INSTALL_STATE_FILE)
-	sudo SHELL=/bin/bash $(DOTBOT) -d $(BASEDIR) -c system.yaml
-	SHELL=/bin/bash $(DOTBOT) -d $(BASEDIR) -c local.yaml
-
-macos: TYPE=macos
-macos: check-state update
-	@echo "macos" > $(INSTALL_STATE_FILE)
-	SHELL=/bin/bash $(DOTBOT) -d $(BASEDIR) -c macos.yaml
+full: system
+	@$(MAKE) install
 
 private: update
-	SHELL=/bin/bash $(DOTBOT) -d $(BASEDIR) -c private.yaml
+	SHELL=/bin/bash $(DOTBOT) -d $(BASEDIR) -c $(LAYERS)/private.yaml
+
+# The install smoke matrix, run here instead of waiting on CI: the same
+# scripts .github/workflows/install-smoke.yml calls, so the two cannot
+# drift. Containers need docker or podman; without one it runs the
+# link-only dry run and says what it skipped. Nothing touches $(HOME).
+smoke:
+	@./.github/smoke/local.sh
 
 # Colors for beautiful output
 PURPLE := \033[1;35m
@@ -76,7 +112,7 @@ lint-header:
 
 lint-shell:
 	@echo "$(CYAN)$(ARROW)$(RESET) $(BOLD)Shell Scripts$(RESET)"
-	@./bin/shellint --check sh/ bin/
+	@./bin/shellint --check sh/ bin/ .github/smoke/
 	@echo ""
 
 lint-yaml:
@@ -123,7 +159,7 @@ format-header:
 
 format-shell:
 	@echo "$(CYAN)$(ARROW)$(RESET) $(BOLD)Shell Scripts$(RESET)"
-	@./bin/shellint --format --fix sh/ bin/
+	@./bin/shellint --format --fix sh/ bin/ .github/smoke/
 	@echo ""
 
 format-prettier:
@@ -144,4 +180,4 @@ format-footer:
 	@echo "$(GREEN)$(CHECK)$(RESET) $(BOLD)All formatting completed!$(RESET)"
 	@echo ""
 
-.PHONY: default update check-state minimal full macos private lint lint-header lint-shell lint-yaml lint-lua lint-json lint-markdown lint-footer format format-header format-shell format-prettier format-lua format-footer
+.PHONY: default update install macos server minimal system full private smoke lint lint-header lint-shell lint-yaml lint-lua lint-json lint-markdown lint-footer format format-header format-shell format-prettier format-lua format-footer

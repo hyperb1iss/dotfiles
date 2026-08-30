@@ -33,16 +33,19 @@ Minimal plugin set. Quality over quantity.
 
 ### Script Loading
 
-All `sh/*.sh` files load automatically via zinit snippets:
+`sh/loader.sh` owns module order for both shells. It runs in two phases so zsh can slot completions and plugins between
+them:
 
 ```bash
-for script_file in "${HOME}/dev/dotfiles/sh/"*.sh; do
-  zinit ice lucid wait"0"
-  zinit snippet "${script_file}"
-done
+source "${DOTFILES}/sh/loader.sh"
+dotfiles_load_core      # shell-common, env, colors, terminal, in that order
+# fpath, compinit, zinit plugins, starship
+dotfiles_load_modules   # the rest of sh/*.sh, alphabetically
 ```
 
-Async loading means fast shell startup even with 100+ aliases.
+Modules are sourced directly rather than through zinit snippets, which cache local files forever. Tool inits inside them
+(`starship`, `zoxide`, `fzf`, `atuin`) are cached by `cached_eval`, so a warm interactive shell starts in well under a
+tenth of a second even with 150 aliases.
 
 ## Shell Options
 
@@ -148,19 +151,21 @@ Startup sequence:
   │
   ├─ History & options configured
   │
-  ├─ Zinit initialized (auto-install if missing)
+  ├─ sh/loader.sh sourced, DOTFILES derived from this file's location
   │
-  ├─ Early critical sources:
-  │  ├─ shell-common.sh  (platform detection, helpers)
+  ├─ dotfiles_load_core:
+  │  ├─ shell-common.sh  (platform detection, helpers, cached_eval)
   │  ├─ env.sh           (PATH setup)
+  │  ├─ colors.sh        (SilkCircuit palette)
   │  └─ terminal.sh      (title management)
   │
-  ├─ Plugins loaded async:
+  ├─ Completions, then Zinit plugins (auto-install if missing):
   │  ├─ zsh-autosuggestions
   │  ├─ zsh-syntax-highlighting
-  │  └─ starship prompt
+  │  ├─ zsh-history-substring-search
+  │  └─ fzf-tab, then the starship prompt
   │
-  ├─ All sh/*.sh loaded as lazy snippets
+  ├─ dotfiles_load_modules: the rest of sh/*.sh, sourced directly
   │
   └─ Platform-specific handlers (macOS, Linux, WSL)
 ```

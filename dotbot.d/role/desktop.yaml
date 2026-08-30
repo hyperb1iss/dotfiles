@@ -1,0 +1,81 @@
+# Desktop role: the workstation tooling that is the same on macOS and Linux.
+#
+# Anything with an OS-specific path lives in the os/ layer instead; this file
+# is what a graphical machine gets regardless of which kernel it boots.
+- defaults:
+    link:
+      relink: true
+      create: true
+
+# ~/.agents/skills is a link *target* below, so it has to exist as a real
+# directory. `create: true` on a link only makes the link's parent.
+- create:
+    - ~/.agents/skills
+
+- link:
+    ~/.fonts: fonts
+    ~/.config/lsd:
+      path: lsd
+      force: true
+    ~/.config/fastfetch/config.jsonc: fastfetch/config.jsonc
+    ~/.config/procs/config.toml: procs/config.toml
+    ~/.config/atuin/config.toml: atuin/config.toml
+    ~/.config/atuin/themes/silkcircuit.toml: atuin/themes/silkcircuit.toml
+    ~/.claude/statusline-command.sh: claude/statusline-command.sh
+    # ~/.agents/skills is the source of truth for agent skills. Codex scans it
+    # natively; Claude Code reaches it through this link.
+    ~/.claude/skills:
+      path: ~/.agents/skills
+      force: true
+    ~/.proto/.prototools: proto/.prototools
+    # starship, bat, dircolors, and ghostty themes are installed by the
+    # SilkCircuit installer in base.yaml
+
+- shell:
+    - command: |
+        # Refresh the font cache now that ~/.fonts points at the repo.
+        # macOS only ships fc-cache when fontconfig comes in from Homebrew.
+        if command -v fc-cache >/dev/null 2>&1; then
+          fc-cache -f
+        fi
+      description: Rebuilding the font cache
+
+    # Claude Code owns settings.json, so merge in the statusLine key rather than
+    # linking the whole file
+    - command: python3 ./claude/install-statusline.py
+      stdout: true
+      stderr: true
+      description: Wiring Claude Code status line
+
+    - command: |
+        # Install proto version manager if not present
+        if ! command -v proto &> /dev/null; then
+          echo "✨ Installing proto version manager..."
+          curl -fsSL https://moonrepo.dev/install/proto.sh | bash -s -- --yes
+          export PROTO_HOME="$HOME/.proto"
+          export PATH="$PROTO_HOME/shims:$PROTO_HOME/bin:$PATH"
+        fi
+        # Install node and npm via proto — versions are pinned by the
+        # tracked proto/.prototools; running `proto pin` here would write
+        # through the ~/.proto/.prototools symlink and dirty the repo
+        if command -v proto &> /dev/null; then
+          echo "📦 Setting up node and npm via proto..."
+          proto install node
+          proto install npm
+        fi
+      stderr: true
+      stdout: true
+      description: "Installing proto + node/npm"
+
+    - command: |
+        # Prefer a package-manager fzf, fall back to Go only when needed.
+        if command -v fzf >/dev/null 2>&1; then
+          echo "fzf already installed"
+        elif command -v go >/dev/null 2>&1; then
+          mkdir -p ~/dev/go && GOPATH=~/dev/go go install github.com/junegunn/fzf@latest
+        else
+          echo "Warning: fzf not found and go not available, skipping fzf install"
+        fi
+      stderr: true
+      stdout: true
+      description: Installing fzf

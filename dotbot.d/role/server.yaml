@@ -1,0 +1,36 @@
+# Server role: headless boxes and containers.
+#
+# The Makefile composes this without the os/ layer, so a server gets base.yaml
+# plus the small package tier below and nothing that assumes a display.
+- defaults:
+    link:
+      relink: true
+      create: true
+
+- shell:
+    - command: |
+        # The server rows of packages.conf. pkg-sync detects pacman or
+        # apt, says so and moves on when the box has neither, and works
+        # as root in a container without sudo installed.
+        bin/pkg-sync install server
+      stderr: true
+      stdout: true
+      description: Installing minimal package set
+
+    - command: |
+        if command -v update-alternatives >/dev/null 2>&1; then
+          sudo update-alternatives --install /usr/bin/editor editor /usr/bin/nvim 60
+          sudo update-alternatives --install /usr/bin/vim vim /usr/bin/nvim 60
+        fi
+      stderr: true
+      stdout: true
+      description: Pointing editor alternatives at nvim
+
+    - command: |
+        # Starship binary (config comes from the SilkCircuit installer in base)
+        if ! command -v starship >/dev/null 2>&1; then
+          curl -sS https://starship.rs/install.sh | sh -s -- --yes
+        fi
+      stderr: true
+      stdout: true
+      description: Installing starship

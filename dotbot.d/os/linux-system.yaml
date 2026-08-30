@@ -1,3 +1,6 @@
+# Linux system layer: the sudo tier. Run on its own (`make system`, which
+# `make full` calls first) because dotbot inherits root's HOME here and must
+# not touch anything under the user's home directory.
 - defaults:
     link:
       relink: true
@@ -38,33 +41,22 @@
 
 - shell:
     - command: |
-        if command -v pacman >/dev/null 2>&1; then
-          # Arch Linux setup
-          sudo pacman -Syu --noconfirm
-          # Install packages from list (failures will be non-fatal)
-          grep -v '^#\|^$' packages_arch.txt | xargs -r sudo pacman -S --needed --noconfirm || true
-        else
-          # Ubuntu/Debian setup
-          sudo add-apt-repository -y ppa:longsleep/golang-backports
-          sudo add-apt-repository -y ppa:git-core/ppa
-          sudo add-apt-repository -y ppa:zhangsongcui3371/fastfetch
-          sudo apt update
-          # Per-package so one unavailable name can't sink the whole batch
-          # (kubectl-on-noble class of failure)
-          grep -v '^#\|^$' packages.txt | while read -r pkg; do
-            sudo apt install -y --no-install-recommends "$pkg" || echo "⚠ skipped: $pkg"
-          done
-          # Rust toolchain + cargo tools are user-scope: local.yaml handles
-          # them so they land in ~/.cargo, not /root/.cargo.
+        # packages.conf is the one manifest; pkg-sync picks pacman or apt
+        # off the box, adds the PPAs apt needs, and warns per package
+        # instead of letting one unavailable name sink the batch.
+        #
+        # Rust toolchain + cargo tools are user-scope: the Linux layer
+        # handles them so they land in ~/.cargo, not /root/.cargo.
+        bin/pkg-sync install desktop
 
-          # Install Podman on Ubuntu/Debian (if not using Arch)
-          if ! command -v podman >/dev/null 2>&1; then
-            echo "Installing Podman..."
-            sudo apt install -y podman podman-docker buildah skopeo
-          fi
+        # Podman on Ubuntu/Debian, where it isn't in the manifest yet
+        if command -v apt-get >/dev/null 2>&1 && ! command -v podman >/dev/null 2>&1; then
+          echo "Installing Podman..."
+          sudo apt-get install -y podman podman-docker buildah skopeo
         fi
       stderr: true
       stdout: true
+      description: "Installing system packages"
     - command: |
         if command -v update-alternatives >/dev/null 2>&1; then
           sudo update-alternatives --install /usr/bin/editor editor /usr/bin/nvim 60
