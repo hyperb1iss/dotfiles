@@ -38,15 +38,18 @@ Everything starts in your `zshrc` and flows through a carefully orchestrated loa
 ```
 zshrc
   │
-  ├─ shell-common.sh   ← Helper functions, platform detection
-  ├─ env.sh            ← PATH, environment variables
-  ├─ terminal.sh       ← Terminal title setup
-  │
-  └─ [zinit loads remaining sh/*.sh files asynchronously]
-      ├─ git.sh
-      ├─ docker.sh
-      ├─ typescript.sh
-      └─ ...
+  └─ sh/loader.sh
+      ├─ dotfiles_load_core
+      │   ├─ shell-common.sh   ← Helper functions, platform detection
+      │   ├─ env.sh            ← PATH, environment variables
+      │   ├─ colors.sh         ← SilkCircuit palette
+      │   └─ terminal.sh       ← Terminal title setup
+      │
+      └─ dotfiles_load_modules (after completions and plugins in zsh)
+          ├─ git.sh
+          ├─ docker.sh
+          ├─ typescript.sh
+          └─ ...
 ```
 
 Scripts are smart about their environment:
@@ -150,7 +153,9 @@ Find, monitor, and control processes with modern tools and interactive selection
 
 ## Pro Tips
 
-**Lazy Loading for Speed**: Scripts load asynchronously via zinit, so your shell starts fast even with 100+ aliases.
+**Fast by Measurement**: Modules are sourced directly and the expensive tool inits are cached by `cached_eval`, so a
+warm shell starts in well under a tenth of a second with 150 aliases. Set
+`DOTFILES_SKIP_MODULES="kubernetes.sh docker.sh"` to leave modules out.
 
 **Conditional Loading**: No Docker installed? The docker.sh script gracefully skips. Same for all tools.
 
