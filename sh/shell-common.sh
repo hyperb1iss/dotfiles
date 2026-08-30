@@ -78,9 +78,15 @@ function has_command() {
 }
 
 # Installation type detection
+# The state file records how this machine was installed, and it is
+# gitignored, so a worktree has none of its own. Fall back to the
+# installed tree rather than reporting "unknown", which on a minimal
+# box would load every module where the real shell loads a trimmed set.
 DOTFILES_INSTALLATION_TYPE="unknown"
 if [[ -r "${DOTFILES}/.install_state" ]]; then
   IFS= read -r DOTFILES_INSTALLATION_TYPE < "${DOTFILES}/.install_state"
+elif [[ -r "${HOME}/dev/dotfiles/.install_state" ]]; then
+  IFS= read -r DOTFILES_INSTALLATION_TYPE < "${HOME}/dev/dotfiles/.install_state"
 fi
 
 function get_installation_type() {

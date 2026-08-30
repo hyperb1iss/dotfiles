@@ -52,10 +52,17 @@ if [ -z "${DOTFILES:-}" ]; then
     *) __dotfiles_root="" ;;
   esac
 
-  # A relative source path resolves against the caller's cwd.
+  # A relative source path resolves against the caller's cwd. A path we
+  # cannot read at all means we do not know which checkout this is, and
+  # quietly loading the installed one there would send somebody
+  # debugging a worktree through the wrong modules entirely.
   case "${__dotfiles_root}" in
     /*) ;;
-    "") __dotfiles_root="${HOME}/dev/dotfiles" ;;
+    "")
+      printf 'dotfiles: cannot place the checkout from "%s", using %s\n' \
+        "${__dotfiles_self}" "${HOME}/dev/dotfiles" >&2
+      __dotfiles_root="${HOME}/dev/dotfiles"
+      ;;
     *) __dotfiles_root="${PWD}/${__dotfiles_root}" ;;
   esac
 
