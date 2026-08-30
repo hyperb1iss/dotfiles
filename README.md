@@ -294,7 +294,7 @@ dstop             # Pick a container with fzf and stop it
 **Key Features:**
 
 - 83 functions and 66 aliases, every one of them named in the manifest
-- Linux command aliases backed by the GNU tools Chocolatey installs
+- Linux command aliases that bind to the real GNU tools when they are on PATH
 - Kubernetes shortcuts that match the names in `sh/kubernetes.sh`
 - Zoxide for smart directory navigation
 - Android and Gradle helpers, sharing `~/.adbdevs` with the Unix side
@@ -312,7 +312,7 @@ hypershell/
 │   └── Public/                        #   One file per domain: Git, Docker, Kubernetes, …
 ├── Microsoft.PowerShell_profile.ps1   # Imports the module, then wires up the session
 ├── PSScriptAnalyzerSettings.psd1      # Lint policy
-├── setup-windows.ps1                  # Chocolatey, PATH, and module installs
+├── setup-windows.ps1                  # rustup, PowerShell modules, PATH, and env
 └── tests/                             # Pester suite
 ```
 
