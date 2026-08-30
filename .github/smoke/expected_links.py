@@ -54,8 +54,19 @@ def main():
     args = parser.parse_args()
 
     # dotbot expands `~` through the environment, so the fake-HOME runs stay
-    # honest only if the expansion here reads the same variable.
+    # honest only if the expansion here reads the same variables.
+    #
+    # HOME alone is not enough. On Windows, expanduser never consults HOME:
+    # it reads USERPROFILE, falls back to HOMEDRIVE+HOMEPATH, and returns
+    # the path with the tilde still on the front when neither is set. That
+    # last case is the dangerous one, because a literal "~/..." string then
+    # gets asserted against and fails for a reason that looks nothing like
+    # the cause. Set all four so --home means the same thing everywhere.
     os.environ["HOME"] = args.home
+    os.environ["USERPROFILE"] = args.home
+    drive, tail = os.path.splitdrive(args.home)
+    os.environ["HOMEDRIVE"] = drive
+    os.environ["HOMEPATH"] = tail or args.home
 
     paths = []
     for layer in args.layers:
