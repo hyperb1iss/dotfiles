@@ -185,6 +185,13 @@ cd $env:USERPROFILE\dev\dotfiles
 .\install.ps1
 ```
 
+### Smoke tests
+
+Every push runs the install for real: `make server` end to end in Ubuntu and Arch containers, plus a link-only pass over
+the desktop layers on Linux and macOS. Run the same thing before you push with `make smoke`, which needs docker or
+podman for the container jobs and skips them with a note when neither is around. Details in
+[the installation guide](docs/getting-started/installation.md#smoke-tests).
+
 ## 🚀 Deep Dive
 
 ### 🐚 Shell Environment

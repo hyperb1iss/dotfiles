@@ -240,6 +240,51 @@ make install  # re-run the composed install
 
 This is safe to run multiple times—it won't reinstall packages, just update symlinks and configurations.
 
+## Smoke Tests
+
+The install runs against fresh machines in CI so a broken layer shows up on a pull request instead of the next time you
+set up a box.
+
+```bash
+make smoke
+```
+
+That runs the same scripts CI does, from `.github/smoke/`. First it checks that `make -n install` composes the layers
+this OS expects, then it does a link-only pass over them: the layers go through Dotbot with `--only clean create link`
+against a temporary `HOME`, so nothing is downloaded and your real home directory is never touched. Then the container
+jobs run, if `docker` or `podman` is installed and its daemon answers. Without that it says what it skipped and still
+reports the rest.
+
+Which layers each lane composes lives in one place, `.github/smoke/layers.sh`, so the workflow and `make smoke` cannot
+disagree about what they are testing.
+
+The container jobs each build a machine from nothing. A bare `ubuntu:24.04` or `archlinux:latest` image gets the handful
+of packages an install needs to start, an unprivileged user with passwordless sudo, and a copy of the checkout at
+`~/dev/dotfiles`, which is where the shell configs expect to find it. Then:
+
+| Job                    | What it proves                                                                                     |
+| ---------------------- | -------------------------------------------------------------------------------------------------- |
+| `ubuntu-server`        | `make server` completes on Ubuntu, every link resolves, `zsh -i` and `bash -i` load their rc files |
+| `arch-server`          | The same on Arch, through pacman instead of apt                                                    |
+| `ubuntu-desktop-links` | The desktop layers plus `host/hyperia.yaml` parse and link, without installing a graphical stack   |
+
+The expected links are read out of the layer yaml as the test runs, so adding a link to `dotbot.d/` needs no bookkeeping
+anywhere else.
+
+What the matrix does not cover: the sudo tier (`make system`), Homebrew and the macOS defaults in `os/macos.yaml`, the
+private overlay, and the graphical Linux stack. The macOS job composes the layers and links them against a temporary
+`HOME` rather than installing, since a real macOS install means Homebrew and a long list of casks. Arch runs on an amd64
+image, so `make smoke` emulates it on Apple Silicon and takes noticeably longer there than the Ubuntu jobs do.
+
+`make smoke` stops at the first container job that fails. To rerun one on its own:
+
+```bash
+./.github/smoke/run-container.sh arch-server
+```
+
+Set `SMOKE_INTERACTIVE=0` to skip the interactive shell check, which is the one step that reaches the network after the
+packages land (Zinit clones its plugins on first run).
+
 ## Troubleshooting
 
 ### Homebrew Not Found (macOS)

@@ -44,6 +44,7 @@ default:
 	@echo ""
 	@echo "Other commands:"
 	@echo "  make update  - Update submodules"
+	@echo "  make smoke   - Run the CI install smoke matrix on this machine"
 	@echo ""
 	@echo "Layers for this machine:"
 	@for layer in $(LAYER_CONFIGS); do echo "  $$layer"; done
@@ -76,6 +77,13 @@ full: system
 private: update
 	SHELL=/bin/bash $(DOTBOT) -d $(BASEDIR) -c $(LAYERS)/private.yaml
 
+# The install smoke matrix, run here instead of waiting on CI: the same
+# scripts .github/workflows/install-smoke.yml calls, so the two cannot
+# drift. Containers need docker or podman; without one it runs the
+# link-only dry run and says what it skipped. Nothing touches $(HOME).
+smoke:
+	@./.github/smoke/local.sh
+
 # Colors for beautiful output
 PURPLE := \033[1;35m
 PINK := \033[1;95m
@@ -104,7 +112,7 @@ lint-header:
 
 lint-shell:
 	@echo "$(CYAN)$(ARROW)$(RESET) $(BOLD)Shell Scripts$(RESET)"
-	@./bin/shellint --check sh/ bin/
+	@./bin/shellint --check sh/ bin/ .github/smoke/
 	@echo ""
 
 lint-yaml:
@@ -151,7 +159,7 @@ format-header:
 
 format-shell:
 	@echo "$(CYAN)$(ARROW)$(RESET) $(BOLD)Shell Scripts$(RESET)"
-	@./bin/shellint --format --fix sh/ bin/
+	@./bin/shellint --format --fix sh/ bin/ .github/smoke/
 	@echo ""
 
 format-prettier:
@@ -172,4 +180,4 @@ format-footer:
 	@echo "$(GREEN)$(CHECK)$(RESET) $(BOLD)All formatting completed!$(RESET)"
 	@echo ""
 
-.PHONY: default update install macos server minimal system full private lint lint-header lint-shell lint-yaml lint-lua lint-json lint-markdown lint-footer format format-header format-shell format-prettier format-lua format-footer
+.PHONY: default update install macos server minimal system full private smoke lint lint-header lint-shell lint-yaml lint-lua lint-json lint-markdown lint-footer format format-header format-shell format-prettier format-lua format-footer
