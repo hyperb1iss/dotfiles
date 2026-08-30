@@ -95,7 +95,9 @@ function Resolve-Manifest {
         [Parameter(Mandatory = $true)][string]$RoleName
     )
 
-    $seen = @{}
+    # Ordinal, not the default. A PowerShell hashtable folds case, so Foo.Bar
+    # and foo.bar would collapse into one entry here and stay two in awk.
+    $seen = New-Object 'System.Collections.Generic.HashSet[string]' ([StringComparer]::Ordinal)
     $resolved = New-Object System.Collections.Generic.List[string]
     $lineNumber = 0
 
@@ -105,7 +107,7 @@ function Resolve-Manifest {
         $line = $line -replace '#.*', ''
         $line = $line.Trim()
         if ($line -eq '') { continue }
-        if ($line.StartsWith('[')) { continue }
+        if ($line.StartsWith('[', [StringComparison]::Ordinal)) { continue }
 
         $fields = $line -split '\s+'
         if ($fields.Count -lt 3) {
@@ -118,7 +120,7 @@ function Resolve-Manifest {
 
         foreach ($field in $fields[2..($fields.Count - 1)]) {
             $token = $field
-            if ($token.StartsWith('bin=')) { continue }
+            if ($token.StartsWith('bin=', [StringComparison]::Ordinal)) { continue }
 
             $scope = $roles
             $at = $token.IndexOf('@')
@@ -134,11 +136,13 @@ function Resolve-Manifest {
                 $token = $token.Substring(0, $eq)
             }
 
-            if ($script:KnownManagers -notcontains $token) {
+            if ($script:KnownManagers -cnotcontains $token) {
                 throw "pkg-sync: $Path line ${lineNumber}: unknown manager: '$token'"
             }
-            if ($token -ne $ManagerName) { continue }
-            if (",$scope," -notlike "*,$RoleName,*") { continue }
+            if ($token -cne $ManagerName) { continue }
+            # String.Contains is ordinal; -like would read a role containing
+            # *, ?, or [ as a wildcard where awk's index() is literal.
+            if (-not ",$scope,".Contains(",$RoleName,")) { continue }
             if ($package -eq '') {
                 throw "pkg-sync: $Path line ${lineNumber}: empty package name"
             }
@@ -146,13 +150,51 @@ function Resolve-Manifest {
         }
 
         foreach ($package in $selected) {
-            if ($seen.ContainsKey($package)) { continue }
-            $seen[$package] = $true
+            if (-not $seen.Add($package)) { continue }
             $resolved.Add($package)
         }
     }
 
     return $resolved
+}
+
+<#
+.SYNOPSIS
+    Every role the manifest mentions.
+.DESCRIPTION
+    The mirror of manifest_roles in bin/pkg-sync, and the reason a typo'd
+    role fails loudly instead of resolving to an empty list and reporting
+    that it installed nothing.
+#>
+function Get-ManifestRole {
+    param(
+        [Parameter(Mandatory = $true)][string]$Path
+    )
+
+    $roles = New-Object 'System.Collections.Generic.HashSet[string]' ([StringComparer]::Ordinal)
+    $lineNumber = 0
+
+    foreach ($rawLine in [System.IO.File]::ReadAllLines($Path)) {
+        $lineNumber++
+        $line = ($rawLine -replace "`r$", '') -replace '#.*', ''
+        $line = $line.Trim()
+        if ($line -eq '') { continue }
+        if ($line.StartsWith('[', [StringComparison]::Ordinal)) { continue }
+
+        $fields = $line -split '\s+'
+        if ($fields.Count -lt 3) {
+            throw "pkg-sync: $Path line ${lineNumber}: expected <name> <roles> <source>..."
+        }
+
+        foreach ($role in ($fields[1] -split ',')) { [void]$roles.Add($role) }
+        foreach ($field in $fields[2..($fields.Count - 1)]) {
+            $at = $field.IndexOf('@')
+            if ($at -lt 0) { continue }
+            foreach ($role in ($field.Substring($at + 1) -split ',')) { [void]$roles.Add($role) }
+        }
+    }
+
+    return @($roles | Sort-Object)
 }
 
 function Get-DefaultRole {
@@ -230,7 +272,7 @@ function Invoke-Main {
         return
     }
 
-    if ($script:KnownManagers -notcontains $Manager) {
+    if ($script:KnownManagers -cnotcontains $Manager) {
         Write-Fail "unknown manager: $Manager"
         return
     }
@@ -238,10 +280,12 @@ function Invoke-Main {
     $resolvedRole = $Role
     if (-not $resolvedRole) { $resolvedRole = Get-DefaultRole -RepoRoot $repoRoot }
 
-    # The resolver throws on a malformed row. Catch it so a bad manifest
+    # The resolvers throw on a malformed row. Catch that so a bad manifest
     # reads as one line on stderr and exit 2, the way the bash twin does,
     # instead of a PowerShell stack trace and exit 1.
     try {
+        $knownRoles = Get-ManifestRole -Path $manifestPath
+
         # @() is not decoration. PowerShell unrolls a collection on return,
         # so one resolved package comes back as a bare string and none comes
         # back as $null, and the .Count below would throw on both under
@@ -254,12 +298,17 @@ function Invoke-Main {
         return
     }
 
+    if ($knownRoles -cnotcontains $resolvedRole) {
+        Write-Fail "unknown role: $resolvedRole (manifest has: $($knownRoles -join ' '))"
+        return
+    }
+
     if ($Command -eq 'list') {
         foreach ($package in $packages) { Write-Output $package }
         return
     }
 
-    if ($Manager -ne 'winget') {
+    if ($Manager -cne 'winget') {
         Write-Fail "install is winget only on Windows, got: $Manager"
         return
     }
