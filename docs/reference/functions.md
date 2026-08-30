@@ -315,8 +315,8 @@ Multiple screenshot functions for various capture modes (see source for details)
 | `is_linux`    | Check if running on Linux     |
 | `is_wsl`      | Check if running in WSL       |
 | `has_command` | Check if command exists       |
-| `is_minimal`  | Check if minimal install mode |
-| `is_full`     | Check if full install mode    |
+| `is_minimal`  | Check if server install       |
+| `is_full`     | Check if desktop install      |
 
 ### Helper Functions
 

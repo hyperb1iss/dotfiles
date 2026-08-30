@@ -4,17 +4,18 @@ Customize your environment to perfection.
 
 ## Shell Configuration
 
-### Installation Types
+### Installation Role
 
-The installation saves its type to `.install_state`:
+`make install` records the role it composed in `.dotfiles_role`:
 
 ```bash
-cat ~/dev/dotfiles/.install_state
-# Output: minimal, full, or macos
+cat ~/dev/dotfiles/.dotfiles_role
+# Output: desktop or server
 ```
 
 Scripts check this with `is_minimal` and `is_full` functions to conditionally load features. This ensures lightweight
-servers don't load desktop-specific utilities.
+servers don't load desktop-specific utilities. Machines installed before the layer split still carry the old
+`.install_state` file, which is read as a fallback until the next `make install`.
 
 ### Environment Variables
 
@@ -479,7 +480,7 @@ Quick reference for where everything lives:
 | Git                | `~/dev/dotfiles/gitconfig`              |
 | Git Iris           | `.git-iris.yaml` (per-project)          |
 | Private settings   | `~/.rc.local`                           |
-| Installation state | `~/dev/dotfiles/.install_state`         |
+| Installation role  | `~/dev/dotfiles/.dotfiles_role`         |
 
 All configs are symlinked from `~/dev/dotfiles` to their expected locations (`~/.zshrc`, `~/.config/nvim`, etc.).
 

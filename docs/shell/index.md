@@ -52,7 +52,7 @@ zshrc
 Scripts are smart about their environment:
 
 ```bash
-is_minimal && return 0  # Skip on minimal installs
+is_minimal && return 0  # Skip on server installs
 is_macos && alias ...   # macOS-only aliases
 has_command docker && ... # Load only if Docker exists
 ```

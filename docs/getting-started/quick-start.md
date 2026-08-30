@@ -356,6 +356,7 @@ New `.sh` files in `sh/` are automatically loaded by Zinit.
 
 ## Next Steps
 
+- [Installation](./installation) — How the install layers compose
 - [Configuration Guide](./configuration) — Customize everything
 - [Shell Utilities](/shell/) — Deep dive into shell scripts
 - [Neovim Setup](/neovim/) — Editor configuration details

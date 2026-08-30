@@ -18,7 +18,7 @@ This script automates everything:
 2. Sets up Homebrew (detects Apple Silicon vs Intel)
 3. Installs Git and other dependencies
 4. Clones the dotfiles repository to `~/dev/dotfiles`
-5. Runs the full installation via `make macos`
+5. Runs the full installation via `make macos`, an alias for `make install`
 6. Configures Zsh as your default shell
 
 ::: tip First Run If Command Line Tools aren't installed, the script will initiate the installation and exit. Complete
@@ -37,16 +37,18 @@ cd ~/dev/dotfiles
 git submodule update --init --recursive
 
 # 3. Run installation
-make macos
+make install
 ```
 
-The `macos` profile installs:
+`make install` composes `base.yaml`, `os/macos.yaml`, and `role/desktop.yaml`, which together install:
 
 - Homebrew packages via `macos/brew.sh`
 - Modern CLI tools (lsd, bat, fd, ripgrep, delta, zoxide)
 - Starship prompt
 - FZF (built from source via Go)
 - Symlinks for configs (zsh, nvim, tmux, git, starship)
+
+`make macos` is kept as an alias and does the same thing.
 
 ## Linux
 
@@ -61,15 +63,15 @@ git submodule update --init --recursive
 make full
 ```
 
-The `full` profile includes:
+`make full` runs the sudo tier first, then the composed install:
 
 - System-level configurations (requires sudo)
 - Desktop environment integrations
 - GUI tools and fonts
 - All shell utilities and CLI tools
 
-::: warning Sudo Required The `full` installation runs `sudo` for system-level changes. Review `system.yaml` first if
-you're cautious. :::
+::: warning Sudo Required The sudo tier runs as root. Review `dotbot.d/os/linux-system.yaml` first if you're cautious,
+or run `make install` on its own to skip it entirely. :::
 
 ### Minimal Server Setup
 
@@ -79,10 +81,10 @@ For headless servers or containers:
 git clone https://github.com/hyperb1iss/dotfiles.git ~/dev/dotfiles
 cd ~/dev/dotfiles
 git submodule update --init --recursive
-make minimal
+make server
 ```
 
-The `minimal` profile includes:
+The `server` role includes:
 
 - Essential shell utilities only
 - No GUI tools or desktop integrations
@@ -108,16 +110,23 @@ WSL-specific features are automatically enabled:
 - Cross-platform clipboard support
 - Browser launching from WSL
 
-## Installation Profiles
+## Installation Targets
 
-| Profile   | Command        | Use Case                         | Sudo Required |
-| --------- | -------------- | -------------------------------- | ------------- |
-| `macos`   | `make macos`   | Full macOS desktop environment   | No            |
-| `full`    | `make full`    | Full Linux/WSL desktop           | Yes           |
-| `minimal` | `make minimal` | Servers, containers, lightweight | No            |
+| Command        | Layers composed                                       | Use Case                          | Sudo Required |
+| -------------- | ----------------------------------------------------- | --------------------------------- | ------------- |
+| `make install` | `base` + `os/<uname>` + `role/desktop` + host/private | Any desktop, macOS or Linux       | No            |
+| `make server`  | `base` + `role/server` + host/private                 | Servers, containers, lightweight  | Yes, packages |
+| `make full`    | The sudo tier, then `make install`                    | Full Linux/WSL desktop            | Yes           |
+| `make system`  | `os/linux-system` only                                | System files, no home changes     | Yes           |
+| `make private` | `private` only                                        | Refresh the dotfiles-private bits | No            |
 
-::: tip Installation State The installation type is saved to `.install_state`. Mixing profiles (e.g., running `minimal`
-then `full`) will warn you to prevent conflicts. :::
+`make macos` and `make minimal` still work; they are aliases for `make install` and `make server`.
+
+::: tip Layers Compose Profiles no longer conflict, so switching between them is safe: run `make server` on a box you
+installed as a desktop and the server layer simply replaces the desktop one. `make install` records the role it used in
+`.dotfiles_role`, which is what the shell reads to decide whether to load the heavier modules. :::
+
+Override the detection when you need to, for example `make install ROLE=server` or `make install HOST=hyperia`.
 
 ## What Gets Installed
 
@@ -221,7 +230,7 @@ make update
 To re-apply configuration after updates:
 
 ```bash
-make macos  # or your installation profile
+make install  # re-run the composed install
 ```
 
 This is safe to run multiple times—it won't reinstall packages, just update symlinks and configurations.
