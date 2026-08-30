@@ -115,10 +115,16 @@ resolve() {
 # @role scope on an individual source.
 manifest_roles() {
   awk '
+    function die(msg) {
+      printf("pkg-sync: %s line %d: %s\n", FILENAME, FNR, msg) > "/dev/stderr"
+      exit 2
+    }
     { sub(/#.*/, ""); gsub(/^[ \t]+|[ \t]+$/, "") }
     /^$/ { next }
     /^\[/ { next }
-    NF < 2 { next }
+    {
+      if (NF < 3) die("expected <name> <roles> <source>...")
+    }
     {
       n = split($2, parts, ",")
       for (i = 1; i <= n; i++) roles[parts[i]] = 1
@@ -369,10 +375,17 @@ main() {
     return 0
   fi
 
-  if ! manifest_roles | grep -qx "${role}"; then
-    err "unknown role: ${role} (manifest has: $(manifest_roles | tr '\n' ' '))"
-    return 2
-  fi
+  # Parses the manifest as a side effect, so a malformed row is caught
+  # here before anything touches the system.
+  local known_roles
+  known_roles="$(manifest_roles | tr '\n' ' ')"
+  case " ${known_roles}" in
+    *" ${role} "*) ;;
+    *)
+      err "unknown role: ${role} (manifest has: ${known_roles% })"
+      return 2
+      ;;
+  esac
 
   if [[ "${command}" == "list" ]]; then
     resolve "${manager}" "${role}"
