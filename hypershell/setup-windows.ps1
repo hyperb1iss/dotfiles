@@ -11,7 +11,8 @@ if (-NOT ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdenti
 if (!(Get-Command choco -ErrorAction SilentlyContinue)) {
     Set-ExecutionPolicy Bypass -Scope Process -Force
     [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072
-    Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
+    $chocoInstall = (New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1')
+    & ([scriptblock]::Create($chocoInstall))
 }
 
 # Install or upgrade necessary tools
@@ -78,14 +79,14 @@ else {
 }
 
 # Diagnostic function
-function Test-PowerShellModules {
+function Test-PowerShellModule {
     Write-Host "Diagnosing PowerShell modules..." -ForegroundColor Yellow
     $psGetModule = Get-Module -Name PowerShellGet -ListAvailable | Sort-Object Version -Descending | Select-Object -First 1
     $packageManagementModule = Get-Module -Name PackageManagement -ListAvailable | Sort-Object Version -Descending | Select-Object -First 1
 
     Write-Host "PowerShellGet version: $($psGetModule.Version)"
     Write-Host "PackageManagement version: $($packageManagementModule.Version)"
-    
+
     $psGetPath = $psGetModule.ModuleBase
     $packageManagementPath = $packageManagementModule.ModuleBase
 
@@ -108,7 +109,7 @@ function Test-PowerShellModules {
 }
 
 # Attempt to repair PowerShellGet and PackageManagement
-function Repair-PowerShellModules {
+function Repair-PowerShellModule {
     Write-Host "Attempting to repair PowerShellGet and PackageManagement..." -ForegroundColor Yellow
 
     $tempFolder = Join-Path $env:TEMP "PSModules"
@@ -138,19 +139,46 @@ function Repair-PowerShellModules {
 }
 
 # Run diagnostics
-Test-PowerShellModules
+Test-PowerShellModule
 
 # Attempt repair
-Repair-PowerShellModules
+Repair-PowerShellModule
 
 # Run diagnostics again to verify repair
-Test-PowerShellModules
+Test-PowerShellModule
 
-# Install PowerShell modules
+# Install the PowerShell modules HyperShell declares.
+#
+# The manifest is the source of truth so this list cannot drift:
+# RequiredModules is what the module imports, and
+# PrivateData.HyperShell.OptionalModules is what it picks up when present.
 Write-Host "Installing PowerShell modules..." -ForegroundColor Yellow
-Install-Module -Name PSReadLine -Force -SkipPublisherCheck
-Install-Module -Name posh-git -Force
-Install-Module -Name Terminal-Icons -Force
+$manifestPath = Join-Path -Path $PSScriptRoot -ChildPath "HyperShell" -AdditionalChildPath "HyperShell.psd1"
+
+if (Test-Path -LiteralPath $manifestPath) {
+    $hyperShellManifest = Import-PowerShellDataFile -LiteralPath $manifestPath
+    $moduleNames = @(
+        $hyperShellManifest.RequiredModules | ForEach-Object {
+            if ($_ -is [hashtable]) { $_.ModuleName } else { $_ }
+        }
+        $hyperShellManifest.PrivateData.HyperShell.OptionalModules
+    ) | Where-Object { $_ } | Select-Object -Unique
+
+    foreach ($moduleName in $moduleNames) {
+        Write-Host "  $moduleName" -ForegroundColor Cyan
+        if (Get-Command Install-PSResource -ErrorAction SilentlyContinue) {
+            # -TrustRepository keeps this non-interactive; without it PSResourceGet
+            # stops for a confirmation prompt on an untrusted PSGallery.
+            Install-PSResource -Name $moduleName -Scope CurrentUser -TrustRepository -ErrorAction Continue
+        }
+        else {
+            Install-Module -Name $moduleName -Scope CurrentUser -Force -SkipPublisherCheck
+        }
+    }
+}
+else {
+    Write-Warning "HyperShell manifest not found at $manifestPath, skipping module installation."
+}
 
 # Setup Visual Studio Code extensions
 Write-Host "Setting up Visual Studio Code extensions..." -ForegroundColor Yellow
@@ -198,10 +226,14 @@ Add-ToPath "C:\cygwin64\bin"
 
 # Function to set environment variables
 function Set-EnvironmentVariable {
+    [CmdletBinding(SupportsShouldProcess)]
     param (
         [string]$Name,
         [string]$Value
     )
+    if (-not $PSCmdlet.ShouldProcess($Name, "Set user environment variable")) {
+        return
+    }
     [Environment]::SetEnvironmentVariable($Name, $Value, "User")
     [Environment]::SetEnvironmentVariable($Name, $Value, "Process")
     Write-Host "Set $Name to $Value" -ForegroundColor Green
