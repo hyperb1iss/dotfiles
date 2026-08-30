@@ -68,9 +68,9 @@ fi
 # the sourced file ends that file, not this function, which is what the
 # `is_minimal && return 0` guard at the top of most modules relies on.
 #
-# A module's exit status is a poor health signal — plenty of them end on
-# a conditional or a cached_eval whose last command is somebody else's
-# init script — so the status only surfaces under
+# A module's exit status is a poor health signal, since plenty of them
+# end on a conditional or on a cached_eval whose last command belongs to
+# somebody else's init script. So the status only surfaces under
 # DOTFILES_LOADER_DEBUG=1. A module with a real syntax error still
 # prints the shell's own parse error either way.
 __dotfiles_source() {

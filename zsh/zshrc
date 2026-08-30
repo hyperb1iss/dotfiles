@@ -95,7 +95,7 @@ cached_eval starship starship-init.zsh starship init zsh --print-full-init
 
 # Phase two: the rest of sh/, sourced directly. They used to go through
 # `zinit snippet`, but zinit copies local snippets into its cache and
-# never invalidates them — interactive shells were running months-old
+# never invalidates them, so interactive shells were running months-old
 # module code while the repo moved on. Direct sourcing is a few ms (the
 # expensive tool inits inside are mtime-cached via cached_eval) and what
 # you edit is what runs.
