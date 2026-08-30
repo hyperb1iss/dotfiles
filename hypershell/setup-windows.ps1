@@ -1,54 +1,43 @@
 # setup-windows.ps1
-# This script sets up the Windows environment with necessary tools and configurations
+#
+# Windows environment setup for everything that is not a package.
+#
+# Packages come from install.ps1, which runs bin/pkg-sync.ps1 against
+# packages.conf and installs them with winget. This script covers the rest:
+# the rustup toolchain, the PowerShell modules HyperShell declares, VS Code
+# extensions, PATH and environment variables, and the developer mode switch.
+#
+# It no longer demands administrator rights up front. Everything here works
+# unelevated except the PowerShellGet repair and the developer mode registry
+# key, and those two check for elevation themselves and print a skip line
+# rather than aborting the whole run.
 
-# Ensure script is run as administrator
-if (-NOT ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")) {
-    Write-Warning "You do not have Administrator rights to run this script!`nPlease re-run this script as an Administrator!"
-    Break
+<#
+.SYNOPSIS
+    Reports whether this session is elevated.
+#>
+function Test-Administrator {
+    [CmdletBinding()]
+    [OutputType([bool])]
+    param()
+
+    try {
+        $identity = [Security.Principal.WindowsIdentity]::GetCurrent()
+        return ([Security.Principal.WindowsPrincipal]$identity).IsInRole(
+            [Security.Principal.WindowsBuiltInRole]::Administrator)
+    }
+    catch {
+        return $false
+    }
 }
 
-# Install Chocolatey if not already installed
-if (!(Get-Command choco -ErrorAction SilentlyContinue)) {
-    Set-ExecutionPolicy Bypass -Scope Process -Force
-    [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072
-    $chocoInstall = (New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1')
-    & ([scriptblock]::Create($chocoInstall))
+$isElevated = Test-Administrator
+if (-not $isElevated) {
+    Write-Host "Running unelevated. Steps that need administrator rights will be skipped." -ForegroundColor Yellow
 }
-
-# Install or upgrade necessary tools
-choco upgrade -y `
-    powershell-core `
-    microsoft-windows-terminal `
-    git `
-    vscode `
-    nodejs `
-    python `
-    fzf `
-    ripgrep `
-    bat `
-    lsd `
-    starship `
-    neovim `
-    gnuwin32-coreutils.install `
-    grep `
-    findutils `
-    sed `
-    gawk `
-    which `
-    unxutils `
-    cygwin `
-    mingw `
-    curl `
-    wget `
-    7zip `
-    bzip2 `
-    openssh `
-    make `
-    delta `
-    zoxide
 
 # ── Rust ─────────────────────────────────────────────────────────────────────
-# Rust comes from rustup, never Chocolatey.
+# Rust comes from rustup, never a package manager.
 #
 # Chocolatey's `rust` package drops a GNU-host toolchain into
 # C:\ProgramData\chocolatey\bin, which lives in the *system* PATH. Windows
@@ -60,9 +49,15 @@ choco upgrade -y `
 #
 # rustup is also the only installer that honours a repo's rust-toolchain.toml,
 # which several projects here pin.
-if (Test-Path "C:\ProgramData\chocolatey\lib\rust") {
-    Write-Host "Removing Chocolatey's rust package (it shadows rustup)..." -ForegroundColor Yellow
-    choco uninstall rust -y
+if ((Test-Path "C:\ProgramData\chocolatey\lib\rust") -and (Get-Command choco -ErrorAction SilentlyContinue)) {
+    if ($isElevated) {
+        Write-Host "Removing Chocolatey's rust package (it shadows rustup)..." -ForegroundColor Yellow
+        choco uninstall rust -y
+    }
+    else {
+        Write-Host "Chocolatey's rust package is installed and shadows rustup." -ForegroundColor Yellow
+        Write-Host "  Run 'choco uninstall rust -y' from an elevated prompt." -ForegroundColor Yellow
+    }
 }
 
 if (!(Get-Command rustup -ErrorAction SilentlyContinue)) {
@@ -108,7 +103,10 @@ function Test-PowerShellModule {
     }
 }
 
-# Attempt to repair PowerShellGet and PackageManagement
+# Attempt to repair PowerShellGet and PackageManagement.
+#
+# This writes into $env:ProgramFiles, so it is the one step here that
+# genuinely needs elevation.
 function Repair-PowerShellModule {
     Write-Host "Attempting to repair PowerShellGet and PackageManagement..." -ForegroundColor Yellow
 
@@ -141,11 +139,15 @@ function Repair-PowerShellModule {
 # Run diagnostics
 Test-PowerShellModule
 
-# Attempt repair
-Repair-PowerShellModule
+if ($isElevated) {
+    Repair-PowerShellModule
 
-# Run diagnostics again to verify repair
-Test-PowerShellModule
+    # Run diagnostics again to verify repair
+    Test-PowerShellModule
+}
+else {
+    Write-Host "Skipping the PowerShellGet repair: it writes to $env:ProgramFiles and needs administrator rights." -ForegroundColor Yellow
+}
 
 # Install the PowerShell modules HyperShell declares.
 #
@@ -216,7 +218,9 @@ function Add-ToPath {
     }
 }
 
-# Add common directories to PATH
+# Add common directories to PATH. The GnuWin32, unxutils, and cygwin entries
+# are what put grep, sed, awk, and find on PATH, which is what HyperShell's
+# aliases for those names bind to.
 Add-ToPath "$env:USERPROFILE\bin"
 Add-ToPath "$env:USERPROFILE\.local\bin"
 Add-ToPath "$env:USERPROFILE\.cargo\bin"
@@ -257,23 +261,16 @@ else {
     Write-Host "Neovim (nvim) not found in PATH. Please ensure it's installed correctly." -ForegroundColor Red
 }
 
-# Install zoxide via cargo if not already installed
-if (!(Get-Command zoxide -ErrorAction SilentlyContinue)) {
-    Write-Host "Installing zoxide via cargo..." -ForegroundColor Yellow
-    if (Get-Command cargo -ErrorAction SilentlyContinue) {
-        cargo install zoxide
-        Write-Host "zoxide installed successfully." -ForegroundColor Green
-    }
-    else {
-        Write-Host "Cargo not found. Please install Rust and Cargo first." -ForegroundColor Red
-    }
+# Enable Developer Mode. Writes to HKLM, so it needs elevation.
+$devModeKey = "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModelUnlock"
+if ($isElevated) {
+    Set-ItemProperty -Path $devModeKey -Name "AllowDevelopmentWithoutDevLicense" -Value 1
+    Write-Host "Developer Mode enabled." -ForegroundColor Green
 }
 else {
-    Write-Host "zoxide is already installed." -ForegroundColor Green
+    Write-Host "Skipping Developer Mode: writing to HKLM needs administrator rights." -ForegroundColor Yellow
+    Write-Host "  Enable it from Settings, or rerun this script elevated." -ForegroundColor Yellow
 }
-
-# Enable Developer Mode
-Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModelUnlock" -Name "AllowDevelopmentWithoutDevLicense" -Value 1
 
 Write-Host "Windows environment setup complete!" -ForegroundColor Green
 Write-Host "Please restart your PowerShell session to ensure all changes take effect." -ForegroundColor Yellow
