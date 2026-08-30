@@ -46,7 +46,7 @@ usage:
   <manager>  apt, pacman, cargo, ppa. Detected from the box when omitted.
   <role>     desktop or server. Defaults to .dotfiles_role, else desktop.
 
-  --dry-run  print the commands instead of running them
+  --dry-run, -n  print the commands instead of running them
 
 examples:
   pkg-sync list apt server
@@ -395,6 +395,13 @@ main() {
       return 2
       ;;
   esac
+
+  # Parse the whole manifest once with the status actually checked. The
+  # install paths read their lists through process substitution, which
+  # swallows the parser's exit code, so a bad row there would truncate
+  # the list instead of failing the run. awk reads every line whatever
+  # manager it was asked about, so one pass catches all of them.
+  resolve "${manager}" "${role}" > /dev/null
 
   if [[ "${command}" == "list" ]]; then
     resolve "${manager}" "${role}"
