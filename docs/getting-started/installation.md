@@ -91,6 +91,56 @@ The `server` role includes:
 - Lightweight footprint
 - Perfect for SSH environments
 
+## Windows
+
+Windows has its own entry point, `install.ps1`, which does everything the Makefile does everywhere else:
+
+```powershell
+git clone https://github.com/hyperb1iss/dotfiles.git $env:USERPROFILE\dev\dotfiles
+cd $env:USERPROFILE\dev\dotfiles
+powershell -ExecutionPolicy Bypass -File .\install.ps1
+```
+
+Windows PowerShell 5.1 defaults to a `Restricted` execution policy on client editions, which refuses to run any script
+at all, so the bypass is how a fresh box gets through the first run. Once PowerShell 7 is installed and the policy is
+`RemoteSigned`, plain `.\install.ps1` works.
+
+In order, it initializes the submodules, installs the winget rows of `packages.conf` for the role, composes the dotbot
+layers, records the role in `.dotfiles_role`, and applies the one step that needs elevation.
+
+### One layer, on purpose
+
+Windows composes `dotbot.d/os/windows.yaml` and nothing else. `base.yaml` and `role/desktop.yaml` link unix paths
+(`~/.zshrc`, `~/.bashrc.local`, `~/bin`) and shell out to bash for the SilkCircuit installer, so the Windows layer
+carries its own copy of the handful of links worth sharing: Neovim, the HyperShell profile, gitconfig, and the Claude
+Code status line. The HyperShell module directory is linked too, behind an `if:` guard, so a checkout made before that
+module landed skips the link instead of failing the whole dotbot run over it.
+
+`dotbot.d/private.yaml` is skipped for the same reason, and the script says so when `~/dev/dotfiles-private` is actually
+checked out. Every `if:` guard in it is a POSIX `[ -f ... ]` test and both of its shell steps are POSIX, while dotbot
+runs shell through `cmd.exe` on Windows. The Windows layer links `~/.claude/CLAUDE.md` and `~/.codex/AGENTS.md` itself,
+with cmd-syntax guards.
+
+`-Role server` narrows the winget package set and is what lands in `.dotfiles_role`. It does not change the layer list,
+because there is only the one.
+
+### Administrator
+
+Elevation is detected once, never demanded. Setting the default WSL version is the only step that needs it, and an
+unelevated run skips that step by name and installs everything else. Run from an administrator prompt when you want it.
+
+### Flags
+
+| Flag              | What it does                                                   |
+| ----------------- | -------------------------------------------------------------- |
+| `-Role server`    | The smaller winget set, for Windows Server                     |
+| `-SkipPackages`   | Relink and reconfigure without touching winget                 |
+| `-SkipSubmodules` | Leave dotbot and tpm at the revision already checked out       |
+| `-DryRun`         | Print every command, including the dotbot invocation, and stop |
+
+Nothing prompts, so the script runs headless. The exit code means something too: 1 when dotbot fails, 2 when there is no
+Python for it to run on.
+
 ## WSL2
 
 Windows Subsystem for Linux works great:
@@ -112,13 +162,14 @@ WSL-specific features are automatically enabled:
 
 ## Installation Targets
 
-| Command        | Layers composed                                       | Use Case                          | Sudo Required |
-| -------------- | ----------------------------------------------------- | --------------------------------- | ------------- |
-| `make install` | `base` + `os/<uname>` + `role/desktop` + host/private | Any desktop, macOS or Linux       | No            |
-| `make server`  | `base` + `role/server` + host/private                 | Servers, containers, lightweight  | Yes, packages |
-| `make full`    | The sudo tier, then `make install`                    | Full Linux/WSL desktop            | Yes           |
-| `make system`  | `os/linux-system` only                                | System files, no home changes     | Yes           |
-| `make private` | `private` only                                        | Refresh the dotfiles-private bits | No            |
+| Command         | Layers composed                                       | Use Case                          | Sudo Required |
+| --------------- | ----------------------------------------------------- | --------------------------------- | ------------- |
+| `make install`  | `base` + `os/<uname>` + `role/desktop` + host/private | Any desktop, macOS or Linux       | No            |
+| `make server`   | `base` + `role/server` + host/private                 | Servers, containers, lightweight  | Yes, packages |
+| `make full`     | The sudo tier, then `make install`                    | Full Linux/WSL desktop            | Yes           |
+| `make system`   | `os/linux-system` only                                | System files, no home changes     | Yes           |
+| `make private`  | `private` only                                        | Refresh the dotfiles-private bits | No            |
+| `.\install.ps1` | `os/windows` only                                     | Windows, the whole install        | Only for WSL  |
 
 `make macos` and `make minimal` still work; they are aliases for `make install` and `make server`.
 
@@ -139,10 +190,22 @@ These are installed by the setup scripts:
 
 - **Homebrew** (macOS) — Via official install script
 - **cargo** (via rustup) — For Rust-based tools
+- **winget** (Windows), which ships with Windows 10 and 11 and needs no bootstrap
 
-On Linux the package list itself is `packages.conf` at the repo root, resolved and installed by `bin/pkg-sync`. Run
+The package list itself is `packages.conf` at the repo root, resolved and installed by `bin/pkg-sync`. Run
 `bin/pkg-sync list apt server` to see exactly what a role gets, or add `-n` to an install to print the plan instead of
 running it.
+
+winget rows live in that same file, carrying package ids rather than names because that is what `winget install --id`
+matches exactly. A fresh Windows box has no bash, so `bin/pkg-sync.ps1` reads the manifest with the same grammar and
+`install.ps1` calls it. Keeping the two readers honest is one command:
+
+```bash
+diff <(bin/pkg-sync list winget desktop) <(pwsh -NoProfile -File bin/pkg-sync.ps1 list winget desktop)
+```
+
+`bin/pkg-sync export winget desktop` writes a `winget import` document to stdout if you would rather feed winget
+directly.
 
 **Modern CLI Tools**
 
