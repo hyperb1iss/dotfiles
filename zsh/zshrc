@@ -31,11 +31,17 @@ HISTFILE=~/.zsh_history
 # phase two (dotfiles_load_modules) after the plugins are in place.
 #
 # DOTFILES steers which checkout loads, which is how a worktree gets
-# tested without disturbing the installed one. A stale value left in
-# the environment must not cost you a working shell, so drop it when it
-# points at nothing and let the loader derive its own path instead.
-[[ -r "${DOTFILES:-${HOME}/dev/dotfiles}/sh/loader.sh" ]] || unset DOTFILES
-source "${DOTFILES:-${HOME}/dev/dotfiles}/sh/loader.sh"
+# tested without disturbing the installed one. An explicit value wins
+# while it points at a real checkout. Otherwise derive the root from
+# this file's own location rather than from a hardcoded path: every
+# shell here inherits an exported DOTFILES pointing at the installed
+# tree, so a worktree's zshrc that trusted it would load the wrong
+# modules, or none at all before this branch is merged.
+#
+# ${(%):-%x} is the file being sourced, :A resolves the ~/.zshrc
+# symlink to its target, and :h:h climbs out of zsh/ to the repo root.
+[[ -r "${DOTFILES:-}/sh/loader.sh" ]] || export DOTFILES="${${(%):-%x}:A:h:h}"
+source "${DOTFILES}/sh/loader.sh"
 dotfiles_load_core
 
 # Add Homebrew completion directories before compinit without shelling out to brew.
