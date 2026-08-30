@@ -100,6 +100,13 @@ dotfiles_load_core() {
 # Set DOTFILES_SKIP_MODULES to a space-separated list of basenames to
 # leave some out, e.g. DOTFILES_SKIP_MODULES="kubernetes.sh docker.sh".
 dotfiles_load_modules() {
+  # zsh aborts the function outright when a glob matches nothing, where
+  # bash leaves the pattern literal for the [ -r ] test below to skip.
+  # Our own presence in sh/ guarantees at least one match, so check for
+  # it rather than reaching for NULL_GLOB, which would otherwise stay
+  # in effect while every module's top level runs.
+  [ -r "${DOTFILES}/sh/loader.sh" ] || return 0
+
   # Prefixed names: these stay in scope while each module's top level
   # runs, so they must not collide with anything a module assigns.
   local __dotfiles_module __dotfiles_name
