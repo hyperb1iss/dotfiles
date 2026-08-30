@@ -21,13 +21,13 @@ purples, electric cyans, and blazing pinks that flows through every tool.
 
 ## 🌟 Core Features
 
-| Feature                  | Description                                                                                                                                                                                            |
-| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| 🐚 **Shell Environment** | • Zsh with Zinit plugin management & Bash fallback<br>• Atuin-powered shell history with cross-machine sync<br>• 28 modular shell scripts with 100+ aliases<br>• Smart platform detection & adaptation |
-| 🖥️ **Terminal Setup**    | • Ghostty terminal with SilkCircuit theme<br>• Tmux multiplexer with custom keybindings<br>• Starship prompt with gradient theme<br>• FZF-powered fuzzy finding everywhere                             |
-| 🤖 **AI Integration**    | • Claude Code CLI for terminal AI pair programming<br>• Avante.nvim for in-editor Claude assistance<br>• Custom Claude Code status line & security hooks                                               |
-| 🎨 **SilkCircuit Theme** | • [silkcircuit-nvim](https://github.com/hyperb1iss/silkcircuit-nvim) Neovim colorscheme<br>• Consistent theming across Neovim, Git, Starship, Tmux, Ghostty, Bat, Delta, Atuin, FZF, and more          |
-| 🛠️ **Development Tools** | • AstroNvim v5 with full LSP for 11+ languages<br>• Proto version manager (Node, Rust, pnpm)<br>• Git workflow enhancements with Delta diffs<br>• Docker & Kubernetes management                       |
+| Feature                  | Description                                                                                                                                                                                               |
+| ------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 🐚 **Shell Environment** | • Zsh with Zinit plugin management & Bash fallback<br>• Atuin-powered shell history with cross-machine sync<br>• 28 modular shell scripts with 100+ aliases<br>• Smart platform detection & adaptation    |
+| 🖥️ **Terminal Setup**    | • Ghostty terminal with SilkCircuit theme<br>• Tmux multiplexer with custom keybindings<br>• Starship prompt with gradient theme<br>• FZF-powered fuzzy finding everywhere                                |
+| 🤖 **AI Integration**    | • Claude Code CLI for terminal AI pair programming<br>• Avante.nvim for in-editor Claude assistance<br>• Custom Claude Code status line & security hooks                                                  |
+| 🎨 **SilkCircuit Theme** | • [silkcircuit-nvim](https://github.com/hyperb1iss/silkcircuit-nvim) Neovim colorscheme<br>• Consistent theming across Neovim, Git, Starship, Tmux, Ghostty, Bat, Delta, Atuin, FZF, and more             |
+| 🛠️ **Development Tools** | • AstroNvim v5 with full LSP for 11+ languages<br>• Proto version manager (Node, Rust, pnpm)<br>• Git workflow enhancements with Delta diffs<br>• Docker & Kubernetes management                          |
 | 🌐 **Cross-Platform**    | • macOS-first with Homebrew & DotBot automation<br>• Linux (Ubuntu/Arch) full desktop & minimal server profiles<br>• WSL2 with seamless path conversion<br>• Windows PowerShell via the HyperShell module |
 
 ## 🔧 Tool Suite
@@ -276,8 +276,7 @@ extract archive.tar.gz      # Smart archive extraction
 
 ### 🤖 HyperShell (PowerShell)
 
-A Linux-shaped PowerShell environment for Windows, shipped as a real
-PowerShell module:
+A Linux-shaped PowerShell environment for Windows, shipped as a real PowerShell module:
 
 ```powershell
 # Linux-style commands
@@ -316,25 +315,23 @@ hypershell/
 └── tests/                             # Pester suite
 ```
 
-Importing the module defines commands and nothing else. The prompt, zoxide,
-PSReadLine keybindings, and banner are functions the profile calls, which is
-what keeps an import quiet inside scripts and CI.
+Importing the module defines commands and nothing else. The prompt, zoxide, PSReadLine keybindings, and banner are
+functions the profile calls, which is what keeps an import quiet inside scripts and CI.
 
 #### Working on it from macOS or Linux
 
-HyperShell targets Windows, but it loads and tests anywhere PowerShell 7.4
-runs, so the whole thing can be developed without a Windows box:
+HyperShell targets Windows, but it loads and tests anywhere PowerShell 7.4 runs, so the whole thing can be developed
+without a Windows box:
 
 ```powershell
 Import-Module ./hypershell/HyperShell -Force
 Get-Command -Module HyperShell
 ```
 
-Commands that wrap a Windows-only cmdlet stay defined and warn instead of
-failing with a missing-command error. The sixteen aliases that would shadow a
-real Unix binary or a PowerShell built-in (`ls`, `cat`, `find`, `touch`, and
-friends) are registered on Windows only, so a macOS session gets 50 aliases
-instead of 66 and the system tools keep working.
+Commands that wrap a Windows-only cmdlet stay defined and warn instead of failing with a missing-command error. The
+sixteen aliases that would shadow a real Unix binary or a PowerShell built-in (`ls`, `cat`, `find`, `touch`, and
+friends) are registered on Windows only, so a macOS session gets 50 aliases instead of 66 and the system tools keep
+working.
 
 Lint and tests run from the repo root:
 
