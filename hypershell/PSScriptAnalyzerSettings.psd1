@@ -8,6 +8,16 @@
 #     Invoke-ScriptAnalyzer -Path hypershell -Recurse -Settings hypershell/PSScriptAnalyzerSettings.psd1
 #
 # Both come back empty. Every other finding was fixed rather than suppressed.
+#
+# Rule selection only, no formatting rules, and that is deliberate.
+# bin/pslint.ps1 hands this same file to Invoke-Formatter, so anything added
+# here becomes the repo-wide formatting standard. Adopting the CodeFormatting
+# preset today rewrites sixteen tracked files (bin/pslint.ps1, install.ps1,
+# setup-windows.ps1, most of the module) over indentation, brace placement,
+# and assignment alignment, and its PSUseCorrectCasing rule turns every -eq
+# into -EQ. That is a repo-wide decision rather than a HyperShell one, so
+# `make format-ps` stays a no-op until the repo makes it: no rules, no
+# rewrites, no drift.
 
 @{
     ExcludeRules = @(
