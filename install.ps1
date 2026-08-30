@@ -165,10 +165,12 @@ function Install-Python {
     }
 
     # A fresh winget install lands in the machine and user PATH, neither
-    # of which this process has read since it started.
+    # of which this process has read since it started. The old process PATH
+    # stays on the end rather than being replaced: a CI runner puts its tool
+    # paths there and nowhere else, so overwriting would strip them.
     $machinePath = [Environment]::GetEnvironmentVariable('Path', 'Machine')
     $userPath = [Environment]::GetEnvironmentVariable('Path', 'User')
-    $env:Path = "$machinePath;$userPath"
+    $env:Path = "$machinePath;$userPath;$env:Path"
 
     return Get-PythonCommand
 }
