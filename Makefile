@@ -160,9 +160,10 @@ lint-markdown:
 	@echo ""
 
 # PSScriptAnalyzer over every tracked .ps1/.psm1/.psd1. Severity policy
-# lives in bin/pslint.ps1: Error and Warning are blocking and fail this
-# target, Information is printed and ignored. Rule selection comes from
-# PSScriptAnalyzerSettings.psd1 when the repo ships one, else PSGallery.
+# lives in bin/pslint.ps1: ParseError, Error and Warning are blocking and
+# fail this target, Information is printed and ignored. Rule selection
+# comes from PSScriptAnalyzerSettings.psd1 when the repo ships one, else
+# the PSGallery preset.
 lint-ps:
 	@echo "$(BLUE)$(ARROW)$(RESET) $(BOLD)PowerShell Scripts$(RESET)"
 	@if [ -n "$(PWSH)" ]; then \
