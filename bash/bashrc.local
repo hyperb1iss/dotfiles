@@ -32,18 +32,10 @@ bind '"\e[Z":menu-complete-backward'       # Shift+Tab to cycle backwards
 bind 'set show-all-if-ambiguous on'        # Show options on first TAB
 bind 'set menu-complete-display-prefix on' # Show the common prefix while cycling
 
-# Source common shell configurations
-source ~/dev/dotfiles/sh/shell-common.sh
-source ~/dev/dotfiles/sh/env.sh # Explicitly source env.sh for PATH and other vars
-
-# Load other utility scripts from sh/ directory
-# This ensures that shell-common.sh and env.sh (sourced above) are not re-sourced.
-for script_file in "${HOME}/dev/dotfiles/sh/"*.sh; do
-  script_basename=$(basename "${script_file}")
-  if [[ "${script_basename}" != "shell-common.sh" && "${script_basename}" != "env.sh" ]]; then
-    source "${script_file}" || echo "Warning: Failed to load ${script_file} in bashrc.local"
-  fi
-done
+# sh/loader.sh owns module order for both shells. Bash has nothing to
+# slot between the core and the rest, so it takes both phases at once.
+source "${DOTFILES:-${HOME}/dev/dotfiles}/sh/loader.sh"
+dotfiles_load_all
 
 # Initialize Starship prompt for Bash
 if has_command starship; then

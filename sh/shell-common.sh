@@ -69,8 +69,8 @@ function has_command() {
 
 # Installation type detection
 DOTFILES_INSTALLATION_TYPE="unknown"
-if [[ -r "${HOME}/dev/dotfiles/.install_state" ]]; then
-  IFS= read -r DOTFILES_INSTALLATION_TYPE < "${HOME}/dev/dotfiles/.install_state"
+if [[ -r "${DOTFILES}/.install_state" ]]; then
+  IFS= read -r DOTFILES_INSTALLATION_TYPE < "${DOTFILES}/.install_state"
 fi
 
 function get_installation_type() {
@@ -123,8 +123,8 @@ safe_source ~/.rc.local
 #    Set DOTFILES_NO_INSPIRATION=1 to disable
 #-------------------------------------------------
 function show_inspiration() {
-  if has_command python3 && [[ -f ~/dev/dotfiles/inspiration/inspiration.py ]]; then
-    python3 ~/dev/dotfiles/inspiration/inspiration.py
+  if has_command python3 && [[ -f "${DOTFILES}/inspiration/inspiration.py" ]]; then
+    python3 "${DOTFILES}/inspiration/inspiration.py"
   fi
 }
 
