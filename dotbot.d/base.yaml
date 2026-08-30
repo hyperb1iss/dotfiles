@@ -29,19 +29,6 @@
 
 - shell:
     - command: |
-        # SilkCircuit theming is owned by its own repo + installer, which
-        # detects apps and copies themes into place (bat, starship, ghostty,
-        # dircolors, git include, k9s, and friends).
-        if [ ! -d ~/dev/silkcircuit ]; then
-          echo "🔮 Cloning SilkCircuit theme repo..."
-          git clone https://github.com/hyperb1iss/silkcircuit ~/dev/silkcircuit
-        fi
-        (cd ~/dev/silkcircuit && ./install.sh -y)
-      stderr: true
-      stdout: true
-      description: "Installing SilkCircuit themes"
-
-    - command: |
         # ~/.zshrc is force-linked below, so move a real one aside rather than
         # destroying it. pwd is the repo root: dotbot chdirs to -d before
         # running shell commands, which keeps this honest in a worktree.
@@ -70,3 +57,39 @@
       force: true
     ~/bin: bin
     ~/.tmux/plugins/tpm: tpm
+
+# Links first, then the theme installer. SilkCircuit does
+# `git config --global --add include.path`, which on a fresh machine would
+# create a real ~/.gitconfig before dotbot could link it and the link would
+# then refuse to clobber it. With the link already in place the installer
+# writes through it into the tracked gitconfig, which already carries the
+# include, so the step is a no-op there and idempotent on every run.
+- shell:
+    - command: |
+        # SilkCircuit theming is owned by its own repo + installer, which
+        # detects apps and copies themes into place (bat, starship, ghostty,
+        # dircolors, git include, k9s, and friends).
+        if [ ! -d ~/dev/silkcircuit ]; then
+          echo "🔮 Cloning SilkCircuit theme repo..."
+          git clone https://github.com/hyperb1iss/silkcircuit ~/dev/silkcircuit
+        fi
+        (cd ~/dev/silkcircuit && ./install.sh -y)
+      stderr: true
+      stdout: true
+      description: "Installing SilkCircuit themes"
+
+    - command: |
+        # macOS bash reaches ~/.bashrc.local through the linked
+        # ~/.bash_profile. Linux distros ship their own ~/.bashrc and never
+        # look for it, so wire the hook in once, leaving the rest of the
+        # file alone.
+        if [ "$(uname -s)" != "Darwin" ]; then
+          rc="$HOME/.bashrc"
+          [ -f "$rc" ] || : > "$rc"
+          if ! grep -q 'bashrc.local' "$rc"; then
+            printf '\n# dotfiles hook\n[ -f ~/.bashrc.local ] && . ~/.bashrc.local\n' >> "$rc"
+            echo "Wired ~/.bashrc.local into $rc"
+          fi
+        fi
+      stdout: true
+      description: Wiring ~/.bashrc.local into the login bash

@@ -63,13 +63,6 @@ create_smoke_user() {
   printf '%s ALL=(ALL) NOPASSWD: ALL\n' "${smoke_user}" > "/etc/sudoers.d/${smoke_user}"
   chmod 0440 "/etc/sudoers.d/${smoke_user}"
 
-  # The repo links ~/.bashrc.local but nothing on Linux sources it (macOS
-  # gets there through bash/bash_profile), so wire it the way a person
-  # would before checking that an interactive bash loads clean.
-  if [ ! -f "${smoke_home}/.bashrc" ]; then
-    : > "${smoke_home}/.bashrc"
-  fi
-  printf '\n[ -f ~/.bashrc.local ] && . ~/.bashrc.local\n' >> "${smoke_home}/.bashrc"
 }
 
 stage_repo() {
