@@ -31,22 +31,10 @@
         # Add cargo to PATH (apt rustup doesn't create ~/.cargo/env)
         export PATH="$HOME/.cargo/bin:$PATH"
         if command -v cargo &> /dev/null; then
-          # Skip tools the system package manager already provides —
-          # on Arch everything here ships via pacman, so this compiles
-          # nothing; it's the fallback path for apt-based systems
-          grep -v '^#\|^$' cargo-tools.txt | sed 's/#.*//' | awk '{print $1}' |
-            while read -r crate; do
-              case "${crate}" in
-                fd-find) bin=fd ;;
-                ripgrep) bin=rg ;;
-                git-delta) bin=delta ;;
-                *) bin="${crate}" ;;
-              esac
-              if ! command -v "${bin}" >/dev/null 2>&1; then
-                echo "📦 cargo install ${crate}"
-                cargo install "${crate}"
-              fi
-            done
+          # pkg-sync skips any crate whose binary is already on PATH, so
+          # on Arch this compiles nothing (pacman ships all of them) and
+          # on apt boxes it fills the gaps.
+          bin/pkg-sync install cargo desktop
         fi
       stderr: true
       stdout: true

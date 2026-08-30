@@ -140,6 +140,10 @@ These are installed by the setup scripts:
 - **Homebrew** (macOS) — Via official install script
 - **cargo** (via rustup) — For Rust-based tools
 
+On Linux the package list itself is `packages.conf` at the repo root, resolved and installed by `bin/pkg-sync`. Run
+`bin/pkg-sync list apt server` to see exactly what a role gets, or add `-n` to an install to print the plan instead of
+running it.
+
 **Modern CLI Tools**
 
 - **lsd** — Better ls with icons
