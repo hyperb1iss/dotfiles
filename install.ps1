@@ -48,6 +48,9 @@ if (-not (Get-Command python -ErrorAction SilentlyContinue)) {
 
 # Execute Dotbot
 Write-Host "Executing Dotbot..." -ForegroundColor Green
-python "dotbot\bin\dotbot" -c "windows.yaml"
+# -d is required: the layer lives in dotbot.d/os/ now, and without a base
+# directory dotbot resolves its relative link sources against that folder
+# instead of the checkout.
+python "dotbot\bin\dotbot" -d "$PSScriptRoot" -c "dotbot.d\os\windows.yaml"
 
 Write-Host "Installation process completed." -ForegroundColor Green

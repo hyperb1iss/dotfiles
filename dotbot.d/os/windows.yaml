@@ -1,6 +1,13 @@
-# windows.yaml
-# Dotbot configuration file for Windows setup
-
+# Windows layer: the whole Windows install, composed on its own.
+#
+# install.ps1 is the Windows `make install`, and it runs this file with
+# `-d <repo root>`. That flag is load bearing now that the layer lives in
+# dotbot.d/os/: without it dotbot resolves the relative link sources below
+# against this file's directory instead of the checkout.
+#
+# Windows deliberately skips base.yaml and role/desktop.yaml. Those layers
+# link unix paths (~/.zshrc, ~/.bashrc.local, ~/bin) and shell out to bash
+# for the SilkCircuit installer, so everything a Windows box needs is here.
 - defaults:
     link:
       create: true
@@ -8,20 +15,22 @@
 
 - clean: ["~"]
 
-- shell:
-    # The skills hub has to exist before Claude Code can be linked at it
-    - command:
-        powershell.exe -NoProfile -Command "[void](New-Item -ItemType Directory -Force -Path $HOME/.agents/skills)"
-      stdin: true
-      stdout: true
-      stderr: true
-      description: Ensuring the ~/.agents skills hub exists
+# ~/.agents/skills is a link *target* below, so it has to exist as a real
+# directory first. `create: true` on a link only makes the link's parent.
+- create:
+    - ~/.agents/skills
 
 - link:
     # Starship prompt config comes from the SilkCircuit repo
     # (clone https://github.com/hyperb1iss/silkcircuit and run install.ps1)
     # Neovim configuration
     ~/AppData/Local/nvim: nvim
+    # HyperShell ships as a PowerShell module. Anything under
+    # Documents/PowerShell/Modules autoloads by name, and force is needed
+    # because a previous Install-PSResource run leaves a real directory here.
+    ~/Documents/PowerShell/Modules/HyperShell:
+      path: hypershell/HyperShell
+      force: true
     # PowerShell profile
     ~/Documents/PowerShell/Microsoft.PowerShell_profile.ps1:
       path: hypershell/Microsoft.PowerShell_profile.ps1
@@ -36,6 +45,8 @@
     # Claude Code / Codex agent files (from dotfiles-private).
     # dotbot runs `if` through cmd.exe here, so the guard must be cmd syntax; a
     # POSIX `[ -f ... ]` test always exits non-zero and skips the link in silence.
+    # This is also why dotbot.d/private.yaml is not composed on Windows: every
+    # guard and shell step in it is POSIX.
     # force is required because both destinations start life as regular files.
     ~/.claude/CLAUDE.md:
       path: ~/dev/dotfiles-private/ai/AGENTS.md
