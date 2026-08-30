@@ -1,0 +1,7 @@
+# Installed and refreshed by the SilkCircuit installer, which formats
+# them with its own stylua config. Formatting them here would make every
+# make install and every make format undo each other.
+lua/plugins/astroui.lua
+lua/plugins/lualine-max-effect.lua
+lua/plugins/neo-tree.lua
+lua/plugins/silkcircuit.lua
