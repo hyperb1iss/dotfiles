@@ -87,6 +87,20 @@ $activeSettings = if ($settingsFile) { $settingsFile }
 elseif ($Format) { 'CodeFormatting' }
 else { 'PSGallery' }
 
+# A settings file that only selects rules is a deliberate formatting
+# no-op, and it has to be an explicit one: Invoke-Formatter on stable
+# PowerShell warns "Cannot parse settings" on such a file and aborts,
+# which on CI turned the no-op into a red step.
+if ($Format -and $settingsFile) {
+    $declared = Import-PowerShellDataFile -LiteralPath $settingsFile
+    $hasFormattingRules = $declared.ContainsKey('IncludeRules') -or $declared.ContainsKey('Rules')
+    if (-not $hasFormattingRules) {
+        $label = [System.IO.Path]::GetRelativePath($repoRoot, $settingsFile)
+        Write-Host "  ${scGray}• $label declares no formatting rules; formatting is a deliberate no-op${reset}"
+        exit 0
+    }
+}
+
 $settingsLabel = if ($settingsFile) {
     [System.IO.Path]::GetRelativePath($repoRoot, $settingsFile)
 }
@@ -107,6 +121,11 @@ if ($Format) {
         if (-not $before) { continue }
 
         $after = Invoke-Formatter -ScriptDefinition $before -Settings $activeSettings
+        if ([string]::IsNullOrEmpty($after) -and -not [string]::IsNullOrEmpty($before)) {
+            Write-Host "  ${scRed}✖${reset} formatter returned nothing for ${file}; refusing to write"
+            $failures++
+            continue
+        }
 
         # -cne, not -ne: PowerShell string comparison is case insensitive by
         # default, and PSUseCorrectCasing is part of the CodeFormatting
