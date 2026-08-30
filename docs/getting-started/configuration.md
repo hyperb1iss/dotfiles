@@ -183,7 +183,8 @@ Delta is configured in `gitconfig` as the default pager. Customize in `~/.gitcon
 
 ## Starship Prompt
 
-The configuration lives in the SilkCircuit repo (`~/dev/silkcircuit/extras/starship/starship.toml`) and is installed by its installer.
+The configuration lives in the SilkCircuit repo (`~/dev/silkcircuit/extras/starship/starship.toml`) and is installed by
+its installer.
 
 ### Common Customizations
 
@@ -489,17 +490,17 @@ echo $PATH | tr ':' '\n'
 
 Quick reference for where everything lives:
 
-| Component          | Configuration File                      |
-| ------------------ | --------------------------------------- |
-| Zsh                | `~/dev/dotfiles/zsh/zshrc`              |
-| Shell scripts      | `~/dev/dotfiles/sh/*.sh`                |
-| Neovim             | `~/dev/dotfiles/nvim/`                  |
-| Starship           | `~/dev/silkcircuit/extras/starship/` |
-| Tmux               | `~/dev/dotfiles/tmux.conf`              |
-| Git                | `~/dev/dotfiles/gitconfig`              |
-| Git Iris           | `.git-iris.yaml` (per-project)          |
-| Private settings   | `~/.rc.local`                           |
-| Installation role  | `~/dev/dotfiles/.dotfiles_role`         |
+| Component         | Configuration File                   |
+| ----------------- | ------------------------------------ |
+| Zsh               | `~/dev/dotfiles/zsh/zshrc`           |
+| Shell scripts     | `~/dev/dotfiles/sh/*.sh`             |
+| Neovim            | `~/dev/dotfiles/nvim/`               |
+| Starship          | `~/dev/silkcircuit/extras/starship/` |
+| Tmux              | `~/dev/dotfiles/tmux.conf`           |
+| Git               | `~/dev/dotfiles/gitconfig`           |
+| Git Iris          | `.git-iris.yaml` (per-project)       |
+| Private settings  | `~/.rc.local`                        |
+| Installation role | `~/dev/dotfiles/.dotfiles_role`      |
 
 All configs are symlinked from `~/dev/dotfiles` to their expected locations (`~/.zshrc`, `~/.config/nvim`, etc.).
 

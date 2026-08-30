@@ -11,8 +11,7 @@
 - shell:
     # The skills hub has to exist before Claude Code can be linked at it
     - command:
-        powershell.exe -NoProfile -Command "[void](New-Item -ItemType Directory -Force
-        -Path $HOME/.agents/skills)"
+        powershell.exe -NoProfile -Command "[void](New-Item -ItemType Directory -Force -Path $HOME/.agents/skills)"
       stdin: true
       stdout: true
       stderr: true
