@@ -144,9 +144,24 @@ Write-Host "  ${scCyan}⚡${reset} analyzing ${bold}${scWhite}$($files.Count) fi
 # Invoke-ScriptAnalyzer has no -LiteralPath and treats -Path as a
 # wildcard, so a tracked file with a bracket in its name matches nothing
 # and its findings vanish into a green run. Escape the metacharacters.
+#
+# The retry works around a nondeterministic NullReferenceException inside
+# PSScriptAnalyzer 1.25.0. It shows up roughly one run in six, always on a
+# .psm1 that sits beside its own .psd1, and only once other files have been
+# analyzed first in the same process, which points at the module resolution
+# it does for a file that looks like a module. The second attempt always
+# succeeds. Without this a green tree fails the gate at random.
 $findings = foreach ($rel in $files) {
     $full = [System.Management.Automation.WildcardPattern]::Escape((Join-Path $repoRoot $rel))
-    Invoke-ScriptAnalyzer -Path $full -Settings $activeSettings
+    try {
+        Invoke-ScriptAnalyzer -Path $full -Settings $activeSettings -ErrorAction Stop
+    }
+    catch {
+        # Untyped on purpose: -ErrorAction Stop wraps the original
+        # NullReferenceException, so matching on the type is unreliable. A
+        # genuine failure still surfaces, because the retry is not guarded.
+        Invoke-ScriptAnalyzer -Path $full -Settings $activeSettings
+    }
 }
 $findings = @($findings)
 
