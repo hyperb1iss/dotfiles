@@ -79,6 +79,7 @@ jobs:
           # markers, so a write to a file that already showed as modified, or
           # an overwrite of an untracked file that already existed, would
           # slip through. Ignored files (the Pester report) stay excluded.
+          set -o pipefail
           snapshot() {
             git diff HEAD --binary | sha256sum
             git ls-files -o --exclude-standard -z | sort -z | xargs -0 -r sha256sum
