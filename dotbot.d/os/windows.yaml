@@ -39,7 +39,6 @@
     ~/Documents/PowerShell/Modules/HyperShell:
       path: hypershell/HyperShell
       force: true
-      if: 'if exist "hypershell\HyperShell" (exit 0) else (exit 1)'
     # PowerShell profile
     ~/Documents/PowerShell/Microsoft.PowerShell_profile.ps1:
       path: hypershell/Microsoft.PowerShell_profile.ps1

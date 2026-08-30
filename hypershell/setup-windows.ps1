@@ -48,23 +48,14 @@ if ($isElevated) {
         & ([scriptblock]::Create($chocoInstall))
     }
 
-    # The GnuWin32, findutils, sed, gawk, and grep packages are what put real
-    # grep, sed, awk, and find on PATH, which is what HyperShell binds its
-    # aliases for those four names to. Dropping them silently disables those
-    # aliases, so they are not optional extras.
+    # Everything winget can install comes from packages.conf through
+    # install.ps1 and bin/pkg-sync.ps1 now; this list is only what winget
+    # does not cover. The GnuWin32, findutils, sed, gawk, and grep packages
+    # are what put real grep, sed, awk, and find on PATH, which is what
+    # HyperShell binds its aliases for those four names to. Dropping them
+    # silently disables those aliases, so they are not optional extras.
     choco upgrade -y `
-        powershell-core `
-        microsoft-windows-terminal `
-        git `
-        vscode `
         nodejs `
-        python `
-        fzf `
-        ripgrep `
-        bat `
-        lsd `
-        starship `
-        neovim `
         gnuwin32-coreutils.install `
         grep `
         findutils `
@@ -76,12 +67,9 @@ if ($isElevated) {
         mingw `
         curl `
         wget `
-        7zip `
         bzip2 `
         openssh `
-        make `
-        delta `
-        zoxide
+        make
 }
 else {
     Write-Host "Skipping package installation: Chocolatey installs machine-wide and needs administrator rights." -ForegroundColor Yellow
