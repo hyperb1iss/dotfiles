@@ -55,7 +55,11 @@ repair_stale_sudo_local() {
   exit 0
 }
 
-require_sudo() {
+# Try for a sudo ticket without insisting on one. Only the Homebrew
+# bootstrap itself needs root; on a Mac that already has brew, the rest of
+# this script runs unprivileged, so a shell with no tty (an agent, a cron
+# job, make install from an IDE) must not fail here.
+acquire_sudo() {
   if sudo -n -v 2>/dev/null; then
     return 0
   fi
@@ -65,6 +69,11 @@ require_sudo() {
     return 0
   fi
 
+  return 1
+}
+
+require_sudo() {
+  acquire_sudo && return 0
   diagnose_sudo_failure
   exit 1
 }
@@ -80,8 +89,19 @@ start_sudo_keepalive() {
 }
 
 repair_stale_sudo_local || true
-require_sudo
-start_sudo_keepalive
+HAVE_SUDO=false
+if ! command -v brew >/dev/null 2>&1; then
+  # A first install writes to /opt/homebrew, so root is not optional here
+  require_sudo
+  HAVE_SUDO=true
+elif acquire_sudo; then
+  HAVE_SUDO=true
+else
+  echo "⚠️  No sudo ticket available; continuing without privileged steps"
+fi
+if [[ "${HAVE_SUDO}" == true ]]; then
+  start_sudo_keepalive
+fi
 
 # Install Homebrew if it's not installed
 if ! command -v brew >/dev/null 2>&1; then
@@ -127,11 +147,17 @@ else
   brew_prefix="/usr/local"
 fi
 
-if [[ -d "${brew_prefix}/opt/openjdk" ]]; then
-  sudo ln -sfn "${brew_prefix}/opt/openjdk/libexec/openjdk.jdk" "/Library/Java/JavaVirtualMachines/openjdk.jdk"
+jdk_src="${brew_prefix}/opt/openjdk/libexec/openjdk.jdk"
+jdk_link="/Library/Java/JavaVirtualMachines/openjdk.jdk"
+if [[ ! -d "${brew_prefix}/opt/openjdk" ]]; then
+  echo "⚠️  No OpenJDK installation found to link"
+elif [[ "$(readlink "${jdk_link}" 2>/dev/null)" == "${jdk_src}" ]]; then
+  echo "✓ OpenJDK already linked for java_home"
+elif [[ "${HAVE_SUDO}" == true ]]; then
+  sudo ln -sfn "${jdk_src}" "${jdk_link}"
   echo "✓ Linked latest OpenJDK for java_home utility"
 else
-  echo "⚠️  No OpenJDK installation found to link"
+  echo "⚠️  Skipping the OpenJDK java_home link (needs sudo)"
 fi
 
 # Set up Rust environment for Homebrew's rustup

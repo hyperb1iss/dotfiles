@@ -63,7 +63,7 @@ cask "slack"                 # Team communication
 cask "visual-studio-code"    # Code editor
 
 # AI Tools
-cask "claude-code"           # Anthropic's CLI for Claude
+cask "claude-code@latest"    # Anthropic's CLI for Claude, the fast-moving channel
 cask "codex"                 # OpenAI's CLI agent
 
 # Fonts
