@@ -28,7 +28,7 @@ purples, electric cyans, and blazing pinks that flows through every tool.
 | 🤖 **AI Integration**    | • Claude Code CLI for terminal AI pair programming<br>• Avante.nvim for in-editor Claude assistance<br>• Custom Claude Code status line & security hooks                                               |
 | 🎨 **SilkCircuit Theme** | • [silkcircuit-nvim](https://github.com/hyperb1iss/silkcircuit-nvim) Neovim colorscheme<br>• Consistent theming across Neovim, Git, Starship, Tmux, Ghostty, Bat, Delta, Atuin, FZF, and more          |
 | 🛠️ **Development Tools** | • AstroNvim v5 with full LSP for 11+ languages<br>• Proto version manager (Node, Rust, pnpm)<br>• Git workflow enhancements with Delta diffs<br>• Docker & Kubernetes management                       |
-| 🌐 **Cross-Platform**    | • macOS-first with Homebrew & DotBot automation<br>• Linux (Ubuntu/Arch) full desktop & minimal server profiles<br>• WSL2 with seamless path conversion<br>• Windows PowerShell via HyperShell modules |
+| 🌐 **Cross-Platform**    | • macOS-first with Homebrew & DotBot automation<br>• Linux (Ubuntu/Arch) full desktop & minimal server profiles<br>• WSL2 with seamless path conversion<br>• Windows PowerShell via the HyperShell module |
 
 ## 🔧 Tool Suite
 
@@ -82,7 +82,7 @@ dotfiles/
 ├── claude/               # Claude Code settings, status line, security hooks
 ├── lsd/                  # LSDeluxe layout (colors come from SilkCircuit)
 ├── macos/                # macOS setup (Brewfile, system prefs, Karabiner)
-├── hypershell/           # Windows PowerShell modules
+├── hypershell/           # HyperShell, the Windows PowerShell module
 ├── docs/                 # VitePress documentation site
 ├── packages.conf         # Every apt, pacman, and cargo package, by role
 ├── Makefile              # Install, lint, and format targets
@@ -276,29 +276,72 @@ extract archive.tar.gz      # Smart archive extraction
 
 ### 🤖 HyperShell (PowerShell)
 
-A Linux-like experience for Windows PowerShell:
+A Linux-shaped PowerShell environment for Windows, shipped as a real
+PowerShell module:
 
 ```powershell
-# Linux-style Commands
-ls --tree         # Directory tree with icons
-grep "pattern"    # Search with ripgrep
+# Linux-style commands
+ls --tree         # Directory tree with icons, via lsd
+cat script.ps1    # Syntax highlighted, via bat
 which code        # Find executable paths
 
-# Docker Management
-dex container     # Interactive container selection
-dlog container    # View container logs
-dstop container   # Stop containers
+# Docker management
+dps               # Every container, running or not
+dlog              # Pick a container with fzf and follow its logs
+dstop             # Pick a container with fzf and stop it
 ```
 
 **Key Features:**
 
-- Modular architecture with 13 specialized modules
-- Linux command aliases using GNU tools
-- Kubernetes support with kubectl aliases and k9s
+- 83 functions and 66 aliases, every one of them named in the manifest
+- Linux command aliases backed by the GNU tools Chocolatey installs
+- Kubernetes shortcuts that match the names in `sh/kubernetes.sh`
 - Zoxide for smart directory navigation
-- Android development utilities
-- HyperShell branding with SilkCircuit theme
-- Advanced FZF integration and Docker management
+- Android and Gradle helpers, sharing `~/.adbdevs` with the Unix side
+- Starship prompt with the SilkCircuit theme, plus the HyperShell banner
+- FZF pickers for files, directories, history, processes, and git
+
+#### Layout
+
+```
+hypershell/
+├── HyperShell/                        # The module
+│   ├── HyperShell.psd1                #   Manifest, explicit exports, no wildcards
+│   ├── HyperShell.psm1                #   Loads Private then Public, exports per manifest
+│   ├── Private/                       #   Platform rules, alias policy, pure parsers
+│   └── Public/                        #   One file per domain: Git, Docker, Kubernetes, …
+├── Microsoft.PowerShell_profile.ps1   # Imports the module, then wires up the session
+├── PSScriptAnalyzerSettings.psd1      # Lint policy
+├── setup-windows.ps1                  # Chocolatey, PATH, and module installs
+└── tests/                             # Pester suite
+```
+
+Importing the module defines commands and nothing else. The prompt, zoxide,
+PSReadLine keybindings, and banner are functions the profile calls, which is
+what keeps an import quiet inside scripts and CI.
+
+#### Working on it from macOS or Linux
+
+HyperShell targets Windows, but it loads and tests anywhere PowerShell 7.4
+runs, so the whole thing can be developed without a Windows box:
+
+```powershell
+Import-Module ./hypershell/HyperShell -Force
+Get-Command -Module HyperShell
+```
+
+Commands that wrap a Windows-only cmdlet stay defined and warn instead of
+failing with a missing-command error. The sixteen aliases that would shadow a
+real Unix binary or a PowerShell built-in (`ls`, `cat`, `find`, `touch`, and
+friends) are registered on Windows only, so a macOS session gets 50 aliases
+instead of 66 and the system tools keep working.
+
+Lint and tests run from the repo root:
+
+```bash
+make lint-ps    # PSScriptAnalyzer over every tracked PowerShell file
+make test-ps    # Pester suite in hypershell/tests
+```
 
 ### 🤖 AI Integration
 
