@@ -98,8 +98,12 @@ Windows has its own entry point, `install.ps1`, which does everything the Makefi
 ```powershell
 git clone https://github.com/hyperb1iss/dotfiles.git $env:USERPROFILE\dev\dotfiles
 cd $env:USERPROFILE\dev\dotfiles
-.\install.ps1
+powershell -ExecutionPolicy Bypass -File .\install.ps1
 ```
+
+Windows PowerShell 5.1 defaults to a `Restricted` execution policy on client editions, which refuses to run any script
+at all, so the bypass is how a fresh box gets through the first run. Once PowerShell 7 is installed and the policy is
+`RemoteSigned`, plain `.\install.ps1` works.
 
 In order, it initializes the submodules, installs the winget rows of `packages.conf` for the role, composes the dotbot
 layers, records the role in `.dotfiles_role`, and applies the one step that needs elevation.
@@ -108,12 +112,14 @@ layers, records the role in `.dotfiles_role`, and applies the one step that need
 
 Windows composes `dotbot.d/os/windows.yaml` and nothing else. `base.yaml` and `role/desktop.yaml` link unix paths
 (`~/.zshrc`, `~/.bashrc.local`, `~/bin`) and shell out to bash for the SilkCircuit installer, so the Windows layer
-carries its own copy of the handful of links worth sharing: Neovim, the HyperShell module and profile, gitconfig, and
-the Claude Code status line.
+carries its own copy of the handful of links worth sharing: Neovim, the HyperShell profile, gitconfig, and the Claude
+Code status line. The HyperShell module directory is linked too, behind an `if:` guard, so a checkout made before that
+module landed skips the link instead of failing the whole dotbot run over it.
 
-`dotbot.d/private.yaml` is skipped for the same reason and says so when it runs. Every `if:` guard in it is a POSIX
-`[ -f ... ]` test and both of its shell steps are POSIX, while dotbot runs shell through `cmd.exe` on Windows. The
-Windows layer links `~/.claude/CLAUDE.md` and `~/.codex/AGENTS.md` itself, with cmd-syntax guards.
+`dotbot.d/private.yaml` is skipped for the same reason, and the script says so when `~/dev/dotfiles-private` is actually
+checked out. Every `if:` guard in it is a POSIX `[ -f ... ]` test and both of its shell steps are POSIX, while dotbot
+runs shell through `cmd.exe` on Windows. The Windows layer links `~/.claude/CLAUDE.md` and `~/.codex/AGENTS.md` itself,
+with cmd-syntax guards.
 
 `-Role server` narrows the winget package set and is what lands in `.dotfiles_role`. It does not change the layer list,
 because there is only the one.

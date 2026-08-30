@@ -134,10 +134,30 @@ function Test-Admin {
     }
 }
 
+<#
+.SYNOPSIS
+    The path to a Python that actually runs.
+.DESCRIPTION
+    Presence on PATH is not enough. Windows 10 and 11 ship a Microsoft
+    Store app-execution alias at
+    %LOCALAPPDATA%\Microsoft\WindowsApps\python.exe that Get-Command
+    resolves happily and that opens the Store instead of running anything.
+    Asking each candidate for its version is what separates the two.
+#>
 function Get-PythonCommand {
     foreach ($candidate in @('python', 'python3', 'py')) {
         $found = Get-Command $candidate -ErrorAction SilentlyContinue
-        if ($found) { return $found.Source }
+        if (-not $found) { continue }
+        try {
+            $version = & $found.Source --version 2>&1
+        }
+        catch {
+            continue
+        }
+        if ($LASTEXITCODE -eq 0 -and "$version" -match 'Python \d') {
+            return $found.Source
+        }
+        Write-Note "ignoring $($found.Source): not a working Python"
     }
     return $null
 }
@@ -346,12 +366,20 @@ function Invoke-Main {
 
     $layers = Get-Layer
     Invoke-Dotbot -Python $python -Layers $layers
-    if ($script:ExitCode -ne 0) { return }
 
+    # Deliberately not an early return. Recording the role and setting the
+    # default WSL version do not depend on the links, so a dotbot failure
+    # should not also cost the machine those. The exit code still carries
+    # the failure out to whoever called this.
     Write-RoleFile
     Invoke-ElevatedStep -Elevated $elevated
 
     Write-Host ''
+    if ($script:ExitCode -ne 0) {
+        Write-Fail 'Install did not finish cleanly. See the errors above.'
+        Write-Host ''
+        return
+    }
     if ($script:Warnings -gt 0) {
         Write-Skip "Install finished with $script:Warnings warning(s) above."
         Write-Note 'Open a new PowerShell session to pick up what did land.'

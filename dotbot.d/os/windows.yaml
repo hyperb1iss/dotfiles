@@ -28,9 +28,14 @@
     # HyperShell ships as a PowerShell module. Anything under
     # Documents/PowerShell/Modules autoloads by name, and force is needed
     # because a previous Install-PSResource run leaves a real directory here.
+    # The guard is cmd syntax because dotbot runs `if` through cmd.exe on
+    # Windows, and it is here because a missing source is a hard dotbot
+    # failure: without it, a checkout made before the module landed fails
+    # the whole run over one link and takes the rest of the install with it.
     ~/Documents/PowerShell/Modules/HyperShell:
       path: hypershell/HyperShell
       force: true
+      if: 'if exist "hypershell\HyperShell" (exit 0) else (exit 1)'
     # PowerShell profile
     ~/Documents/PowerShell/Microsoft.PowerShell_profile.ps1:
       path: hypershell/Microsoft.PowerShell_profile.ps1

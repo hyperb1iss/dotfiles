@@ -105,11 +105,11 @@ function Resolve-Manifest {
         $lineNumber++
         $line = $rawLine -replace "`r$", ''
         $line = $line -replace '#.*', ''
-        $line = $line.Trim()
+        $line = $line -replace '^[ \t]+|[ \t]+$', ''
         if ($line -eq '') { continue }
         if ($line.StartsWith('[', [StringComparison]::Ordinal)) { continue }
 
-        $fields = $line -split '\s+'
+        $fields = $line -split '[ \t]+'
         if ($fields.Count -lt 3) {
             throw "pkg-sync: $Path line ${lineNumber}: expected <name> <roles> <source>..."
         }
@@ -177,11 +177,11 @@ function Get-ManifestRole {
     foreach ($rawLine in [System.IO.File]::ReadAllLines($Path)) {
         $lineNumber++
         $line = ($rawLine -replace "`r$", '') -replace '#.*', ''
-        $line = $line.Trim()
+        $line = $line -replace '^[ \t]+|[ \t]+$', ''
         if ($line -eq '') { continue }
         if ($line.StartsWith('[', [StringComparison]::Ordinal)) { continue }
 
-        $fields = $line -split '\s+'
+        $fields = $line -split '[ \t]+'
         if ($fields.Count -lt 3) {
             throw "pkg-sync: $Path line ${lineNumber}: expected <name> <roles> <source>..."
         }

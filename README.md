@@ -192,7 +192,10 @@ Headless boxes want `make server`.
 git clone https://github.com/hyperb1iss/dotfiles.git $env:USERPROFILE\dev\dotfiles
 
 cd $env:USERPROFILE\dev\dotfiles
-.\install.ps1
+
+# Windows PowerShell 5.1 ships a Restricted execution policy on client
+# editions, so a fresh box needs the bypass for the first run
+powershell -ExecutionPolicy Bypass -File .\install.ps1
 ```
 
 `install.ps1` is the Windows `make install`. It initializes the submodules, installs the winget rows of `packages.conf`
