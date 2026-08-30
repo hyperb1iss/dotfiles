@@ -1,16 +1,19 @@
 # setup-windows.ps1
 #
-# Windows environment setup for everything that is not a package.
+# Windows environment setup: packages, the rustup toolchain, the PowerShell
+# modules HyperShell declares, VS Code extensions, PATH and environment
+# variables, and the developer mode switch.
 #
-# Packages come from install.ps1, which runs bin/pkg-sync.ps1 against
-# packages.conf and installs them with winget. This script covers the rest:
-# the rustup toolchain, the PowerShell modules HyperShell declares, VS Code
-# extensions, PATH and environment variables, and the developer mode switch.
+# windows.yaml invokes this as the Windows setup step, and nothing else on
+# Windows installs packages today, so the Chocolatey block below stays until
+# something actually replaces it.
 #
-# It no longer demands administrator rights up front. Everything here works
-# unelevated except the PowerShellGet repair and the developer mode registry
-# key, and those two check for elevation themselves and print a skip line
-# rather than aborting the whole run.
+# It no longer demands administrator rights up front. A blanket gate meant an
+# unelevated run did nothing at all, even though most of this works fine
+# unelevated: PowerShell modules install to CurrentUser, PATH and EDITOR are
+# user-scope environment variables, and VS Code extensions are per-user. The
+# steps that genuinely need elevation check for it themselves and print a
+# skip line saying what to rerun.
 
 <#
 .SYNOPSIS
@@ -34,6 +37,54 @@ function Test-Administrator {
 $isElevated = Test-Administrator
 if (-not $isElevated) {
     Write-Host "Running unelevated. Steps that need administrator rights will be skipped." -ForegroundColor Yellow
+}
+
+# Chocolatey installs machine-wide, so the whole package step needs elevation.
+if ($isElevated) {
+    if (!(Get-Command choco -ErrorAction SilentlyContinue)) {
+        Set-ExecutionPolicy Bypass -Scope Process -Force
+        [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072
+        $chocoInstall = (New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1')
+        & ([scriptblock]::Create($chocoInstall))
+    }
+
+    # The GnuWin32, findutils, sed, gawk, and grep packages are what put real
+    # grep, sed, awk, and find on PATH, which is what HyperShell binds its
+    # aliases for those four names to. Dropping them silently disables those
+    # aliases, so they are not optional extras.
+    choco upgrade -y `
+        powershell-core `
+        microsoft-windows-terminal `
+        git `
+        vscode `
+        nodejs `
+        python `
+        fzf `
+        ripgrep `
+        bat `
+        lsd `
+        starship `
+        neovim `
+        gnuwin32-coreutils.install `
+        grep `
+        findutils `
+        sed `
+        gawk `
+        which `
+        unxutils `
+        cygwin `
+        mingw `
+        curl `
+        wget `
+        7zip `
+        bzip2 `
+        openssh `
+        make `
+        delta `
+        zoxide
+}
+else {
+    Write-Host "Skipping package installation: Chocolatey installs machine-wide and needs administrator rights." -ForegroundColor Yellow
 }
 
 # ── Rust ─────────────────────────────────────────────────────────────────────
@@ -219,8 +270,7 @@ function Add-ToPath {
 }
 
 # Add common directories to PATH. The GnuWin32, unxutils, and cygwin entries
-# are what put grep, sed, awk, and find on PATH, which is what HyperShell's
-# aliases for those names bind to.
+# are where the packages above drop grep, sed, awk, and find.
 Add-ToPath "$env:USERPROFILE\bin"
 Add-ToPath "$env:USERPROFILE\.local\bin"
 Add-ToPath "$env:USERPROFILE\.cargo\bin"
@@ -259,6 +309,21 @@ if ($nvimPath) {
 }
 else {
     Write-Host "Neovim (nvim) not found in PATH. Please ensure it's installed correctly." -ForegroundColor Red
+}
+
+# Install zoxide via cargo if not already installed
+if (!(Get-Command zoxide -ErrorAction SilentlyContinue)) {
+    Write-Host "Installing zoxide via cargo..." -ForegroundColor Yellow
+    if (Get-Command cargo -ErrorAction SilentlyContinue) {
+        cargo install zoxide
+        Write-Host "zoxide installed successfully." -ForegroundColor Green
+    }
+    else {
+        Write-Host "Cargo not found. Please install Rust and Cargo first." -ForegroundColor Red
+    }
+}
+else {
+    Write-Host "zoxide is already installed." -ForegroundColor Green
 }
 
 # Enable Developer Mode. Writes to HKLM, so it needs elevation.
