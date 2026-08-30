@@ -70,7 +70,7 @@ resolve() {
       exit 2
     }
     function has_role(scope, want) { return index("," scope ",", "," want ",") > 0 }
-    { sub(/#.*/, ""); gsub(/^[ \t]+|[ \t]+$/, "") }
+    { sub(/\r$/, ""); sub(/#.*/, ""); gsub(/^[ \t]+|[ \t]+$/, "") }
     /^$/ { next }
     /^\[/ { next }
     {
@@ -95,7 +95,7 @@ resolve() {
           token = substr(token, 1, eq - 1)
         }
         if (token != "apt" && token != "pacman" && token != "cargo" && token != "ppa")
-          die("unknown manager: " token)
+          die("unknown manager: '" token "'")
         if (token != manager) continue
         if (!has_role(scope, role)) continue
         if (pkg == "") die("empty package name")
@@ -119,7 +119,7 @@ manifest_roles() {
       printf("pkg-sync: %s line %d: %s\n", FILENAME, FNR, msg) > "/dev/stderr"
       exit 2
     }
-    { sub(/#.*/, ""); gsub(/^[ \t]+|[ \t]+$/, "") }
+    { sub(/\r$/, ""); sub(/#.*/, ""); gsub(/^[ \t]+|[ \t]+$/, "") }
     /^$/ { next }
     /^\[/ { next }
     {
