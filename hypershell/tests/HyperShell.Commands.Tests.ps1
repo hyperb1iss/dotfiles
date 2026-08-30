@@ -456,6 +456,7 @@ Describe 'File utilities' {
             { Get-Tail -Path $missing -Lines 2 -ErrorAction Stop }
             { Get-Tail -file $missing -Lines 2 -ErrorAction Stop }
             { Get-Tail $missing 2 -ErrorAction Stop }
+            { Get-Tail -path $missing -lines 2 -ErrorAction Stop }
         )
 
         foreach ($form in $forms) {
@@ -469,10 +470,50 @@ Describe 'File utilities' {
         }
     }
 
+    It 'creates every file touch is given' {
+        $first = Join-Path $script:TempRoot 'multi-one.txt'
+        $second = Join-Path $script:TempRoot 'multi-two.txt'
+        New-File $first $second | Out-Null
+
+        Test-Path -LiteralPath $first | Should -BeTrue
+        Test-Path -LiteralPath $second | Should -BeTrue
+    }
+
+    It 'errors rather than prompting when mkdir gets no path' {
+        # Mandatory would make a bare mkdir block on a prompt, which hangs any
+        # script that hits it. It has to fail instead.
+        (Get-Command New-Directory).Parameters['Path'].Attributes |
+            Where-Object { $_ -is [System.Management.Automation.ParameterAttribute] } |
+            ForEach-Object { $_.Mandatory } |
+            Should -Not -Contain $true
+
+        { New-Directory -ErrorAction Stop } | Should -Throw
+    }
+
     It 'supports -WhatIf' {
         $path = Join-Path $script:TempRoot 'never-created.txt'
         New-File -Path $path -WhatIf | Out-Null
         Test-Path -LiteralPath $path | Should -BeFalse
+    }
+}
+
+Describe 'Reloading' {
+    It 'keeps the prompt and zoxide alive across a reload' {
+        # Import-Module -Force -Global tears down the old module instance,
+        # and the global prompt function and zoxide's globals go with it, so
+        # reload has to put the session back together afterwards.
+        $pwshPath = (Get-Process -Id $PID).Path
+        $moduleRoot = Join-Path (Split-Path -Parent $PSScriptRoot) 'HyperShell'
+        $profilePath = Join-Path (Split-Path -Parent $PSScriptRoot) 'Microsoft.PowerShell_profile.ps1'
+
+        $output = & $pwshPath -NoProfile -NonInteractive -Command @"
+`$env:PSModulePath = '$(Split-Path -Parent $moduleRoot)' + [IO.Path]::PathSeparator + `$env:PSModulePath
+. '$profilePath'
+Update-Profile 6> `$null
+"prompt=`$([bool](Get-Command prompt -CommandType Function -ErrorAction SilentlyContinue))"
+"@ 2>&1 | Out-String
+
+        $output | Should -Match 'prompt=True'
     }
 }
 

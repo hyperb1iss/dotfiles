@@ -288,17 +288,23 @@ function Initialize-HyperShellPrompt {
     if (-not $NoStarship) {
         $init = Get-HyperShellStarshipInitScript
         if ($init) {
+            # What the prompt was before, so an init that defines no prompt of
+            # its own is not mistaken for a successful one.
+            $existing = (Get-Command -Name prompt -CommandType Function -ErrorAction SilentlyContinue).ScriptBlock
+
             # Dot-sourced rather than passed to Invoke-Expression so the init
             # runs as a script block; it declares its own global functions.
             . ([scriptblock]::Create($init))
 
             # function:global:prompt is not a valid provider path (it silently
             # resolves to nothing), so the current prompt comes from
-            # Get-Command. Never capture our own shim: if a future starship
-            # init stopped defining a prompt, capturing the shim would make it
-            # call itself forever on the next render.
+            # Get-Command. Never capture our own shim either: if a future
+            # starship init stopped defining a prompt, capturing the shim
+            # would make it call itself forever on the next render.
             $captured = (Get-Command -Name prompt -CommandType Function -ErrorAction SilentlyContinue).ScriptBlock
-            if ($captured -and $captured.ToString() -notmatch 'Invoke-HyperShellPrompt') {
+            $isNew = $captured -and ((-not $existing) -or ($captured.ToString() -ne $existing.ToString()))
+
+            if ($isNew -and $captured.ToString() -notmatch 'Invoke-HyperShellPrompt') {
                 $script:HyperShellBasePrompt = $captured
                 $starshipInstalled = $true
             }

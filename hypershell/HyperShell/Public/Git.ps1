@@ -172,18 +172,22 @@ function Show-FzfGitLog {
 
     $commit = git log --graph --color=always --format='%C(auto)%h%d %s %C(black)%C(bold)%cr' |
         fzf --ansi --no-sort --reverse --tiebreak=index --preview 'git show --color=always {2}' |
-        ForEach-Object { ($_ -split '\s+') | Where-Object { $_ -match '^[0-9a-f]{7,40}$' } | Select-Object -First 1 } |
+        ForEach-Object { ($_ -split '\s+') | Where-Object { $_ -match '^[0-9a-f]{4,40}$' } | Select-Object -First 1 } |
         Select-Object -First 1
 
     if (-not $commit) {
         return
     }
 
-    # Application, not alias: on Windows HyperShell aliases `less` to bat,
-    # which rejects -R, so a plain command lookup would find the alias and
-    # pipe into something that cannot take the flag.
-    if (Get-Command -Name 'less' -CommandType Application -ErrorAction SilentlyContinue) {
-        git show --color=always $commit | less -R
+    # On Windows HyperShell aliases `less` to bat, which rejects -R. Resolving
+    # the application is only half the job: invoking the bare name afterwards
+    # goes straight back through the alias, so the resolved command object is
+    # what gets called.
+    $lessApp = Get-Command -Name 'less' -CommandType Application -ErrorAction SilentlyContinue |
+        Select-Object -First 1
+
+    if ($lessApp) {
+        git show --color=always $commit | & $lessApp -R
     }
     else {
         git show --color=always $commit

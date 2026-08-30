@@ -76,10 +76,14 @@ function Import-HyperShellCompanionModule {
 .SYNOPSIS
     Reloads HyperShell into the current session.
 .DESCRIPTION
-    Forces a global reimport of the module. Dot-sourcing $PROFILE from inside
-    a function would load into that function's scope and vanish on return, so
-    this reloads the part that holds every command. Prompt, zoxide, and
-    PSReadLine setup still need a fresh session.
+    Forces a global reimport of the module, then redoes the session setup the
+    profile normally does. Dot-sourcing $PROFILE from inside a function would
+    load into that function's scope and vanish on return, so the reimport is
+    how the commands come back.
+
+    The setup calls are not optional. Removing the old module instance takes
+    the global prompt function and zoxide's globals with it, so an import on
+    its own leaves the session with a stock prompt and a dead z.
 .EXAMPLE
     reload
 #>
@@ -94,7 +98,13 @@ function Update-Profile {
     }
 
     Import-Module -Name $script:HyperShellRoot -Force -Global
-    Write-Host 'HyperShell reloaded. Start a new session to redo prompt setup.' -ForegroundColor Green
+
+    # Resolves to the freshly imported copies, not this module instance's.
+    Set-HyperShellPSReadLineOption
+    Initialize-HyperShellPrompt
+    Initialize-HyperShellZoxide
+
+    Write-Host 'HyperShell reloaded.' -ForegroundColor Green
 }
 
 Add-HyperShellAlias -Name 'reload' -Value 'Update-Profile'

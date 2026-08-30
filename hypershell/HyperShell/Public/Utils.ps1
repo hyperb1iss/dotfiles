@@ -9,9 +9,9 @@
 function New-File {
     [CmdletBinding(SupportsShouldProcess)]
     param(
-        [Parameter(Position = 0)]
+        [Parameter(Position = 0, ValueFromRemainingArguments)]
         [Alias('file')]
-        [string]$Path
+        [string[]]$Path
     )
 
     if (-not $Path) {
@@ -19,8 +19,10 @@ function New-File {
         return
     }
 
-    if ($PSCmdlet.ShouldProcess($Path, 'Create file')) {
-        New-Item -ItemType File -Path $Path
+    foreach ($item in $Path) {
+        if ($PSCmdlet.ShouldProcess($item, 'Create file')) {
+            New-Item -ItemType File -Path $item
+        }
     }
 }
 
@@ -31,9 +33,16 @@ function New-File {
 function New-Directory {
     [CmdletBinding(SupportsShouldProcess)]
     param(
-        [Parameter(Mandatory, Position = 0)]
+        # Not Mandatory: that would prompt for input on a bare `mkdir`, which
+        # hangs a script. The original errored out instead, so this does too.
+        [Parameter(Position = 0)]
         [string]$Path
     )
+
+    if (-not $Path) {
+        Write-Error 'Usage: mkdir <directory>'
+        return
+    }
 
     if ($PSCmdlet.ShouldProcess($Path, 'Create directory')) {
         New-Item -ItemType Directory -Force -Path $Path | Out-Null
