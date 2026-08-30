@@ -1,0 +1,6 @@
+# PowerShell files are read by Windows PowerShell 5.1 too; keep LF in the repo
+# and let git never rewrite them, so a checkout with autocrlf stays clean.
+*.ps1 text eol=lf
+*.psm1 text eol=lf
+*.psd1 text eol=lf
+*.sh text eol=lf

@@ -35,10 +35,67 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y zsh
 
+      # pwsh ships on the runner image; the modules do not. Major versions
+      # are pinned so an upstream release cannot turn a green branch red
+      # without a commit here. Install-PSResource is the modern path and
+      # Install-Module is the fallback for older PowerShell.
+      - name: → Install PowerShell modules
+        shell: pwsh
+        run: |
+          $modules = @(
+            @{ Name = 'PSScriptAnalyzer'; Range = '[1.0.0,2.0.0)'; Min = '1.0.0'; Max = '1.999.999' }
+            @{ Name = 'Pester';           Range = '[6.0.0,7.0.0)'; Min = '6.0.0'; Max = '6.999.999' }
+          )
+          foreach ($m in $modules) {
+            if (Get-Command Install-PSResource -ErrorAction SilentlyContinue) {
+              Install-PSResource -Name $m.Name -Version $m.Range -TrustRepository -Scope CurrentUser
+            }
+            else {
+              Install-Module -Name $m.Name -MinimumVersion $m.Min -MaximumVersion $m.Max `
+                -Force -SkipPublisherCheck -Scope CurrentUser
+            }
+          }
+          Get-Module -ListAvailable -Name PSScriptAnalyzer, Pester |
+            Select-Object Name, Version | Format-Table -AutoSize
+
       - name: → Run all linters
         run: |
           echo "» Running comprehensive linting..."
           make lint
+
+      # Tests run against the committed tree, before the formatting check
+      # rewrites anything under it.
+      #
+      # The tree is snapshotted either side of the run so a test that
+      # writes into the repo is blamed here, by name, instead of tripping
+      # the formatting check three steps later with a message about
+      # formatting. Pester's own testResults.xml is gitignored and so
+      # never shows up in either snapshot.
+      - name: → Run tests
+        run: |
+          echo "» Running tests..."
+
+          # Untracked files by name plus a hash of the tracked-file diff.
+          # Status alone would compare only the M/?? flags, so a write to a
+          # file that already showed as modified would slip through.
+          snapshot() {
+            git status --porcelain
+            git diff HEAD --binary | sha256sum
+          }
+
+          before=$(snapshot)
+
+          make test
+
+          after=$(snapshot)
+          if [ "$before" != "$after" ]; then
+            echo "::error::The test run modified the working tree. Tests must leave the repository byte-identical."
+            echo "! Before:"
+            echo "$before"
+            echo "! After:"
+            echo "$after"
+            exit 1
+          fi
 
       - name: → Check formatting
         run: |
