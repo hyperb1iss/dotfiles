@@ -293,8 +293,8 @@ install_winget() {
   # matches the identifier exactly instead of fuzzy-matching a name.
   for id in "${PKG_LIST[@]}"; do
     run winget install --id "${id}" -e \
-      --accept-package-agreements --accept-source-agreements ||
-      echo "⚠ skipped: ${id}"
+      --accept-package-agreements --accept-source-agreements \
+      || echo "⚠ skipped: ${id}"
   done
 }
 

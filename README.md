@@ -21,13 +21,13 @@ purples, electric cyans, and blazing pinks that flows through every tool.
 
 ## 🌟 Core Features
 
-| Feature                  | Description                                                                                                                                                                                                  |
-| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| 🐚 **Shell Environment** | • Zsh with Zinit plugin management & Bash fallback<br>• Atuin-powered shell history with cross-machine sync<br>• 28 modular shell scripts with 100+ aliases<br>• Smart platform detection & adaptation       |
-| 🖥️ **Terminal Setup**    | • Ghostty terminal with SilkCircuit theme<br>• Tmux multiplexer with custom keybindings<br>• Starship prompt with gradient theme<br>• FZF-powered fuzzy finding everywhere                                   |
-| 🤖 **AI Integration**    | • Claude Code CLI for terminal AI pair programming<br>• Avante.nvim for in-editor Claude assistance<br>• Custom Claude Code status line & security hooks                                                     |
-| 🎨 **SilkCircuit Theme** | • [silkcircuit-nvim](https://github.com/hyperb1iss/silkcircuit-nvim) Neovim colorscheme<br>• Consistent theming across Neovim, Git, Starship, Tmux, Ghostty, Bat, Delta, Atuin, FZF, and more                |
-| 🛠️ **Development Tools** | • AstroNvim v5 with full LSP for 11+ languages<br>• Proto version manager (Node, Rust, pnpm)<br>• Git workflow enhancements with Delta diffs<br>• Docker & Kubernetes management                             |
+| Feature                  | Description                                                                                                                                                                                                             |
+| ------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 🐚 **Shell Environment** | • Zsh with Zinit plugin management & Bash fallback<br>• Atuin-powered shell history with cross-machine sync<br>• 28 modular shell scripts with 100+ aliases<br>• Smart platform detection & adaptation                  |
+| 🖥️ **Terminal Setup**    | • Ghostty terminal with SilkCircuit theme<br>• Tmux multiplexer with custom keybindings<br>• Starship prompt with gradient theme<br>• FZF-powered fuzzy finding everywhere                                              |
+| 🤖 **AI Integration**    | • Claude Code CLI for terminal AI pair programming<br>• Avante.nvim for in-editor Claude assistance<br>• Custom Claude Code status line & security hooks                                                                |
+| 🎨 **SilkCircuit Theme** | • [silkcircuit-nvim](https://github.com/hyperb1iss/silkcircuit-nvim) Neovim colorscheme<br>• Consistent theming across Neovim, Git, Starship, Tmux, Ghostty, Bat, Delta, Atuin, FZF, and more                           |
+| 🛠️ **Development Tools** | • AstroNvim v5 with full LSP for 11+ languages<br>• Proto version manager (Node, Rust, pnpm)<br>• Git workflow enhancements with Delta diffs<br>• Docker & Kubernetes management                                        |
 | 🌐 **Cross-Platform**    | • macOS-first with Homebrew & DotBot automation<br>• Linux (Ubuntu/Arch) full desktop & minimal server profiles<br>• WSL2 with seamless path conversion<br>• Windows via install.ps1, winget, and the HyperShell module |
 
 ## 🔧 Tool Suite
