@@ -236,7 +236,7 @@ test-ps:
 		echo "  $(GRAY)$(BULLET) no hypershell/tests/*.Tests.ps1 yet, skipping$(RESET)"; \
 	else \
 		$(PWSH) -NoProfile -NoLogo -Command \
-			"if (Get-Module -ListAvailable -Name Pester) { Invoke-Pester -Path hypershell/tests -CI } else { Write-Host '  Pester not installed, skipping'; }"; \
+			"if (Get-Module -ListAvailable -Name Pester) { Invoke-Pester -Path hypershell/tests -CI } else { Write-Host '  Pester not installed but tests exist; install Pester 6'; exit 1 }"; \
 	fi
 	@echo ""
 
