@@ -144,7 +144,18 @@ jobs:
 
       - name: → Run the Pester suite on Windows
         shell: pwsh
-        run: Invoke-Pester -Path hypershell/tests -CI
+        run: |
+          # The installed module link autoloads a second HyperShell into the
+          # test session: Windows does not resolve the reparse point to the
+          # checkout path, so PowerShell sees two distinct loaded modules,
+          # `Get-Module HyperShell` returns both, and Pester's module-scope
+          # invocation collapses them into the command name
+          # "HyperShell HyperShell". Tests import by path, so the user
+          # module directory contributes nothing but that duplicate.
+          $sep = [IO.Path]::PathSeparator
+          $env:PSModulePath = ($env:PSModulePath -split $sep |
+            Where-Object { $_ -notlike "$env:USERPROFILE*" }) -join $sep
+          Invoke-Pester -Path hypershell/tests -CI
 
       - name: → Assert the tree is byte-identical
         shell: bash
