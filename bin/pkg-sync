@@ -165,6 +165,15 @@ run_as_root() {
   fi
 }
 
+# Repository metadata is best effort. One stale third-party source in
+# sources.list.d must not stop the packages from installing, which is
+# what the yaml did before pkg-sync existed. Every failure gets named.
+run_soft() {
+  if ! run_as_root "$@"; then
+    warn "continuing after failure: $*"
+  fi
+}
+
 # Read a resolved list into the global PKG_LIST array. bash 3.2 has no
 # readarray, so this is the portable spelling.
 read_list() {
@@ -188,7 +197,7 @@ install_pacman() {
     return 0
   fi
 
-  run_as_root pacman -Syu --noconfirm
+  run_soft pacman -Syu --noconfirm
   # pacman resolves the batch atomically, so a single unknown name sinks
   # the whole install. Retry one at a time when that happens: same
   # skip-with-a-warning contract as apt, and the casualty gets named.
@@ -212,21 +221,21 @@ install_apt() {
     return 0
   fi
 
-  run_as_root apt-get update
+  run_soft apt-get update
 
   if [[ "${#ppas[@]}" -gt 0 ]]; then
     # add-apt-repository lives in software-properties-common, which a
     # minimal Ubuntu image does not ship. Install it first rather than
     # dying on a missing command.
     if ! command -v add-apt-repository > /dev/null 2>&1; then
-      run_as_root env DEBIAN_FRONTEND=noninteractive \
+      run_soft env DEBIAN_FRONTEND=noninteractive \
         apt-get install -y --no-install-recommends software-properties-common
     fi
     if command -v add-apt-repository > /dev/null 2>&1 || [[ "${DRY_RUN}" -eq 1 ]]; then
       for pkg in "${ppas[@]}"; do
-        run_as_root add-apt-repository -y "${pkg}"
+        run_soft add-apt-repository -y "${pkg}"
       done
-      run_as_root apt-get update
+      run_soft apt-get update
     else
       warn "add-apt-repository unavailable, skipping ${#ppas[@]} PPA(s)"
     fi
@@ -270,9 +279,9 @@ install_ppa() {
     return 0
   fi
   for ppa in "${PKG_LIST[@]}"; do
-    run_as_root add-apt-repository -y "${ppa}"
+    run_soft add-apt-repository -y "${ppa}"
   done
-  run_as_root apt-get update
+  run_soft apt-get update
 }
 
 # ─────────────────────────────────────────────────────────────
