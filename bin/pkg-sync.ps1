@@ -242,7 +242,11 @@ function Invoke-Main {
     # reads as one line on stderr and exit 2, the way the bash twin does,
     # instead of a PowerShell stack trace and exit 1.
     try {
-        $packages = Resolve-Manifest -Path $manifestPath -ManagerName $Manager -RoleName $resolvedRole
+        # @() is not decoration. PowerShell unrolls a collection on return,
+        # so one resolved package comes back as a bare string and none comes
+        # back as $null, and the .Count below would throw on both under
+        # Set-StrictMode -Version Latest.
+        $packages = @(Resolve-Manifest -Path $manifestPath -ManagerName $Manager -RoleName $resolvedRole)
     }
     catch {
         [Console]::Error.WriteLine($_.Exception.Message)

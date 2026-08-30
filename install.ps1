@@ -67,6 +67,7 @@ $ErrorActionPreference = 'Stop'
 
 $script:RepoRoot = $PSScriptRoot
 $script:ExitCode = 0
+$script:Warnings = 0
 
 # $IsWindows only exists from PowerShell 6, and this script still has to
 # run under the 5.1 that ships in the box.
@@ -89,6 +90,14 @@ function Write-Note {
 function Write-Skip {
     param([Parameter(Mandatory = $true)][string]$Message)
     Write-Host "-- $Message" -ForegroundColor Yellow
+}
+
+# A step that did not do its job. Counted, so the closing line cannot claim
+# a clean install over the top of one.
+function Write-Warn {
+    param([Parameter(Mandatory = $true)][string]$Message)
+    Write-Host "[warn] $Message" -ForegroundColor Yellow
+    $script:Warnings++
 }
 
 function Write-Ok {
@@ -176,20 +185,26 @@ function Initialize-Submodule {
     }
     & git -C $script:RepoRoot submodule update --init --recursive
     if ($LASTEXITCODE -ne 0) {
-        Write-Skip "git submodule update exited $LASTEXITCODE, continuing"
+        Write-Warn "git submodule update exited $LASTEXITCODE, continuing"
     }
 }
 
 function Install-ManifestPackage {
     $reader = Join-Path $script:RepoRoot 'bin/pkg-sync.ps1'
     if (-not (Test-Path -LiteralPath $reader)) {
-        Write-Skip "bin/pkg-sync.ps1 is missing, skipping packages"
+        Write-Warn 'bin/pkg-sync.ps1 is missing, no packages were installed'
         return
     }
     # A child pwsh would need pwsh on PATH, which is one of the things
     # this very step installs. Dot-sourcing is not an option either
     # because the reader calls exit. So: same host, same session.
     & $reader install winget $Role -DryRun:$DryRun
+    # A malformed manifest exits 2 there. Packages are best effort, the same
+    # as the apt path on Linux, so that is a named warning rather than the
+    # end of the install: the links are still worth having.
+    if ($LASTEXITCODE -ne 0) {
+        Write-Warn "pkg-sync.ps1 exited $LASTEXITCODE, packages may be incomplete"
+    }
 }
 
 <#
@@ -335,7 +350,13 @@ function Invoke-Main {
     Invoke-ElevatedStep -Elevated $elevated
 
     Write-Host ''
-    Write-Ok "Install complete. Open a new PowerShell session to pick it all up."
+    if ($script:Warnings -gt 0) {
+        Write-Skip "Install finished with $script:Warnings warning(s) above."
+        Write-Note 'Open a new PowerShell session to pick up what did land.'
+    }
+    else {
+        Write-Ok 'Install complete. Open a new PowerShell session to pick it all up.'
+    }
     Write-Host ''
 }
 
