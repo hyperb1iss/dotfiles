@@ -188,10 +188,15 @@ find_scripts() {
 is_shell_script() {
   local file="$1"
 
-  # Quick file type check using file command
+  # Quick file type check using file command.
+  #
+  # The bare "sh script" alternative has to be anchored: file describes a
+  # pwsh script as "a /usr/bin/env pwsh script" and a fish script as
+  # "fish script", and an unanchored "sh script" matches the tail of
+  # both, handing shellcheck a file it cannot parse.
   local file_type
   file_type=$(file -b "${file}" 2> /dev/null || echo "")
-  [[ "${file_type}" =~ (shell script|sh script|bash script|zsh script|Bourne-Again shell|POSIX shell) ]]
+  [[ "${file_type}" =~ (shell\ script|(^|[^[:alnum:]])sh\ script|bash\ script|zsh\ script|Bourne-Again\ shell|POSIX\ shell) ]]
 }
 
 # Simplified script identification
@@ -206,7 +211,8 @@ should_process_file() {
     *.sh | *.bash | *.zsh) return 0 ;;
     *bashrc* | *zshrc*) return 0 ;;
     zshenv | zlogin | zlogout | zprofile) return 0 ;;
-    *) ;; # Continue to other checks
+    *.ps1 | *.psm1 | *.psd1) return 1 ;; # PowerShell belongs to bin/pslint.ps1
+    *) ;;                                # Continue to other checks
   esac
 
   # bin/* files need content check
