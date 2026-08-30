@@ -75,12 +75,13 @@ jobs:
         run: |
           echo "» Running tests..."
 
-          # Untracked files by name plus a hash of the tracked-file diff.
-          # Status alone would compare only the M/?? flags, so a write to a
-          # file that already showed as modified would slip through.
+          # Content hashes, not status flags: status compares only the M/??
+          # markers, so a write to a file that already showed as modified, or
+          # an overwrite of an untracked file that already existed, would
+          # slip through. Ignored files (the Pester report) stay excluded.
           snapshot() {
-            git status --porcelain
             git diff HEAD --binary | sha256sum
+            git ls-files -o --exclude-standard -z | sort -z | xargs -0 -r sha256sum
           }
 
           before=$(snapshot)
