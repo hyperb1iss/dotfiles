@@ -80,9 +80,7 @@ dotfiles/
 ├── gitconfig             # Git config with SilkCircuit colors + Delta
 ├── proto/                # Proto version manager (.prototools)
 ├── claude/               # Claude Code settings, status line, security hooks
-├── lsd/                  # LSDeluxe file listing config
-├── procs/                # Procs process viewer config
-├── fastfetch/            # Fastfetch system info display
+├── lsd/                  # LSDeluxe layout (colors come from SilkCircuit)
 ├── macos/                # macOS setup (Brewfile, system prefs, Karabiner)
 ├── hypershell/           # Windows PowerShell modules
 ├── docs/                 # VitePress documentation site

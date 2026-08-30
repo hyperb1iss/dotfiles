@@ -12,15 +12,21 @@
 - create:
     - ~/.agents/skills
 
+# The SilkCircuit installer owns the themed tool configs (procs, fastfetch,
+# lsd colors, the atuin theme) and will not create files inside a foreign
+# git repo, so those paths must not resolve into this checkout. Dead links
+# left by older installs are swept below; ~/.config/lsd was a directory
+# link and is still alive, so it gets removed by name.
+- clean:
+    ~/.config:
+      recursive: true
+- shell:
+    - command: "[ -L ~/.config/lsd ] && rm ~/.config/lsd || true"
+      description: Retiring the ~/.config/lsd directory link
 - link:
     ~/.fonts: fonts
-    ~/.config/lsd:
-      path: lsd
-      force: true
-    ~/.config/fastfetch/config.jsonc: fastfetch/config.jsonc
-    ~/.config/procs/config.toml: procs/config.toml
+    ~/.config/lsd/config.yaml: lsd/config.yaml
     ~/.config/atuin/config.toml: atuin/config.toml
-    ~/.config/atuin/themes/silkcircuit.toml: atuin/themes/silkcircuit.toml
     ~/.claude/statusline-command.sh: claude/statusline-command.sh
     # ~/.agents/skills is the source of truth for agent skills. Codex scans it
     # natively; Claude Code reaches it through this link.
