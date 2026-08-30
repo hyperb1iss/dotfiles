@@ -303,16 +303,35 @@ set -g pane-active-border-style 'fg=#c792ea'
 
 ## Platform-Specific Configuration
 
+### Linux
+
+**Packages:**
+
+Every apt, pacman, and cargo package lives in `packages.conf`, one row per tool:
+
+```
+# name        roles           sources
+lazygit       desktop         pacman
+ripgrep       desktop         pacman cargo bin=rg
+```
+
+A row names the package for each manager (`apt=git-core` when the names differ), which roles it belongs to, and which
+manager provides it. Check your work before touching the machine:
+
+```bash
+bin/pkg-sync list pacman desktop        # resolved names, one per line
+bin/pkg-sync install apt server -n      # the plan, without running it
+```
+
 ### macOS
 
 **Homebrew:**
 
-Customize installed packages in `macos/brew.sh`:
+Customize installed packages in `macos/Brewfile`, which `macos/brew.sh` feeds to `brew bundle`:
 
-```bash
-# Add your preferred packages
-brew install neovim
-brew install --cask visual-studio-code
+```ruby
+brew "neovim"
+cask "visual-studio-code"
 ```
 
 ### WSL2

@@ -86,6 +86,7 @@ dotfiles/
 ├── macos/                # macOS setup (Brewfile, system prefs, Karabiner)
 ├── hypershell/           # Windows PowerShell modules
 ├── docs/                 # VitePress documentation site
+├── packages.conf         # Every apt, pacman, and cargo package, by role
 ├── Makefile              # Install, lint, and format targets
 └── dotbot.d/             # DotBot install layers
     ├── base.yaml         #   Every machine, every OS, every role
@@ -106,6 +107,21 @@ base.yaml → os/<uname>.yaml → role/<role>.yaml → host/<hostname>.yaml → 
 The Makefile detects the OS from `uname`, defaults the role to `desktop`, and appends the host and private layers only
 when those files are actually there. Each layer answers one question, so a shared change like the SilkCircuit installer
 or the Atuin config lives in exactly one file instead of three.
+
+### 📦 One package manifest
+
+Every apt, pacman, and cargo package lives in [`packages.conf`](./packages.conf), one row per tool, carrying the name
+each manager uses and the roles it belongs to. [`bin/pkg-sync`](./bin/pkg-sync) resolves that manifest and runs the
+install, so the layers ask for a role and stay out of the package business:
+
+```bash
+bin/pkg-sync list apt server           # what a headless Ubuntu box gets
+bin/pkg-sync install pacman desktop -n # the plan, without running it
+bin/pkg-sync install desktop           # detect the manager, install for real
+```
+
+It needs bash and awk and nothing else, which is the point: it runs on a box that has not installed anything yet.
+Homebrew is the exception and keeps its own declarative manifest in [`macos/Brewfile`](./macos/Brewfile).
 
 ## 🔤 Installing Nerd Fonts
 
