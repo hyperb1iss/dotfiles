@@ -19,6 +19,16 @@ function New-File {
         return
     }
 
+    # ValueFromRemainingArguments is what makes `touch a b c` work, but it
+    # also swallows a mistyped parameter name as a literal filename, so
+    # `touch -notaparam x` would quietly create a file called -notaparam.
+    # Anything that looks like a parameter is rejected instead.
+    $looksLikeParameter = @($Path | Where-Object { $_ -like '-*' })
+    if ($looksLikeParameter) {
+        Write-Error "Not a parameter of touch: $($looksLikeParameter -join ', '). For a file whose name starts with a dash, use ./$($looksLikeParameter[0])"
+        return
+    }
+
     foreach ($item in $Path) {
         if ($PSCmdlet.ShouldProcess($item, 'Create file')) {
             New-Item -ItemType File -Path $item

@@ -479,6 +479,19 @@ Describe 'File utilities' {
         Test-Path -LiteralPath $second | Should -BeTrue
     }
 
+    It 'refuses a mistyped parameter instead of creating a file named after it' {
+        $probe = Join-Path $script:TempRoot 'dash-guard'
+        New-Item -ItemType Directory -Path $probe -Force | Out-Null
+        Push-Location $probe
+        try {
+            { New-File -notaparam 'real.txt' -ErrorAction Stop } | Should -Throw
+            @(Get-ChildItem -LiteralPath $probe).Count | Should -Be 0
+        }
+        finally {
+            Pop-Location
+        }
+    }
+
     It 'errors rather than prompting when mkdir gets no path' {
         # Mandatory would make a bare mkdir block on a prompt, which hangs any
         # script that hits it. It has to fail instead.
