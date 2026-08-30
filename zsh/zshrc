@@ -29,6 +29,12 @@ HISTFILE=~/.zsh_history
 # sh/loader.sh owns module order for both shells. Phase one now, so
 # completions and plugins below have PATH and the helper functions;
 # phase two (dotfiles_load_modules) after the plugins are in place.
+#
+# DOTFILES steers which checkout loads, which is how a worktree gets
+# tested without disturbing the installed one. A stale value left in
+# the environment must not cost you a working shell, so drop it when it
+# points at nothing and let the loader derive its own path instead.
+[[ -r "${DOTFILES:-${HOME}/dev/dotfiles}/sh/loader.sh" ]] || unset DOTFILES
 source "${DOTFILES:-${HOME}/dev/dotfiles}/sh/loader.sh"
 dotfiles_load_core
 

@@ -34,6 +34,11 @@ bind 'set menu-complete-display-prefix on' # Show the common prefix while cyclin
 
 # sh/loader.sh owns module order for both shells. Bash has nothing to
 # slot between the core and the rest, so it takes both phases at once.
+#
+# A stale DOTFILES in the environment must not cost you a working
+# shell, so drop it when it points at nothing and let the loader derive
+# its own path instead.
+[[ -r "${DOTFILES:-${HOME}/dev/dotfiles}/sh/loader.sh" ]] || unset DOTFILES
 source "${DOTFILES:-${HOME}/dev/dotfiles}/sh/loader.sh"
 dotfiles_load_all
 
