@@ -32,16 +32,34 @@ run_step() {
 }
 
 if [ "$(uname -s)" = "Darwin" ]; then
-  host_layers="dotbot.d/base.yaml dotbot.d/os/macos.yaml dotbot.d/role/desktop.yaml"
+  lane="desktop-macos"
 else
-  host_layers="dotbot.d/base.yaml dotbot.d/os/linux.yaml dotbot.d/role/desktop.yaml dotbot.d/host/hyperia.yaml"
+  lane="desktop-linux"
 fi
+
+host_layers=$("${smoke_dir}/layers.sh" list "${lane}")
+
+run_step "layer composition" "${smoke_dir}/layers.sh" check-compose "${lane}"
 
 # shellcheck disable=SC2086 # the layer list is deliberately word split
 run_step "host dry link run" "${smoke_dir}/dry-link.sh" "${repo_root}" ${host_layers}
 
 if [ -n "${SMOKE_RUNTIME:-}" ] || command -v docker > /dev/null 2>&1 || command -v podman > /dev/null 2>&1; then
-  run_step "container matrix" "${smoke_dir}/run-container.sh"
+  note "container matrix"
+  set +e
+  "${smoke_dir}/run-container.sh"
+  rc=$?
+  set -e
+  # 127 is run-container.sh saying there is no usable runtime, which is a
+  # skip rather than a failure. Anything else is a real result.
+  if [ "${rc}" -eq 0 ]; then
+    good "container matrix"
+  elif [ "${rc}" -eq 127 ]; then
+    warn "container jobs skipped, the Linux matrix still runs in CI"
+  else
+    bad "container matrix"
+    failed="${failed} container-matrix"
+  fi
 else
   warn "no docker or podman on this machine, skipping the container jobs"
   warn "the Linux install matrix still runs in CI on every push"

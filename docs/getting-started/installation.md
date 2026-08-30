@@ -245,10 +245,14 @@ set up a box.
 make smoke
 ```
 
-That runs the same scripts CI does, from `.github/smoke/`. First comes a link-only pass for this OS: the layers go
-through Dotbot with `--only clean create link` against a temporary `HOME`, so nothing is downloaded and your real home
-directory is never touched. Then the container jobs run, if `docker` or `podman` is installed. Without either one it
-says what it skipped and still reports the dry run.
+That runs the same scripts CI does, from `.github/smoke/`. First it checks that `make -n install` composes the layers
+this OS expects, then it does a link-only pass over them: the layers go through Dotbot with `--only clean create link`
+against a temporary `HOME`, so nothing is downloaded and your real home directory is never touched. Then the container
+jobs run, if `docker` or `podman` is installed and its daemon answers. Without that it says what it skipped and still
+reports the rest.
+
+Which layers each lane composes lives in one place, `.github/smoke/layers.sh`, so the workflow and `make smoke` cannot
+disagree about what they are testing.
 
 The container jobs each build a machine from nothing. A bare `ubuntu:24.04` or `archlinux:latest` image gets the handful
 of packages an install needs to start, an unprivileged user with passwordless sudo, and a copy of the checkout at

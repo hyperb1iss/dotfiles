@@ -48,22 +48,8 @@ jobs:
           submodules: recursive
 
       - name: → Check the composed layers
-        run: |
-          out=$(make -n install)
-          printf '%s\n' "$out"
-          for layer in dotbot.d/base.yaml dotbot.d/os/macos.yaml dotbot.d/role/desktop.yaml; do
-            case "$out" in
-            *"$layer"*) echo "  ok $layer" ;;
-            *)
-              echo "::error::make -n install did not compose $layer"
-              exit 1
-              ;;
-            esac
-          done
+        run: ./.github/smoke/layers.sh check-compose desktop-macos
 
       - name: → Link the macOS layers against a temp HOME
         run: |
-          ./.github/smoke/dry-link.sh . \
-            dotbot.d/base.yaml \
-            dotbot.d/os/macos.yaml \
-            dotbot.d/role/desktop.yaml
+          ./.github/smoke/dry-link.sh . $(./.github/smoke/layers.sh list desktop-macos)

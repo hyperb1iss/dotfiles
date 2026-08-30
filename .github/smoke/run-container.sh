@@ -68,6 +68,13 @@ runtime=$(pick_runtime) || {
   exit 127
 }
 
+# Installed is not the same as running. Without this a stopped Docker
+# Desktop reports a daemon socket error per job instead of once, clearly.
+if ! "${runtime}" info > /dev/null 2>&1; then
+  echo "✖ ${runtime} is installed but not responding; is the daemon running?" >&2
+  exit 127
+fi
+
 # No argument means the whole matrix. Positional parameters rather than an
 # array: bash 3.2 on macOS treats an empty array expansion under `set -u`
 # as an unbound variable.
@@ -86,7 +93,7 @@ for job in "$@"; do
   image="${rest%%|*}"
   rest="${rest#*|}"
   mode="${rest%%|*}"
-  platform="${SMOKE_PLATFORM:-${rest#*|}}"
+  platform="${SMOKE_PLATFORM-${rest#*|}}"
 
   printf '\n\033[1;35m▶ \033[1;36m%s\033[0m \033[0;90m(%s, %s, %s%s)\033[0m\n' \
     "${job}" "${image}" "${mode}" "${runtime}" "${platform:+, ${platform}}"

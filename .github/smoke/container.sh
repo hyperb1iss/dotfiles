@@ -94,15 +94,21 @@ phase_root() {
   create_smoke_user
   stage_repo
 
+  # Hand off to the staged copy, not the mount: the copy is the tree
+  # under test, and running it there needs no assumption about whether an
+  # unprivileged user can read /src.
   banner "Handing off to ${smoke_user}"
   exec su - "${smoke_user}" -c \
-    "SMOKE_INTERACTIVE=${smoke_interactive} bash ${src}/.github/smoke/container.sh user ${mode}"
+    "SMOKE_INTERACTIVE=${smoke_interactive} bash ${repo}/.github/smoke/container.sh user ${mode}"
 }
 
-# An interactive shell prints more than the command it was given: zsh
-# emits terminal control bytes even with no tty, and the rc files log as
-# they load. Grepping the whole transcript for the marker is the only
-# reliable read on "did the rc file run to the end".
+# What this proves: the shell starts interactively, sources its rc files,
+# and reaches the command. It does not prove the rc file ran without
+# errors along the way, since -c runs either way.
+#
+# Matching is a grep over the whole transcript rather than an equality
+# test on the last line, because zsh emits terminal control bytes even
+# with no tty and the rc files log as they load.
 assert_shell_ok() {
   local label="$1"
   shift
@@ -134,8 +140,12 @@ phase_user_server() {
   make -C "${repo}" server
 
   banner "Link assertions"
-  "${repo}/.github/smoke/assert-links.sh" "${HOME}" "${repo}" \
-    "${repo}/dotbot.d/base.yaml" "${repo}/dotbot.d/role/server.yaml"
+  local layers=""
+  for layer in $("${repo}/.github/smoke/layers.sh" list server); do
+    layers="${layers} ${repo}/${layer}"
+  done
+  # shellcheck disable=SC2086 # the layer list is deliberately word split
+  "${repo}/.github/smoke/assert-links.sh" "${HOME}" "${repo}" ${layers}
 
   assert_interactive_shells
 
@@ -149,11 +159,9 @@ phase_user_server() {
 }
 
 phase_user_desktop_links() {
+  # shellcheck disable=SC2046 # the layer list is deliberately word split
   "${repo}/.github/smoke/dry-link.sh" "${repo}" \
-    dotbot.d/base.yaml \
-    dotbot.d/os/linux.yaml \
-    dotbot.d/role/desktop.yaml \
-    dotbot.d/host/hyperia.yaml
+    $("${repo}/.github/smoke/layers.sh" list desktop-linux)
 }
 
 phase_user() {
