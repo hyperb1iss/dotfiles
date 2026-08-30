@@ -30,17 +30,18 @@ HISTFILE=~/.zsh_history
 # completions and plugins below have PATH and the helper functions;
 # phase two (dotfiles_load_modules) after the plugins are in place.
 #
-# DOTFILES steers which checkout loads, which is how a worktree gets
-# tested without disturbing the installed one. An explicit value wins
-# while it points at a real checkout. Otherwise derive the root from
-# this file's own location rather than from a hardcoded path: every
-# shell here inherits an exported DOTFILES pointing at the installed
-# tree, so a worktree's zshrc that trusted it would load the wrong
-# modules, or none at all before this branch is merged.
+# The rc file you source is the selector for which checkout loads, so
+# derive the root from this file's own location and overwrite whatever
+# DOTFILES the environment carried in. An inherited value is never
+# trusted: shell-common exports DOTFILES, so every shell started from
+# a normal session carries the installed tree's path, and a worktree's
+# zshrc that honored it would quietly load the installed modules
+# instead of the ones under test.
 #
 # ${(%):-%x} is the file being sourced, :A resolves the ~/.zshrc
 # symlink to its target, and :h:h climbs out of zsh/ to the repo root.
-[[ -r "${DOTFILES:-}/sh/loader.sh" ]] || export DOTFILES="${${(%):-%x}:A:h:h}"
+# Still exported, since modules and scripts read it.
+export DOTFILES="${${(%):-%x}:A:h:h}"
 source "${DOTFILES}/sh/loader.sh"
 dotfiles_load_core
 

@@ -35,40 +35,38 @@ bind 'set menu-complete-display-prefix on' # Show the common prefix while cyclin
 # sh/loader.sh owns module order for both shells. Bash has nothing to
 # slot between the core and the rest, so it takes both phases at once.
 #
-# Same rule as zshrc: an explicit DOTFILES wins while it points at a
-# real checkout, otherwise derive the root from this file's own
-# location. Never from a hardcoded path, because every shell here
-# inherits an exported DOTFILES aimed at the installed tree and a
-# worktree that trusted it would load the wrong modules.
+# Same rule as zshrc: the rc file you source is the selector, so derive
+# the root from this file's own location and overwrite whatever
+# DOTFILES came in from the environment. An inherited value is never
+# trusted, because shell-common exports it and every shell started
+# from a normal session therefore carries the installed tree's path.
 #
 # ~/.bashrc.local is a symlink into the repo, and macOS bash 3.2 has no
-# readlink -f. dotbot writes absolute links, so a single readlink is
-# enough, and it only runs when climbing out of the unresolved path
-# fails to find a loader.
-if [[ ! -r "${DOTFILES:-}/sh/loader.sh" ]]; then
-  __dotfiles_rc="${BASH_SOURCE[0]}"
-  [[ -L "${__dotfiles_rc}" ]] && __dotfiles_rc="$(readlink "${__dotfiles_rc}")"
+# readlink -f. dotbot writes absolute links, so a single hop is enough,
+# and the -L test keeps it from running on a plain file.
+__dotfiles_rc="${BASH_SOURCE[0]}"
+[[ -L "${__dotfiles_rc}" ]] && __dotfiles_rc="$(readlink "${__dotfiles_rc}")"
 
-  case "${__dotfiles_rc}" in
-    */bash/bashrc.local) __dotfiles_root="${__dotfiles_rc%/bash/bashrc.local}" ;;
-    bash/bashrc.local) __dotfiles_root="${PWD}" ;;
-    *) __dotfiles_root="" ;;
-  esac
+case "${__dotfiles_rc}" in
+  */bash/bashrc.local) __dotfiles_root="${__dotfiles_rc%/bash/bashrc.local}" ;;
+  bash/bashrc.local) __dotfiles_root="${PWD}" ;;
+  *) __dotfiles_root="" ;;
+esac
 
-  # A relative source path resolves against the caller's cwd.
-  case "${__dotfiles_root}" in
-    /*) ;;
-    "")
-      printf 'dotfiles: cannot place the checkout from "%s", using %s\n' \
-        "${__dotfiles_rc}" "${HOME}/dev/dotfiles" >&2
-      __dotfiles_root="${HOME}/dev/dotfiles"
-      ;;
-    *) __dotfiles_root="${PWD}/${__dotfiles_root}" ;;
-  esac
+# A relative source path resolves against the caller's cwd.
+case "${__dotfiles_root}" in
+  /*) ;;
+  "")
+    printf 'dotfiles: cannot place the checkout from "%s", using %s\n' \
+      "${__dotfiles_rc}" "${HOME}/dev/dotfiles" >&2
+    __dotfiles_root="${HOME}/dev/dotfiles"
+    ;;
+  *) __dotfiles_root="${PWD}/${__dotfiles_root}" ;;
+esac
 
-  export DOTFILES="${__dotfiles_root}"
-  unset __dotfiles_rc __dotfiles_root
-fi
+# Exported, since modules and scripts read it.
+export DOTFILES="${__dotfiles_root}"
+unset __dotfiles_rc __dotfiles_root
 source "${DOTFILES}/sh/loader.sh"
 dotfiles_load_all
 
