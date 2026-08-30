@@ -1,0 +1,69 @@
+name: 🧪 Install Smoke
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # → Real installs in throwaway containers, plus the desktop layers as a
+  #   link-only run so the graphical stack never has to be installed
+  linux:
+    name: » ${{ matrix.label }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - label: Ubuntu server install
+            job: ubuntu-server
+          - label: Arch server install
+            job: arch-server
+          - label: Linux desktop links
+            job: ubuntu-desktop-links
+    steps:
+      - name: → Checkout code
+        uses: actions/checkout@v7
+        with:
+          submodules: recursive
+
+      - name: → Run the smoke container
+        run: ./.github/smoke/run-container.sh ${{ matrix.job }}
+
+  # → macOS gets a dry run: compose the layers, then link them against a
+  #   temporary HOME. Homebrew and the macOS defaults tier stay out of it
+  macos:
+    name: » macOS dry run
+    runs-on: macos-latest
+    timeout-minutes: 15
+    steps:
+      - name: → Checkout code
+        uses: actions/checkout@v7
+        with:
+          submodules: recursive
+
+      - name: → Check the composed layers
+        run: |
+          out=$(make -n install)
+          printf '%s\n' "$out"
+          for layer in dotbot.d/base.yaml dotbot.d/os/macos.yaml dotbot.d/role/desktop.yaml; do
+            case "$out" in
+            *"$layer"*) echo "  ok $layer" ;;
+            *)
+              echo "::error::make -n install did not compose $layer"
+              exit 1
+              ;;
+            esac
+          done
+
+      - name: → Link the macOS layers against a temp HOME
+        run: |
+          ./.github/smoke/dry-link.sh . \
+            dotbot.d/base.yaml \
+            dotbot.d/os/macos.yaml \
+            dotbot.d/role/desktop.yaml
