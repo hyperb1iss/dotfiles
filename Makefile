@@ -45,6 +45,9 @@ default:
 	@echo "Other commands:"
 	@echo "  make update  - Update submodules"
 	@echo "  make smoke   - Run the CI install smoke matrix on this machine"
+	@echo "  make lint    - Lint shell, yaml, lua, json, markdown, PowerShell"
+	@echo "  make format  - Reformat everything the linters check"
+	@echo "  make test    - Run the Pester suite for the PowerShell profile"
 	@echo ""
 	@echo "Layers for this machine:"
 	@for layer in $(LAYER_CONFIGS); do echo "  $$layer"; done
@@ -91,6 +94,7 @@ CYAN := \033[1;36m
 GREEN := \033[1;32m
 YELLOW := \033[1;33m
 CORAL := \033[1;91m
+BLUE := \033[1;94m
 GRAY := \033[0;90m
 RESET := \033[0m
 BOLD := \033[1m
@@ -102,8 +106,18 @@ BULLET := •
 WARNING := !
 ERROR := ×
 
+# PowerShell 7 installs as `pwsh`; the preview channel installs as
+# `pwsh-preview`, so take whichever is on PATH. Empty means no PowerShell
+# on this box, and every ps target then skips instead of failing.
+PWSH := $(shell command -v pwsh 2> /dev/null || command -v pwsh-preview 2> /dev/null)
+
 # Linting and formatting
-lint: lint-header lint-shell lint-yaml lint-lua lint-json lint-markdown lint-footer
+#
+# lint-ps runs last on purpose: it is the only linter besides lint-shell
+# that can fail the chain, and a failing prerequisite stops make, so
+# putting it at the end means a PowerShell finding never hides the yaml,
+# lua, json or markdown output.
+lint: lint-header lint-shell lint-yaml lint-lua lint-json lint-markdown lint-ps lint-footer
 
 lint-header:
 	@echo ""
@@ -145,12 +159,25 @@ lint-markdown:
 	@echo "  $(GREEN)$(CHECK) Markdown linting complete$(RESET)"
 	@echo ""
 
+# PSScriptAnalyzer over every tracked .ps1/.psm1/.psd1. Severity policy
+# lives in bin/pslint.ps1: Error and Warning are blocking and fail this
+# target, Information is printed and ignored. Rule selection comes from
+# PSScriptAnalyzerSettings.psd1 when the repo ships one, else PSGallery.
+lint-ps:
+	@echo "$(BLUE)$(ARROW)$(RESET) $(BOLD)PowerShell Scripts$(RESET)"
+	@if [ -n "$(PWSH)" ]; then \
+		$(PWSH) -NoProfile -NoLogo -File ./bin/pslint.ps1; \
+	else \
+		echo "  $(GRAY)$(BULLET) pwsh not installed, skipping$(RESET)"; \
+	fi
+	@echo ""
+
 lint-footer:
 	@echo ""
 	@echo "$(GREEN)$(CHECK)$(RESET) $(BOLD)All linting checks completed!$(RESET)"
 	@echo ""
 
-format: format-header format-shell format-prettier format-lua format-footer
+format: format-header format-shell format-prettier format-lua format-ps format-footer
 
 format-header:
 	@echo ""
@@ -175,9 +202,47 @@ format-lua:
 	-@cd nvim && stylua lua 2>&1 | sed 's/^/  │ /' || true
 	@echo ""
 
+format-ps:
+	@echo "$(BLUE)$(ARROW)$(RESET) $(BOLD)PowerShell Scripts$(RESET)"
+	@if [ -n "$(PWSH)" ]; then \
+		$(PWSH) -NoProfile -NoLogo -File ./bin/pslint.ps1 -Format; \
+	else \
+		echo "  $(GRAY)$(BULLET) pwsh not installed, skipping$(RESET)"; \
+	fi
+	@echo ""
+
 format-footer:
 	@echo ""
 	@echo "$(GREEN)$(CHECK)$(RESET) $(BOLD)All formatting completed!$(RESET)"
 	@echo ""
 
-.PHONY: default update install macos server minimal system full private smoke lint lint-header lint-shell lint-yaml lint-lua lint-json lint-markdown lint-footer format format-header format-shell format-prettier format-lua format-footer
+# Tests
+test: test-header test-ps test-footer
+
+test-header:
+	@echo ""
+	@echo "$(PURPLE)▶ $(CYAN)Running Tests$(RESET)"
+	@echo ""
+
+# Pester over hypershell/tests. The directory and the module it exercises
+# arrive together, so until then this skips loudly rather than failing.
+# Pester 5 or newer is required: -CI is what turns a failed test into a
+# nonzero exit code.
+test-ps:
+	@echo "$(BLUE)$(ARROW)$(RESET) $(BOLD)PowerShell Tests$(RESET)"
+	@if [ -z "$(PWSH)" ]; then \
+		echo "  $(GRAY)$(BULLET) pwsh not installed, skipping$(RESET)"; \
+	elif [ -z "$$(ls hypershell/tests/*.Tests.ps1 2> /dev/null)" ]; then \
+		echo "  $(GRAY)$(BULLET) no hypershell/tests/*.Tests.ps1 yet, skipping$(RESET)"; \
+	else \
+		$(PWSH) -NoProfile -NoLogo -Command \
+			"if (Get-Module -ListAvailable -Name Pester) { Invoke-Pester -Path hypershell/tests -CI } else { Write-Host '  Pester not installed, skipping'; }"; \
+	fi
+	@echo ""
+
+test-footer:
+	@echo ""
+	@echo "$(GREEN)$(CHECK)$(RESET) $(BOLD)All tests completed!$(RESET)"
+	@echo ""
+
+.PHONY: default update install macos server minimal system full private smoke lint lint-header lint-shell lint-yaml lint-lua lint-json lint-markdown lint-ps lint-footer format format-header format-shell format-prettier format-lua format-ps format-footer test test-header test-ps test-footer
