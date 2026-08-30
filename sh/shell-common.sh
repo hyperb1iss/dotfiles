@@ -54,8 +54,18 @@ function is_macos() {
   [[ "${OSTYPE}" == "darwin"* ]]
 }
 
+# Read /proc/version in-shell rather than shelling out to grep. The
+# grep spawn cost 2ms of every shell start, and on macOS it paid that
+# to look for a file that cannot exist. WSL1 writes "Microsoft" in the
+# kernel string, WSL2 writes "microsoft".
 function is_wsl() {
-  grep -qi microsoft /proc/version 2> /dev/null
+  [[ -r /proc/version ]] || return 1
+  local kernel_version
+  IFS= read -r kernel_version < /proc/version 2> /dev/null || return 1
+  case "${kernel_version}" in
+    *[Mm]icrosoft*) return 0 ;;
+    *) return 1 ;;
+  esac
 }
 
 function is_linux() {
