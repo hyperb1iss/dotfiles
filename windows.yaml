@@ -29,7 +29,8 @@
     # Git configuration
     ~/.gitconfig: gitconfig
     # Fastfetch configuration (Windows path)
-    ~/AppData/Roaming/fastfetch/config.jsonc: fastfetch/config.jsonc
+    # fastfetch config is owned by the SilkCircuit installer, which does not
+    # run on Windows yet; copy extras/fastfetch/<variant>.jsonc by hand
     # Claude Code configuration
     ~/.claude/statusline-command.sh: claude/statusline-command.sh
     # Claude Code / Codex agent files (from dotfiles-private).

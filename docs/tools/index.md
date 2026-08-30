@@ -32,7 +32,8 @@ Configured with SilkCircuit colors and platform-specific settings in `ghostty/`.
 ### Atuin Shell History
 
 [Atuin](https://atuin.sh/) replaces standard shell history with a SQLite-backed, searchable database featuring
-cross-machine sync, per-directory filtering, and a SilkCircuit-themed UI (`atuin/themes/silkcircuit.toml`).
+cross-machine sync, per-directory filtering, and a SilkCircuit-themed UI (the theme file is installed by the SilkCircuit
+installer).
 
 ### Proto Version Manager
 
@@ -190,12 +191,12 @@ Each tool is configured in the dotfiles:
 | **Ghostty**  | `ghostty/config`, `ghostty/*.conf`  | Terminal emulator      |
 | **Starship** | `silkcircuit: extras/starship/`     | Prompt customization   |
 | **Tmux**     | `tmux.conf`                         | Key bindings, theme    |
-| **Atuin**    | `atuin/`, `atuin/themes/`           | Shell history, theme   |
+| **Atuin**    | `atuin/config.toml`                 | Shell history          |
 | **Proto**    | `proto/.prototools`                 | Language versions      |
 | **lsd**      | `lsd/config.yaml`                   | Display settings       |
 | **bat**      | `silkcircuit: extras/bat/`          | Theme, syntax settings |
 | **Delta**    | `gitconfig` (delta section)         | Git diff styling       |
-| **procs**    | `procs/config.toml`                 | Process display        |
+| **procs**    | `silkcircuit: extras/procs/`        | Process display        |
 | **FZF**      | `sh/fzf.sh`, `sh/env.sh` (ENV vars) | Defaults, key bindings |
 | **zoxide**   | Automatic (tracks your usage)       | Database stored in XDG |
 

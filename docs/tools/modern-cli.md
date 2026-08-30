@@ -342,18 +342,8 @@ procs --docker
 
 ### Configuration
 
-Located at `/Users/bliss/dev/dotfiles/procs/config.toml`:
-
-```toml
-[display]
-separator = "│"
-ascending = false
-color_mode = "auto"
-
-[sort]
-column = "cpu"
-order = "descending"
-```
+`~/.config/procs/config.toml` is written by the SilkCircuit installer (`extras/procs/` in that repo, one file per
+variant), not tracked here.
 
 ## delta (diff replacement)
 
