@@ -24,6 +24,10 @@
 .EXAMPLE
     .\bin\pkg-sync.ps1 install winget desktop -DryRun
 #>
+# PSReviewUnusedParameter cannot see through PowerShell's dynamic
+# scoping: these parameters are read inside the functions below by
+# bare name, which the rule's static per-scope analysis misses.
+[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', '')]
 [CmdletBinding()]
 param(
     [Parameter(Position = 0)]

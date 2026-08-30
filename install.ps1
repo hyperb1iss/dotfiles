@@ -50,6 +50,10 @@
 [Diagnostics.CodeAnalysis.SuppressMessageAttribute(
     'PSAvoidUsingWriteHost', '',
     Justification = 'Progress output for an interactive installer')]
+# PSReviewUnusedParameter cannot see through PowerShell's dynamic
+# scoping: these parameters are read inside the functions below by
+# bare name, which the rule's static per-scope analysis misses.
+[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSReviewUnusedParameter', '')]
 [CmdletBinding()]
 param(
     [ValidateSet('desktop', 'server')]
