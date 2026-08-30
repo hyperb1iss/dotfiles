@@ -9,9 +9,12 @@
 # .psm1 and .psd1 with PSScriptAnalyzer, or rewrites them in place with
 # Invoke-Formatter when -Format is passed.
 #
-# Severity policy: Error and Warning are blocking and set a nonzero exit
-# code. Information is printed and ignored, so advisory nits stay visible
-# without stopping a commit while genuine defects do.
+# Severity policy: ParseError, Error and Warning are blocking and set a
+# nonzero exit code. Information is printed and ignored, so advisory nits
+# stay visible without stopping a commit while genuine defects do.
+# ParseError is its own severity rather than a flavour of Error, so it
+# has to be named explicitly or a file that does not even compile sails
+# through green.
 #
 # Rule selection comes from PSScriptAnalyzerSettings.psd1 when the repo
 # ships one (root first, then hypershell/), otherwise the PSGallery
@@ -104,8 +107,20 @@ if ($Format) {
         if (-not $before) { continue }
 
         $after = Invoke-Formatter -ScriptDefinition $before -Settings $activeSettings
-        if ($after -ne $before) {
-            Set-Content -LiteralPath $full -Value $after -NoNewline -Encoding utf8NoBOM
+
+        # -cne, not -ne: PowerShell string comparison is case insensitive by
+        # default, and PSUseCorrectCasing is part of the CodeFormatting
+        # preset, so a file whose only fix is casing would be formatted,
+        # compared equal, and silently never written.
+        if ($after -cne $before) {
+            # Preserve a byte order mark when the file already had one.
+            # Windows PowerShell 5.1 reads a BOM-less UTF-8 file as ANSI,
+            # so quietly dropping one can corrupt non-ASCII characters.
+            $head = [System.IO.File]::ReadAllBytes($full) | Select-Object -First 3
+            $encoding = if ($head.Count -eq 3 -and $head[0] -eq 0xEF -and
+                $head[1] -eq 0xBB -and $head[2] -eq 0xBF) { 'utf8BOM' } else { 'utf8NoBOM' }
+
+            Set-Content -LiteralPath $full -Value $after -NoNewline -Encoding $encoding
             $rewritten.Add($rel)
         }
     }
@@ -126,8 +141,12 @@ if ($Format) {
 # ─────────────────────────────────────────────────────────────
 Write-Host "  ${scCyan}⚡${reset} analyzing ${bold}${scWhite}$($files.Count) files${reset} ${scGray}($settingsLabel)${reset}"
 
+# Invoke-ScriptAnalyzer has no -LiteralPath and treats -Path as a
+# wildcard, so a tracked file with a bracket in its name matches nothing
+# and its findings vanish into a green run. Escape the metacharacters.
 $findings = foreach ($rel in $files) {
-    Invoke-ScriptAnalyzer -Path (Join-Path $repoRoot $rel) -Settings $activeSettings
+    $full = [System.Management.Automation.WildcardPattern]::Escape((Join-Path $repoRoot $rel))
+    Invoke-ScriptAnalyzer -Path $full -Settings $activeSettings
 }
 $findings = @($findings)
 
@@ -137,6 +156,7 @@ if ($findings.Count -eq 0) {
 }
 
 $glyphs = @{
+    ParseError  = "${scRed}✖${reset}"
     Error       = "${scRed}✖${reset}"
     Warning     = "${scOrange}⚠${reset}"
     Information = "${scGray}◦${reset}"
@@ -156,11 +176,16 @@ foreach ($group in $findings | Group-Object { [System.IO.Path]::GetRelativePath(
 
 Write-Host ""
 Write-Host "  ${scPurple}▸${reset} ${bold}findings by rule${reset}"
-foreach ($group in $findings | Group-Object RuleName | Sort-Object Count, Name -Descending) {
+foreach ($group in $findings | Group-Object RuleName |
+        Sort-Object @{ Expression = 'Count'; Descending = $true }, @{ Expression = 'Name' }) {
     Write-Host ("    {0}{1,4}{2} {3}" -f $scWhite, $group.Count, $reset, $group.Name)
 }
 
-$blocking = @($findings | Where-Object { $_.Severity -in @('Error', 'Warning') }).Count
+# ParseError is its own severity, not a flavour of Error. A file that does
+# not parse is the most basic defect there is, so it has to block.
+$blocking = @($findings | Where-Object {
+        $_.Severity -in @('ParseError', 'Error', 'Warning')
+    }).Count
 $advisory = $findings.Count - $blocking
 
 Write-Host ""
@@ -169,7 +194,7 @@ if ($advisory -gt 0) {
 }
 
 if ($blocking -gt 0) {
-    Write-Host "  ${scRed}${bold}✖ $blocking blocking findings${reset} ${scGray}(error/warning severity)${reset}"
+    Write-Host "  ${scRed}${bold}✖ $blocking blocking findings${reset} ${scGray}(parse error, error or warning severity)${reset}"
     exit 1
 }
 
