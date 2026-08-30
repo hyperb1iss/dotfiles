@@ -7,7 +7,7 @@ return {
   lazy = false,
   priority = 1000,
   config = function()
-    require("silkcircuit").setup {
+    require("silkcircuit").setup({
       transparent = false,
       terminal_colors = true,
       dim_inactive = false,
@@ -23,6 +23,6 @@ return {
         types = { bold = true },
         constants = { bold = true },
       },
-    }
+    })
   end,
 }

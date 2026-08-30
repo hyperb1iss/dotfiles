@@ -13,7 +13,9 @@ return {
       local visual_block_mode = string.char(22)
       local select_block_mode = string.char(19)
       local function get_current_clients()
-        if vim.lsp.get_clients then return vim.lsp.get_clients { bufnr = 0 } end
+        if vim.lsp.get_clients then
+          return vim.lsp.get_clients({ bufnr = 0 })
+        end
         return vim.lsp.get_active_clients()
       end
 
@@ -85,7 +87,9 @@ return {
         lsp = {
           function()
             local clients = get_current_clients()
-            if #clients == 0 then return "" end
+            if #clients == 0 then
+              return ""
+            end
 
             local names = {}
             for _, client in ipairs(clients) do
@@ -94,14 +98,16 @@ return {
             return " " .. table.concat(names, ", ")
           end,
           color = { fg = silkcircuit_colors.cyan, gui = "italic" },
-          cond = function() return #get_current_clients() > 0 end,
+          cond = function()
+            return #get_current_clients() > 0
+          end,
         },
 
         -- Progress with custom format
         progress = {
           function()
-            local current = vim.fn.line "."
-            local total = vim.fn.line "$"
+            local current = vim.fn.line(".")
+            local total = vim.fn.line("$")
             local percent = math.floor(current / total * 100)
             return string.format("%3d%% %d/%d", percent, current, total)
           end,
@@ -111,7 +117,9 @@ return {
 
         -- Clock for productivity tracking
         clock = {
-          function() return os.date "%H:%M" end,
+          function()
+            return os.date("%H:%M")
+          end,
           icon = "",
           color = { fg = silkcircuit_colors.yellow_bright, gui = "bold" },
         },
@@ -120,7 +128,9 @@ return {
         macro = {
           function()
             local reg = vim.fn.reg_recording()
-            if reg ~= "" then return "⏺ @" .. reg end
+            if reg ~= "" then
+              return "⏺ @" .. reg
+            end
             return ""
           end,
           color = { fg = silkcircuit_colors.glow_pink, gui = "bold" },
@@ -203,7 +213,9 @@ return {
           lualine_y = {},
           lualine_z = {
             {
-              function() return "▁▂▃▄▅▆▇█▇▆▅▄▃▂▁" end,
+              function()
+                return "▁▂▃▄▅▆▇█▇▆▅▄▃▂▁"
+              end,
               color = { fg = silkcircuit_colors.purple_muted },
             },
           },
