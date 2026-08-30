@@ -75,7 +75,9 @@ if [[ -r "${HOME}/dev/dotfiles/.dotfiles_role" ]]; then
   IFS= read -r DOTFILES_INSTALLATION_TYPE < "${HOME}/dev/dotfiles/.dotfiles_role"
 elif [[ -r "${HOME}/dev/dotfiles/.install_state" ]]; then
   IFS= read -r DOTFILES_INSTALLATION_TYPE < "${HOME}/dev/dotfiles/.install_state"
-  [[ "${DOTFILES_INSTALLATION_TYPE}" = "minimal" ]] && DOTFILES_INSTALLATION_TYPE="server"
+  if [[ "${DOTFILES_INSTALLATION_TYPE}" = "minimal" ]]; then
+    DOTFILES_INSTALLATION_TYPE="server"
+  fi
 fi
 
 function get_installation_type() {

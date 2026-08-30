@@ -6,7 +6,6 @@
 - defaults:
     link:
       relink: true
-      force: true
       create: true
 
 - shell:

@@ -122,9 +122,10 @@ WSL-specific features are automatically enabled:
 
 `make macos` and `make minimal` still work; they are aliases for `make install` and `make server`.
 
-::: tip Layers Compose Profiles no longer conflict, so switching between them is safe: run `make server` on a box you
-installed as a desktop and the server layer simply replaces the desktop one. `make install` records the role it used in
-`.dotfiles_role`, which is what the shell reads to decide whether to load the heavier modules. :::
+::: tip Layers Compose Profiles no longer collide, so there is no state guard to fight: run `make server` on a box you
+installed as a desktop and it succeeds instead of erroring. Dotbot only adds links, so the desktop links that role no
+longer installs are left in place; remove them by hand if you want the box genuinely lean. `make install` records the
+role it used in `.dotfiles_role`, which is what the shell reads to decide whether to load the heavier modules. :::
 
 Override the detection when you need to, for example `make install ROLE=server` or `make install HOST=hyperia`.
 

@@ -9,14 +9,23 @@
 # `defaults` replaces rather than merges, and it carries across the file
 # boundary because the configs are one list. Every layer therefore declares
 # its own defaults block instead of inheriting whatever ran before it.
+#
+# force is per link, not global: it deletes whatever real file or directory
+# squats the link path, so it is spent only on the paths that need it (the
+# directory links, and ~/.zshrc, which gets backed up first below).
 - defaults:
     link:
       relink: true
-      force: true
       create: true
 
 # Exactly one clean pass for the whole composition.
 - clean: ["~"]
+
+# SilkCircuit decides whether Ghostty is installed by looking for this
+# directory, and on macOS Ghostty is a cask with no binary on PATH, so the
+# directory has to exist before the installer runs or the themes never land.
+- create:
+    - ~/.config/ghostty
 
 - shell:
     - command: |
@@ -33,9 +42,10 @@
       description: "Installing SilkCircuit themes"
 
     - command: |
-        # Links force through whatever squats the path, so move a real
-        # ~/.zshrc aside rather than destroying it.
-        zshrc_target="$HOME/dev/dotfiles/zsh/zshrc"
+        # ~/.zshrc is force-linked below, so move a real one aside rather than
+        # destroying it. pwd is the repo root: dotbot chdirs to -d before
+        # running shell commands, which keeps this honest in a worktree.
+        zshrc_target="$(pwd)/zsh/zshrc"
         zshrc_link="$HOME/.zshrc"
         if [ -e "$zshrc_link" ] || [ -L "$zshrc_link" ]; then
           if [ "$(readlink "$zshrc_link" 2>/dev/null || true)" != "$zshrc_target" ]; then
@@ -52,7 +62,11 @@
     ~/.bashrc.local: bash/bashrc.local
     ~/.gitconfig: gitconfig
     ~/.tmux.conf: tmux.conf
-    ~/.zshrc: zsh/zshrc
-    ~/.config/nvim: nvim
+    ~/.zshrc:
+      path: zsh/zshrc
+      force: true
+    ~/.config/nvim:
+      path: nvim
+      force: true
     ~/bin: bin
     ~/.tmux/plugins/tpm: tpm

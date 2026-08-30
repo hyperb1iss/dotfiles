@@ -5,7 +5,6 @@
 - defaults:
     link:
       relink: true
-      force: true
       create: true
 
 # ~/.agents/skills is a link *target* below, so it has to exist as a real
@@ -15,7 +14,9 @@
 
 - link:
     ~/.fonts: fonts
-    ~/.config/lsd: lsd
+    ~/.config/lsd:
+      path: lsd
+      force: true
     ~/.config/fastfetch/config.jsonc: fastfetch/config.jsonc
     ~/.config/procs/config.toml: procs/config.toml
     ~/.config/atuin/config.toml: atuin/config.toml
@@ -23,7 +24,9 @@
     ~/.claude/statusline-command.sh: claude/statusline-command.sh
     # ~/.agents/skills is the source of truth for agent skills. Codex scans it
     # natively; Claude Code reaches it through this link.
-    ~/.claude/skills: ~/.agents/skills
+    ~/.claude/skills:
+      path: ~/.agents/skills
+      force: true
     ~/.proto/.prototools: proto/.prototools
     # starship, bat, dircolors, and ghostty themes are installed by the
     # SilkCircuit installer in base.yaml
