@@ -298,7 +298,17 @@ function Initialize-HyperShellPrompt {
     if ($starshipInstalled) {
         # function:global:prompt is not a valid provider path (it silently
         # resolves to nothing), so the current prompt comes from Get-Command.
-        $script:HyperShellBasePrompt = (Get-Command -Name prompt -CommandType Function -ErrorAction SilentlyContinue).ScriptBlock
+        $captured = (Get-Command -Name prompt -CommandType Function -ErrorAction SilentlyContinue).ScriptBlock
+
+        # Never capture our own shim. If a future starship init stopped
+        # defining a prompt, capturing the shim would make it call itself
+        # forever on the next render.
+        if ($captured -and $captured.ToString() -notmatch 'Invoke-HyperShellPrompt') {
+            $script:HyperShellBasePrompt = $captured
+        }
+        else {
+            $starshipInstalled = [bool]$script:HyperShellBasePrompt
+        }
     }
     else {
         $script:HyperShellBasePrompt = {

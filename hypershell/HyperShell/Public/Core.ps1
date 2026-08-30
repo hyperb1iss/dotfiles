@@ -24,13 +24,8 @@ function Set-HyperShellPSReadLineOption {
         return
     }
 
-    if (-not (Get-Module -ListAvailable -Name PSReadLine)) {
-        Write-Warning 'PSReadLine is not available, skipping keybinding setup.'
-        return
-    }
-
-    Import-Module PSReadLine -ErrorAction SilentlyContinue
-
+    # No availability check: PSReadLine is in the manifest's RequiredModules,
+    # so the module import already failed if it were missing.
     Set-PSReadLineOption -EditMode Emacs
     Set-PSReadLineKeyHandler -Key UpArrow -Function HistorySearchBackward
     Set-PSReadLineKeyHandler -Key DownArrow -Function HistorySearchForward

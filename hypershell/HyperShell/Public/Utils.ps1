@@ -10,6 +10,7 @@ function New-File {
     [CmdletBinding(SupportsShouldProcess)]
     param(
         [Parameter(Position = 0)]
+        [Alias('file')]
         [string]$Path
     )
 
@@ -47,9 +48,11 @@ function Get-Tail {
     [CmdletBinding()]
     param(
         [Parameter(Mandatory, Position = 0)]
+        [Alias('file')]
         [string]$Path,
 
         [Parameter(Position = 1)]
+        [Alias('lines')]
         [int]$Lines = 10
     )
 

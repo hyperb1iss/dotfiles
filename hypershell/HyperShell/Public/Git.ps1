@@ -179,7 +179,10 @@ function Show-FzfGitLog {
         return
     }
 
-    if (Test-HyperShellCommand -Name 'less') {
+    # Application, not alias: on Windows HyperShell aliases `less` to bat,
+    # which rejects -R, so a plain command lookup would find the alias and
+    # pipe into something that cannot take the flag.
+    if (Get-Command -Name 'less' -CommandType Application -ErrorAction SilentlyContinue) {
         git show --color=always $commit | less -R
     }
     else {

@@ -59,12 +59,18 @@ function Switch-KubeConfig {
     [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSAvoidUsingWriteHost', '',
         Justification = 'Interactive listing, not pipeline data.')]
     [CmdletBinding(SupportsShouldProcess)]
+    [OutputType([bool])]
     param(
         [Parameter(Position = 0)]
         [string]$ConfigName
     )
 
     $configDir = Join-Path -Path $HOME -ChildPath '.kube' -AdditionalChildPath 'configs'
+
+    # Created on demand so a fresh box has somewhere to drop config files.
+    if (-not (Test-Path -LiteralPath $configDir)) {
+        New-Item -ItemType Directory -Path $configDir -Force -ErrorAction SilentlyContinue | Out-Null
+    }
 
     if ([string]::IsNullOrEmpty($ConfigName)) {
         Write-Host "Current KUBECONFIG: $env:KUBECONFIG"
@@ -86,7 +92,7 @@ function Switch-KubeConfig {
 
     if (-not (Test-Path -LiteralPath $configFile)) {
         Write-Warning "Config $ConfigName not found in $configDir"
-        return
+        return $false
     }
 
     if ($PSCmdlet.ShouldProcess($ConfigName, 'Set KUBECONFIG')) {

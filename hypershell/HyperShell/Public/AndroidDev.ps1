@@ -180,6 +180,13 @@ function Set-AndroidProjectLocation {
 
     $script:HyperShellLastAndroidProject = $projectRoot
 
+    # No path means remember the project and stay put, which is what the
+    # original did. Jumping to the project root on a bare `acd` would be a
+    # surprise.
+    if (-not $Path) {
+        return
+    }
+
     $target = $projectRoot
     foreach ($segment in $Path) {
         $target = Join-Path $target $segment

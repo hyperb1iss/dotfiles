@@ -38,11 +38,24 @@ function Set-AndroidDevice {
         }
     }
 
+    # Raw lines are kept alongside the parsed entries so a rewrite preserves
+    # anything this parser does not understand. Reconstructing the file from
+    # parsed entries alone would silently delete a user's comments.
+    $rawLines = @(Get-Content -LiteralPath $configFile -ErrorAction SilentlyContinue)
     $entries = @(
-        Get-Content -LiteralPath $configFile -ErrorAction SilentlyContinue |
+        $rawLines |
             ForEach-Object { ConvertFrom-HyperShellDeviceAliasLine -Line $_ } |
             Where-Object { $_ }
     )
+
+    # Every line that is not the named alias, kept verbatim.
+    function Get-OtherLine {
+        param([string]$Name)
+        return @($rawLines | Where-Object {
+                $parsed = ConvertFrom-HyperShellDeviceAliasLine -Line $_
+                -not ($parsed -and $parsed.Alias -eq $Name)
+            })
+    }
 
     switch ($Arguments[0]) {
         '--add' {
@@ -58,8 +71,7 @@ function Set-AndroidDevice {
                 return
             }
 
-            $kept = $entries | Where-Object { $_.Alias -ne $name }
-            $lines = @($kept | ForEach-Object { "$($_.Alias):$($_.Serial)" }) + "${name}:${serial}"
+            $lines = @(Get-OtherLine -Name $name) + "${name}:${serial}"
             Set-Content -LiteralPath $configFile -Value $lines
             Write-Host "Added device alias '$name' for serial '$serial'"
         }
@@ -76,7 +88,7 @@ function Set-AndroidDevice {
                 return
             }
 
-            $lines = @($entries | Where-Object { $_.Alias -ne $name } | ForEach-Object { "$($_.Alias):$($_.Serial)" })
+            $lines = @(Get-OtherLine -Name $name)
             Set-Content -LiteralPath $configFile -Value $lines
             Write-Host "Removed device alias '$name'"
         }

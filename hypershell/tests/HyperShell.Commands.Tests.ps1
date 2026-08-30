@@ -107,7 +107,7 @@ Describe 'Docker helpers' {
         Mock docker -ModuleName HyperShell { '' }
         Mock fzf -ModuleName HyperShell { '' }
 
-        Select-DockerContainerId | Should -BeNullOrEmpty
+        Select-DockerContainerId 6> $null | Should -BeNullOrEmpty
     }
 }
 
@@ -135,7 +135,7 @@ Describe 'Kubernetes helpers' {
         $previous = $env:KUBECONFIG
         try {
             Set-ModuleHome -Path $fakeHome
-            Switch-KubeConfig -ConfigName 'staging'
+            Switch-KubeConfig -ConfigName 'staging' 6> $null
             $env:KUBECONFIG | Should -Be (Join-Path $configs 'staging')
         }
         finally {
@@ -144,11 +144,26 @@ Describe 'Kubernetes helpers' {
         }
     }
 
-    It 'warns instead of switching to a config that does not exist' {
+    It 'warns and returns false for a config that does not exist' {
         Set-ModuleHome -Path (Join-Path $script:TempRoot 'kube-home')
         try {
-            Switch-KubeConfig -ConfigName 'nope' -WarningVariable warned -WarningAction SilentlyContinue
+            $result = Switch-KubeConfig -ConfigName 'nope' -WarningVariable warned -WarningAction SilentlyContinue
             $warned -join ' ' | Should -Match 'not found'
+            # Callers can test the result, the way the original did.
+            $result | Should -BeFalse
+        }
+        finally {
+            Set-ModuleHome -Path $HOME
+        }
+    }
+
+    It 'creates the config directory on a fresh machine' {
+        $fresh = Join-Path $script:TempRoot 'kube-fresh'
+        New-Item -ItemType Directory -Path $fresh -Force | Out-Null
+        try {
+            Set-ModuleHome -Path $fresh
+            Switch-KubeConfig 6> $null
+            Test-Path -LiteralPath (Join-Path $fresh '.kube/configs') | Should -BeTrue
         }
         finally {
             Set-ModuleHome -Path $HOME
@@ -197,6 +212,26 @@ Describe 'Android device aliases' {
         }
         finally {
             $env:ANDROID_SERIAL = $previousSerial
+            Set-ModuleHome -Path $HOME
+        }
+    }
+
+    It 'keeps comments and unparseable lines when rewriting' {
+        $fakeHome = Join-Path $script:TempRoot 'adb-preserve'
+        New-Item -ItemType Directory -Path $fakeHome -Force | Out-Null
+        $configFile = Join-Path $fakeHome '.adbdevs'
+        Set-Content -LiteralPath $configFile -Value @('# my devices', 'pixel:1.2.3.4:5555', 'garbage line')
+
+        try {
+            Set-ModuleHome -Path $fakeHome
+            Set-AndroidDevice '--add' 'tab' 'R5CT30' 6> $null
+
+            $lines = Get-Content -LiteralPath $configFile
+            $lines | Should -Contain '# my devices'
+            $lines | Should -Contain 'garbage line'
+            $lines | Should -Contain 'tab:R5CT30'
+        }
+        finally {
             Set-ModuleHome -Path $HOME
         }
     }
@@ -349,8 +384,30 @@ Describe 'Paths and prompt helpers' {
         }
     }
 
-    It 'sets the window title without throwing' {
-        { Set-HyperShellWindowTitle -Title 'HyperShell test' } | Should -Not -Throw
+    It 'actually sets the window title' {
+        # The function swallows host errors by design, so asserting it does
+        # not throw would pass no matter what. Read the title back instead,
+        # and skip on a host that does not support one.
+        $supported = $true
+        $previous = $null
+        try { $previous = $Host.UI.RawUI.WindowTitle } catch { $supported = $false }
+
+        if (-not $supported) {
+            Set-ItResult -Skipped -Because 'this host has no window title'
+            return
+        }
+
+        try {
+            Set-HyperShellWindowTitle -Title 'HyperShell test title'
+            $Host.UI.RawUI.WindowTitle | Should -Be 'HyperShell test title'
+
+            Set-HyperShellWindowTitle -Title 'never applied' -WhatIf
+            $Host.UI.RawUI.WindowTitle | Should -Be 'HyperShell test title'
+        }
+        finally {
+            try { $Host.UI.RawUI.WindowTitle = $previous }
+            catch { Write-Debug "could not restore the window title: $($_.Exception.Message)" }
+        }
     }
 
     It 'installs a fallback prompt when starship is skipped' {
@@ -380,6 +437,12 @@ Describe 'File utilities' {
         Test-Path -LiteralPath $path | Should -BeTrue
     }
 
+    It 'still accepts the original -file parameter name' {
+        $path = Join-Path $script:TempRoot 'by-old-name.txt'
+        New-File -file $path | Out-Null
+        Test-Path -LiteralPath $path | Should -BeTrue
+    }
+
     It 'supports -WhatIf' {
         $path = Join-Path $script:TempRoot 'never-created.txt'
         New-File -Path $path -WhatIf | Out-Null
@@ -388,7 +451,17 @@ Describe 'File utilities' {
 }
 
 Describe 'PSReadLine configuration' {
-    It 'applies without throwing' {
-        { Set-HyperShellPSReadLineOption } | Should -Not -Throw
+    It 'applies and sets the fzf preview options' {
+        # This genuinely rebinds keys in the running session, which is fine in
+        # a throwaway `make test` process but rude if someone runs Pester
+        # interactively, so the environment variable is put back afterwards.
+        $previousFzf = $env:FZF_DEFAULT_OPTS
+        try {
+            { Set-HyperShellPSReadLineOption } | Should -Not -Throw
+            $env:FZF_DEFAULT_OPTS | Should -Match '--height 40%'
+        }
+        finally {
+            $env:FZF_DEFAULT_OPTS = $previousFzf
+        }
     }
 }

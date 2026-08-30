@@ -11,9 +11,14 @@
 # files hold shared state and pure helpers; Public files define the commands
 # and register their aliases through Add-HyperShellAlias.
 #
-# Importing this module only defines things. Anything that touches the live
-# session (the prompt, zoxide, PSReadLine) is a function the profile calls, so
-# an import stays quiet in scripts and CI.
+# Importing this module defines commands and stays quiet: the prompt, zoxide,
+# and PSReadLine setup are functions the profile calls, not import-time work.
+#
+# Two things do run at import, both carried over from the old profile. On
+# Windows, Register-JavaAlias creates a global java<version> alias per
+# installed JDK, because those names are only knowable at runtime and so
+# cannot live in the manifest. The kubectl and gw argument completers also
+# register, since a completer has to be in place before the first Tab.
 
 $script:HyperShellRoot = $PSScriptRoot
 
