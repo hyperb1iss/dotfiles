@@ -31,6 +31,16 @@ run_step() {
   fi
 }
 
+# Every lane, host and container alike, reads yaml through dotbot's vendored
+# PyYAML, and the container jobs copy this tree rather than cloning it. A
+# checkout that skipped the nested submodule fails in every lane at once,
+# so say so here instead of after a container bootstrap.
+if [ ! -d "${repo_root}/dotbot/lib/pyyaml/lib/yaml" ]; then
+  bad "dotbot's vendored PyYAML is missing"
+  echo "  run: git submodule update --init --recursive" >&2
+  exit 1
+fi
+
 if [ "$(uname -s)" = "Darwin" ]; then
   lane="desktop-macos"
 else
