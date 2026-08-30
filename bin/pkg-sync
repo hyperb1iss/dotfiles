@@ -11,6 +11,7 @@
 #
 #   pkg-sync list [manager] [role]
 #   pkg-sync install [manager] [role] [--dry-run]
+#   pkg-sync export winget [role]
 #
 # Runs on a bare box: bash 3.2, awk, and nothing else. No python, no
 # jq, no network.
@@ -25,7 +26,7 @@ DRY_RUN=0
 
 # Managers the manifest may name. brew is listed so a stray `pkg-sync
 # install brew` gets a pointer instead of a parse error.
-MANAGERS="apt pacman cargo ppa"
+MANAGERS="apt pacman cargo ppa winget"
 
 # ─────────────────────────────────────────────────────────────
 # Output
@@ -41,9 +42,11 @@ pkg-sync ⚡ resolve and install packages from packages.conf
 usage:
   pkg-sync list [<manager>] [<role>]
   pkg-sync install [<manager>] [<role>] [--dry-run]
+  pkg-sync export winget [<role>]
   pkg-sync roles
 
-  <manager>  apt, pacman, cargo, ppa. Detected from the box when omitted.
+  <manager>  apt, pacman, cargo, ppa, winget. Detected from the box when
+             omitted.
   <role>     desktop or server. Defaults to .dotfiles_role, else desktop.
 
   --dry-run, -n  print the commands instead of running them
@@ -52,6 +55,7 @@ examples:
   pkg-sync list apt server
   pkg-sync install pacman desktop --dry-run
   pkg-sync install                 # this box, this role, for real
+  pkg-sync export winget desktop   # a `winget import` document on stdout
 EOF
 }
 
@@ -94,8 +98,9 @@ resolve() {
           pkg = substr(token, eq + 1)
           token = substr(token, 1, eq - 1)
         }
-        if (token != "apt" && token != "pacman" && token != "cargo" && token != "ppa")
-          die("unknown manager: '" token "'")
+        if (token != "apt" && token != "pacman" && token != "cargo" &&
+            token != "ppa" && token != "winget")
+          die("unknown manager: \047" token "\047")
         if (token != manager) continue
         if (!has_role(scope, role)) continue
         if (pkg == "") die("empty package name")
@@ -271,6 +276,57 @@ install_cargo() {
   done < <(resolve cargo "${role}" 1)
 }
 
+install_winget() {
+  local role="$1" id
+  read_list < <(resolve winget "${role}")
+  if [[ "${#PKG_LIST[@]}" -eq 0 ]]; then
+    info "no winget packages for role ${role}"
+    return 0
+  fi
+
+  if ! command -v winget > /dev/null 2>&1 && [[ "${DRY_RUN}" -eq 0 ]]; then
+    warn "winget not found, skipping ${#PKG_LIST[@]} package(s)"
+    return 0
+  fi
+
+  # Per package, so one retired id cannot sink the batch. --id with -e
+  # matches the identifier exactly instead of fuzzy-matching a name.
+  for id in "${PKG_LIST[@]}"; do
+    run winget install --id "${id}" -e \
+      --accept-package-agreements --accept-source-agreements ||
+      echo "⚠ skipped: ${id}"
+  done
+}
+
+# A `winget import` document on stdout. Hand-rolled because the box that
+# needs it has no jq, and the schema is four fixed keys around a list.
+export_winget() {
+  local role="$1" id first=1
+  read_list < <(resolve winget "${role}")
+  printf '{\n'
+  # shellcheck disable=SC2016  # $schema is a JSON key, not a shell variable
+  printf '  "$schema": "https://aka.ms/winget-packages.schema.2.0.json",\n'
+  printf '  "Sources": [\n'
+  printf '    {\n'
+  printf '      "Packages": [\n'
+  for id in "${PKG_LIST[@]}"; do
+    [[ "${first}" -eq 1 ]] || printf ',\n'
+    first=0
+    printf '        { "PackageIdentifier": "%s" }' "${id}"
+  done
+  [[ "${first}" -eq 1 ]] || printf '\n'
+  printf '      ],\n'
+  printf '      "SourceDetails": {\n'
+  printf '        "Argument": "https://cdn.winget.microsoft.com/cache",\n'
+  printf '        "Identifier": "Microsoft.Winget.Source_8wekyb3d8bbwe",\n'
+  printf '        "Name": "winget",\n'
+  printf '        "Type": "Microsoft.PreIndexed.Package"\n'
+  printf '      }\n'
+  printf '    }\n'
+  printf '  ]\n'
+  printf '}\n'
+}
+
 install_ppa() {
   local role="$1" ppa
   read_list < <(resolve ppa "${role}")
@@ -294,6 +350,8 @@ detect_manager() {
     echo "apt"
   elif command -v brew > /dev/null 2>&1; then
     echo "brew"
+  elif command -v winget > /dev/null 2>&1; then
+    echo "winget"
   fi
 }
 
@@ -363,7 +421,7 @@ main() {
       manifest_roles
       return 0
       ;;
-    list | install) ;;
+    list | install | export) ;;
     *)
       err "unknown command: ${command}"
       usage >&2
@@ -382,6 +440,13 @@ main() {
   if [[ "${manager}" == "brew" ]]; then
     info "Homebrew packages live in macos/Brewfile, installed by macos/brew.sh"
     return 0
+  fi
+
+  # Only winget has an import format worth emitting, and it is the one
+  # manager whose consumer might not have this script's shell.
+  if [[ "${command}" == "export" && "${manager}" != "winget" ]]; then
+    err "export is winget only, got: ${manager}"
+    return 2
   fi
 
   # Parses the manifest as a side effect, so a malformed row is caught
@@ -408,12 +473,18 @@ main() {
     return 0
   fi
 
+  if [[ "${command}" == "export" ]]; then
+    export_winget "${role}"
+    return 0
+  fi
+
   info "installing ${manager} packages for role ${role}"
   case "${manager}" in
     pacman) install_pacman "${role}" ;;
     apt) install_apt "${role}" ;;
     cargo) install_cargo "${role}" ;;
     ppa) install_ppa "${role}" ;;
+    winget) install_winget "${role}" ;;
   esac
 }
 
