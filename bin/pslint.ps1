@@ -160,6 +160,10 @@ $findings = foreach ($rel in $files) {
         # Untyped on purpose: -ErrorAction Stop wraps the original
         # NullReferenceException, so matching on the type is unreliable. A
         # genuine failure still surfaces, because the retry is not guarded.
+        #
+        # A file that emitted findings and then threw would have those
+        # findings counted twice. That cannot hide anything, and it cannot
+        # happen today because the crash lands on a file with none.
         Invoke-ScriptAnalyzer -Path $full -Settings $activeSettings
     }
 }

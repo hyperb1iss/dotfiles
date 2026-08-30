@@ -291,26 +291,24 @@ function Initialize-HyperShellPrompt {
             # Dot-sourced rather than passed to Invoke-Expression so the init
             # runs as a script block; it declares its own global functions.
             . ([scriptblock]::Create($init))
-            $starshipInstalled = $true
+
+            # function:global:prompt is not a valid provider path (it silently
+            # resolves to nothing), so the current prompt comes from
+            # Get-Command. Never capture our own shim: if a future starship
+            # init stopped defining a prompt, capturing the shim would make it
+            # call itself forever on the next render.
+            $captured = (Get-Command -Name prompt -CommandType Function -ErrorAction SilentlyContinue).ScriptBlock
+            if ($captured -and $captured.ToString() -notmatch 'Invoke-HyperShellPrompt') {
+                $script:HyperShellBasePrompt = $captured
+                $starshipInstalled = $true
+            }
         }
     }
 
-    if ($starshipInstalled) {
-        # function:global:prompt is not a valid provider path (it silently
-        # resolves to nothing), so the current prompt comes from Get-Command.
-        $captured = (Get-Command -Name prompt -CommandType Function -ErrorAction SilentlyContinue).ScriptBlock
-
-        # Never capture our own shim. If a future starship init stopped
-        # defining a prompt, capturing the shim would make it call itself
-        # forever on the next render.
-        if ($captured -and $captured.ToString() -notmatch 'Invoke-HyperShellPrompt') {
-            $script:HyperShellBasePrompt = $captured
-        }
-        else {
-            $starshipInstalled = [bool]$script:HyperShellBasePrompt
-        }
-    }
-    else {
+    # Anything that did not end up with a usable starship prompt gets the
+    # HyperShell one, including the case where starship ran but left nothing
+    # worth calling.
+    if (-not $starshipInstalled) {
         $script:HyperShellBasePrompt = {
             $esc = [char]27
             "$esc[38;5;213mHyperShell$esc[0m $esc[38;5;159m$(Get-HyperShellNormalizedPath -Path $PWD.Path)$esc[0m$esc[38;5;201m>$esc[0m "

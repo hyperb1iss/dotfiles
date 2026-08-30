@@ -206,7 +206,11 @@ else {
 # RequiredModules is what the module imports, and
 # PrivateData.HyperShell.OptionalModules is what it picks up when present.
 Write-Host "Installing PowerShell modules..." -ForegroundColor Yellow
-$manifestPath = Join-Path -Path $PSScriptRoot -ChildPath "HyperShell" -AdditionalChildPath "HyperShell.psd1"
+# Nested rather than -AdditionalChildPath: windows.yaml invokes this script
+# with powershell.exe, which is always Windows PowerShell 5.1, and that
+# parameter arrived in PowerShell 6. Binding would fail, $manifestPath would
+# come out null, and the module install would silently skip itself.
+$manifestPath = Join-Path (Join-Path $PSScriptRoot "HyperShell") "HyperShell.psd1"
 
 if (Test-Path -LiteralPath $manifestPath) {
     $hyperShellManifest = Import-PowerShellDataFile -LiteralPath $manifestPath
@@ -217,15 +221,20 @@ if (Test-Path -LiteralPath $manifestPath) {
         $hyperShellManifest.PrivateData.HyperShell.OptionalModules
     ) | Where-Object { $_ } | Select-Object -Unique
 
+    # AllUsers when elevated, which is what the original Install-Module calls
+    # did by default; CurrentUser otherwise, so an unelevated run still gets
+    # working modules instead of an access error.
+    $moduleScope = if ($isElevated) { 'AllUsers' } else { 'CurrentUser' }
+
     foreach ($moduleName in $moduleNames) {
-        Write-Host "  $moduleName" -ForegroundColor Cyan
+        Write-Host "  $moduleName ($moduleScope)" -ForegroundColor Cyan
         if (Get-Command Install-PSResource -ErrorAction SilentlyContinue) {
             # -TrustRepository keeps this non-interactive; without it PSResourceGet
             # stops for a confirmation prompt on an untrusted PSGallery.
-            Install-PSResource -Name $moduleName -Scope CurrentUser -TrustRepository -ErrorAction Continue
+            Install-PSResource -Name $moduleName -Scope $moduleScope -TrustRepository -ErrorAction Continue
         }
         else {
-            Install-Module -Name $moduleName -Scope CurrentUser -Force -SkipPublisherCheck
+            Install-Module -Name $moduleName -Scope $moduleScope -Force -SkipPublisherCheck
         }
     }
 }

@@ -443,6 +443,32 @@ Describe 'File utilities' {
         Test-Path -LiteralPath $path | Should -BeTrue
     }
 
+    It 'binds Get-Tail in every call form' {
+        # Get-Tail follows the file with -Wait, so it is never pointed at a
+        # real one here. Parameter binding happens before the body runs, and a
+        # missing path fails immediately rather than waiting, so a binding
+        # fault is distinguishable from the expected path error. This exists
+        # because an [Alias('lines')] on $Lines once aliased the parameter to
+        # itself and broke every single call, with nothing to catch it.
+        $missing = Join-Path $script:TempRoot 'no-such-file.log'
+
+        $forms = @(
+            { Get-Tail -Path $missing -Lines 2 -ErrorAction Stop }
+            { Get-Tail -file $missing -Lines 2 -ErrorAction Stop }
+            { Get-Tail $missing 2 -ErrorAction Stop }
+        )
+
+        foreach ($form in $forms) {
+            $failure = $null
+            try { & $form }
+            catch { $failure = $_ }
+
+            $failure | Should -Not -BeNullOrEmpty
+            $failure.Exception.Message | Should -Not -Match 'conflicts with the parameter alias'
+            $failure.FullyQualifiedErrorId | Should -Match 'PathNotFound|ItemNotFound'
+        }
+    }
+
     It 'supports -WhatIf' {
         $path = Join-Path $script:TempRoot 'never-created.txt'
         New-File -Path $path -WhatIf | Out-Null

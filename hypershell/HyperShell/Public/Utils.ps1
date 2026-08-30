@@ -51,8 +51,10 @@ function Get-Tail {
         [Alias('file')]
         [string]$Path,
 
+        # No [Alias('lines')] here: parameter names are case insensitive, so
+        # aliasing Lines to itself makes every call fail to bind. -lines
+        # already works by case-insensitive match.
         [Parameter(Position = 1)]
-        [Alias('lines')]
         [int]$Lines = 10
     )
 
