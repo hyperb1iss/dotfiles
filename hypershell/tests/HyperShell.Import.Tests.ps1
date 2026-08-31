@@ -85,10 +85,13 @@ Describe 'HyperShell import' {
     It 'every exported alias points at something the module exports' {
         $functions = $script:Module.ExportedFunctions.Keys
         foreach ($alias in $script:Module.ExportedAliases.Values) {
-            # Aliases onto external tools (k, kx, kns) are fine; the rest have
-            # to resolve to a function this module actually ships.
+            # Aliases onto external tools (k, kx, kns) are fine, and so is a
+            # built-in cmdlet (which -> Get-Command); what this catches is a
+            # Verb-Noun target the module claims to ship but does not.
             if ($alias.Definition -match '^[A-Z][a-z]+-') {
-                $functions | Should -Contain $alias.Definition
+                if (-not (Get-Command $alias.Definition -CommandType Cmdlet -ErrorAction SilentlyContinue)) {
+                    $functions | Should -Contain $alias.Definition
+                }
             }
         }
     }

@@ -60,6 +60,7 @@
         'Set-FzfLocation'
         'Set-FzfLocationWithPreview'
         'Stop-FzfProcess'
+        'Stop-ProcessByName'
 
         # Git.ps1
         'Add-FzfGitChange'

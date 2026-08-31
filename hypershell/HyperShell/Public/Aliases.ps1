@@ -115,7 +115,7 @@ Add-HyperShellAlias -Name 'cat' -Value 'Invoke-Cat' -Shadow
 Add-HyperShellAlias -Name 'less' -Value 'bat' -Shadow
 Add-HyperShellAlias -Name 'which' -Value 'Get-Command' -Shadow
 Add-HyperShellAlias -Name 'wget' -Value 'Invoke-WebRequest' -Shadow
-Add-HyperShellAlias -Name 'pkill' -Value 'Stop-Process' -Shadow
+Add-HyperShellAlias -Name 'pkill' -Value 'Stop-ProcessByName' -Shadow
 Add-HyperShellAlias -Name 'ifconfig' -Value 'ipconfig' -Shadow
 Add-HyperShellAlias -Name 'clear' -Value 'Clear-HyperShellHost' -Shadow
 Add-HyperShellAlias -Name 'history' -Value 'Get-HyperShellHistory' -Shadow

@@ -97,6 +97,34 @@ function Find-File {
     Get-ChildItem -Recurse | Where-Object { $_.Name -match $Pattern }
 }
 
+<#
+.SYNOPSIS
+    Stops processes by name, the way unix pkill does.
+.DESCRIPTION
+    Stop-Process binds an integer id positionally, so aliasing pkill
+    straight to it broke the muscle-memory call shape `pkill node`.
+    This wrapper matches process names instead.
+#>
+function Stop-ProcessByName {
+    [CmdletBinding(SupportsShouldProcess)]
+    param(
+        [Parameter(Mandatory, Position = 0)]
+        [string]$Name
+    )
+
+    $procs = @(Get-Process -Name "*$Name*" -ErrorAction SilentlyContinue)
+    if ($procs.Count -eq 0) {
+        Write-Warning "No processes match '$Name'"
+        return
+    }
+
+    foreach ($proc in $procs) {
+        if ($PSCmdlet.ShouldProcess("$($proc.ProcessName) ($($proc.Id))", 'Stop-Process')) {
+            Stop-Process -Id $proc.Id
+        }
+    }
+}
+
 Add-HyperShellAlias -Name 'touch' -Value 'New-File' -Shadow
 Add-HyperShellAlias -Name 'mkdir' -Value 'New-Directory' -Shadow
 Add-HyperShellAlias -Name 'tail' -Value 'Get-Tail' -Shadow
