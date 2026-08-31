@@ -3,19 +3,17 @@
 <!-- markdownlint-disable MD013 -->
 
 <p align="center">
-  <a href="https://github.com/hyperb1iss/dotfiles/actions/workflows/install-smoke.yml"><img src="https://img.shields.io/github/actions/workflow/status/hyperb1iss/dotfiles/install-smoke.yml?branch=main&style=for-the-badge&label=install%20smoke&logo=githubactions&logoColor=white&labelColor=12101a" alt="Install smoke tests"></a>
-  <a href="https://github.com/hyperb1iss/dotfiles/actions/workflows/lint.yml"><img src="https://img.shields.io/github/actions/workflow/status/hyperb1iss/dotfiles/lint.yml?branch=main&style=for-the-badge&label=lint&logo=githubactions&logoColor=white&labelColor=12101a" alt="Lint"></a>
-  <a href="https://hyperb1iss.github.io/dotfiles/"><img src="https://img.shields.io/badge/docs-vitepress-informational?style=for-the-badge&logo=vitepress&logoColor=white&labelColor=12101a&color=e135ff" alt="Documentation site"></a>
-  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-informational?style=for-the-badge&labelColor=12101a&color=ff6ac1" alt="MIT license"></a>
+  <a href="https://hyperb1iss.github.io/dotfiles/"><img src="https://img.shields.io/badge/docs-vitepress-informational?style=for-the-badge&logo=vitepress&logoColor=white&color=e135ff" alt="Documentation site"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-informational?style=for-the-badge&color=ff6ac1" alt="MIT license"></a>
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/OS-macOS%20%7C%20Linux%20%7C%20Windows%20%7C%20WSL2-informational?style=for-the-badge&logo=apple&logoColor=white&labelColor=12101a&color=ff00ff" alt="macOS, Linux, Windows, and WSL2">
-  <img src="https://img.shields.io/badge/Shell-Zsh%20%7C%20Bash%20%7C%20PowerShell-informational?style=for-the-badge&logo=gnu-bash&logoColor=white&labelColor=12101a&color=b300ff" alt="Zsh, Bash, and PowerShell">
-  <a href="https://astronvim.com/"><img src="https://img.shields.io/badge/Editor-AstroNvim%20v5-informational?style=for-the-badge&logo=neovim&logoColor=white&labelColor=12101a&color=9933ff" alt="AstroNvim v5"></a>
-  <a href="https://ghostty.org/"><img src="https://img.shields.io/badge/Terminal-Ghostty%20%7C%20Tmux-informational?style=for-the-badge&logo=ghostty&logoColor=white&labelColor=12101a&color=00ffff" alt="Ghostty and Tmux"></a>
-  <a href="https://starship.rs/"><img src="https://img.shields.io/badge/Prompt-Starship-informational?style=for-the-badge&logo=starship&logoColor=white&labelColor=12101a&color=33ffcc" alt="Starship prompt"></a>
-  <a href="https://github.com/hyperb1iss/silkcircuit-nvim"><img src="https://img.shields.io/badge/Theme-SilkCircuit-informational?style=for-the-badge&labelColor=12101a&color=e135ff" alt="SilkCircuit theme"></a>
+  <img src="https://img.shields.io/badge/OS-macOS%20%7C%20Linux%20%7C%20Windows%20%7C%20WSL2-informational?style=for-the-badge&logo=apple&logoColor=white&color=ff00ff" alt="macOS, Linux, Windows, and WSL2">
+  <img src="https://img.shields.io/badge/Shell-Zsh%20%7C%20Bash%20%7C%20PowerShell-informational?style=for-the-badge&logo=gnu-bash&logoColor=white&color=b300ff" alt="Zsh, Bash, and PowerShell">
+  <a href="https://astronvim.com/"><img src="https://img.shields.io/badge/Editor-AstroNvim%20v5-informational?style=for-the-badge&logo=neovim&logoColor=white&color=9933ff" alt="AstroNvim v5"></a>
+  <a href="https://ghostty.org/"><img src="https://img.shields.io/badge/Terminal-Ghostty%20%7C%20Tmux-informational?style=for-the-badge&logo=ghostty&logoColor=white&color=00ffff" alt="Ghostty and Tmux"></a>
+  <a href="https://starship.rs/"><img src="https://img.shields.io/badge/Prompt-Starship-informational?style=for-the-badge&logo=starship&logoColor=white&color=33ffcc" alt="Starship prompt"></a>
+  <a href="https://github.com/hyperb1iss/silkcircuit-nvim"><img src="https://img.shields.io/badge/Theme-SilkCircuit-informational?style=for-the-badge&color=e135ff" alt="SilkCircuit theme"></a>
 </p>
 
 <!-- markdownlint-enable MD013 -->
