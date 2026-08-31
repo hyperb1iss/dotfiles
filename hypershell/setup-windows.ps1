@@ -1,53 +1,82 @@
 # setup-windows.ps1
-# This script sets up the Windows environment with necessary tools and configurations
+#
+# Windows environment setup: packages, the rustup toolchain, the PowerShell
+# modules HyperShell declares, VS Code extensions, PATH and environment
+# variables, and the developer mode switch.
+#
+# windows.yaml invokes this as the Windows setup step, and nothing else on
+# Windows installs packages today, so the Chocolatey block below stays until
+# something actually replaces it.
+#
+# It no longer demands administrator rights up front. A blanket gate meant an
+# unelevated run did nothing at all, even though most of this works fine
+# unelevated: PowerShell modules install to CurrentUser, PATH and EDITOR are
+# user-scope environment variables, and VS Code extensions are per-user. The
+# steps that genuinely need elevation check for it themselves and print a
+# skip line saying what to rerun.
 
-# Ensure script is run as administrator
-if (-NOT ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")) {
-    Write-Warning "You do not have Administrator rights to run this script!`nPlease re-run this script as an Administrator!"
-    Break
+<#
+.SYNOPSIS
+    Reports whether this session is elevated.
+#>
+function Test-Administrator {
+    [CmdletBinding()]
+    [OutputType([bool])]
+    param()
+
+    try {
+        $identity = [Security.Principal.WindowsIdentity]::GetCurrent()
+        return ([Security.Principal.WindowsPrincipal]$identity).IsInRole(
+            [Security.Principal.WindowsBuiltInRole]::Administrator)
+    }
+    catch {
+        return $false
+    }
 }
 
-# Install Chocolatey if not already installed
-if (!(Get-Command choco -ErrorAction SilentlyContinue)) {
-    Set-ExecutionPolicy Bypass -Scope Process -Force
-    [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072
-    Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
+$isElevated = Test-Administrator
+if (-not $isElevated) {
+    Write-Host "Running unelevated. Steps that need administrator rights will be skipped." -ForegroundColor Yellow
 }
 
-# Install or upgrade necessary tools
-choco upgrade -y `
-    powershell-core `
-    microsoft-windows-terminal `
-    git `
-    vscode `
-    nodejs `
-    python `
-    fzf `
-    ripgrep `
-    bat `
-    lsd `
-    starship `
-    neovim `
-    gnuwin32-coreutils.install `
-    grep `
-    findutils `
-    sed `
-    gawk `
-    which `
-    unxutils `
-    cygwin `
-    mingw `
-    curl `
-    wget `
-    7zip `
-    bzip2 `
-    openssh `
-    make `
-    delta `
-    zoxide
+# Chocolatey installs machine-wide, so the whole package step needs elevation.
+if ($isElevated) {
+    if (!(Get-Command choco -ErrorAction SilentlyContinue)) {
+        Set-ExecutionPolicy Bypass -Scope Process -Force
+        [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072
+        $chocoInstall = (New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1')
+        & ([scriptblock]::Create($chocoInstall))
+    }
+
+    # Everything winget can install comes from packages.conf through
+    # install.ps1 and bin/pkg-sync.ps1 now; this list is only what winget
+    # does not cover. The GnuWin32, findutils, sed, gawk, and grep packages
+    # are what put real grep, sed, awk, and find on PATH, which is what
+    # HyperShell binds its aliases for those four names to. Dropping them
+    # silently disables those aliases, so they are not optional extras.
+    choco upgrade -y `
+        nodejs `
+        gnuwin32-coreutils.install `
+        grep `
+        findutils `
+        sed `
+        gawk `
+        which `
+        unxutils `
+        cygwin `
+        mingw `
+        curl `
+        wget `
+        bzip2 `
+        openssh `
+        make
+}
+else {
+    Write-Host "Skipping package installation: Chocolatey installs machine-wide and needs administrator rights." -ForegroundColor Yellow
+}
 
 # ── Rust ─────────────────────────────────────────────────────────────────────
-# Rust comes from rustup, never Chocolatey.
+# Rust comes from rustup, never a package manager.
 #
 # Chocolatey's `rust` package drops a GNU-host toolchain into
 # C:\ProgramData\chocolatey\bin, which lives in the *system* PATH. Windows
@@ -59,9 +88,15 @@ choco upgrade -y `
 #
 # rustup is also the only installer that honours a repo's rust-toolchain.toml,
 # which several projects here pin.
-if (Test-Path "C:\ProgramData\chocolatey\lib\rust") {
-    Write-Host "Removing Chocolatey's rust package (it shadows rustup)..." -ForegroundColor Yellow
-    choco uninstall rust -y
+if ((Test-Path "C:\ProgramData\chocolatey\lib\rust") -and (Get-Command choco -ErrorAction SilentlyContinue)) {
+    if ($isElevated) {
+        Write-Host "Removing Chocolatey's rust package (it shadows rustup)..." -ForegroundColor Yellow
+        choco uninstall rust -y
+    }
+    else {
+        Write-Host "Chocolatey's rust package is installed and shadows rustup." -ForegroundColor Yellow
+        Write-Host "  Run 'choco uninstall rust -y' from an elevated prompt." -ForegroundColor Yellow
+    }
 }
 
 if (!(Get-Command rustup -ErrorAction SilentlyContinue)) {
@@ -78,14 +113,14 @@ else {
 }
 
 # Diagnostic function
-function Test-PowerShellModules {
+function Test-PowerShellModule {
     Write-Host "Diagnosing PowerShell modules..." -ForegroundColor Yellow
     $psGetModule = Get-Module -Name PowerShellGet -ListAvailable | Sort-Object Version -Descending | Select-Object -First 1
     $packageManagementModule = Get-Module -Name PackageManagement -ListAvailable | Sort-Object Version -Descending | Select-Object -First 1
 
     Write-Host "PowerShellGet version: $($psGetModule.Version)"
     Write-Host "PackageManagement version: $($packageManagementModule.Version)"
-    
+
     $psGetPath = $psGetModule.ModuleBase
     $packageManagementPath = $packageManagementModule.ModuleBase
 
@@ -107,8 +142,11 @@ function Test-PowerShellModules {
     }
 }
 
-# Attempt to repair PowerShellGet and PackageManagement
-function Repair-PowerShellModules {
+# Attempt to repair PowerShellGet and PackageManagement.
+#
+# This writes into $env:ProgramFiles, so it is the one step here that
+# genuinely needs elevation.
+function Repair-PowerShellModule {
     Write-Host "Attempting to repair PowerShellGet and PackageManagement..." -ForegroundColor Yellow
 
     $tempFolder = Join-Path $env:TEMP "PSModules"
@@ -138,19 +176,59 @@ function Repair-PowerShellModules {
 }
 
 # Run diagnostics
-Test-PowerShellModules
+Test-PowerShellModule
 
-# Attempt repair
-Repair-PowerShellModules
+if ($isElevated) {
+    Repair-PowerShellModule
 
-# Run diagnostics again to verify repair
-Test-PowerShellModules
+    # Run diagnostics again to verify repair
+    Test-PowerShellModule
+}
+else {
+    Write-Host "Skipping the PowerShellGet repair: it writes to $env:ProgramFiles and needs administrator rights." -ForegroundColor Yellow
+}
 
-# Install PowerShell modules
+# Install the PowerShell modules HyperShell declares.
+#
+# The manifest is the source of truth so this list cannot drift:
+# RequiredModules is what the module imports, and
+# PrivateData.HyperShell.OptionalModules is what it picks up when present.
 Write-Host "Installing PowerShell modules..." -ForegroundColor Yellow
-Install-Module -Name PSReadLine -Force -SkipPublisherCheck
-Install-Module -Name posh-git -Force
-Install-Module -Name Terminal-Icons -Force
+# Nested rather than -AdditionalChildPath: windows.yaml invokes this script
+# with powershell.exe, which is always Windows PowerShell 5.1, and that
+# parameter arrived in PowerShell 6. Binding would fail, $manifestPath would
+# come out null, and the module install would silently skip itself.
+$manifestPath = Join-Path (Join-Path $PSScriptRoot "HyperShell") "HyperShell.psd1"
+
+if (Test-Path -LiteralPath $manifestPath) {
+    $hyperShellManifest = Import-PowerShellDataFile -LiteralPath $manifestPath
+    $moduleNames = @(
+        $hyperShellManifest.RequiredModules | ForEach-Object {
+            if ($_ -is [hashtable]) { $_.ModuleName } else { $_ }
+        }
+        $hyperShellManifest.PrivateData.HyperShell.OptionalModules
+    ) | Where-Object { $_ } | Select-Object -Unique
+
+    # AllUsers when elevated, which is what the original Install-Module calls
+    # did by default; CurrentUser otherwise, so an unelevated run still gets
+    # working modules instead of an access error.
+    $moduleScope = if ($isElevated) { 'AllUsers' } else { 'CurrentUser' }
+
+    foreach ($moduleName in $moduleNames) {
+        Write-Host "  $moduleName ($moduleScope)" -ForegroundColor Cyan
+        if (Get-Command Install-PSResource -ErrorAction SilentlyContinue) {
+            # -TrustRepository keeps this non-interactive; without it PSResourceGet
+            # stops for a confirmation prompt on an untrusted PSGallery.
+            Install-PSResource -Name $moduleName -Scope $moduleScope -TrustRepository -ErrorAction Continue
+        }
+        else {
+            Install-Module -Name $moduleName -Scope $moduleScope -Force -SkipPublisherCheck
+        }
+    }
+}
+else {
+    Write-Warning "HyperShell manifest not found at $manifestPath, skipping module installation."
+}
 
 # Setup Visual Studio Code extensions
 Write-Host "Setting up Visual Studio Code extensions..." -ForegroundColor Yellow
@@ -188,7 +266,8 @@ function Add-ToPath {
     }
 }
 
-# Add common directories to PATH
+# Add common directories to PATH. The GnuWin32, unxutils, and cygwin entries
+# are where the packages above drop grep, sed, awk, and find.
 Add-ToPath "$env:USERPROFILE\bin"
 Add-ToPath "$env:USERPROFILE\.local\bin"
 Add-ToPath "$env:USERPROFILE\.cargo\bin"
@@ -198,10 +277,14 @@ Add-ToPath "C:\cygwin64\bin"
 
 # Function to set environment variables
 function Set-EnvironmentVariable {
+    [CmdletBinding(SupportsShouldProcess)]
     param (
         [string]$Name,
         [string]$Value
     )
+    if (-not $PSCmdlet.ShouldProcess($Name, "Set user environment variable")) {
+        return
+    }
     [Environment]::SetEnvironmentVariable($Name, $Value, "User")
     [Environment]::SetEnvironmentVariable($Name, $Value, "Process")
     Write-Host "Set $Name to $Value" -ForegroundColor Green
@@ -240,8 +323,16 @@ else {
     Write-Host "zoxide is already installed." -ForegroundColor Green
 }
 
-# Enable Developer Mode
-Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModelUnlock" -Name "AllowDevelopmentWithoutDevLicense" -Value 1
+# Enable Developer Mode. Writes to HKLM, so it needs elevation.
+$devModeKey = "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\AppModelUnlock"
+if ($isElevated) {
+    Set-ItemProperty -Path $devModeKey -Name "AllowDevelopmentWithoutDevLicense" -Value 1
+    Write-Host "Developer Mode enabled." -ForegroundColor Green
+}
+else {
+    Write-Host "Skipping Developer Mode: writing to HKLM needs administrator rights." -ForegroundColor Yellow
+    Write-Host "  Enable it from Settings, or rerun this script elevated." -ForegroundColor Yellow
+}
 
 Write-Host "Windows environment setup complete!" -ForegroundColor Green
 Write-Host "Please restart your PowerShell session to ensure all changes take effect." -ForegroundColor Yellow

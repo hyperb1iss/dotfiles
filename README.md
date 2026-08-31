@@ -21,14 +21,14 @@ purples, electric cyans, and blazing pinks that flows through every tool.
 
 ## 🌟 Core Features
 
-| Feature                  | Description                                                                                                                                                                                            |
-| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| 🐚 **Shell Environment** | • Zsh with Zinit plugin management & Bash fallback<br>• Atuin-powered shell history with cross-machine sync<br>• 28 modular shell scripts with 100+ aliases<br>• Smart platform detection & adaptation |
-| 🖥️ **Terminal Setup**    | • Ghostty terminal with SilkCircuit theme<br>• Tmux multiplexer with custom keybindings<br>• Starship prompt with gradient theme<br>• FZF-powered fuzzy finding everywhere                             |
-| 🤖 **AI Integration**    | • Claude Code CLI for terminal AI pair programming<br>• Avante.nvim for in-editor Claude assistance<br>• Custom Claude Code status line & security hooks                                               |
-| 🎨 **SilkCircuit Theme** | • [silkcircuit-nvim](https://github.com/hyperb1iss/silkcircuit-nvim) Neovim colorscheme<br>• Consistent theming across Neovim, Git, Starship, Tmux, Ghostty, Bat, Delta, Atuin, FZF, and more          |
-| 🛠️ **Development Tools** | • AstroNvim v5 with full LSP for 11+ languages<br>• Proto version manager (Node, Rust, pnpm)<br>• Git workflow enhancements with Delta diffs<br>• Docker & Kubernetes management                       |
-| 🌐 **Cross-Platform**    | • macOS-first with Homebrew & DotBot automation<br>• Linux (Ubuntu/Arch) full desktop & minimal server profiles<br>• WSL2 with seamless path conversion<br>• Windows PowerShell via HyperShell modules |
+| Feature                  | Description                                                                                                                                                                                                             |
+| ------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 🐚 **Shell Environment** | • Zsh with Zinit plugin management & Bash fallback<br>• Atuin-powered shell history with cross-machine sync<br>• 28 modular shell scripts with 100+ aliases<br>• Smart platform detection & adaptation                  |
+| 🖥️ **Terminal Setup**    | • Ghostty terminal with SilkCircuit theme<br>• Tmux multiplexer with custom keybindings<br>• Starship prompt with gradient theme<br>• FZF-powered fuzzy finding everywhere                                              |
+| 🤖 **AI Integration**    | • Claude Code CLI for terminal AI pair programming<br>• Avante.nvim for in-editor Claude assistance<br>• Custom Claude Code status line & security hooks                                                                |
+| 🎨 **SilkCircuit Theme** | • [silkcircuit-nvim](https://github.com/hyperb1iss/silkcircuit-nvim) Neovim colorscheme<br>• Consistent theming across Neovim, Git, Starship, Tmux, Ghostty, Bat, Delta, Atuin, FZF, and more                           |
+| 🛠️ **Development Tools** | • AstroNvim v5 with full LSP for 11+ languages<br>• Proto version manager (Node, Rust, pnpm)<br>• Git workflow enhancements with Delta diffs<br>• Docker & Kubernetes management                                        |
+| 🌐 **Cross-Platform**    | • macOS-first with Homebrew & DotBot automation<br>• Linux (Ubuntu/Arch) full desktop & minimal server profiles<br>• WSL2 with seamless path conversion<br>• Windows via install.ps1, winget, and the HyperShell module |
 
 ## 🔧 Tool Suite
 
@@ -82,13 +82,13 @@ dotfiles/
 ├── claude/               # Claude Code settings, status line, security hooks
 ├── lsd/                  # LSDeluxe layout (colors come from SilkCircuit)
 ├── macos/                # macOS setup (Brewfile, system prefs, Karabiner)
-├── hypershell/           # Windows PowerShell modules
+├── hypershell/           # HyperShell, the Windows PowerShell module
 ├── docs/                 # VitePress documentation site
-├── packages.conf         # Every apt, pacman, and cargo package, by role
+├── packages.conf         # Every apt, pacman, cargo, and winget package, by role
 ├── Makefile              # Install, lint, and format targets
 └── dotbot.d/             # DotBot install layers
     ├── base.yaml         #   Every machine, every OS, every role
-    ├── os/               #   macos, linux, linux-system (the sudo tier)
+    ├── os/               #   macos, linux, windows, linux-system (the sudo tier)
     ├── role/             #   desktop, server
     ├── host/             #   Per-machine overrides, keyed by hostname
     └── private.yaml      #   dotfiles-private overlay
@@ -106,20 +106,33 @@ The Makefile detects the OS from `uname`, defaults the role to `desktop`, and ap
 when those files are actually there. Each layer answers one question, so a shared change like the SilkCircuit installer
 or the Atuin config lives in exactly one file instead of three.
 
+Windows composes a single layer, `os/windows.yaml`, because `base.yaml` and `role/desktop.yaml` link unix paths and
+shell out to bash for the SilkCircuit installer. `install.ps1` is what runs it, and it is the Windows `make install`.
+
 ### 📦 One package manifest
 
-Every apt, pacman, and cargo package lives in [`packages.conf`](./packages.conf), one row per tool, carrying the name
-each manager uses and the roles it belongs to. [`bin/pkg-sync`](./bin/pkg-sync) resolves that manifest and runs the
+Every apt, pacman, cargo, and winget package lives in [`packages.conf`](./packages.conf), one row per tool, carrying the
+name each manager uses and the roles it belongs to. [`bin/pkg-sync`](./bin/pkg-sync) resolves that manifest and runs the
 install, so the layers ask for a role and stay out of the package business:
 
 ```bash
 bin/pkg-sync list apt server           # what a headless Ubuntu box gets
 bin/pkg-sync install pacman desktop -n # the plan, without running it
 bin/pkg-sync install desktop           # detect the manager, install for real
+bin/pkg-sync export winget desktop     # a `winget import` document on stdout
 ```
 
 It needs bash and awk and nothing else, which is the point: it runs on a box that has not installed anything yet.
-Homebrew is the exception and keeps its own declarative manifest in [`macos/Brewfile`](./macos/Brewfile).
+
+Windows has no bash on a fresh box, so [`bin/pkg-sync.ps1`](./bin/pkg-sync.ps1) reads the same manifest with the same
+grammar and `install.ps1` calls it. The two readers have to agree, which is one command to check:
+
+```bash
+diff <(bin/pkg-sync list winget desktop) <(pwsh -NoProfile -File bin/pkg-sync.ps1 list winget desktop)
+```
+
+Homebrew is the exception and keeps its own declarative manifest in [`macos/Brewfile`](./macos/Brewfile), because casks,
+taps, and mas entries would flatten in this format.
 
 ## 🔤 Installing Nerd Fonts
 
@@ -178,9 +191,23 @@ Headless boxes want `make server`.
 # Clone the repository
 git clone https://github.com/hyperb1iss/dotfiles.git $env:USERPROFILE\dev\dotfiles
 
-# Install as administrator
 cd $env:USERPROFILE\dev\dotfiles
-.\install.ps1
+
+# Windows PowerShell 5.1 ships a Restricted execution policy on client
+# editions, so a fresh box needs the bypass for the first run
+powershell -ExecutionPolicy Bypass -File .\install.ps1
+```
+
+`install.ps1` is the Windows `make install`. It initializes the submodules, installs the winget rows of `packages.conf`
+for the role, composes `dotbot.d/os/windows.yaml`, and records the role in `.dotfiles_role`.
+
+Administrator is detected, not demanded. Only setting the default WSL version needs elevation, and an unelevated run
+says so by name and installs everything else. Run it from an administrator prompt when you want that step too.
+
+```powershell
+.\install.ps1 -Role server      # the smaller winget set, for Windows Server
+.\install.ps1 -SkipPackages     # relink and reconfigure, leave winget alone
+.\install.ps1 -DryRun           # print every command instead of running it
 ```
 
 ### Smoke tests
@@ -276,29 +303,69 @@ extract archive.tar.gz      # Smart archive extraction
 
 ### 🤖 HyperShell (PowerShell)
 
-A Linux-like experience for Windows PowerShell:
+A Linux-shaped PowerShell environment for Windows, shipped as a real PowerShell module:
 
 ```powershell
-# Linux-style Commands
-ls --tree         # Directory tree with icons
-grep "pattern"    # Search with ripgrep
+# Linux-style commands
+ls --tree         # Directory tree with icons, via lsd
+cat script.ps1    # Syntax highlighted, via bat
 which code        # Find executable paths
 
-# Docker Management
-dex container     # Interactive container selection
-dlog container    # View container logs
-dstop container   # Stop containers
+# Docker management
+dps               # Every container, running or not
+dlog              # Pick a container with fzf and follow its logs
+dstop             # Pick a container with fzf and stop it
 ```
 
 **Key Features:**
 
-- Modular architecture with 13 specialized modules
-- Linux command aliases using GNU tools
-- Kubernetes support with kubectl aliases and k9s
+- 83 functions and 66 aliases, every one of them named in the manifest
+- Linux command aliases that bind to the real GNU tools when they are installed
+- Kubernetes shortcuts that match the names in `sh/kubernetes.sh`
 - Zoxide for smart directory navigation
-- Android development utilities
-- HyperShell branding with SilkCircuit theme
-- Advanced FZF integration and Docker management
+- Android and Gradle helpers, sharing `~/.adbdevs` with the Unix side
+- Starship prompt with the SilkCircuit theme, plus the HyperShell banner
+- FZF pickers for files, directories, history, processes, and git
+
+#### Layout
+
+```
+hypershell/
+├── HyperShell/                        # The module
+│   ├── HyperShell.psd1                #   Manifest, explicit exports, no wildcards
+│   ├── HyperShell.psm1                #   Loads Private then Public, exports per manifest
+│   ├── Private/                       #   Platform rules, alias policy, pure parsers
+│   └── Public/                        #   One file per domain: Git, Docker, Kubernetes, …
+├── Microsoft.PowerShell_profile.ps1   # Imports the module, then wires up the session
+├── PSScriptAnalyzerSettings.psd1      # Lint policy
+├── setup-windows.ps1                  # packages, rustup, modules, PATH, and env
+└── tests/                             # Pester suite
+```
+
+Importing the module defines commands and nothing else. The prompt, zoxide, PSReadLine keybindings, and banner are
+functions the profile calls, which is what keeps an import quiet inside scripts and CI.
+
+#### Working on it from macOS or Linux
+
+HyperShell targets Windows, but it loads and tests anywhere PowerShell 7.4 runs, so the whole thing can be developed
+without a Windows box:
+
+```powershell
+Import-Module ./hypershell/HyperShell -Force
+Get-Command -Module HyperShell
+```
+
+Commands that wrap a Windows-only cmdlet stay defined and warn instead of failing with a missing-command error. The
+sixteen aliases that would shadow a real Unix binary or a PowerShell built-in (`ls`, `cat`, `find`, `touch`, and
+friends) are registered on Windows only, so a macOS session gets 50 aliases instead of 66 and the system tools keep
+working.
+
+Lint and tests run from the repo root:
+
+```bash
+make lint-ps    # PSScriptAnalyzer over every tracked PowerShell file
+make test-ps    # Pester suite in hypershell/tests
+```
 
 ### 🤖 AI Integration
 
@@ -360,7 +427,7 @@ cd ~/dev/dotfiles
 git pull
 make  # For Linux/WSL2
 # Or
-.\install.ps1  # For Windows (run as administrator)
+.\install.ps1  # For Windows
 ```
 
 ## 🤝 Contributing

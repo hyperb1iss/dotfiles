@@ -53,3 +53,170 @@ jobs:
       - name: → Link the macOS layers against a temp HOME
         run: |
           ./.github/smoke/dry-link.sh . $(./.github/smoke/layers.sh list desktop-macos)
+
+  # → Windows gets the real thing: install.ps1 against the runner's own
+  #   profile (a throwaway VM), then assertions on what it produced. The
+  #   package tier is skipped because winget on a runner costs minutes and
+  #   flakes; the manifest reader itself is exercised by the parity step.
+  windows:
+    name: » Windows install
+    runs-on: windows-latest
+    timeout-minutes: 20
+    steps:
+      - name: → Checkout code
+        uses: actions/checkout@v7
+        with:
+          submodules: recursive
+
+      - name: → Install PowerShell modules
+        shell: pwsh
+        run: |
+          foreach ($m in @(
+            @{ Name = 'PSScriptAnalyzer'; Range = '[1.0.0,2.0.0)' }
+            @{ Name = 'Pester';           Range = '[6.0.0,7.0.0)' }
+          )) {
+            if (Get-Command Install-PSResource -ErrorAction SilentlyContinue) {
+              Install-PSResource -Name $m.Name -Version $m.Range -TrustRepository -Scope CurrentUser
+            }
+            else {
+              Install-Module -Name $m.Name -Scope CurrentUser -Force -SkipPublisherCheck
+            }
+          }
+
+      - name: → Snapshot the tree
+        shell: bash
+        run: |
+          set -o pipefail
+          {
+            git diff HEAD --binary | sha256sum
+            git ls-files -o --exclude-standard -z | sort -z | xargs -0 -r sha256sum
+          } > "$RUNNER_TEMP/tree.before"
+
+      - name: → Run install.ps1
+        shell: pwsh
+        run: |
+          ./install.ps1 -SkipPackages -SkipSubmodules
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - name: → Assert links and role
+        shell: pwsh
+        run: |
+          ./.github/smoke/assert-links.ps1 -TargetHome $env:USERPROFILE -Repo . -Layers dotbot.d/os/windows.yaml
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          $role = (Get-Content .dotfiles_role -Raw).Trim()
+          if ($role -ne 'desktop') {
+            Write-Host "x .dotfiles_role says '$role', expected 'desktop'"
+            exit 1
+          }
+          Write-Host '  + .dotfiles_role = desktop'
+
+      - name: → Import the module through the installed link
+        shell: pwsh
+        run: |
+          # Counts come from the manifest, not hardcoded numbers, so adding
+          # a function does not break the smoke job. On Windows every alias
+          # exports; the unix policy is asserted by the Linux job below.
+          $psd1 = Import-PowerShellDataFile hypershell/HyperShell/HyperShell.psd1
+          $installed = Join-Path $env:USERPROFILE 'Documents/PowerShell/Modules/HyperShell'
+          Import-Module $installed -Force -ErrorAction Stop
+          $m = Get-Module HyperShell
+          if ($m.ExportedFunctions.Count -ne $psd1.FunctionsToExport.Count) {
+            Write-Host "x exported $($m.ExportedFunctions.Count) functions, manifest declares $($psd1.FunctionsToExport.Count)"
+            exit 1
+          }
+          if ($m.ExportedAliases.Count -ne $psd1.AliasesToExport.Count) {
+            Write-Host "x exported $($m.ExportedAliases.Count) aliases, manifest declares $($psd1.AliasesToExport.Count)"
+            exit 1
+          }
+          Write-Host "  + module exports $($m.ExportedFunctions.Count) functions, $($m.ExportedAliases.Count) aliases"
+
+      - name: → Load the profile through the installed link
+        shell: pwsh
+        run: |
+          $profilePath = Join-Path $env:USERPROFILE 'Documents/PowerShell/Microsoft.PowerShell_profile.ps1'
+          $out = pwsh -NoProfile -Command ". '$profilePath'; if (Get-Module HyperShell) { 'smoke-profile-ok' }"
+          if ($out -notcontains 'smoke-profile-ok') {
+            Write-Host 'x profile did not load the HyperShell module'
+            Write-Host ($out -join "`n")
+            exit 1
+          }
+          Write-Host '  + profile loads and imports HyperShell'
+
+      - name: → Run the Pester suite on Windows
+        shell: pwsh
+        run: |
+          # The installed module link autoloads a second HyperShell into the
+          # test session: Windows does not resolve the reparse point to the
+          # checkout path, so PowerShell sees two distinct loaded modules,
+          # `Get-Module HyperShell` returns both, and Pester's module-scope
+          # invocation collapses them into the command name
+          # "HyperShell HyperShell". Tests import by path, so the user
+          # module directory contributes nothing but that duplicate.
+          $sep = [IO.Path]::PathSeparator
+          $env:PSModulePath = ($env:PSModulePath -split $sep |
+            Where-Object { $_ -notlike "$env:USERPROFILE*" }) -join $sep
+          # Belt and braces: the link itself goes away too, because one
+          # stripped-path miss (OneDrive Documents redirection, a future
+          # runner image change) brings the duplicate straight back. The
+          # earlier steps already proved the link works.
+          $installed = Join-Path $env:USERPROFILE 'Documents/PowerShell/Modules/HyperShell'
+          if (Test-Path -LiteralPath $installed) {
+            (Get-Item -LiteralPath $installed).Delete()
+          }
+          Get-Module HyperShell -All | Remove-Module -Force -ErrorAction SilentlyContinue
+          Invoke-Pester -Path hypershell/tests -CI
+          $pesterExit = $LASTEXITCODE
+          if ($pesterExit -ne 0) {
+            Write-Host '--- diagnostics ---'
+            Write-Host "PSModulePath: $env:PSModulePath"
+            Get-Module -All | Where-Object Name -like '*HyperShell*' |
+              Format-Table Name, Version, Path -AutoSize | Out-String | Write-Host
+            Get-Module Pester -ListAvailable |
+              Format-Table Name, Version, Path -AutoSize | Out-String | Write-Host
+          }
+          exit $pesterExit
+
+      - name: → Assert the tree is byte-identical
+        shell: bash
+        run: |
+          set -o pipefail
+          # install.ps1 legitimately writes .dotfiles_role, which is
+          # gitignored, and Pester writes its ignored report; anything else
+          # is a test or install step leaking into the checkout.
+          {
+            git diff HEAD --binary | sha256sum
+            git ls-files -o --exclude-standard -z | sort -z | xargs -0 -r sha256sum
+          } > "$RUNNER_TEMP/tree.after"
+          if ! cmp -s "$RUNNER_TEMP/tree.before" "$RUNNER_TEMP/tree.after"; then
+            echo "::error::The install or tests modified the working tree."
+            diff "$RUNNER_TEMP/tree.before" "$RUNNER_TEMP/tree.after" || true
+            exit 1
+          fi
+          echo "+ tree byte-identical"
+
+  # → The unix side of the module: import on Linux and hold the alias
+  #   policy, so a Windows-only alias never shadows /bin/ls on a dev box
+  linux-module:
+    name: » Linux module import
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: → Checkout code
+        uses: actions/checkout@v7
+
+      - name: → Import and assert the unix alias policy
+        shell: pwsh
+        run: |
+          Import-Module ./hypershell/HyperShell -Force -ErrorAction Stop
+          $m = Get-Module HyperShell
+          $shadow = @('ls', 'cat', 'grep', 'find', 'sed', 'awk', 'which', 'touch', 'tail') |
+            Where-Object { $m.ExportedAliases.ContainsKey($_) }
+          if ($shadow) {
+            Write-Host "x unix import exports shadowing aliases: $($shadow -join ', ')"
+            exit 1
+          }
+          if ($m.ExportedFunctions.Count -lt 1) {
+            Write-Host 'x module imported but exported nothing'
+            exit 1
+          }
+          Write-Host "  + $($m.ExportedFunctions.Count) functions, $($m.ExportedAliases.Count) aliases, no unix shadowing"

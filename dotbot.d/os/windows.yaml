@@ -1,0 +1,130 @@
+# Windows layer: the whole Windows install, composed on its own.
+#
+# install.ps1 is the Windows `make install`, and it runs this file with
+# `-d <repo root>`. That flag is load bearing now that the layer lives in
+# dotbot.d/os/: without it dotbot resolves the relative link sources below
+# against this file's directory instead of the checkout.
+#
+# Windows deliberately skips base.yaml and role/desktop.yaml. Those layers
+# link unix paths (~/.zshrc, ~/.bashrc.local, ~/bin) and shell out to bash
+# for the SilkCircuit installer, so everything a Windows box needs is here.
+- defaults:
+    link:
+      create: true
+      relink: true
+
+- clean: ["~"]
+
+# ~/.agents/skills is a link *target* below, so it has to exist as a real
+# directory first. `create: true` on a link only makes the link's parent.
+- create:
+    - ~/.agents/skills
+
+- link:
+    # Starship prompt config comes from the SilkCircuit repo
+    # (clone https://github.com/hyperb1iss/silkcircuit and run install.ps1)
+    # Neovim configuration
+    ~/AppData/Local/nvim: nvim
+    # HyperShell ships as a PowerShell module. Anything under
+    # Documents/PowerShell/Modules autoloads by name, and force is needed
+    # because a previous Install-PSResource run leaves a real directory here.
+    # The guard is cmd syntax because dotbot runs `if` through cmd.exe on
+    # Windows, and it is here because a missing source is a hard dotbot
+    # failure: without it, a checkout made before the module landed fails
+    # the whole run over one link and takes the rest of the install with it.
+    # It earns its keep only while hypershell/HyperShell is untracked. Once
+    # that directory is in the repo its absence is impossible, and the guard
+    # only costs the smoke harness an assertion, since expected_links.py
+    # skips every conditional link. Drop it then.
+    ~/Documents/PowerShell/Modules/HyperShell:
+      path: hypershell/HyperShell
+      force: true
+    # PowerShell profile
+    ~/Documents/PowerShell/Microsoft.PowerShell_profile.ps1:
+      path: hypershell/Microsoft.PowerShell_profile.ps1
+      force: true
+    # Git configuration
+    ~/.gitconfig: gitconfig
+    # Fastfetch configuration (Windows path)
+    # fastfetch config is owned by the SilkCircuit installer, which does not
+    # run on Windows yet; copy extras/fastfetch/<variant>.jsonc by hand
+    # Claude Code configuration
+    ~/.claude/statusline-command.sh: claude/statusline-command.sh
+    # Claude Code / Codex agent files (from dotfiles-private).
+    # dotbot runs `if` through cmd.exe here, so the guard must be cmd syntax; a
+    # POSIX `[ -f ... ]` test always exits non-zero and skips the link in silence.
+    # This is also why dotbot.d/private.yaml is not composed on Windows: every
+    # guard and shell step in it is POSIX.
+    # force is required because both destinations start life as regular files.
+    ~/.claude/CLAUDE.md:
+      path: ~/dev/dotfiles-private/ai/AGENTS.md
+      force: true
+      if: 'if exist "%USERPROFILE%\dev\dotfiles-private\ai\AGENTS.md" (exit 0) else (exit 1)'
+    ~/.codex/AGENTS.md:
+      path: ~/dev/dotfiles-private/ai/AGENTS.md
+      force: true
+      if: 'if exist "%USERPROFILE%\dev\dotfiles-private\ai\AGENTS.md" (exit 0) else (exit 1)'
+    # ~/.agents/skills is the source of truth for agent skills. Codex scans it
+    # natively; Claude Code reaches it through this link.
+    ~/.claude/skills:
+      path: ~/.agents/skills
+      force: true
+
+- shell:
+    # Ensure fastfetch config directory exists on Windows
+    - command:
+        powershell.exe -NoProfile -Command "New-Item -ItemType Directory -Force -Path \"$Env:APPDATA\\fastfetch\" |
+        Out-Null"
+      stdin: true
+      stdout: true
+      stderr: true
+      description: Create fastfetch config directory
+
+    # Claude Code owns settings.json, so merge in the statusLine key rather than
+    # linking the whole file
+    - command: python ./claude/install-statusline.py
+      stdin: true
+      stdout: true
+      stderr: true
+      description: Wiring Claude Code status line
+
+# Packages come from packages.conf now, resolved by bin/pkg-sync.ps1 and
+# installed by install.ps1 before this layer runs. Setting the default WSL
+# version moved to install.ps1 too, where the one administrator check lives.
+- shell:
+    # Run the Windows setup script
+    # pwsh first: the setup script targets PowerShell 7 semantics, and by
+    # this point install.ps1 has already installed it from the manifest.
+    # Windows PowerShell 5.1 stays as the fallback for a bootstrap where
+    # the package tier was skipped.
+    - command:
+        where pwsh > nul 2>&1 && (pwsh -NoProfile -ExecutionPolicy Bypass -File ./hypershell/setup-windows.ps1) ||
+        powershell.exe -ExecutionPolicy Bypass -File ./hypershell/setup-windows.ps1
+      stdin: true
+      stdout: true
+      stderr: true
+      description: Running Windows setup script
+
+    # Rust components for editor tooling. rls and its rust-analysis data
+    # component were retired from rustup years ago, so asking for them
+    # fails the step and, dotbot being dotbot, the run. rust-analyzer plus
+    # the std sources it reads are the live equivalents.
+    # `where` is the cmd spelling of `command -v`: no rustup means skip,
+    # not fail, which matters on a box that never wanted Rust.
+    - command:
+        where rustup > nul 2>&1 && (rustup component add rust-src rust-analyzer || echo skipped rustup components) ||
+        echo skipped rustup, not on PATH
+      stdin: true
+      stdout: true
+      stderr: true
+      description: Installing Rust components
+
+    # pynvim for Neovim's Python host. Guarded the same way: the winget
+    # Python row puts pip on PATH, but -SkipPackages and the server role
+    # are both ways to arrive here without it.
+    - command:
+        where pip > nul 2>&1 && (pip install pynvim || echo skipped pynvim) || echo skipped pynvim, pip not on PATH
+      stdin: true
+      stdout: true
+      stderr: true
+      description: Installing pynvim
