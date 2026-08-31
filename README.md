@@ -13,7 +13,7 @@
   <a href="https://astronvim.com/"><img src="https://img.shields.io/badge/Editor-AstroNvim%20v5-informational?style=for-the-badge&logo=neovim&logoColor=white&color=9933ff" alt="AstroNvim v5"></a>
   <a href="https://ghostty.org/"><img src="https://img.shields.io/badge/Terminal-Ghostty%20%7C%20Tmux-informational?style=for-the-badge&logo=ghostty&logoColor=white&color=00ffff" alt="Ghostty and Tmux"></a>
   <a href="https://starship.rs/"><img src="https://img.shields.io/badge/Prompt-Starship-informational?style=for-the-badge&logo=starship&logoColor=white&color=33ffcc" alt="Starship prompt"></a>
-  <a href="https://github.com/hyperb1iss/silkcircuit-nvim"><img src="https://img.shields.io/badge/Theme-SilkCircuit-informational?style=for-the-badge&color=e135ff" alt="SilkCircuit theme"></a>
+  <a href="https://github.com/hyperb1iss/silkcircuit"><img src="https://img.shields.io/badge/Theme-SilkCircuit-informational?style=for-the-badge&color=e135ff" alt="SilkCircuit theme"></a>
 </p>
 
 <!-- markdownlint-enable MD013 -->
@@ -22,8 +22,8 @@ Hey there! I'm **Stefanie Jane**, aka **[hyperb1iss](https://github.com/hyperb1i
 Seattle. These dotfiles turn a fresh machine into a fully themed, fully wired workstation on **macOS, Linux, Windows, or
 WSL2**. The Unix side runs Zsh with a modular script library; Windows gets the same energy through **HyperShell**, a
 real PowerShell module with Linux-shaped commands. Everything wears
-[SilkCircuit](https://github.com/hyperb1iss/silkcircuit-nvim), a cyberpunk color system of neon purples, electric cyans,
-and blazing pinks that flows through every tool from Neovim to git diffs.
+[SilkCircuit](https://github.com/hyperb1iss/silkcircuit), a cyberpunk color system of neon purples, electric cyans, and
+blazing pinks that flows through every tool from Neovim to git diffs.
 
 This README is the tour. The field manual lives at
 **[hyperb1iss.github.io/dotfiles](https://hyperb1iss.github.io/dotfiles/)** 📚
@@ -39,7 +39,7 @@ This README is the tour. The field manual lives at
 | 🐚 **Shell Environment** | • Zsh with Zinit plugin management & Bash fallback<br>• Atuin shell history with cross-machine sync<br>• 30 modular shell scripts with 150+ aliases<br>• Smart platform detection & adaptation                   |
 | 🖥️ **Terminal Setup**    | • Ghostty terminal with SilkCircuit theme<br>• Tmux multiplexer with custom keybindings<br>• Starship prompt with gradient theme<br>• FZF-powered fuzzy finding everywhere                                       |
 | 🤖 **AI Integration**    | • Claude Code CLI for terminal AI pair programming<br>• Avante.nvim for in-editor Claude assistance<br>• Custom Claude Code status line & security hooks                                                         |
-| 🎨 **SilkCircuit Theme** | • [silkcircuit-nvim](https://github.com/hyperb1iss/silkcircuit-nvim) Neovim colorscheme<br>• Consistent theming across Neovim, Git, Starship, Tmux, Ghostty, Bat, Delta, Atuin, FZF, and more                    |
+| 🎨 **SilkCircuit Theme** | • [silkcircuit](https://github.com/hyperb1iss/silkcircuit) color system<br>• Consistent theming across Neovim, Git, Starship, Tmux, Ghostty, Bat, Delta, Atuin, FZF, and more                                    |
 | 🛠️ **Development Tools** | • AstroNvim v5 with Mason-managed LSP, formatters, and debuggers<br>• Proto version manager with per-project pins<br>• Git workflow enhancements with Delta diffs<br>• Docker & Kubernetes management            |
 | 🌐 **Cross-Platform**    | • macOS with Homebrew & DotBot automation<br>• Linux (Ubuntu/Arch) full desktop & minimal server profiles<br>• Windows via install.ps1, winget, and the HyperShell module<br>• WSL2 with two-way path conversion |
 
@@ -367,25 +367,11 @@ AI coding assistance at two levels:
 
 ### 🎨 Theming System: SilkCircuit
 
-The whole environment wears **SilkCircuit**, a cyberpunk color system with five variants (neon, vibrant, soft, glow, and
-dawn). The default neon variant looks like this:
+The whole environment wears [**SilkCircuit**](https://github.com/hyperb1iss/silkcircuit), a cyberpunk color system with
+five variants and extras for 20+ tools. The palette, variants, and design rules live in its own repo; the installer
+copies every theme asset into place here. In this environment it covers:
 
-|                          Color Preview                           | Name                | Hex Code  | Usage                                |
-| :--------------------------------------------------------------: | ------------------- | --------- | ------------------------------------ |
-|   ![Background](https://placehold.co/50x30/12101a/12101a.png)    | **Background**      | `#12101a` | Terminal and editor base, deep space |
-| ![Electric Purple](https://placehold.co/50x30/e135ff/e135ff.png) | **Electric Purple** | `#e135ff` | Keywords, control flow               |
-|    ![Pure Pink](https://placehold.co/50x30/ff00ff/ff00ff.png)    | **Pure Pink**       | `#ff00ff` | Prompts, emphasis, highlights        |
-|    ![Neon Cyan](https://placehold.co/50x30/80ffea/80ffea.png)    | **Neon Cyan**       | `#80ffea` | Functions, interaction               |
-|      ![Coral](https://placehold.co/50x30/ff6ac1/ff6ac1.png)      | **Coral**           | `#ff6ac1` | Numbers, constants                   |
-| ![Electric Yellow](https://placehold.co/50x30/f1fa8c/f1fa8c.png) | **Electric Yellow** | `#f1fa8c` | Classes, types, warnings             |
-|  ![Success Green](https://placehold.co/50x30/50fa7b/50fa7b.png)  | **Success Green**   | `#50fa7b` | Added files, success states          |
-|    ![Error Red](https://placehold.co/50x30/ff6363/ff6363.png)    | **Error Red**       | `#ff6363` | Deleted files, errors                |
-
-The palette is defined by [**silkcircuit-nvim**](https://github.com/hyperb1iss/silkcircuit-nvim), a standalone Neovim
-colorscheme with 30+ plugin integrations, WCAG AA accessibility compliance, and extras that theme the rest of the
-environment:
-
-- **Neovim** - Full theme via silkcircuit-nvim with 30+ plugin support
+- **Neovim** - Full colorscheme with 30+ plugin integrations
 - **Ghostty** - Terminal emulator with SilkCircuit colors
 - **Git** - Custom log formatting with the `silkcircuit` pretty format
 - **Starship Prompt** - SilkCircuit gradient theme with powerline segments
@@ -422,8 +408,8 @@ Got ideas for improvements? Found a bug? Feel free to:
 
 If you like these dotfiles, you might be interested in some of my other projects:
 
-- [silkcircuit-nvim](https://github.com/hyperb1iss/silkcircuit-nvim): The cyberpunk Neovim colorscheme that powers this
-  environment, with 5 variants, 30+ integrations, and extras for terminals, Git, VSCode, and more
+- [silkcircuit](https://github.com/hyperb1iss/silkcircuit): The cyberpunk color system that powers this environment,
+  with 5 variants and extras for Neovim, VS Code, terminals, and 20+ tools
 - [git-iris](https://github.com/hyperb1iss/git-iris): AI-accelerated git workflow tool
 - [contexter](https://github.com/hyperb1iss/contexter): Chrome extension and CLI for quickly copying code into LLMs
 - [signalrgb-homeassistant](https://github.com/hyperb1iss/signalrgb-homeassistant): SignalRGB integration for Home
