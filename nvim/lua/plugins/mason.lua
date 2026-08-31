@@ -4,7 +4,7 @@
 return {
   -- mason.nvim v2 handles ensure_installed natively
   {
-    "williamboman/mason.nvim",
+    "mason-org/mason.nvim",
     opts = {
       ensure_installed = {
         -- LSP servers
@@ -30,7 +30,7 @@ return {
   -- mason-lspconfig bridges mason and lspconfig
   -- NOTE: automatic_installation disabled — mason.nvim v2 handles ensure_installed natively
   {
-    "williamboman/mason-lspconfig.nvim",
+    "mason-org/mason-lspconfig.nvim",
     opts = {},
   },
   -- use mason-null-ls for automatic null-ls source installation
