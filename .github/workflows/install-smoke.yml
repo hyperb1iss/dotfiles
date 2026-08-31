@@ -155,7 +155,26 @@ jobs:
           $sep = [IO.Path]::PathSeparator
           $env:PSModulePath = ($env:PSModulePath -split $sep |
             Where-Object { $_ -notlike "$env:USERPROFILE*" }) -join $sep
+          # Belt and braces: the link itself goes away too, because one
+          # stripped-path miss (OneDrive Documents redirection, a future
+          # runner image change) brings the duplicate straight back. The
+          # earlier steps already proved the link works.
+          $installed = Join-Path $env:USERPROFILE 'Documents/PowerShell/Modules/HyperShell'
+          if (Test-Path -LiteralPath $installed) {
+            (Get-Item -LiteralPath $installed).Delete()
+          }
+          Get-Module HyperShell -All | Remove-Module -Force -ErrorAction SilentlyContinue
           Invoke-Pester -Path hypershell/tests -CI
+          $pesterExit = $LASTEXITCODE
+          if ($pesterExit -ne 0) {
+            Write-Host '--- diagnostics ---'
+            Write-Host "PSModulePath: $env:PSModulePath"
+            Get-Module -All | Where-Object Name -like '*HyperShell*' |
+              Format-Table Name, Version, Path -AutoSize | Out-String | Write-Host
+            Get-Module Pester -ListAvailable |
+              Format-Table Name, Version, Path -AutoSize | Out-String | Write-Host
+          }
+          exit $pesterExit
 
       - name: → Assert the tree is byte-identical
         shell: bash
