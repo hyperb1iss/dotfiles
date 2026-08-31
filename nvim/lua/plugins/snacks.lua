@@ -34,7 +34,7 @@ n e o v i m
     indent = {
       enabled = true,
       scope = {
-        enabled = false, -- disabled: crashes on Neovim 0.12 treesitter API changes
+        enabled = true,
       },
     },
     input = { enabled = true },
@@ -54,7 +54,7 @@ n e o v i m
     },
     profiler = { enabled = true },
     quickfile = { enabled = true },
-    scope = { enabled = false }, -- disabled: crashes on Neovim 0.12 treesitter API changes
+    scope = { enabled = true },
     scroll = {
       enabled = false,
     },
