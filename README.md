@@ -1,34 +1,43 @@
 # 🌠 Stefanie's Dotfiles
 
+<!-- markdownlint-disable MD013 -->
+
 <p align="center">
-  <img src="https://img.shields.io/badge/OS-macOS%20%7C%20Linux%20%7C%20WSL2-informational?style=for-the-badge&logo=apple&logoColor=white&color=ff00ff">
-  <img src="https://img.shields.io/badge/Shell-Zsh%20%7C%20Bash-informational?style=for-the-badge&logo=gnu-bash&logoColor=white&color=b300ff">
-  <img src="https://img.shields.io/badge/Editor-AstroNvim%20v5-informational?style=for-the-badge&logo=neovim&logoColor=white&color=9933ff">
-  <img src="https://img.shields.io/badge/Theme-SilkCircuit-informational?style=for-the-badge&logo=neovim&logoColor=white&color=e135ff">
-  <img src="https://img.shields.io/badge/Terminal-Ghostty%20%7C%20Tmux-informational?style=for-the-badge&logo=ghostty&logoColor=white&color=00ffff">
-  <img src="https://img.shields.io/badge/Prompt-Starship-informational?style=for-the-badge&logo=starship&logoColor=white&color=33ffcc">
+  <img src="https://img.shields.io/badge/OS-macOS%20%7C%20Linux%20%7C%20Windows%20%7C%20WSL2-informational?style=for-the-badge&logo=apple&logoColor=white&color=ff00ff" alt="macOS, Linux, Windows, and WSL2">
+  <img src="https://img.shields.io/badge/Shell-Zsh%20%7C%20Bash%20%7C%20PowerShell-informational?style=for-the-badge&logo=gnu-bash&logoColor=white&color=b300ff" alt="Zsh, Bash, and PowerShell">
+  <a href="https://astronvim.com/"><img src="https://img.shields.io/badge/Editor-AstroNvim%20v5-informational?style=for-the-badge&logo=neovim&logoColor=white&color=9933ff" alt="AstroNvim v5"></a>
+  <a href="https://ghostty.org/"><img src="https://img.shields.io/badge/Terminal-Ghostty%20%7C%20Tmux-informational?style=for-the-badge&logo=ghostty&logoColor=white&color=00ffff" alt="Ghostty and Tmux"></a>
+  <a href="https://starship.rs/"><img src="https://img.shields.io/badge/Prompt-Starship-informational?style=for-the-badge&logo=starship&logoColor=white&color=33ffcc" alt="Starship prompt"></a>
+  <a href="https://github.com/hyperb1iss/silkcircuit"><img src="https://img.shields.io/badge/Theme-SilkCircuit-informational?style=for-the-badge&color=e135ff" alt="SilkCircuit theme"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-informational?style=for-the-badge&color=ff6ac1" alt="MIT license"></a>
 </p>
 
-Hey there! Welcome to my personal dotfiles repository! I'm **Stefanie Jane**, aka **hyperb1iss**—a creative technologist
-based in Seattle. These dotfiles create a powerful, beautiful development environment with a macOS-first focus that also
-works seamlessly across Linux and WSL2. Everything is tied together by the
-[SilkCircuit](https://github.com/hyperb1iss/silkcircuit-nvim) color theme—a cyberpunk-inspired aesthetic with neon
-purples, electric cyans, and blazing pinks that flows through every tool.
+<!-- markdownlint-enable MD013 -->
+
+Hey there! I'm **Stefanie Jane**, aka **[hyperb1iss](https://github.com/hyperb1iss)**, a creative technologist in
+Seattle. These dotfiles turn a fresh machine into a fully themed, fully wired workstation on **macOS, Linux, Windows, or
+WSL2**. The Unix side runs Zsh with a modular script library; Windows gets the same energy through **HyperShell**, a
+real PowerShell module with Linux-shaped commands. Everything wears
+[SilkCircuit](https://github.com/hyperb1iss/silkcircuit), a cyberpunk color system of neon purples, electric cyans, and
+blazing pinks that flows through every tool from Neovim to git diffs.
+
+This README is the tour. The field manual lives at
+**[hyperb1iss.github.io/dotfiles](https://hyperb1iss.github.io/dotfiles/)** 📚
 
 <p align="center">
-  <img src="images/terminal-bliss.png" alt="Terminal Bliss" width="600" />
+  <img src="images/terminal-bliss.png" alt="Ghostty, tmux, AstroNvim, and fastfetch in SilkCircuit" width="800" />
 </p>
 
 ## 🌟 Core Features
 
-| Feature                  | Description                                                                                                                                                                                                             |
-| ------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 🐚 **Shell Environment** | • Zsh with Zinit plugin management & Bash fallback<br>• Atuin-powered shell history with cross-machine sync<br>• 28 modular shell scripts with 100+ aliases<br>• Smart platform detection & adaptation                  |
-| 🖥️ **Terminal Setup**    | • Ghostty terminal with SilkCircuit theme<br>• Tmux multiplexer with custom keybindings<br>• Starship prompt with gradient theme<br>• FZF-powered fuzzy finding everywhere                                              |
-| 🤖 **AI Integration**    | • Claude Code CLI for terminal AI pair programming<br>• Avante.nvim for in-editor Claude assistance<br>• Custom Claude Code status line & security hooks                                                                |
-| 🎨 **SilkCircuit Theme** | • [silkcircuit-nvim](https://github.com/hyperb1iss/silkcircuit-nvim) Neovim colorscheme<br>• Consistent theming across Neovim, Git, Starship, Tmux, Ghostty, Bat, Delta, Atuin, FZF, and more                           |
-| 🛠️ **Development Tools** | • AstroNvim v5 with full LSP for 11+ languages<br>• Proto version manager (Node, Rust, pnpm)<br>• Git workflow enhancements with Delta diffs<br>• Docker & Kubernetes management                                        |
-| 🌐 **Cross-Platform**    | • macOS-first with Homebrew & DotBot automation<br>• Linux (Ubuntu/Arch) full desktop & minimal server profiles<br>• WSL2 with seamless path conversion<br>• Windows via install.ps1, winget, and the HyperShell module |
+| Feature                  | Description                                                                                                                                                                                                      |
+| ------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 🐚 **Shell Environment** | • Zsh with Zinit plugin management & Bash fallback<br>• Atuin shell history with cross-machine sync<br>• 30 modular shell scripts with 150+ aliases<br>• Smart platform detection & adaptation                   |
+| 🖥️ **Terminal Setup**    | • Ghostty terminal with SilkCircuit theme<br>• Tmux multiplexer with custom keybindings<br>• Starship prompt with gradient theme<br>• FZF-powered fuzzy finding everywhere                                       |
+| 🤖 **AI Integration**    | • Claude Code CLI for terminal AI pair programming<br>• Avante.nvim for in-editor Claude assistance<br>• Custom Claude Code status line & security hooks                                                         |
+| 🎨 **SilkCircuit Theme** | • [silkcircuit](https://github.com/hyperb1iss/silkcircuit) color system<br>• Consistent theming across Neovim, Git, Starship, Tmux, Ghostty, Bat, Delta, Atuin, FZF, and more                                    |
+| 🛠️ **Development Tools** | • AstroNvim v5 with Mason-managed LSP, formatters, and debuggers<br>• Proto version manager with per-project pins<br>• Git workflow enhancements with Delta diffs<br>• Docker & Kubernetes management            |
+| 🌐 **Cross-Platform**    | • macOS with Homebrew & DotBot automation<br>• Linux (Ubuntu/Arch) full desktop & minimal server profiles<br>• Windows via install.ps1, winget, and the HyperShell module<br>• WSL2 with two-way path conversion |
 
 ## 🔧 Tool Suite
 
@@ -38,7 +47,7 @@ purples, electric cyans, and blazing pinks that flows through every tool.
 | -------------------------------------------------------------------- | -------------------- | --------------------------------------------------------------------------- |
 | 📝 **[AstroNvim v5](https://astronvim.com/)**                        | Neovim configuration | • IDE-like features<br>• Avante.nvim AI assistant<br>• SilkCircuit theme    |
 | 👻 **[Ghostty](https://ghostty.org/)**                               | Terminal emulator    | • GPU-accelerated<br>• SilkCircuit theme<br>• Native macOS/Linux            |
-| 🚀 **[Starship](https://starship.rs/)**                              | Cross-shell prompt   | • SilkCircuit gradient theme<br>• Git status integration<br>• Context-aware |
+| 🌌 **[Starship](https://starship.rs/)**                              | Cross-shell prompt   | • SilkCircuit gradient theme<br>• Git status integration<br>• Context-aware |
 | 🖥️ **[Tmux](https://github.com/tmux/tmux)**                          | Terminal multiplexer | • Custom key bindings<br>• SilkCircuit color scheme<br>• Session management |
 | 🤖 **[Claude Code](https://docs.anthropic.com/en/docs/claude-code)** | AI pair programmer   | • Custom status line<br>• Security hooks<br>• Project-aware assistance      |
 
@@ -53,14 +62,14 @@ purples, electric cyans, and blazing pinks that flows through every tool.
 | 🔀 **[Delta](https://github.com/dandavison/delta)**     | Git diff viewer | • Syntax highlighting<br>• Side-by-side diffs<br>• SilkCircuit theme  |
 | ⏪ **[Atuin](https://atuin.sh/)**                       | Shell history   | • SQLite-backed<br>• Cross-machine sync<br>• Per-directory filtering  |
 | 📌 **[Zoxide](https://github.com/ajeetdsouza/zoxide)**  | Smart cd        | • Learns your habits<br>• Fuzzy matching<br>• Instant directory jumps |
-| 🔧 **[Proto](https://moonrepo.dev/proto)**              | Version manager | • Node, Rust, pnpm versions<br>• Auto .prototools detection<br>• Fast |
+| 🔧 **[Proto](https://moonrepo.dev/proto)**              | Version manager | • Node, Python, pnpm & more<br>• Auto .prototools detection<br>• Fast |
 
 ### 🖼️ System & Customization
 
 | Tool                                                           | Description    | Features                                                              |
 | -------------------------------------------------------------- | -------------- | --------------------------------------------------------------------- |
-| 📊 **[Fastfetch](https://github.com/fastfetch-cli/fastfetch)** | System info    | • Fast system information<br>• Performance metrics<br>• Custom config |
-| ✨ **[shellint](./bin/shellint)**                              | Shell linter   | • Shellcheck integration<br>• Auto-fixing<br>• Format with shfmt      |
+| 📊 **[Fastfetch](https://github.com/fastfetch-cli/fastfetch)** | System info    | • Fast system information<br>• Performance metrics<br>• Themed config |
+| 🪄 **[shellint](./bin/shellint)**                              | Shell linter   | • Shellcheck integration<br>• Auto-fixing<br>• Format with shfmt      |
 | 🔧 **[DotBot](https://github.com/anishathalye/dotbot)**        | Config manager | • Automated setup<br>• Cross-platform support<br>• Profile management |
 
 ## 📁 Repository Structure
@@ -71,8 +80,8 @@ dotfiles/
 │   └── lua/plugins/      #   Plugin configs (silkcircuit, avante, treesitter, …)
 ├── zsh/                  # Zsh configuration (zshrc + completion)
 ├── bash/                 # Bash configuration (profile + bashrc.local)
-├── sh/                   # 28 modular shell scripts (git, docker, k8s, macos, …)
-├── bin/                  # Utility scripts (shellint, diskclean, repo, …)
+├── sh/                   # 30 modular shell scripts (git, docker, k8s, macos, …)
+├── bin/                  # Utility scripts (shellint, pkg-sync, scrape, …)
 ├── ghostty/              # Ghostty terminal config (macOS + Linux)
 ├── modules-load.d/       # Kernel modules loaded at boot (tcp_bbr)
 ├── tmux.conf             # Tmux multiplexer configuration
@@ -94,7 +103,7 @@ dotfiles/
     └── private.yaml      #   dotfiles-private overlay
 ```
 
-### 🌊 How the layers compose
+### 🌊 How the Layers Compose
 
 Installation is one DotBot run over a stack of layers, picked for the machine you are standing on:
 
@@ -103,94 +112,70 @@ base.yaml → os/<uname>.yaml → role/<role>.yaml → host/<hostname>.yaml → 
 ```
 
 The Makefile detects the OS from `uname`, defaults the role to `desktop`, and appends the host and private layers only
-when those files are actually there. Each layer answers one question, so a shared change like the SilkCircuit installer
-or the Atuin config lives in exactly one file instead of three.
+when those files exist. Each layer answers one question, so a shared change lives in exactly one file instead of three.
+Windows runs a single layer, `os/windows.yaml`, through `install.ps1`, since the shared layers assume Unix paths. The
+full walkthrough is in [the installation guide](https://hyperb1iss.github.io/dotfiles/getting-started/installation).
 
-Windows composes a single layer, `os/windows.yaml`, because `base.yaml` and `role/desktop.yaml` link unix paths and
-shell out to bash for the SilkCircuit installer. `install.ps1` is what runs it, and it is the Windows `make install`.
+<p align="center">
+  <img src="images/silkcircuit-shell.png" alt="The dotbot.d layer tree and a Delta diff" width="800" />
+</p>
 
-### 📦 One package manifest
+### 📦 One Package Manifest
 
 Every apt, pacman, cargo, and winget package lives in [`packages.conf`](./packages.conf), one row per tool, carrying the
-name each manager uses and the roles it belongs to. [`bin/pkg-sync`](./bin/pkg-sync) resolves that manifest and runs the
-install, so the layers ask for a role and stay out of the package business:
+name each manager uses and the roles it belongs to. [`bin/pkg-sync`](./bin/pkg-sync) resolves the manifest and runs the
+install using nothing but bash and awk, so it works on a box that has not installed anything yet. Windows reads the same
+manifest through [`bin/pkg-sync.ps1`](./bin/pkg-sync.ps1).
 
 ```bash
 bin/pkg-sync list apt server           # what a headless Ubuntu box gets
 bin/pkg-sync install pacman desktop -n # the plan, without running it
 bin/pkg-sync install desktop           # detect the manager, install for real
-bin/pkg-sync export winget desktop     # a `winget import` document on stdout
-```
-
-It needs bash and awk and nothing else, which is the point: it runs on a box that has not installed anything yet.
-
-Windows has no bash on a fresh box, so [`bin/pkg-sync.ps1`](./bin/pkg-sync.ps1) reads the same manifest with the same
-grammar and `install.ps1` calls it. The two readers have to agree, which is one command to check:
-
-```bash
-diff <(bin/pkg-sync list winget desktop) <(pwsh -NoProfile -File bin/pkg-sync.ps1 list winget desktop)
 ```
 
 Homebrew is the exception and keeps its own declarative manifest in [`macos/Brewfile`](./macos/Brewfile), because casks,
 taps, and mas entries would flatten in this format.
 
-## 🔤 Installing Nerd Fonts
+## 🔤 Nerd Fonts
 
-Nerd Fonts are required for proper icon display in the terminal. These are not automatically installed by dotbot. Follow
-these steps to install them:
-
-1. Visit the [Nerd Fonts website](https://www.nerdfonts.com/)
-2. Download your preferred font (I recommend JetBrainsMono Nerd Font)
-3. Extract the downloaded zip file
-4. Install the fonts:
-   - On Windows: Right-click on each `.ttf` file and select "Install"
-   - On macOS: Double-click each `.ttf` file and click "Install Font"
-   - On Linux: Copy the `.ttf` files to `~/.local/share/fonts/` and run `fc-cache -fv`
-5. Configure your terminal to use the installed Nerd Font
-
-For WSL2 users, make sure to set the Nerd Font in your Windows Terminal settings as well.
+Terminal icons need a [Nerd Font](https://www.nerdfonts.com/), and the installer deliberately stays out of the font
+business. Grab one (JetBrainsMono is a solid default), install it, and point your terminal at it. On WSL2, set the font
+in Windows Terminal too.
 
 ## 🛠️ Installation
+
+### macOS
+
+```bash
+# Option 1: The installer script
+bash -c "$(curl -fsSL https://raw.githubusercontent.com/hyperb1iss/dotfiles/main/install_macos.sh)"
+
+# Option 2: Manual
+git clone https://github.com/hyperb1iss/dotfiles.git ~/dev/dotfiles
+cd ~/dev/dotfiles
+make install
+```
 
 ### Linux/WSL2
 
 ```bash
-# Clone the repository
 git clone https://github.com/hyperb1iss/dotfiles.git ~/dev/dotfiles
+cd ~/dev/dotfiles
 
 # Install everything, system tier included
-cd ~/dev/dotfiles
 make full
 
 # Or skip the sudo tier and install just the user layers
 make install
 ```
 
-### macOS
-
-```bash
-# Option 1: Using the installer script
-bash -c "$(curl -fsSL https://raw.githubusercontent.com/hyperb1iss/dotfiles/main/install_macos.sh)"
-
-# Option 2: Manual installation
-# Clone the repository
-git clone https://github.com/hyperb1iss/dotfiles.git ~/dev/dotfiles
-
-# Install everything
-cd ~/dev/dotfiles
-make install
-```
-
 `make install` composes the right layers for whatever machine it runs on, so it is the one command worth remembering.
-`make macos` and `make minimal` are aliases for it and for `make server`; `make full` adds the sudo tier on Linux first.
 Headless boxes want `make server`.
 
 ### Windows
 
 ```powershell
-# Clone the repository
 git clone https://github.com/hyperb1iss/dotfiles.git $env:USERPROFILE\dev\dotfiles
-
 cd $env:USERPROFILE\dev\dotfiles
 
 # Windows PowerShell 5.1 ships a Restricted execution policy on client
@@ -199,10 +184,9 @@ powershell -ExecutionPolicy Bypass -File .\install.ps1
 ```
 
 `install.ps1` is the Windows `make install`. It initializes the submodules, installs the winget rows of `packages.conf`
-for the role, composes `dotbot.d/os/windows.yaml`, and records the role in `.dotfiles_role`.
-
-Administrator is detected, not demanded. Only setting the default WSL version needs elevation, and an unelevated run
-says so by name and installs everything else. Run it from an administrator prompt when you want that step too.
+for the role, runs the Windows DotBot layer, and records the role for next time. Administrator is detected, not
+demanded: only setting the default WSL version needs elevation, and an unelevated run says so by name and installs
+everything else.
 
 ```powershell
 .\install.ps1 -Role server      # the smaller winget set, for Windows Server
@@ -210,14 +194,13 @@ says so by name and installs everything else. Run it from an administrator promp
 .\install.ps1 -DryRun           # print every command instead of running it
 ```
 
-### Smoke tests
+### Smoke Tests
 
 Every push runs the install for real: `make server` end to end in Ubuntu and Arch containers, plus a link-only pass over
-the desktop layers on Linux and macOS. Run the same thing before you push with `make smoke`, which needs docker or
-podman for the container jobs and skips them with a note when neither is around. Details in
-[the installation guide](docs/getting-started/installation.md#smoke-tests).
+the desktop layers on Linux and macOS. Run the same thing before you push with `make smoke`. Details in
+[the installation guide](https://hyperb1iss.github.io/dotfiles/getting-started/installation#smoke-tests).
 
-## 🚀 Deep Dive
+## 🔮 Deep Dive
 
 ### 🐚 Shell Environment
 
@@ -236,9 +219,9 @@ fzf               # Fuzzy find files or history
 **Key Features:**
 
 - Unified configuration across Bash and Zsh with Zinit plugin management
-- Enhanced history with timestamps and duplicate removal
+- Atuin history with cross-machine sync and per-directory filtering
 - Intelligent tab completion with fuzzy finding
-- Directory jumping with `z` command and bookmarking system
+- Directory jumping with `z` and a bookmark system (`mark`/`unmark`)
 - Git worktree manager (`gwt`) with comprehensive subcommands
 - Interactive FZF functions for files, processes, and Docker
 - Cross-platform environment variables and platform detection
@@ -278,30 +261,28 @@ goapps                      # Jump to packages/apps
 
 ### 🪟 WSL2 Integration
 
-Seamless Windows and Linux integration:
+Windows and Linux, acting like one machine:
 
 ```bash
 # Path Conversion
 wslpath "C:\Users\Stefanie"  # Convert Windows to WSL path
-wslopen ~/projects           # Open WSL path in Windows Explorer
+wopen ~/projects             # Open a WSL path in Windows Explorer
 
 # Navigation
-cdw                         # Jump to Windows user directory
+cdw                         # Jump to the Windows user directory
 
-# File Operations
-apush file.txt              # Smart file pushing to Android
-extract archive.tar.gz      # Smart archive extraction
+# Clipboard
+clip-path file.txt          # Copy a file's Windows path to the clipboard
 ```
 
 **Key Features:**
 
-- Seamless path conversion
-- File system integration
+- Two-way path conversion
+- Explorer and clipboard integration
 - Shared Git configuration
-- WSL backup utilities
-- Cross-platform clipboard support
+- WSL backup utility (`bin/wsl_backup.sh`)
 
-### 🤖 HyperShell (PowerShell)
+### ⚡ HyperShell (PowerShell)
 
 A Linux-shaped PowerShell environment for Windows, shipped as a real PowerShell module:
 
@@ -319,7 +300,7 @@ dstop             # Pick a container with fzf and stop it
 
 **Key Features:**
 
-- 83 functions and 66 aliases, every one of them named in the manifest
+- 84 functions and 66 aliases, every one of them named in the manifest
 - Linux command aliases that bind to the real GNU tools when they are installed
 - Kubernetes shortcuts that match the names in `sh/kubernetes.sh`
 - Zoxide for smart directory navigation
@@ -332,18 +313,17 @@ dstop             # Pick a container with fzf and stop it
 ```
 hypershell/
 ├── HyperShell/                        # The module
-│   ├── HyperShell.psd1                #   Manifest, explicit exports, no wildcards
-│   ├── HyperShell.psm1                #   Loads Private then Public, exports per manifest
-│   ├── Private/                       #   Platform rules, alias policy, pure parsers
-│   └── Public/                        #   One file per domain: Git, Docker, Kubernetes, …
-├── Microsoft.PowerShell_profile.ps1   # Imports the module, then wires up the session
-├── PSScriptAnalyzerSettings.psd1      # Lint policy
-├── setup-windows.ps1                  # packages, rustup, modules, PATH, and env
+│   ├── HyperShell.psd1                #   Manifest with explicit exports
+│   ├── HyperShell.psm1                #   Loads Private, then Public
+│   ├── Private/                       #   Platform rules, alias policy, parsers
+│   └── Public/                        #   One file per domain: Git, Docker, …
+├── Microsoft.PowerShell_profile.ps1   # Imports the module, wires up the session
+├── setup-windows.ps1                  # Packages, rustup, modules, PATH, and env
 └── tests/                             # Pester suite
 ```
 
-Importing the module defines commands and nothing else. The prompt, zoxide, PSReadLine keybindings, and banner are
-functions the profile calls, which is what keeps an import quiet inside scripts and CI.
+Importing the module defines commands and nothing else; the prompt, zoxide, keybindings, and banner are wired up by the
+profile, which keeps imports quiet inside scripts and CI.
 
 #### Working on it from macOS or Linux
 
@@ -355,12 +335,9 @@ Import-Module ./hypershell/HyperShell -Force
 Get-Command -Module HyperShell
 ```
 
-Commands that wrap a Windows-only cmdlet stay defined and warn instead of failing with a missing-command error. The
-sixteen aliases that would shadow a real Unix binary or a PowerShell built-in (`ls`, `cat`, `find`, `touch`, and
-friends) are registered on Windows only, so a macOS session gets 50 aliases instead of 66 and the system tools keep
-working.
-
-Lint and tests run from the repo root:
+Commands that wrap a Windows-only cmdlet stay defined and warn instead of failing. The sixteen aliases that would shadow
+a real Unix binary or a PowerShell built-in (`ls`, `cat`, `find`, `touch`, and friends) register on Windows only, so a
+macOS session gets 50 aliases instead of 66 and the system tools keep working.
 
 ```bash
 make lint-ps    # PSScriptAnalyzer over every tracked PowerShell file
@@ -369,65 +346,49 @@ make test-ps    # Pester suite in hypershell/tests
 
 ### 🤖 AI Integration
 
-The environment includes AI coding assistance at two levels:
+AI coding assistance at two levels:
 
-**[Claude Code CLI](https://docs.anthropic.com/en/docs/claude-code)** — Terminal AI pair programming:
+**[Claude Code CLI](https://docs.anthropic.com/en/docs/claude-code)**, terminal AI pair programming:
 
 - Custom SilkCircuit status line showing git, language versions, and context
 - Security hooks for safe command execution
-- Project-aware assistance with custom AGENTS.md configuration
+- Project-aware assistance with custom agent configuration
 - Integrated directly into the terminal workflow
 
-**[Avante.nvim](https://github.com/yetone/avante.nvim)** — In-editor AI assistance:
+**[Avante.nvim](https://github.com/yetone/avante.nvim)**, in-editor AI assistance:
 
-- Configured with Claude Sonnet 4 for intelligent code suggestions
+- Claude-powered code suggestions inside Neovim
 - Interactive sidebar with diff-based edits and conflict resolution
-- Context-aware suggestions within your Neovim editing session
+- Context-aware suggestions within your editing session
 
-### 🎨 Theming System - SilkCircuit
+### 🎨 Theming System: SilkCircuit
 
-The environment features the custom **SilkCircuit** color scheme, a cyberpunk-inspired theme with neon accents:
+The whole environment wears [**SilkCircuit**](https://github.com/hyperb1iss/silkcircuit), a cyberpunk color system with
+five variants and extras for 20+ tools. The palette, variants, and design rules live in its own repo; the installer
+copies every theme asset into place here. In this environment it covers:
 
-|                          Color Preview                          | Name               | Hex Code  | Usage                                   |
-| :-------------------------------------------------------------: | ------------------ | --------- | --------------------------------------- |
-|   ![Background](https://placehold.co/50x30/1a1a2e/1a1a2e.png)   | **Background**     | `#1a1a2e` | Terminal background, deep space purple  |
-|  ![Neon Magenta](https://placehold.co/50x30/ff00ff/ff00ff.png)  | **Neon Magenta**   | `#ff00ff` | Current branches, prompts, highlights   |
-| ![Electric Cyan](https://placehold.co/50x30/00ffff/00ffff.png)  | **Electric Cyan**  | `#00ffff` | Local branches, help text, dates        |
-| ![Bright Magenta](https://placehold.co/50x30/ff79c6/ff79c6.png) | **Bright Magenta** | `#ff79c6` | Changed files, authors, remote branches |
-|     ![Yellow](https://placehold.co/50x30/ffdc00/ffdc00.png)     | **Yellow**         | `#ffdc00` | Branch decorations, code files          |
-|     ![Green](https://placehold.co/50x30/50fa7b/50fa7b.png)      | **Green**          | `#50fa7b` | Added files, executables                |
-|      ![Red](https://placehold.co/50x30/ff5555/ff5555.png)       | **Red**            | `#ff5555` | Deleted files, errors                   |
-|     ![Purple](https://placehold.co/50x30/c792ea/c792ea.png)     | **Purple**         | `#c792ea` | Keywords, tmux accents                  |
-
-The SilkCircuit theme is powered by [**silkcircuit-nvim**](https://github.com/hyperb1iss/silkcircuit-nvim)—a standalone
-Neovim colorscheme plugin with 5 variants (neon, vibrant, soft, glow, dawn), 30+ plugin integrations, and WCAG AA
-accessibility compliance. It's loaded as a local plugin from `~/dev/silkcircuit-nvim` and also provides extras for
-environment-wide theming.
-
-The theme is consistently applied across the entire environment:
-
-- **Neovim** - Full theme via silkcircuit-nvim with 30+ plugin support
+- **Neovim** - Full colorscheme with 30+ plugin integrations
 - **Ghostty** - Terminal emulator with SilkCircuit colors
-- **Git** - Custom log formatting with `silkcircuit` pretty format
+- **Git** - Custom log formatting with the `silkcircuit` pretty format
 - **Starship Prompt** - SilkCircuit gradient theme with powerline segments
 - **Tmux** - Status bar with purple and pink accents
-- **Atuin** - Shell history UI themed with SilkCircuit palette
+- **Atuin** - Shell history UI themed with the SilkCircuit palette
 - **FZF / fzf-tab** - Fuzzy finder with SilkCircuit color scheme
 - **LSDeluxe** - File type colors matching the theme
-- **Bat** - Custom SilkCircuit.tmTheme for syntax highlighting
+- **Bat** - SilkCircuit syntax highlighting theme
 - **Delta** - Git diff viewer with themed colors
 - **Claude Code** - Custom status line with SilkCircuit RGB colors
 
 ## 🔄 Updating
 
-To update the dotfiles repository:
-
 ```bash
 cd ~/dev/dotfiles
 git pull
-make  # For Linux/WSL2
-# Or
-.\install.ps1  # For Windows
+make install     # macOS, Linux, WSL2
+```
+
+```powershell
+.\install.ps1    # Windows
 ```
 
 ## 🤝 Contributing
@@ -439,12 +400,12 @@ Got ideas for improvements? Found a bug? Feel free to:
 3. Make your changes
 4. Submit a pull request
 
-## 🚀 Other Projects
+## 💜 Other Projects
 
 If you like these dotfiles, you might be interested in some of my other projects:
 
-- [silkcircuit-nvim](https://github.com/hyperb1iss/silkcircuit-nvim): The cyberpunk Neovim colorscheme that powers this
-  environment — 5 variants, 30+ integrations, extras for terminals, Git, VSCode, and more
+- [silkcircuit](https://github.com/hyperb1iss/silkcircuit): The cyberpunk color system that powers this environment,
+  with 5 variants and extras for Neovim, VS Code, terminals, and 20+ tools
 - [git-iris](https://github.com/hyperb1iss/git-iris): AI-accelerated git workflow tool
 - [contexter](https://github.com/hyperb1iss/contexter): Chrome extension and CLI for quickly copying code into LLMs
 - [signalrgb-homeassistant](https://github.com/hyperb1iss/signalrgb-homeassistant): SignalRGB integration for Home
