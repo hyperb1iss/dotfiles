@@ -159,6 +159,6 @@ function Register-JavaAlias {
 }
 
 Add-HyperShellAlias -Name 'setjdk' -Value 'Set-JavaVersion'
-Add-HyperShellAlias -Name 'javalist' -Value 'Set-JavaVersion'
+Add-HyperShellAlias -Name 'javalist' -Value 'Get-JavaInstallation'
 
 Register-JavaAlias
