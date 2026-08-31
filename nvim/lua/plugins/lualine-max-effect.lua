@@ -106,7 +106,9 @@ return {
             local current = vim.fn.line(".")
             local total = vim.fn.line("$")
             local percent = math.floor(current / total * 100)
-            return string.format("%3d%% %d/%d", percent, current, total)
+            -- statusline-escape the literal percent: lualine only escapes
+            -- built-in components, and a raw "% " is an invalid stl item
+            return string.format("%3d%%%% %d/%d", percent, current, total)
           end,
           icon = "",
           color = { fg = silkcircuit_colors.purple_muted },
