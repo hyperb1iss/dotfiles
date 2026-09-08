@@ -292,10 +292,20 @@ Multiple screenshot functions for various capture modes (see source for details)
 | --------- | ---------------------------------- |
 | `fopen`   | Open file in editor with preview   |
 | `fkill`   | Kill processes interactively       |
-| `fh`      | Search command history             |
 | `fenv`    | Search environment variables       |
 | `frg`     | Ripgrep search with file opening   |
 | `fdocker` | Docker container selector and exec |
+
+## History
+
+The history helpers live in `sh/atuin.sh`.
+
+| Function                  | Description                                               |
+| ------------------------- | --------------------------------------------------------- |
+| `hfail [query] [limit]`   | Find failed user commands in this workspace               |
+| `hlast [query]`           | Recall the last successful user command in this directory |
+| `hstats [period] [count]` | Show command usage stats                                  |
+| `hagents [query] [limit]` | Find commands recorded by agent hooks                     |
 
 ## Homebrew
 

@@ -33,7 +33,11 @@ Configured with SilkCircuit colors and platform-specific settings in `ghostty/`.
 
 [Atuin](https://atuin.sh/) replaces standard shell history with a SQLite-backed, searchable database featuring
 cross-machine sync, per-directory filtering, and a SilkCircuit-themed UI (the theme file is installed by the SilkCircuit
-installer).
+installer). The shell module (`sh/atuin.sh`) loads after fzf so Atuin owns history search in both Bash and Zsh.
+
+Press Ctrl+R for workspace search, or Up for prefix search using the current buffer. Ctrl+T and Alt+C remain fzf file
+and directory pickers. The helpers `hfail` and `hlast` search user commands; `hagents` searches agent commands. The
+configuration enables the search daemon and disables Atuin's AI, dotfiles management, and PTY proxy features.
 
 ### Proto Version Manager
 

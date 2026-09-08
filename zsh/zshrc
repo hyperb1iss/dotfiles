@@ -77,25 +77,8 @@ zinit light zsh-users/zsh-syntax-highlighting
 zinit light zsh-users/zsh-history-substring-search
 zinit light Aloxaf/fzf-tab
 
-# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-# Atuin: Modern shell history with per-directory awareness
-# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-# Atuin replaces Ctrl+R with a full-screen fuzzy search UI
-# Features: SQLite backend, directory filtering, cross-machine sync, stats
-# The actual `atuin init` happens once in sh/fzf.sh (after fzf's bindings,
-# so atuin wins ^R) — initializing here too would double the subprocess
-# spawn and race the keybinds.
-if command -v atuin &>/dev/null; then
-  # Custom strategy for zsh-autosuggestions using Atuin's per-directory history
-  _zsh_autosuggest_strategy_atuin() {
-    suggestion=$(atuin search --cmd-only --limit 1 --search-mode prefix -- "$1" 2>/dev/null)
-  }
-  # Use Atuin first, fall back to standard history if no match
-  ZSH_AUTOSUGGEST_STRATEGY=(atuin history completion)
-fi
-
-# Note: Up/down arrows handled by Atuin with workspace filtering
-# history-substring-search still available via Ctrl+P/Ctrl+N if needed
+# Atuin owns Ctrl+R and Up after the modules load. Ctrl+P/Ctrl+N keep
+# the classic substring walk through zsh history.
 bindkey '^P' history-substring-search-up
 bindkey '^N' history-substring-search-down
 
