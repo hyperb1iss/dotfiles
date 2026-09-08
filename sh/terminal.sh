@@ -40,8 +40,10 @@ function setup_terminal_title() {
     autoload -Uz add-zsh-hook
     add-zsh-hook precmd set_terminal_title
   elif is_bash; then
-    # For bash, use PROMPT_COMMAND
-    PROMPT_COMMAND="set_terminal_title"
+    # Preserve prompt hooks installed by the caller or other tools.
+    if [[ "${PROMPT_COMMAND:-}" != *set_terminal_title* ]]; then
+      PROMPT_COMMAND="set_terminal_title${PROMPT_COMMAND:+;${PROMPT_COMMAND}}"
+    fi
   fi
 }
 

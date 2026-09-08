@@ -47,20 +47,12 @@ if has_command fzf; then
   export FZF_CTRL_T_COMMAND="${FZF_DEFAULT_COMMAND}"
   export FZF_ALT_C_COMMAND="${FD_COMMAND} --type d --hidden --follow --exclude .git"
 
-  # Initialize shell completion and key bindings
-  # Note: We unbind Ctrl+R in zsh to let Atuin handle history search
+  # Initialize file pickers and completion. Atuin loads afterward and
+  # replaces the history binding when it is installed.
   if is_bash; then
     cached_eval fzf fzf-init.bash fzf --bash
   elif is_zsh; then
     cached_eval fzf fzf-init.zsh fzf --zsh
-    # Unbind Ctrl+R so Atuin can use it for history search
-    # fzf still provides Ctrl+T (files) and Alt+C (cd)
-    # This is the ONLY atuin init — zshrc defines the autosuggest
-    # strategy but must not init again (double subprocess, ^R races)
-    if command -v atuin &> /dev/null; then
-      bindkey -r '^R'
-      cached_eval atuin atuin-init.zsh atuin init zsh --disable-up-arrow
-    fi
   fi
 
   # Custom functions using fzf
@@ -102,23 +94,6 @@ if has_command fzf; then
   }
 
   # NOTE: gadd and gco are defined in git.sh with SilkCircuit styling
-
-  # Interactive history search — loads the pick into the edit buffer
-  # (zsh) or history recall (bash) instead of blind-executing it
-  function fh() {
-    local cmd
-    if is_zsh; then
-      cmd=$(history -n -r 1 | fzf +s --tac) || return
-      # shellcheck disable=SC2154
-      [[ -n "${cmd}" ]] && print -z "${cmd}"
-    else
-      cmd=$(history | fzf +s --tac | sed 's/ *[0-9]* *//') || return
-      if [[ -n "${cmd}" ]]; then
-        history -s "${cmd}"
-        echo "${cmd}  ← recall with ↑"
-      fi
-    fi
-  }
 
   # Interactive environment variable search
   function fenv() {

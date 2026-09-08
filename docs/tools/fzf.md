@@ -78,15 +78,6 @@ fkill
 fkill 9  # Sends SIGKILL instead
 ```
 
-**`fh` — Fuzzy History Search**
-
-```bash
-fh
-# Search through command history
-# Press Enter to execute command
-# Integrates with zsh history
-```
-
 **`fenv` — Environment Variable Search**
 
 ```bash
@@ -349,7 +340,7 @@ FZF is used throughout the dotfiles:
 
 | Module         | Functions                                   |
 | -------------- | ------------------------------------------- |
-| `sh/fzf.sh`    | Core functions (fcd, fopen, fkill, fh, frg) |
+| `sh/fzf.sh`    | Core functions (fcd, fopen, fkill, frg)     |
 | `sh/git.sh`    | Git operations (gadd, gco, glog, gstash)    |
 | `sh/git.sh`    | Git worktree manager (gwt)                  |
 | `sh/docker.sh` | Container management (dexec, dlf, dstop)    |

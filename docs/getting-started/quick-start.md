@@ -100,7 +100,7 @@ fkill   # Interactive process killer
         # Multi-select with Tab
         # Shows full process info
 
-fh      # Fuzzy history search
+Ctrl+R  # Atuin history search (Up arrow for prefix search)
         # Search through your command history
         # Enter to execute
 

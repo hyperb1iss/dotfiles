@@ -100,7 +100,9 @@ dotfiles_load_core() {
   __dotfiles_source "${DOTFILES}/sh/terminal.sh"
 }
 
-# Phase two: every other module, alphabetically. Modules gate themselves
+# Phase two: the remaining modules, then Atuin. Its history bindings must
+# follow fzf, and bash-preexec must install after the other prompt hooks
+# so Bash records the first command too. Modules gate themselves
 # on platform and install type (is_minimal, is_macos, is_wsl), so the
 # loader stays dumb about which ones apply here.
 #
@@ -127,8 +129,15 @@ dotfiles_load_modules() {
       *" ${__dotfiles_name} "*) continue ;;
     esac
 
+    [ "${__dotfiles_name}" = atuin.sh ] && continue
+
     __dotfiles_source "${__dotfiles_module}"
   done
+
+  case " ${DOTFILES_SKIP_MODULES:-} " in
+    *" atuin.sh "*) ;;
+    *) __dotfiles_source "${DOTFILES}/sh/atuin.sh" ;;
+  esac
 }
 
 # Both phases back to back, for shells with nothing to slot between.
