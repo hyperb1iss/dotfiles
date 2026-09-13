@@ -1,0 +1,10 @@
+# Herdr plugins ⚡ installed by role/desktop.yaml
+#
+#   <owner>/<repo>[/<subdir>]   <plugin id it registers as>   # note
+#
+# `herdr plugin install <path>` clones, builds, and registers; ids already
+# registered are skipped, so rerunning is cheap. Plugins we author live
+# under herdr/plugins/ and are linked in place, not installed.
+wyattjoh/herdr-plugin-gh-pr       gh-pr                # PR number + CI state as $pr in the sidebar
+persiyanov/herdr-reviewr          persiyanov.reviewr   # diff review + PR pane beside the agent
+speardragon/herdr-plugin-manager  ray.plugin-manager   # browse the marketplace from a popup

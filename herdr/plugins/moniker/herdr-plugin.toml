@@ -1,0 +1,19 @@
+id = "nova.moniker"
+name = "Moniker"
+version = "0.1.0"
+min_herdr_version = "0.9.0"
+description = "Two-word tab names from what the agent is actually doing, courtesy of a fast model."
+platforms = ["macos", "linux"]
+
+# Fires on every agent status transition. The script bails in
+# milliseconds unless an agent in an unnamed session just started working.
+[[events]]
+on = "pane.agent_status_changed"
+command = ["python3", "moniker.py", "event"]
+
+# Force a fresh name for the pane in context (bind to a key in config.toml).
+[[actions]]
+id = "rename"
+title = "Name this tab"
+contexts = ["pane", "tab", "workspace"]
+command = ["python3", "moniker.py", "rename"]
