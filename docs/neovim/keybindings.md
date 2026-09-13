@@ -3,7 +3,8 @@
 Everything hangs off `Space`; press it and let which-key show the rest
 
 Notation: `Space` is the leader, `,` the local leader, `C-x` is Ctrl, `S-x` is Shift. Mode is normal unless a table says
-otherwise. Mappings marked (ours) come from `nvim/lua/plugins/`; the rest are AstroNvim v6 defaults.
+otherwise. Mappings marked (ours) come from `nvim/lua/plugins/` or the community recipes picked in
+`nvim/lua/community.lua`; the rest are AstroNvim v6 defaults.
 
 ## Which-key groups
 
@@ -91,7 +92,7 @@ In a picker: `C-j` / `C-k` move, `Enter` open, `C-v` vsplit, `C-s` split, `C-t` 
 | Key         | Action                            |
 | ----------- | --------------------------------- |
 | `gd`        | Definition                        |
-| `gD`        | Declaration (ours)                |
+| `gD`        | Declaration                       |
 | `gI`        | Implementation                    |
 | `gy`        | Type definition                   |
 | `gK`        | Signature help                    |

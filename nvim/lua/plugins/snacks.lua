@@ -31,7 +31,6 @@ return {
         { section = "startup" },
       },
     },
-    bigfile = { enabled = true },
     quickfile = { enabled = true },
     terminal = {
       win = { position = "bottom", height = 0.3 },
@@ -40,10 +39,8 @@ return {
       -- the SilkCircuit installer owns ~/.config/lazygit; don't paint over it
       configure = false,
     },
-    words = { debounce = 200 },
   },
   specs = {
-    { "akinsho/toggleterm.nvim", enabled = false },
     {
       "AstroNvim/astrocore",
       opts = function(_, opts)
