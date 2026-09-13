@@ -16,6 +16,17 @@ if has_command fzf; then
   # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   # SilkCircuit Theme for fzf
   # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  # The colors are the fzf extra the SilkCircuit installer drops into
+  # ~/.config/fzf; it only sets --color, so the layout lives here. fzf-tab and
+  # the tmux popups inherit FZF_DEFAULT_OPTS, which keeps every picker on the
+  # same palette.
+  fzf_theme="${XDG_CONFIG_HOME:-$HOME/.config}/fzf/silkcircuit-neon.sh"
+  fzf_colors=""
+  if [[ -f "${fzf_theme}" ]]; then
+    # shellcheck source=/dev/null
+    source "${fzf_theme}"
+    fzf_colors="${FZF_DEFAULT_OPTS:-}"
+  fi
   export FZF_DEFAULT_OPTS="
     --height 40%
     --layout=reverse
@@ -24,11 +35,9 @@ if has_command fzf; then
     --prompt='▸ '
     --pointer='▶'
     --marker='✓'
-    --color=fg:#c0caf5,fg+:#ffffff,bg:-1,bg+:#2a2139
-    --color=hl:#e135ff,hl+:#ff79c6,info:#f1fa8c,marker:#50fa7b
-    --color=prompt:#80ffea,spinner:#80ffea,pointer:#e135ff,header:#ff6ac1
-    --color=border:#e135ff,scrollbar:#e135ff,label:#80ffea,query:#ffffff
+    ${fzf_colors}
   "
+  unset fzf_theme fzf_colors
 
   # Determine which bat command to use
   if has_command batcat; then
