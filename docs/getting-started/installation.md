@@ -415,7 +415,7 @@ The dotfiles use symlinks, so removing them is straightforward:
 rm ~/.zshrc
 rm ~/.config/starship.toml
 rm ~/.tmux.conf
-rm ~/.gitconfig
+rm ~/.config/git/config
 rm -rf ~/.config/nvim
 
 # Remove the repository

@@ -28,7 +28,7 @@ derive="${repo}/.github/smoke/expected_links.py"
 # profile skips them.
 floor=(
   "${home}/.bashrc.local"
-  "${home}/.gitconfig"
+  "${home}/.config/git/config"
   "${home}/.tmux.conf"
   "${home}/.zshrc"
   "${home}/.config/nvim"

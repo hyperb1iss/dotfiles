@@ -142,7 +142,8 @@ git config --global user.name "Your Name"
 git config --global user.email "you@example.com"
 
 # Or edit gitconfig directly
-# The dotfiles symlink ~/.gitconfig to ~/dev/dotfiles/gitconfig
+# The dotfiles symlink ~/.config/git/config to ~/dev/dotfiles/gitconfig.
+# ~/.gitconfig stays a local file; anything set there overrides the tracked config.
 ```
 
 ### Git Iris (AI Commit Messages)
@@ -170,7 +171,7 @@ export GWT_NO_COLOR=1                          # Disable colors (for scripts)
 
 ### Delta (Git Diff Tool)
 
-Delta is configured in `gitconfig` as the default pager. Customize in `~/.gitconfig` or `~/dev/dotfiles/gitconfig`:
+Delta is configured in `gitconfig` as the default pager. Customize in `~/.gitconfig` (local, wins) or `~/dev/dotfiles/gitconfig` (tracked):
 
 ```ini
 [delta]

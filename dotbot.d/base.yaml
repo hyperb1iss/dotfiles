@@ -50,7 +50,13 @@
 
 - link:
     ~/.bashrc.local: bash/bashrc.local
-    ~/.gitconfig: gitconfig
+    # Git reads ~/.config/git/config first and ~/.gitconfig second, and
+    # `git config --global` writes to ~/.gitconfig whenever that file exists.
+    # Linking the tracked config at the XDG path and keeping ~/.gitconfig as
+    # a plain local file means installers (SilkCircuit, gh, anything that
+    # calls `git config --global`) land their edits in the local file and
+    # never rewrite the tracked one. Local values win on shared keys.
+    ~/.config/git/config: gitconfig
     ~/.tmux.conf: tmux.conf
     ~/.zshrc:
       path: zsh/zshrc
