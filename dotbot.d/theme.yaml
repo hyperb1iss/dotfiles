@@ -7,10 +7,12 @@
 # and whatever dotfiles-private installs. Running it earlier on a fresh
 # machine silently themes nothing.
 #
-# It also does `git config --global --add include.path`, which is why the
-# ~/.gitconfig link lives in base.yaml: with the link already in place the
-# installer writes through it into the tracked gitconfig, which carries the
-# include already, so the step is a no-op there and idempotent on every run.
+# It also does `git config --global --add include.path`. With --global,
+# git reads and writes a single file: ~/.gitconfig when it exists, so the
+# installer adds its include to the plain local ~/.gitconfig on first run
+# and finds it there afterwards. The tracked gitconfig (linked at
+# ~/.config/git/config by base.yaml) carries the same include as a floor
+# and is never rewritten; git reads both and the local file wins.
 - defaults:
     link:
       relink: true
