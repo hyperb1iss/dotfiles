@@ -111,5 +111,10 @@ rows = [["state_icon", "workspace"], ["branch", "git_status"]]
 # Ghostty raises the desktop notification for background agents.
 delivery = "terminal"
 
+# Copy-on-select already happens silently; the "copied to clipboard"
+# toast on every drag is noise.
+[ui.toast.clipboard]
+enabled = false
+
 [ui.sound]
 enabled = true
