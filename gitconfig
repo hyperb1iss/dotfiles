@@ -58,6 +58,11 @@
 [include]
 	path = ~/.config/git/silkcircuit-neon.gitconfig
 
+# Plain `git log` uses the SilkCircuit named format from the include above:
+# purple hash line, decorate colors, bold subject, muted body.
+[format]
+	pretty = silkcircuit
+
 [credential "https://github.com"]
 	helper =
 	helper = !gh auth git-credential
