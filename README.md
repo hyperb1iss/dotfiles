@@ -100,7 +100,8 @@ dotfiles/
     ├── os/               #   macos, linux, windows, linux-system (the sudo tier)
     ├── role/             #   desktop, server
     ├── host/             #   Per-machine overrides, keyed by hostname
-    └── private.yaml      #   dotfiles-private overlay
+    ├── private.yaml      #   dotfiles-private overlay
+    └── theme.yaml        #   SilkCircuit installer, always last
 ```
 
 ### 🌊 How the Layers Compose
@@ -108,13 +109,15 @@ dotfiles/
 Installation is one DotBot run over a stack of layers, picked for the machine you are standing on:
 
 ```
-base.yaml → os/<uname>.yaml → role/<role>.yaml → host/<hostname>.yaml → private.yaml
+base.yaml → os/<uname>.yaml → role/<role>.yaml → host/<hostname>.yaml → private.yaml → theme.yaml
 ```
 
 The Makefile detects the OS from `uname`, defaults the role to `desktop`, and appends the host and private layers only
 when those files exist. Each layer answers one question, so a shared change lives in exactly one file instead of three.
-Windows runs a single layer, `os/windows.yaml`, through `install.ps1`, since the shared layers assume Unix paths. The
-full walkthrough is in [the installation guide](https://hyperb1iss.github.io/dotfiles/getting-started/installation).
+The theme layer closes every run: the SilkCircuit installer autodetects which tools are present, so it runs only after
+every package tier has put them on disk. Windows runs a single layer, `os/windows.yaml`, through `install.ps1`, since
+the shared layers assume Unix paths. The full walkthrough is in
+[the installation guide](https://hyperb1iss.github.io/dotfiles/getting-started/installation).
 
 <p align="center">
   <img src="images/silkcircuit-shell.png" alt="The dotbot.d layer tree and a Delta diff" width="800" />
