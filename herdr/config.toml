@@ -116,5 +116,6 @@ delivery = "terminal"
 [ui.toast.clipboard]
 enabled = false
 
+# Toasts already say who needs attention; a chime on top is too much.
 [ui.sound]
-enabled = true
+enabled = false
