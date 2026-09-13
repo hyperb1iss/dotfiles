@@ -51,10 +51,12 @@
 	process = git-lfs filter-process
 
 # All SilkCircuit theming (colors, delta, pretty formats, log aliases)
-# lives in the silkcircuit repo; its installer copies the include target
-# here and keeps it fresh on every dotfiles install run
+# lives in the silkcircuit repo; its installer drops one file per variant
+# into ~/.config/git and adds an include for the primary variant unless a
+# matching line is already here. Git ignores a missing include file, so
+# this is safe before the installer has run.
 [include]
-	path = ~/.config/silkcircuit/gitconfig
+	path = ~/.config/git/silkcircuit-neon.gitconfig
 
 [credential "https://github.com"]
 	helper =
