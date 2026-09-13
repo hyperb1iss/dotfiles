@@ -81,6 +81,12 @@ type = "plugin_action"
 command = "persiyanov.reviewr.open"
 description = "reviewr: diff and PR pane for this workspace"
 
+[[keys.command]]
+key = "prefix+alt+k"
+type = "shell"
+command = "herdr-k8s"
+description = "k9s: one tab per cluster in the kubernetes workspace"
+
 [ui]
 # New tabs get a generated name instead of a prompt; rename later with
 # prefix then shift+t, or `herdr tab rename`.

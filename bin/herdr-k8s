@@ -1,0 +1,129 @@
+#!/usr/bin/env bash
+#
+# ╭──────────────────────────────────────────────────────────────╮
+# │  herdr-k8s ⚡ one k9s tab per cluster in the herdr session   │
+# │  Part of the SilkCircuit dotfiles ecosystem                  │
+# ╰──────────────────────────────────────────────────────────────╯
+#
+# Builds (or tops up) the "kubernetes" workspace over the herdr socket
+# API: one tab per cluster, each running `k9s-cluster <context>`, which
+# owns the SSO refresh loop. Tabs that already carry a cluster label are
+# left alone, so rerunning after a server restart only fills the gaps.
+#
+# The cluster table is not part of this repo: it names an employer's
+# contexts. It comes from HERDR_K8S_CLUSTERS, falling back to the file
+# dotfiles-private keeps beside its env profile, one "label context" pair
+# per line with # comments allowed.
+#
+# Herdr has no startup hook, so this runs on demand: from a shell, or via
+# the prefix+alt+k binding in herdr/config.toml.
+#
+# Usage:
+#   herdr-k8s            build missing tabs
+#   herdr-k8s --list     print the cluster table and exit
+
+set -euo pipefail
+
+purple=$'\033[38;2;225;53;255m'
+cyan=$'\033[38;2;128;255;234m'
+green=$'\033[38;2;80;250;123m'
+coral=$'\033[38;2;255;99;99m'
+gray=$'\033[38;2;98;114;164m'
+reset=$'\033[0m'
+
+info() { printf '%s→%s %s\n' "${purple}" "${reset}" "$*"; }
+ok() { printf '%s✓%s %s\n' "${green}" "${reset}" "$*"; }
+dim() { printf '  %s%s%s\n' "${gray}" "$*" "${reset}"; }
+fail() {
+  printf '%s×%s %s\n' "${coral}" "${reset}" "$*" >&2
+  exit 1
+}
+
+workspace_label="kubernetes"
+
+clusters_file="${HERDR_K8S_CLUSTERS:-${HOME}/dev/dotfiles-private/env/herdr-k8s.clusters}"
+[[ -r "${clusters_file}" ]] || fail "no cluster table at ${clusters_file} (set HERDR_K8S_CLUSTERS)"
+
+# "label context" per line, in sidebar order; blank lines and # comments skipped.
+clusters=()
+while read -r label ctx _; do
+  [[ -z "${label}" || "${label}" == \#* ]] && continue
+  [[ -n "${ctx}" ]] || fail "${clusters_file}: line '${label}' has no context"
+  clusters+=("${label}|${ctx}")
+done < "${clusters_file}"
+((${#clusters[@]})) || fail "${clusters_file} lists no clusters"
+
+if [[ "${1:-}" == "--list" ]]; then
+  for entry in "${clusters[@]}"; do
+    printf '%s%-10s%s %s\n' "${cyan}" "${entry%%|*}" "${reset}" "${entry#*|}"
+  done
+  exit 0
+fi
+
+for tool in herdr jq kubectl; do
+  command -v "${tool}" > /dev/null 2>&1 || fail "${tool} is not installed"
+done
+command -v k9s-cluster > /dev/null 2>&1 || fail "k9s-cluster is not on PATH (it lives next to this script)"
+
+herdr status server > /dev/null 2>&1 || fail "no herdr server is running"
+
+# Every herdr command answers JSON; an error comes back as .error.
+api() {
+  local out
+  out=$(herdr "$@") || fail "herdr $* failed: ${out}"
+  if jq -e '.error' <<< "${out}" > /dev/null 2>&1; then
+    fail "herdr $*: $(jq -r '.error.message // .error' <<< "${out}")"
+  fi
+  printf '%s' "${out}"
+}
+
+# ─────────────────────────────────────────────────────────────
+# Workspace
+# ─────────────────────────────────────────────────────────────
+
+workspace_id=$(api workspace list \
+  | jq -r --arg l "${workspace_label}" '.result.workspaces[] | select(.label == $l) | .workspace_id' \
+  | head -n 1)
+
+if [[ -z "${workspace_id}" ]]; then
+  info "creating workspace ${workspace_label}"
+  workspace_id=$(api workspace create --label "${workspace_label}" --cwd "${HOME}" --no-focus \
+    | jq -r '.result.workspace.workspace_id')
+  [[ -n "${workspace_id}" && "${workspace_id}" != "null" ]] || fail "workspace create returned no id"
+fi
+ok "workspace ${workspace_label} (${workspace_id})"
+
+existing_labels=$(api tab list --workspace "${workspace_id}" | jq -r '.result.tabs[].label')
+known_contexts=$(kubectl config get-contexts -o name 2> /dev/null)
+
+# ─────────────────────────────────────────────────────────────
+# Tabs
+# ─────────────────────────────────────────────────────────────
+
+created=0
+for entry in "${clusters[@]}"; do
+  label="${entry%%|*}"
+  ctx="${entry#*|}"
+
+  if grep -qx "${label}" <<< "${existing_labels}"; then
+    dim "${label}: tab exists, leaving it"
+    continue
+  fi
+  if ! grep -qx "${ctx}" <<< "${known_contexts}"; then
+    dim "${label}: context ${ctx} missing from kubeconfig, skipping"
+    continue
+  fi
+
+  info "${label} → ${ctx}"
+  tab_json=$(api tab create --workspace "${workspace_id}" --label "${label}" --cwd "${HOME}" --no-focus)
+  pane_id=$(jq -r '.result.root_pane.pane_id' <<< "${tab_json}")
+  [[ -n "${pane_id}" && "${pane_id}" != "null" ]] || fail "tab create for ${label} returned no root pane"
+
+  # The shell needs to reach its prompt before the command lands, or zsh
+  # init can swallow it. The starship prompt always carries the username.
+  api pane wait-output "${pane_id}" --match "${USER}" --timeout 15000 > /dev/null
+  api pane run "${pane_id}" "k9s-cluster ${ctx}" > /dev/null
+  created=$((created + 1))
+done
+
+ok "${created} tab(s) launched in ${workspace_label}"

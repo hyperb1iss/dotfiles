@@ -1,0 +1,230 @@
+#!/usr/bin/env bash
+#
+# ╭──────────────────────────────────────────────────────────────╮
+# │  k9s-cluster ⚡ k9s pinned to one context, SSO self-healing  │
+# │  Part of the SilkCircuit dotfiles ecosystem                  │
+# ╰──────────────────────────────────────────────────────────────╯
+#
+# Runs k9s against a single kubeconfig context and keeps it alive across
+# expired cloud logins. The context's exec credential plugin decides the
+# auth flavor:
+#
+#   aws eks get-token        AWS SSO, checked and refreshed via the
+#                            AWS_PROFILE the kubeconfig sets for it
+#   kubelogin (azurecli)     Azure CLI token for the AKS server id
+#   anything else            no login to manage, plain k9s
+#
+# Each launch is preceded by an auth probe. When k9s exits and the probe
+# now fails, the login is refreshed and k9s comes straight back; a clean
+# exit with healthy auth is a real quit. Several tabs share one SSO
+# session, so a login lock lets the first tab that notices do the browser
+# dance while the others wait and then re-probe instead of opening seven
+# browser windows.
+#
+# Usage:
+#   k9s-cluster <context> [k9s args...]
+#   k9s-cluster --check <context>      probe auth, print the verdict, exit
+
+set -euo pipefail
+
+purple=$'\033[38;2;225;53;255m'
+cyan=$'\033[38;2;128;255;234m'
+green=$'\033[38;2;80;250;123m'
+coral=$'\033[38;2;255;99;99m'
+orange=$'\033[38;2;255;180;100m'
+gray=$'\033[38;2;98;114;164m'
+reset=$'\033[0m'
+
+info() { printf '%s→%s %s\n' "${purple}" "${reset}" "$*"; }
+ok() { printf '%s✓%s %s\n' "${green}" "${reset}" "$*"; }
+warn() { printf '%s!%s %s\n' "${orange}" "${reset}" "$*"; }
+dim() { printf '  %s%s%s\n' "${gray}" "$*" "${reset}"; }
+fail() {
+  printf '%s×%s %s\n' "${coral}" "${reset}" "$*" >&2
+  exit 1
+}
+
+check_only=0
+if [[ "${1:-}" == "--check" ]]; then
+  check_only=1
+  shift
+fi
+
+ctx="${1:-}"
+[[ -n "${ctx}" ]] || fail "usage: k9s-cluster [--check] <context> [k9s args...]"
+shift
+
+for tool in kubectl jq k9s; do
+  command -v "${tool}" > /dev/null 2>&1 || fail "${tool} is not installed"
+done
+
+lock_root="${XDG_CACHE_HOME:-${HOME}/.cache}/k9s-cluster"
+mkdir -p "${lock_root}"
+
+# ─────────────────────────────────────────────────────────────
+# Resolve the auth flavor from the context's exec plugin
+# ─────────────────────────────────────────────────────────────
+
+# One jq pass: context -> user -> exec command, AWS_PROFILE env, and the
+# kubelogin --server-id argument. Fields come back tab separated.
+resolve_auth() {
+  kubectl config view -o json 2> /dev/null | jq -r --arg ctx "${ctx}" '
+    (.contexts[]? | select(.name == $ctx) | .context.user) as $user
+    | ((.users[]? | select(.name == $user) | .user.exec) // {}) as $exec
+    | [
+        ($exec.command // "static"),
+        (($exec.env // []) | map(select(.name == "AWS_PROFILE")) | .[0].value // ""),
+        (($exec.args // []) | index("--server-id") as $i
+          | if $i == null then "" else .[$i + 1] end)
+      ]
+    | @tsv'
+}
+
+auth_line=$(resolve_auth) || true
+[[ -n "${auth_line}" ]] || fail "context ${ctx} is not in the kubeconfig"
+IFS=$'\t' read -r exec_cmd aws_profile az_server_id <<< "${auth_line}"
+
+case "${exec_cmd}" in
+  aws) flavor="aws" ;;
+  kubelogin) flavor="azure" ;;
+  *) flavor="none" ;;
+esac
+
+if [[ "${flavor}" == "aws" && -z "${aws_profile}" ]]; then
+  aws_profile="${AWS_PROFILE:-default}"
+fi
+
+# ─────────────────────────────────────────────────────────────
+# Probe and refresh
+# ─────────────────────────────────────────────────────────────
+
+auth_ok() {
+  case "${flavor}" in
+    aws)
+      aws sts get-caller-identity --profile "${aws_profile}" --output text > /dev/null 2>&1
+      ;;
+    azure)
+      local args=(--output none)
+      [[ -n "${az_server_id}" ]] && args+=(--resource "${az_server_id}")
+      az account get-access-token "${args[@]}" > /dev/null 2>&1
+      ;;
+    *)
+      return 0
+      ;;
+  esac
+}
+
+# The lock is a directory so mkdir gives us an atomic acquire. A pid file
+# inside lets a waiter clear a lock left behind by a tab that was killed
+# mid-login.
+lock_dir="${lock_root}/login-${flavor}.lock"
+
+acquire_login_lock() {
+  while ! mkdir "${lock_dir}" 2> /dev/null; do
+    local holder
+    holder=$(cat "${lock_dir}/pid" 2> /dev/null || true)
+    if [[ -n "${holder}" ]] && ! kill -0 "${holder}" 2> /dev/null; then
+      rm -rf "${lock_dir}"
+      continue
+    fi
+    return 1
+  done
+  printf '%s' "$$" > "${lock_dir}/pid"
+  return 0
+}
+
+release_login_lock() {
+  rm -rf "${lock_dir}"
+}
+
+run_login() {
+  case "${flavor}" in
+    aws)
+      info "aws sso login (profile ${aws_profile})"
+      aws sso login --profile "${aws_profile}"
+      ;;
+    azure)
+      info "az login"
+      az login --output none
+      ;;
+  esac
+}
+
+refresh_auth() {
+  [[ "${flavor}" != "none" ]] || return 0
+
+  if acquire_login_lock; then
+    trap release_login_lock EXIT
+    run_login
+    release_login_lock
+    trap - EXIT
+  else
+    warn "another tab is already logging in, waiting for it"
+    while [[ -d "${lock_dir}" ]]; do
+      sleep 1
+    done
+  fi
+
+  auth_ok || fail "login did not stick for ${ctx}; run it by hand and relaunch"
+  ok "auth refreshed"
+}
+
+ensure_auth() {
+  if auth_ok; then
+    return 0
+  fi
+  warn "auth expired for ${ctx}"
+  refresh_auth
+}
+
+# ─────────────────────────────────────────────────────────────
+# Main
+# ─────────────────────────────────────────────────────────────
+
+describe_auth() {
+  case "${flavor}" in
+    aws) printf 'aws sso · profile %s' "${aws_profile}" ;;
+    azure) printf 'azure cli' ;;
+    *) printf 'static credentials' ;;
+  esac
+}
+
+if ((check_only)); then
+  if auth_ok; then
+    ok "${ctx}: auth ok ($(describe_auth))"
+  else
+    warn "${ctx}: auth expired ($(describe_auth))"
+    exit 1
+  fi
+  exit 0
+fi
+
+printf '%s⎈ %s%s  %s%s%s\n' "${cyan}" "${ctx}" "${reset}" "${gray}" "$(describe_auth)" "${reset}"
+
+# Consecutive failures with healthy auth mean something other than login is
+# wrong (network, RBAC, a dead cluster). Stop there and leave the error on
+# screen instead of relaunching k9s in a loop.
+crash_streak=0
+while :; do
+  ensure_auth
+
+  set +e
+  k9s --context "${ctx}" "$@"
+  rc=$?
+  set -e
+
+  if auth_ok; then
+    ((rc == 0)) && exit 0
+    crash_streak=$((crash_streak + 1))
+    if ((crash_streak >= 3)); then
+      fail "k9s exited ${rc} three times with healthy auth on ${ctx}; not a login problem"
+    fi
+    warn "k9s exited ${rc}, relaunching"
+    sleep 1
+    continue
+  fi
+
+  crash_streak=0
+  dim "k9s exited ${rc} and the login is stale, refreshing"
+  refresh_auth
+done
