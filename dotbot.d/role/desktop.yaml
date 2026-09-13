@@ -35,7 +35,12 @@
     ~/.claude/skills:
       path: ~/.agents/skills
       force: true
-    ~/.proto/.prototools: proto/.prototools
+    # A box that came with proto already has a real file here (devboxes
+    # ship pins of their own). The tracked file is the source of truth
+    # for global pins, so replace it; per-project .prototools still win.
+    ~/.proto/.prototools:
+      path: proto/.prototools
+      force: true
     # The theme files themselves (starship, bat, fzf, tmux, dircolors,
     # ghostty, the Claude Code status line) are installed by the SilkCircuit
     # installer in theme.yaml. The configs linked above only pick a variant.
