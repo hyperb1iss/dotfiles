@@ -1,430 +1,280 @@
 # Keybindings
 
-_Master your keyboard-driven workflow_
-
-This is your complete reference for all keybindings in this Neovim configuration. Everything is organized by category to
-help you discover powerful workflows. The leader key is `Space`.
-
-## Essential Concepts
-
-**Notation:**
-
-- `Space` = Leader key
-- `C-x` = Ctrl + x
-- `M-x` = Alt/Option + x (Meta)
-- `S-x` = Shift + x
-
-**Modes:**
-
-- `n` = Normal mode
-- `i` = Insert mode
-- `v` = Visual mode
-- `t` = Terminal mode
-
-## General Navigation
-
-### Window Management
-
-| Key       | Action               | Description             |
-| --------- | -------------------- | ----------------------- |
-| `C-h`     | Move to left window  | Navigate between splits |
-| `C-j`     | Move to window below |                         |
-| `C-k`     | Move to window above |                         |
-| `C-l`     | Move to right window |                         |
-| `C-Up`    | Resize +2 vertical   | Make window taller      |
-| `C-Down`  | Resize -2 vertical   | Make window shorter     |
-| `C-Left`  | Resize -2 horizontal | Make window narrower    |
-| `C-Right` | Resize +2 horizontal | Make window wider       |
-
-### Buffer Navigation
-
-| Key        | Action               | Description              |
-| ---------- | -------------------- | ------------------------ |
-| `]b`       | Next buffer          | Cycle through open files |
-| `[b`       | Previous buffer      |                          |
-| `Space b`  | Buffer menu          | Shows buffer commands    |
-| `Space bd` | Delete buffer (pick) | Choose buffer to close   |
-| `Space bb` | Buffers list         | Shows all buffers        |
-
-### Tab Management
-
-| Key       | Action       | Description          |
-| --------- | ------------ | -------------------- |
-| `]t`      | Next tab     | Move to next tab     |
-| `[t`      | Previous tab | Move to previous tab |
-| `Space t` | Tab menu     | Shows tab commands   |
-
-## File Explorer (Neo-tree)
-
-| Key       | Action           | Mode | Description              |
-| --------- | ---------------- | ---- | ------------------------ |
-| `Space e` | Toggle file tree | n    | Open/close file explorer |
-| `Space o` | Focus file tree  | n    | Jump to file explorer    |
-
-**Inside Neo-tree:**
-
-| Key    | Action              | Description                |
-| ------ | ------------------- | -------------------------- |
-| `a`    | Add file/directory  | Create new file or folder  |
-| `d`    | Delete              | Delete file or directory   |
-| `r`    | Rename              | Rename file or directory   |
-| `y`    | Copy                | Copy to clipboard          |
-| `x`    | Cut                 | Cut to clipboard           |
-| `p`    | Paste               | Paste from clipboard       |
-| `c`    | Copy name           | Copy filename to clipboard |
-| `C`    | Copy relative path  | Copy path relative to cwd  |
-| `m`    | Move                | Move file to new location  |
-| `o`    | Open                | Open file                  |
-| `s`    | Open in split       | Open in horizontal split   |
-| `S`    | Open in vsplit      | Open in vertical split     |
-| `t`    | Open in tab         | Open in new tab            |
-| `<CR>` | Open/toggle folder  | Enter/expand folder        |
-| `h`    | Collapse folder     | Close current folder       |
-| `H`    | Toggle hidden files | Show/hide dotfiles         |
-| `R`    | Refresh             | Reload file tree           |
-| `?`    | Show help           | Display all keybindings    |
-| `q`    | Close               | Close Neo-tree             |
-
-## Finding & Searching
-
-### Snacks Picker (Primary)
-
-| Key         | Action           | Description                 |
-| ----------- | ---------------- | --------------------------- |
-| `Space f f` | Find files       | Fuzzy find files in project |
-| `Space f w` | Find word (grep) | Search text in all files    |
-| `Space f r` | Recent files     | Recently opened files       |
-| `Space f b` | Find buffers     | Search through open buffers |
-| `Space f c` | Config files     | Search Neovim config files  |
-
-**Inside Picker:**
-
-- `C-j` / `C-k` - Move down/up
-- `Enter` - Select item
-- `C-s` - Open in split
-- `C-v` - Open in vsplit
-- `Esc` - Close picker
-
-### Telescope (Advanced)
-
-| Key         | Action         | Description                  |
-| ----------- | -------------- | ---------------------------- |
-| `Space f F` | Find all files | Include hidden/ignored files |
-| `Space f '` | Find marks     | Navigate to marks            |
-| `Space f h` | Help tags      | Search help documentation    |
-| `Space f k` | Keymaps        | Search keybindings           |
-| `Space f m` | Man pages      | Search man pages             |
-| `Space f n` | Notifications  | Browse notification history  |
-| `Space f o` | Old files      | Recently opened files        |
-
-## LSP Actions
-
-### Code Intelligence
-
-| Key  | Action                | Description                     |
-| ---- | --------------------- | ------------------------------- |
-| `gd` | Go to definition      | Jump to where symbol is defined |
-| `gD` | Go to declaration     | Jump to symbol declaration      |
-| `gi` | Go to implementation  | Jump to implementation          |
-| `gr` | Go to references      | Show all references             |
-| `gy` | Go to type definition | Jump to type definition         |
-| `K`  | Hover documentation   | Show symbol documentation       |
-| `gK` | Signature help        | Show function signature         |
-
-### LSP Commands
-
-| Key         | Action              | Description                         |
-| ----------- | ------------------- | ----------------------------------- |
-| `Space l a` | Code actions        | Show available code actions         |
-| `Space l d` | Buffer diagnostics  | Show diagnostics for current buffer |
-| `Space l D` | Project diagnostics | Show all project diagnostics        |
-| `Space l f` | Format buffer       | Format current file                 |
-| `Space l i` | LSP info            | Show LSP server info                |
-| `Space l r` | Rename symbol       | Rename symbol across project        |
-| `Space l s` | Document symbols    | List symbols in file                |
-| `Space l S` | Workspace symbols   | List symbols in workspace           |
-| `Space l T` | LSP references      | LSP references via Trouble          |
-
-### Diagnostics Navigation
-
-| Key   | Action                | Description                   |
-| ----- | --------------------- | ----------------------------- |
-| `]d`  | Next diagnostic       | Jump to next issue            |
-| `[d`  | Previous diagnostic   | Jump to previous issue        |
-| `gl`  | Show line diagnostics | Float with error details      |
-| `C-\` | Toggle Trouble panel  | Quick diagnostic panel toggle |
-
-## Trouble (Diagnostics Panel)
-
-| Key         | Action              | Description                        |
-| ----------- | ------------------- | ---------------------------------- |
-| `Space l d` | Buffer diagnostics  | Trouble panel for current file     |
-| `Space l D` | Project diagnostics | Trouble panel for all files        |
-| `Space l s` | Symbols outline     | Document symbols in Trouble        |
-| `Space l T` | LSP references      | References/definitions via Trouble |
-| `C-\`       | Quick toggle        | Toggle diagnostics panel           |
-
-**Inside Trouble:**
-
-| Key         | Action             | Description                |
-| ----------- | ------------------ | -------------------------- |
-| `<CR>`      | Jump and close     | Go to item and close panel |
-| `o`         | Jump and close     | Same as Enter              |
-| `<Tab>`     | Toggle fold        | Expand/collapse item       |
-| `j` / `k`   | Next/previous      | Navigate items             |
-| `]]` / `[[` | Next/previous item | Alternative navigation     |
-| `q`         | Close              | Close Trouble panel        |
-| `<Esc>`     | Close              | Alternative close          |
-| `r` / `R`   | Refresh            | Reload diagnostics         |
-| `?`         | Help               | Show all keybindings       |
-
-## AI Integration
-
-### Avante (Claude in Editor)
-
-| Key         | Action           | Description                       |
-| ----------- | ---------------- | --------------------------------- |
-| `Space a a` | Ask AI           | Ask Claude about selection/buffer |
-| `Space a e` | Edit with AI     | Get code suggestions from Claude  |
-| `Space a r` | Refresh response | Regenerate AI response            |
-
-**Suggestions:**
-
-| Key   | Action              | Description                  |
-| ----- | ------------------- | ---------------------------- |
-| `M-l` | Accept suggestion   | Apply AI suggestion          |
-| `M-]` | Next suggestion     | Cycle to next suggestion     |
-| `M-[` | Previous suggestion | Cycle to previous suggestion |
-| `C-]` | Dismiss suggestion  | Reject current suggestion    |
-
-**Navigation in Avante panel:**
-
-| Key     | Action                 | Description                     |
-| ------- | ---------------------- | ------------------------------- |
-| `]]`    | Next section           | Jump to next response section   |
-| `[[`    | Previous section       | Jump to previous section        |
-| `Tab`   | Switch panes           | Toggle between input and output |
-| `S-Tab` | Switch panes (reverse) | Toggle in reverse               |
-
-**Diff resolution:**
-
-| Key   | Action            | Description                |
-| ----- | ----------------- | -------------------------- |
-| `c o` | Choose ours       | Keep your code             |
-| `c t` | Choose theirs     | Accept AI suggestion       |
-| `c a` | Choose all        | Accept all AI changes      |
-| `c b` | Choose both       | Keep both versions         |
-| `c c` | Choose cursor     | Resolve at cursor position |
-| `]x`  | Next conflict     | Jump to next conflict      |
-| `[x`  | Previous conflict | Jump to previous conflict  |
-
-### Claude Code CLI
-
-| Key         | Action                | Description                      |
-| ----------- | --------------------- | -------------------------------- |
-| `C-,`       | Toggle terminal       | Open/close Claude Code terminal  |
-| `Space a c` | Toggle Claude Code    | Alternative toggle               |
-| `Space c C` | Continue conversation | Resume last Claude Code session  |
-| `Space c V` | Verbose mode          | Claude Code with detailed output |
-
-## Terminal Management
-
-| Key   | Action          | Mode | Description                    |
-| ----- | --------------- | ---- | ------------------------------ |
-| `C-t` | Toggle terminal | n, t | Open/close integrated terminal |
-| `C-,` | Claude terminal | n, t | Claude Code terminal           |
-
-**Terminal mode navigation:**
-
-- `C-h/j/k/l` - Move between windows from terminal
-- `C-t` - Close terminal
-- `C-,` - Close Claude Code terminal
-
-## Git Integration
-
-### Git Commands
-
-| Key         | Action            | Description             |
-| ----------- | ----------------- | ----------------------- |
-| `Space g g` | Git browse        | Open file in GitHub     |
-| `Space g b` | Git blame line    | Show git blame for line |
-| `Space g B` | Git browse (open) | Open in browser         |
-| `Space g f` | File history      | Lazygit file history    |
-| `Space g l` | Lazygit           | Open Lazygit            |
-| `Space g L` | Lazygit log       | Show git log            |
-
-### Gitsigns (Hunk Operations)
-
-| Key         | Action          | Description                 |
-| ----------- | --------------- | --------------------------- |
-| `]g`        | Next hunk       | Jump to next git change     |
-| `[g`        | Previous hunk   | Jump to previous git change |
-| `Space g h` | Preview hunk    | Show git diff for hunk      |
-| `Space g s` | Stage hunk      | Stage current hunk          |
-| `Space g r` | Reset hunk      | Discard hunk changes        |
-| `Space g S` | Stage buffer    | Stage entire file           |
-| `Space g u` | Undo stage hunk | Unstage hunk                |
-
-## Editing Enhancements
-
-### Comments
-
-| Key     | Action               | Mode | Description             |
-| ------- | -------------------- | ---- | ----------------------- |
-| `g c c` | Toggle comment line  | n    | Comment/uncomment line  |
-| `g c`   | Toggle comment       | v    | Comment selection       |
-| `g b c` | Toggle block comment | n    | Block comment line      |
-| `g b`   | Toggle block comment | v    | Block comment selection |
-
-### Text Objects & Selection
-
-| Key  | Action             | Description                     |
-| ---- | ------------------ | ------------------------------- |
-| `]]` | Next reference     | Jump to next word reference     |
-| `[[` | Previous reference | Jump to previous word reference |
-
-### Completion (Insert Mode)
-
-| Key       | Action             | Mode | Description              |
-| --------- | ------------------ | ---- | ------------------------ |
-| `C-Space` | Trigger completion | i    | Show completion menu     |
-| `Tab`     | Select next        | i    | Next completion item     |
-| `S-Tab`   | Select previous    | i    | Previous completion item |
-| `Enter`   | Confirm            | i    | Accept completion        |
-| `C-e`     | Close menu         | i    | Dismiss completion       |
-
-**Snippet navigation:**
-
-- `Tab` - Next placeholder
-- `S-Tab` - Previous placeholder
-
-## UI Toggles
-
-### Visual Elements
-
-| Key         | Action                  | Description                |
-| ----------- | ----------------------- | -------------------------- |
-| `Space u a` | Toggle autopairs        | Enable/disable autopairs   |
-| `Space u b` | Toggle background       | Light/dark background      |
-| `Space u c` | Toggle completion       | Enable/disable nvim-cmp    |
-| `Space u C` | Toggle conceallevel     | Show/hide concealed text   |
-| `Space u d` | Toggle diagnostics      | All/some/none              |
-| `Space u g` | Toggle signcolumn       | Show/hide sign column      |
-| `Space u i` | Toggle indent guides    | Show/hide indent lines     |
-| `Space u l` | Toggle statusline       | Show/hide status bar       |
-| `Space u n` | Toggle line numbers     | Show/hide line numbers     |
-| `Space u N` | Toggle relative numbers | Relative/absolute numbers  |
-| `Space u p` | Toggle paste mode       | Paste mode on/off          |
-| `Space u s` | Toggle spell check      | Enable/disable spell check |
-| `Space u S` | Toggle syntax           | Enable/disable syntax hl   |
-| `Space u t` | Toggle tabline          | Show/hide buffer tabs      |
-| `Space u u` | Toggle URL highlighting | Highlight URLs             |
-| `Space u w` | Toggle word wrap        | Enable/disable line wrap   |
-| `Space u y` | Toggle syntax (buffer)  | Buffer-local syntax toggle |
-| `Space u Y` | Toggle semantic tokens  | LSP semantic highlighting  |
-
-### Notifications
-
-| Key         | Action                    | Description               |
-| ----------- | ------------------------- | ------------------------- |
-| `Space u n` | Dismiss all notifications | Clear notification popups |
-
-## Debug Adapter Protocol
-
-### Debugging
-
-| Key         | Action                 | Description               |
-| ----------- | ---------------------- | ------------------------- |
-| `Space d b` | Toggle breakpoint      | Set/remove breakpoint     |
-| `Space d B` | Conditional breakpoint | Breakpoint with condition |
-| `Space d c` | Continue               | Resume execution          |
-| `Space d C` | Run to cursor          | Continue to cursor        |
-| `Space d i` | Step into              | Step into function        |
-| `Space d o` | Step over              | Step over function        |
-| `Space d O` | Step out               | Step out of function      |
-| `Space d p` | Pause                  | Pause execution           |
-| `Space d r` | REPL                   | Open debug REPL           |
-| `Space d s` | Start debugging        | Start debug session       |
-| `Space d t` | Terminate              | Stop debugging            |
-| `Space d u` | Toggle UI              | Show/hide debug UI        |
-
-## Plugin Management
-
-| Key         | Action           | Description               |
-| ----------- | ---------------- | ------------------------- |
-| `Space p l` | Lazy             | Open Lazy plugin manager  |
-| `Space p s` | Mason            | Open Mason tool installer |
-| `Space p d` | Profiler scratch | Open profiler results     |
-
-## Session Management
-
-| Key         | Action         | Description           |
-| ----------- | -------------- | --------------------- |
-| `Space S s` | Save session   | Save current session  |
-| `Space S l` | Load session   | Load previous session |
-| `Space S d` | Delete session | Delete saved session  |
-| `Space S f` | Find session   | Browse sessions       |
-
-## Advanced Features
-
-### Macros
-
-| Key   | Action         | Mode | Description                     |
-| ----- | -------------- | ---- | ------------------------------- |
-| `q a` | Record macro   | n    | Record macro to register 'a'    |
-| `q`   | Stop recording | n    | Stop macro recording            |
-| `@ a` | Play macro     | n    | Execute macro from register 'a' |
-| `@@`  | Repeat macro   | n    | Repeat last macro               |
-
-### Marks
-
-| Key         | Action       | Description              |
-| ----------- | ------------ | ------------------------ |
-| `m a`       | Set mark     | Set mark 'a' at cursor   |
-| `' a`       | Jump to mark | Jump to mark 'a'         |
-| `Space f '` | Find marks   | Search marks with picker |
-
-## Pro Tips
-
-### Workflow Optimization
-
-1. **Learn the leader key menus** - Press `Space` and wait a moment to see available commands
-2. **Use Trouble for diagnostics** - `Space l d` gives you a better view than inline diagnostics
-3. **Master buffer navigation** - `]b` and `[b` are faster than finding files again
-4. **Leverage AI wisely** - Use `Space a a` for quick questions, `C-,` for larger refactors
-5. **Git integration is powerful** - `Space g l` opens Lazygit without leaving Neovim
-
-### Custom Keybinding Template
-
-Add your own keybindings in `nvim/lua/plugins/astrocore.lua`:
-
-```lua
-mappings = {
-  n = {
-    ["<leader>X"] = { "<cmd>MyCommand<cr>", desc = "My custom command" },
-  },
-}
-```
-
-### Which-Key Integration
-
-Press any leader key (`Space`, `g`, `]`, `[`) and pause - which-key will show you available completions. This is the
-best way to discover keybindings you didn't know existed.
-
-## Cheat Sheet Summary
-
-**Most used commands:**
-
-```
-Space f f   - Find files
-Space f w   - Grep files
-Space e     - File explorer
-C-,         - Claude Code
-Space l d   - Diagnostics
-g d         - Go to definition
-K           - Hover docs
-Space l a   - Code actions
-Space l f   - Format
-```
-
-Master these, and you'll be productive immediately. The rest will come naturally as you explore.
+Everything hangs off `Space`; press it and let which-key show the rest
+
+Notation: `Space` is the leader, `,` the local leader, `C-x` is Ctrl, `S-x` is Shift. Mode is normal unless a table says
+otherwise. Mappings marked (ours) come from `nvim/lua/plugins/`; the rest are AstroNvim v6 defaults.
+
+## Which-key groups
+
+| Prefix    | Group               |
+| --------- | ------------------- |
+| `Space a` | Claude (ours)       |
+| `Space b` | Buffers             |
+| `Space d` | Debugger            |
+| `Space f` | Find                |
+| `Space g` | Git                 |
+| `Space l` | Language tools      |
+| `Space O` | Octo, GitHub (ours) |
+| `Space p` | Packages            |
+| `Space S` | Sessions            |
+| `Space t` | Terminal            |
+| `Space u` | UI toggles          |
+| `Space x` | Trouble and lists   |
+
+## Files and windows
+
+| Key                                | Action                                 |
+| ---------------------------------- | -------------------------------------- |
+| `Space w`                          | Save                                   |
+| `Space q`                          | Quit window                            |
+| `Space Q`                          | Exit Neovim                            |
+| `Space n`                          | New file                               |
+| `Space R`                          | Rename file                            |
+| `Space h`                          | Home screen (dashboard)                |
+| `Space e`                          | Toggle Neo-tree                        |
+| `Space o`                          | Focus Neo-tree                         |
+| `\|` / `\\`                        | Vertical / horizontal split            |
+| `C-h` `C-j` `C-k` `C-l`            | Move between splits (also in terminal) |
+| `C-Up` `C-Down` `C-Left` `C-Right` | Resize split                           |
+
+Inside Neo-tree: `a` add, `A` add directory, `d` delete, `r` rename, `y` `x` `p` copy, cut, paste, `c` `m` copy or move
+to a path, `Y` copy path picker, `s` vsplit, `S` split, `t` tab, `w` open with window picker, `H` toggle hidden, `/`
+filter, `.` set root, `Backspace` up a level, `[g` `]g` previous or next modified file, `P` preview, `?` help.
+
+## Buffers and tabs
+
+| Key         | Action                                                |
+| ----------- | ----------------------------------------------------- |
+| `]b` / `[b` | Next / previous buffer                                |
+| `Space c`   | Close buffer                                          |
+| `Space C`   | Force close buffer                                    |
+| `Space bd`  | Pick a buffer to close from the tabline               |
+| `Space bC`  | Close all buffers                                     |
+| `Space bp`  | Previous buffer                                       |
+| `Space bs*` | Sort buffers by extension, path, number, modification |
+| `Space fb`  | Find buffers (picker)                                 |
+| `]t` / `[t` | Next / previous tab                                   |
+
+## Find (snacks picker)
+
+| Key             | Action                         |
+| --------------- | ------------------------------ |
+| `Space ff`      | Files                          |
+| `Space fF`      | All files, including hidden    |
+| `Space fw`      | Grep the project               |
+| `Space fW`      | Grep including hidden files    |
+| `Space fc`      | Grep the word under the cursor |
+| `Space fs`      | Smart: buffers, recent, files  |
+| `Space fo`      | Recent files                   |
+| `Space fO`      | Recent files in cwd            |
+| `Space fg`      | Git files                      |
+| `Space fp`      | Projects                       |
+| `Space fl`      | Lines in the buffer            |
+| `Space fh`      | Help tags                      |
+| `Space fk`      | Keymaps                        |
+| `Space fC`      | Commands                       |
+| `Space fm`      | Man pages                      |
+| `Space fr`      | Registers                      |
+| `Space f'`      | Marks                          |
+| `Space fu`      | Undo history                   |
+| `Space fn`      | Notifications                  |
+| `Space ft`      | Colorschemes                   |
+| `Space fT`      | TODO comments                  |
+| `Space fa`      | AstroNvim config files         |
+| `Space f Enter` | Resume the last picker         |
+
+In a picker: `C-j` / `C-k` move, `Enter` open, `C-v` vsplit, `C-s` split, `C-t` send to Trouble, `Esc` close.
+
+## Language tools
+
+| Key         | Action                            |
+| ----------- | --------------------------------- |
+| `gd`        | Definition                        |
+| `gD`        | Declaration (ours)                |
+| `gI`        | Implementation                    |
+| `gy`        | Type definition                   |
+| `gK`        | Signature help                    |
+| `K`         | Hover                             |
+| `gl`        | Hover diagnostics                 |
+| `Space la`  | Code action (also in visual mode) |
+| `Space lA`  | Source action                     |
+| `Space lr`  | Rename symbol                     |
+| `Space lR`  | References                        |
+| `Space lf`  | Format buffer with conform (ours) |
+| `Space lc`  | Conform info (ours)               |
+| `Space ld`  | Hover diagnostics                 |
+| `Space lD`  | Search diagnostics                |
+| `Space ls`  | Search document symbols           |
+| `Space lS`  | Symbols outline (aerial)          |
+| `Space lG`  | Search workspace symbols          |
+| `Space lh`  | Signature help                    |
+| `Space li`  | LSP info                          |
+| `Space ll`  | CodeLens refresh                  |
+| `Space lL`  | CodeLens run                      |
+| `Space lv`  | Select Python virtualenv          |
+| `]d` / `[d` | Next / previous diagnostic        |
+| `]e` / `[e` | Next / previous error             |
+| `]w` / `[w` | Next / previous warning           |
+
+Completion in insert mode: `C-Space` open or toggle docs, `C-n` / `C-p` or `C-j` / `C-k` move, `Enter` accept, `Tab` /
+`S-Tab` next or previous snippet field, `C-u` / `C-d` scroll docs, `C-e` dismiss.
+
+## Trouble and lists
+
+| Key         | Action                            |
+| ----------- | --------------------------------- |
+| `Space xx`  | Trouble: buffer diagnostics       |
+| `Space xX`  | Trouble: workspace diagnostics    |
+| `Space xt`  | Trouble: TODO comments            |
+| `Space xT`  | Trouble: TODO, FIX and FIXME only |
+| `Space xL`  | Trouble: location list            |
+| `Space xQ`  | Trouble: quickfix list            |
+| `Space xq`  | Open quickfix list                |
+| `Space xl`  | Open location list                |
+| `]T` / `[T` | Next / previous TODO comment      |
+
+Inside Trouble: `j` / `k` move, `Enter` jump, `q` or `Esc` close.
+
+## Git
+
+| Key         | Action                               |
+| ----------- | ------------------------------------ |
+| `Space gg`  | Lazygit (ours)                       |
+| `Space tl`  | Lazygit (ours)                       |
+| `Space gf`  | Lazygit history for this file (ours) |
+| `Space go`  | Open the file on GitHub              |
+| `Space gb`  | Git branches                         |
+| `Space gc`  | Git commits                          |
+| `Space gC`  | Git commits for this buffer          |
+| `Space gt`  | Git status                           |
+| `Space gT`  | Git stash                            |
+| `Space gl`  | Blame line (gitsigns)                |
+| `Space gp`  | Preview hunk                         |
+| `Space gh`  | Reset hunk                           |
+| `Space gr`  | Reset buffer                         |
+| `Space gs`  | Stage hunk                           |
+| `Space gS`  | Stage buffer                         |
+| `Space gu`  | Unstage hunk                         |
+| `Space gd`  | Diff this file                       |
+| `]g` / `[g` | Next / previous hunk                 |
+| `]G` / `[G` | Last / first hunk                    |
+
+## Octo (GitHub)
+
+| Key        | Action               |
+| ---------- | -------------------- |
+| `Space Oo` | Octo picker          |
+| `Space Oi` | List issues          |
+| `Space OI` | Search issues        |
+| `Space Op` | List pull requests   |
+| `Space OP` | Search pull requests |
+| `Space Or` | Start a review       |
+| `Space Oa` | Run a workflow       |
+| `Space On` | Notifications        |
+
+Inside an Octo buffer, `,` is the local leader: `,ca` comment, `,ic` close, `,io` reopen, `,po` checkout PR, `,pm`
+merge, `,vs` start review, `,vr` resume review, `C-r` reload, `C-b` open in browser. `:Octo` with no arguments lists
+every command.
+
+## Claude
+
+| Key        | Mode   | Action                                  |
+| ---------- | ------ | --------------------------------------- |
+| `Space as` | visual | Send selection to Claude                |
+| `Space as` | normal | In Neo-tree: send the file under cursor |
+| `Space ab` | normal | Add the current buffer                  |
+| `Space aa` | normal | Accept the open diff                    |
+| `Space ad` | normal | Deny the open diff                      |
+| `Space ai` | normal | Connection status                       |
+
+## Terminal
+
+| Key                     | Action                                     |
+| ----------------------- | ------------------------------------------ |
+| `F7`                    | Toggle terminal (normal, insert, terminal) |
+| `Space tf`              | Floating terminal                          |
+| `Space th`              | Horizontal terminal                        |
+| `Space tv`              | Vertical terminal                          |
+| `C-h` `C-j` `C-k` `C-l` | Leave the terminal toward a split          |
+
+All of these use snacks.nvim. Toggleterm is disabled.
+
+## Editing
+
+| Key                 | Action                                |
+| ------------------- | ------------------------------------- |
+| `Space /`           | Toggle comment (normal and visual)    |
+| `gco` / `gcO`       | Comment below / above                 |
+| `Tab` / `S-Tab`     | Indent / unindent selection (visual)  |
+| `jj` / `jk`         | Leave insert mode                     |
+| `]r` / `[r`         | Next / previous reference of the word |
+| `af` `if` `ac` `ic` | Function and class text objects       |
+| `Space u(`          | Toggle rainbow delimiters (buffer)    |
+| `Space u)`          | Toggle rainbow delimiters (global)    |
+
+## UI toggles
+
+| Key         | Action                              |
+| ----------- | ----------------------------------- |
+| `Space ub`  | Background light / dark             |
+| `Space uc`  | Completion (buffer)                 |
+| `Space uC`  | Completion (global)                 |
+| `Space ud`  | Diagnostics                         |
+| `Space uD`  | Dismiss notifications               |
+| `Space uf`  | Autoformat (buffer)                 |
+| `Space uF`  | Autoformat (global, off by default) |
+| `Space ug`  | Sign column                         |
+| `Space uh`  | Inlay hints (buffer)                |
+| `Space ui`  | Indent setting                      |
+| `Space ul`  | Statusline                          |
+| `Space uL`  | CodeLens                            |
+| `Space un`  | Line numbering                      |
+| `Space up`  | Paste mode                          |
+| `Space ur`  | Reference highlighting              |
+| `Space us`  | Spellcheck                          |
+| `Space uS`  | Conceal                             |
+| `Space ut`  | Tabline                             |
+| `Space uu`  | URL highlight                       |
+| `Space uv`  | Virtual text                        |
+| `Space uw`  | Wrap                                |
+| `Space uY`  | Semantic highlighting (buffer)      |
+| `Space uZ`  | Zen mode                            |
+| `Space u\|` | Toggle indent guides                |
+
+## Sessions and packages
+
+| Key        | Action                  |
+| ---------- | ----------------------- |
+| `Space Sl` | Load last session       |
+| `Space Ss` | Save session            |
+| `Space St` | Save this tab's session |
+| `Space Sf` | Load a session          |
+| `Space Sd` | Delete a session        |
+| `Space pi` | Lazy install            |
+| `Space ps` | Lazy status             |
+| `Space pS` | Lazy sync               |
+| `Space pu` | Lazy check updates      |
+| `Space pU` | Lazy update             |
+| `Space pa` | Update Lazy and Mason   |
+| `Space pm` | Mason                   |
+| `Space pM` | Mason tools update      |
+
+## Debugger
+
+| Key                  | Action                      |
+| -------------------- | --------------------------- |
+| `F5` / `Space dc`    | Start or continue           |
+| `F9` / `Space db`    | Toggle breakpoint           |
+| `F10` / `Space do`   | Step over                   |
+| `F11` / `Space di`   | Step into                   |
+| `S-F11` / `Space dO` | Step out                    |
+| `F6` / `Space dp`    | Pause                       |
+| `S-F5` / `Space dQ`  | Terminate                   |
+| `Space dB`           | Clear breakpoints           |
+| `Space dr`           | Restart                     |
+| `Space dR`           | Toggle REPL                 |
+| `Space ds`           | Run to cursor               |
+| `Space du`           | Toggle debugger UI          |
+| `Space dh`           | Hover value                 |
+| `Space dE`           | Evaluate selection (visual) |
