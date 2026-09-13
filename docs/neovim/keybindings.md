@@ -10,7 +10,7 @@ otherwise. Mappings marked (ours) come from `nvim/lua/plugins/` or the community
 
 | Prefix    | Group               |
 | --------- | ------------------- |
-| `Space a` | Claude (ours)       |
+| `Space a` | Agents (ours)       |
 | `Space b` | Buffers             |
 | `Space d` | Debugger            |
 | `Space f` | Find                |
@@ -178,16 +178,21 @@ Inside an Octo buffer, `,` is the local leader: `,ca` comment, `,ic` close, `,io
 merge, `,vs` start review, `,vr` resume review, `C-r` reload, `C-b` open in browser. `:Octo` with no arguments lists
 every command.
 
-## Claude
+## Agents
 
 | Key        | Mode   | Action                                  |
 | ---------- | ------ | --------------------------------------- |
-| `Space as` | visual | Send selection to Claude                |
-| `Space as` | normal | In Neo-tree: send the file under cursor |
+| `Space av` | visual | Send selection to Claude                |
+| `Space av` | normal | In Neo-tree: send the file under cursor |
 | `Space ab` | normal | Add the current buffer                  |
 | `Space aa` | normal | Accept the open diff                    |
 | `Space ad` | normal | Deny the open diff                      |
 | `Space ai` | normal | Connection status                       |
+| `Space ac` | normal | herdr-nvim: annotate the current line   |
+| `Space ac` | visual | herdr-nvim: annotate the selection      |
+| `Space al` | normal | herdr-nvim: list annotations            |
+| `Space as` | normal | herdr-nvim: paste annotations to agent  |
+| `Space aS` | normal | herdr-nvim: paste and submit            |
 
 ## Terminal
 
