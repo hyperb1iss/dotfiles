@@ -6,8 +6,10 @@
 # then run `herdr-config` (or `make install`) to regenerate and reload.
 #
 # No [theme] table belongs in this file: the composer supplies it from the
-# installer's silkcircuit-<variant>.toml files, glow by night and dawn by
-# day, switching with the terminal's reported appearance.
+# installer's silkcircuit-<variant>.toml, glow unless HERDR_THEME_VARIANT
+# says otherwise. It is pinned rather than auto-switched because herdr
+# trusts the appearance the terminal reports, and that came back light on
+# a dark Mac.
 
 onboarding = false
 
