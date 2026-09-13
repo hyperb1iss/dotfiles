@@ -90,13 +90,12 @@ The `server` role includes:
 
 - Essential shell utilities only
 - No GUI tools or desktop integrations
+- Lightweight footprint
+- Perfect for SSH environments
 
 A box with no display that is still a full development machine (a cloud devbox, a remote workstation) wants
 `make headless` instead: the server package tier, then the desktop tooling (proto, herdr, agent skills, the themed
 configs), and none of the graphical stack. The shell loads every module, exactly as a desktop does.
-
-- Lightweight footprint
-- Perfect for SSH environments
 
 ## Windows
 
