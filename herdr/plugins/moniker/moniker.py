@@ -38,9 +38,9 @@ Rules:
 - Clever, specific, a little whimsical. Puns and wordplay welcome when they fit.
 - Name the actual work (the feature, the bug, the tool), never the process ("Coding", "Task", "Session", "Working").
 - Unicode is fine (accents, arrows, middle dots). Emoji are forbidden.
-- Title Case. No quotes, no trailing punctuation, no explanation.
+- all lowercase. No quotes, no trailing punctuation, no explanation.
 
-Examples of the style (never reuse these, invent one for the session at hand): Theme Layer, Glow Pinned, Tab Whisperer, Atuin Rescue, Retry Storm, Lockfile Drift, Nvim Sync.
+Examples of the style (never reuse these, invent one for the session at hand): theme layer, glow pinned, tab whisperer, atuin rescue, retry storm, lockfile drift, nvim sync.
 
 Reply with the name only."""
 
@@ -121,7 +121,7 @@ def clean(raw: str) -> str | None:
     words = [w for w in re.split(r"\s+", line) if w]
     if not words:
         return None
-    name = " ".join(words[:MAX_WORDS])
+    name = " ".join(words[:MAX_WORDS]).lower()
     if len(name) > MAX_CHARS:
         name = name[:MAX_CHARS].rstrip()
     return name or None
@@ -158,7 +158,7 @@ def local_fallback(agent: dict) -> str | None:
         return clean(title)
     cwd = agent.get("foreground_cwd") or agent.get("cwd") or ""
     base = Path(cwd).name if cwd else ""
-    return clean(base.replace("-", " ").title()) if base else None
+    return clean(base.replace("-", " ")) if base else None
 
 
 def gather(pane_id: str, agent: dict) -> str:
