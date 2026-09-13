@@ -60,8 +60,6 @@ return {
         maps.n["<Leader>gg"] = { function() require("snacks").lazygit() end, desc = "Lazygit" }
         maps.n["<Leader>tl"] = maps.n["<Leader>gg"]
         maps.n["<Leader>gf"] = { function() require("snacks").lazygit.log_file() end, desc = "Lazygit file history" }
-        maps.n["<Leader>gL"] = { function() require("snacks").lazygit.log() end, desc = "Lazygit log" }
-        maps.n["<Leader>gB"] = { function() require("snacks").git.blame_line() end, desc = "Git blame line" }
       end,
     },
   },
