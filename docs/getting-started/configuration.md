@@ -171,7 +171,8 @@ export GWT_NO_COLOR=1                          # Disable colors (for scripts)
 
 ### Delta (Git Diff Tool)
 
-Delta is configured in `gitconfig` as the default pager. Customize in `~/.gitconfig` (local, wins) or `~/dev/dotfiles/gitconfig` (tracked):
+Delta is configured in `gitconfig` as the default pager. Customize in `~/.gitconfig` (local, wins) or
+`~/dev/dotfiles/gitconfig` (tracked):
 
 ```ini
 [delta]
