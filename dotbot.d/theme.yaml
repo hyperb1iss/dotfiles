@@ -28,6 +28,25 @@
       description: "Installing SilkCircuit themes"
 
     - command: |
+        # btop rewrites btop.conf wholesale on exit, so the theme is seeded
+        # into whatever is there rather than linked from this repo.
+        if command -v btop >/dev/null 2>&1; then
+          conf="${XDG_CONFIG_HOME:-$HOME/.config}/btop/btop.conf"
+          mkdir -p "$(dirname "$conf")"
+          [ -f "$conf" ] || : > "$conf"
+          if grep -q '^color_theme' "$conf"; then
+            sed -i.silkcircuit.bak 's/^color_theme.*/color_theme = "silkcircuit-neon"/' "$conf"
+            rm -f "$conf.silkcircuit.bak"
+          else
+            printf 'color_theme = "silkcircuit-neon"\n' >> "$conf"
+          fi
+          echo "btop color_theme set to silkcircuit-neon"
+        fi
+      stderr: true
+      stdout: true
+      description: "Pointing btop at the SilkCircuit theme"
+
+    - command: |
         # Herdr reads one config.toml with no include mechanism, so the
         # tracked settings in herdr/ and the theme tables the installer
         # just dropped are composed into it here. See bin/herdr-config.

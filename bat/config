@@ -1,0 +1,10 @@
+# The SilkCircuit installer drops every variant into the bat config dir and
+# rebuilds the cache; this picks the one bat uses.
+--theme="silkcircuit-neon"
+--italic-text=always
+--map-syntax="*.conf:INI"
+--map-syntax="*.service:INI"
+--map-syntax="*.zsh:Bourne Again Shell (bash)"
+--map-syntax="*.zshrc:Bourne Again Shell (bash)"
+--map-syntax=".zshrc:Bourne Again Shell (bash)"
+--map-syntax=".zprofile:Bourne Again Shell (bash)"

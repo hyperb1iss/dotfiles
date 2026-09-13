@@ -1,0 +1,4 @@
+# bottom ships the SilkCircuit palettes through Opaline, so the theme is a
+# name rather than a file. `btm --theme <name>` overrides it for one run.
+[flags]
+theme = "silkcircuit-neon"
