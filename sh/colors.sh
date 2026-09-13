@@ -164,19 +164,6 @@ sc_progress_bar() {
 }
 
 # ─────────────────────────────────────────────────────────────
-# FZF Integration
-# ─────────────────────────────────────────────────────────────
-
-# Get SilkCircuit FZF color scheme
-# Usage: export FZF_DEFAULT_OPTS="$(sc_fzf_opts)"
-sc_fzf_opts() {
-  echo "--color=bg+:#3c3836,bg:#1d2021,spinner:#e135ff,hl:#80ffea"
-  echo "--color=fg:#f8f8f2,header:#80ffea,info:#f1fa8c,pointer:#e135ff"
-  echo "--color=marker:#50fa7b,fg+:#f8f8f2,prompt:#e135ff,hl+:#ff6ac1"
-  echo "--color=border:#625c7a"
-}
-
-# ─────────────────────────────────────────────────────────────
 # Auto-initialize on source
 # ─────────────────────────────────────────────────────────────
 __sc_init_colors

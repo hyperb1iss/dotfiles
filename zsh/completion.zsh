@@ -107,12 +107,8 @@ zstyle ':fzf-tab:complete:*:*' fzf-preview 'bat --color=always --style=numbers -
 # Switch groups with < and >
 zstyle ':fzf-tab:*' switch-group '<' '>'
 
-# SilkCircuit colors for fzf-tab
-zstyle ':fzf-tab:*' fzf-flags \
-  '--color=fg:#c0caf5,fg+:#ffffff,bg:-1,bg+:#2a2139' \
-  '--color=hl:#e135ff,hl+:#ff79c6,info:#f1fa8c,marker:#50fa7b' \
-  '--color=prompt:#80ffea,spinner:#80ffea,pointer:#e135ff,header:#ff6ac1' \
-  '--color=border:#e135ff,scrollbar:#e135ff'
+# Colors come from FZF_DEFAULT_OPTS, which sh/fzf.sh builds from the
+# SilkCircuit fzf extra, so fzf-tab needs no --color flags of its own.
 
 # Use tmux popup if available (comment out if not using tmux)
 # zstyle ':fzf-tab:*' fzf-command ftb-tmux-popup
