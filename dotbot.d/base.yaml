@@ -48,6 +48,22 @@
       stdout: true
       description: Preparing Zsh configuration link
 
+    - command: |
+        # The tracked gitconfig used to be linked at ~/.gitconfig. Machines
+        # that still carry that link would keep routing `git config --global`
+        # writes into the repo, so swap it for an empty local file once.
+        # Only a link into this repo is replaced; a real file is left alone.
+        gitconfig_target="$(pwd)/gitconfig"
+        gitconfig_link="$HOME/.gitconfig"
+        if [ -L "$gitconfig_link" ] && [ "$(readlink "$gitconfig_link")" = "$gitconfig_target" ]; then
+          rm "$gitconfig_link"
+          : > "$gitconfig_link"
+          echo "Replaced the ~/.gitconfig link with an empty local file"
+        fi
+      stderr: true
+      stdout: true
+      description: Migrating ~/.gitconfig to a local file
+
 - link:
     ~/.bashrc.local: bash/bashrc.local
     # Git reads ~/.config/git/config first and ~/.gitconfig second, and
