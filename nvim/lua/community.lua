@@ -1,19 +1,32 @@
--- AstroCommunity: import any community modules here
--- We import this file in `lazy_setup.lua` before the `plugins/` folder.
--- This guarantees that the specs are processed before any user plugins.
+-- AstroCommunity imports. These land before `plugins/` so user specs can
+-- override anything a pack sets.
 
 ---@type LazySpec
 return {
   "AstroNvim/astrocommunity",
-  { import = "astrocommunity.colorscheme.catppuccin" },
+
+  -- Languages we actually write
   { import = "astrocommunity.pack.lua" },
   { import = "astrocommunity.pack.rust" },
-  { import = "astrocommunity.pack.typescript" }, -- TypeScript/JavaScript support
-  { import = "astrocommunity.pack.tailwindcss" }, -- TailwindCSS support
-  { import = "astrocommunity.pack.html-css" }, -- HTML/CSS support
-  { import = "astrocommunity.pack.json" }, -- JSON support
-  { import = "astrocommunity.pack.yaml" }, -- YAML support
-  { import = "astrocommunity.pack.markdown" }, -- Markdown support
+  { import = "astrocommunity.pack.python.base" },
+  { import = "astrocommunity.pack.python.ruff" },
+  { import = "astrocommunity.pack.python.ty" },
+  { import = "astrocommunity.pack.typescript" },
+  { import = "astrocommunity.pack.html-css" },
+  { import = "astrocommunity.pack.tailwindcss" },
+  { import = "astrocommunity.pack.json" },
+  { import = "astrocommunity.pack.yaml" },
+  { import = "astrocommunity.pack.toml" },
+  { import = "astrocommunity.pack.markdown" },
+  { import = "astrocommunity.pack.bash" },
+  { import = "astrocommunity.pack.docker" },
+  { import = "astrocommunity.pack.ps1" },
 
-  -- import/override with your plugins folder
+  -- Formatting and linting without none-ls
+  { import = "astrocommunity.editing-support.conform-nvim" },
+  { import = "astrocommunity.lsp.nvim-lint" },
+
+  -- UI
+  { import = "astrocommunity.diagnostics.trouble-nvim" },
+  { import = "astrocommunity.editing-support.rainbow-delimiters-nvim" },
 }
