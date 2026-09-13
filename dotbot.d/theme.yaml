@@ -26,3 +26,12 @@
       stderr: true
       stdout: true
       description: "Installing SilkCircuit themes"
+
+    - command: |
+        # Herdr reads one config.toml with no include mechanism, so the
+        # tracked settings in herdr/ and the theme tables the installer
+        # just dropped are composed into it here. See bin/herdr-config.
+        bin/herdr-config
+      stderr: true
+      stdout: true
+      description: "Composing herdr config"
