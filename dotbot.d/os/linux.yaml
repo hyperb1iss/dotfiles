@@ -61,9 +61,16 @@
     - command: |
         # gtk-custom-css points here; default to the neon variant but leave
         # machine-local choices (e.g. glow to match auto/theme.ghostty) alone.
-        # The variants themselves are copied in by the SilkCircuit installer.
-        if [ ! -e ~/.config/ghostty/silkcircuit.css ] && [ ! -L ~/.config/ghostty/silkcircuit.css ]; then
-          ln -s ~/.config/ghostty/themes/silkcircuit-neon.css ~/.config/ghostty/silkcircuit.css
+        # The SilkCircuit installer copies the GTK stylesheets beside the
+        # config, not under themes/ (they style window chrome, not colors),
+        # and a link that dangles from the old location is retargeted.
+        css_link=~/.config/ghostty/silkcircuit.css
+        css_target=~/.config/ghostty/silkcircuit-neon.css
+        if [ -L "$css_link" ] && [ ! -e "$css_link" ]; then
+          rm "$css_link"
+        fi
+        if [ ! -e "$css_link" ] && [ ! -L "$css_link" ]; then
+          ln -s "$css_target" "$css_link"
         fi
       description: "Linking Ghostty SilkCircuit CSS"
 
