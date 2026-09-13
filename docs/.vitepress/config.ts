@@ -82,7 +82,7 @@ export default defineConfig({
           items: [
             { text: 'Overview', link: '/neovim/' },
             { text: 'Plugins', link: '/neovim/plugins' },
-            { text: 'Keymaps', link: '/neovim/keymaps' },
+            { text: 'Keybindings', link: '/neovim/keybindings' },
             { text: 'LSP & Completion', link: '/neovim/lsp' },
             { text: 'AI Integration', link: '/neovim/ai' },
           ],

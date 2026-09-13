@@ -1,201 +1,103 @@
-# Neovim Configuration
+# Neovim
 
-_AstroNvim v5 supercharged with SilkCircuit aesthetics and electric AI power_
+AstroNvim v6 on Neovim 0.12, painted in SilkCircuit, wired for a Claude Code workflow
 
 ## Overview
 
-This is a carefully crafted Neovim setup that transforms your editor into a powerful, beautiful development environment.
-Built on [AstroNvim v5](https://astronvim.com/), it combines robust LSP support, cutting-edge AI integration, and the
-stunning [SilkCircuit](https://github.com/hyperb1iss/silkcircuit-nvim) color palette into one cohesive experience.
+The editor is [AstroNvim v6](https://astronvim.com/) with a short list of overrides. AstroNvim supplies the framework
+(lazy.nvim, LSP wiring, blink.cmp completion, snacks.nvim pickers, heirline statusline), AstroCommunity supplies the
+language packs, and `nvim/lua/plugins/` holds the handful of opinions layered on top. The
+[SilkCircuit](https://github.com/hyperb1iss/silkcircuit) colorscheme themes every surface and the terminal around it.
 
-**What you get:**
+What you get:
 
-- **11+ languages** with full LSP support out of the box
-- **Claude AI integration** via Avante.nvim for intelligent code assistance
-- **[SilkCircuit theme](https://github.com/hyperb1iss/silkcircuit-nvim)** - neon colors that match your terminal
-  aesthetic (loaded from `~/dev/silkcircuit-nvim`)
-- **Modern plugin ecosystem** managed seamlessly by lazy.nvim
-- **Optimized workflow** with carefully curated keybindings and UI components
+- Language servers, formatters and linters for the languages in `~/dev`: Lua, Rust, Python (ruff and ty), TypeScript,
+  HTML/CSS/Tailwind, JSON, YAML, TOML, Markdown, Bash, Docker and PowerShell
+- Claude Code attached over the IDE protocol, so a Claude running in a herdr pane can read your selection and open its
+  diffs in the editor
+- snacks.nvim for the dashboard, picker, terminal, lazygit, notifications and input prompts
+- Trouble for diagnostics, Octo for GitHub, and treesitter parsers that install themselves
 
-## Project Structure
+## Structure
 
 ```
 nvim/
-├── init.lua              # Entry point - bootstraps AstroNvim
+├── init.lua                # Bootstraps lazy.nvim
+├── lazy-lock.json          # Pinned plugin commits
 ├── lua/
-│   ├── lazy_setup.lua    # Plugin manager configuration
-│   ├── community.lua     # AstroCommunity language packs
-│   ├── polish.lua        # Post-load customization & highlights
-│   └── plugins/          # Individual plugin configurations
-│       ├── astrocore.lua     # Core options, mappings, autocmds
-│       ├── astrolsp.lua      # LSP settings & server configs
-│       ├── astroui.lua       # UI elements & statusline
-│       ├── avante.lua        # Claude AI assistant
-│       ├── mason.lua         # LSP/tool installer
-│       ├── neo-tree.lua      # File explorer
-│       ├── none-ls.lua       # Formatters & linters
-│       ├── silkcircuit.lua   # Custom colorscheme
-│       ├── snacks.nvim       # Dashboard, picker, terminal
-│       ├── treesitter.lua    # Syntax parsing
-│       ├── trouble.lua       # Diagnostics panel
-│       └── user.lua          # Additional plugins
+│   ├── lazy_setup.lua      # AstroNvim + community + plugins imports
+│   ├── community.lua       # Language packs and community recipes
+│   ├── polish.lua          # Runs last: GUI font, Neovide tweaks
+│   └── plugins/
+│       ├── astrocore.lua   # Options, treesitter list, autocmds, which-key groups
+│       ├── astrolsp.lua    # LSP features and mappings
+│       ├── astroui.lua     # SilkCircuit statusline colors (installer-owned)
+│       ├── blink.lua       # Signature help from blink.cmp
+│       ├── claudecode.lua  # Claude Code IDE bridge
+│       ├── disabled.lua    # Core plugins this setup replaces
+│       ├── format.lua      # conform formatters, nvim-lint linters
+│       ├── mason.lua       # Extra Mason tools
+│       ├── neo-tree.lua    # File explorer (installer-owned)
+│       ├── octo.lua        # GitHub issues and PRs
+│       ├── silkcircuit.lua # Colorscheme setup (installer-owned)
+│       └── snacks.lua      # Dashboard, terminal, lazygit, mappings
+└── .styluaignore           # The installer-owned files above
 ```
 
-## Key Features
+The three installer-owned files are copied in by the SilkCircuit installer and must stay byte-identical to
+`extras/astronvim/plugins/` in that repo. Edit them there.
 
-### Language Intelligence
+## Quick start
 
-Full LSP support powered by Mason, with automatic installation and configuration:
+```
+nvim                # Dashboard: f find file, w find word, o recent, p projects, s last session
 
-- **TypeScript/JavaScript** - ts_ls, ESLint, Biome, Prettier
-- **Lua** - lua_ls with lazydev for Neovim API completion
-- **Rust** - rustaceanvim with rust-analyzer integration
-- **Vue.js** - Volar for Vue 3 component intelligence
-- **CSS/HTML** - cssls, html, with Tailwind CSS support
-- **JSON/YAML** - Schema validation and formatting
-- **GraphQL** - Full language server support
-- **Markdown** - Enhanced editing with live preview capabilities
-
-### AI-Powered Development
-
-Two complementary AI tools integrated directly into your workflow:
-
-**[Avante.nvim](https://github.com/yetone/avante.nvim)** - Claude in your editor
-
-- Inline code assistance with context awareness
-- Real-time suggestions as you type
-- Beautiful markdown rendering in side panel
-- Diff-based edits with visual conflict resolution
-
-**Claude Code CLI** - Terminal-based AI pair programming
-
-- Multi-file refactoring and analysis
-- Project-wide context understanding
-- Seamless integration with git workflows
-
-### Modern, Beautiful UI
-
-Every visual element has been thoughtfully designed:
-
-- **Snacks.nvim** - Sleek dashboard, fuzzy picker, integrated terminal
-- **Neo-tree** - File explorer with git status indicators and custom icons
-- **Trouble.nvim** - VSCode-like diagnostics panel with symbol navigation
-- **Rainbow delimiters** - Color-coded bracket pairs matching SilkCircuit palette
-- **Custom statusline** - Essential info without clutter
-
-## Quick Start Guide
-
-### Essential Commands
-
-```bash
-# Open Neovim
-nvim
-
-# Navigate files
-Space f f         # Find files (fuzzy search)
-Space f w         # Find word in project (grep)
-Space f r         # Recent files
-Space f b         # Find buffers
-
-# File explorer
-Space e           # Toggle Neo-tree
-
-# AI assistance
-Ctrl-,            # Toggle Claude Code terminal
-Space a a         # Ask Claude about selection
-Space a e         # Edit with Claude suggestions
-
-# Diagnostics
-Space l d         # Buffer diagnostics (Trouble)
-Space l D         # Project diagnostics (Trouble)
-Ctrl-\            # Quick toggle diagnostics panel
+Space f f           # Find files
+Space f w           # Grep the project
+Space e             # Toggle Neo-tree
+Space x x           # Trouble: buffer diagnostics
+Space l f           # Format buffer (conform)
+F7                  # Toggle terminal
+Space g g           # Lazygit
+Space a s           # Send selection to Claude (visual mode)
 ```
 
-### Your First Session
+Leader is `Space`, local leader is `,`. Press `Space` and wait for which-key to show every group.
 
-1. **Open Neovim** - You'll see the SilkCircuit dashboard with quick actions
-2. **Find a file** - Press `Space f f` and start typing
-3. **Explore the tree** - Press `Space e` to toggle the file explorer
-4. **Get AI help** - Select some code and press `Space a a` to ask Claude
-5. **Check diagnostics** - Press `Space l d` to see any issues in your code
+## Documentation
 
-## Documentation Sections
+- [Plugins](./plugins): what is installed and why
+- [Keybindings](./keybindings): every mapping, grouped by prefix
+- [LSP, formatting and completion](./lsp): servers, tools, conform and nvim-lint
+- [AI integration](./ai): the Claude Code bridge and the herdr workflow
 
-Dive deeper into specific areas:
+## Customizing
 
-- **[Plugins](./plugins)** - Complete plugin list with descriptions
-- **[Keybindings](./keybindings)** - All keyboard shortcuts organized by category
-- **[LSP & Completion](./lsp)** - Language server setup and completion config
-- **[AI Integration](./ai)** - Claude and Avante configuration details
-
-## Customization Tips
-
-### Adding Your Own Plugins
-
-Create a new file in `nvim/lua/plugins/`:
+Add a plugin by dropping a spec into `nvim/lua/plugins/`:
 
 ```lua
--- nvim/lua/plugins/my-plugin.lua
 return {
   "username/plugin-name",
-  event = "VeryLazy",  -- Lazy load for fast startup
-  opts = {
-    -- Plugin configuration here
-  },
+  event = "VeryLazy",
+  opts = {},
   keys = {
-    { "<leader>mp", "<cmd>MyPlugin<cr>", desc = "My Plugin Action" },
+    { "<Leader>mp", "<Cmd>MyPlugin<CR>", desc = "My plugin" },
   },
 }
 ```
 
-### Modifying Keybindings
+Mappings go in `nvim/lua/plugins/astrocore.lua` under `opts.mappings`, keyed by mode. Language packs are one line each
+in `nvim/lua/community.lua`; browse [AstroCommunity](https://github.com/AstroNvim/astrocommunity) for more.
 
-Edit `nvim/lua/plugins/astrocore.lua`:
+Switch the SilkCircuit variant at runtime with `:SilkCircuit glow` (or `neon`, `vibrant`, `soft`, `dawn`). The choice
+persists in `~/.local/share/nvim/silkcircuit_preferences.json`.
 
-```lua
-mappings = {
-  n = {  -- normal mode
-    ["<leader>custom"] = { "<cmd>MyCommand<cr>", desc = "My custom action" },
-  },
-  v = {  -- visual mode
-    ["<leader>cv"] = { ":CustomVisual<cr>", desc = "Visual mode action" },
-  },
-}
-```
+## Sandbox testing
 
-### Adjusting Colors
-
-The SilkCircuit theme is a standalone Neovim colorscheme plugin at
-[`~/dev/silkcircuit-nvim`](https://github.com/hyperb1iss/silkcircuit-nvim). It's loaded as a local plugin in
-`nvim/lua/community.lua` and configured in `nvim/lua/plugins/silkcircuit.lua`. The theme provides 5 variants (neon,
-vibrant, soft, glow, dawn) and 30+ plugin integrations.
-
-You can switch variants at runtime with `:SilkCircuit vibrant` or override specific highlight groups in
-`nvim/lua/polish.lua`:
-
-```lua
-vim.api.nvim_set_hl(0, "Normal", { fg = "#f8f8f2", bg = "#1a1826" })
-vim.api.nvim_set_hl(0, "Comment", { fg = "#6272a4", italic = true })
-```
+To try config changes without touching the live editor, symlink a worktree's `nvim/` to `~/.config/nvimtest` and run
+`NVIM_APPNAME=nvimtest nvim`. The sandbox gets its own data, state and cache directories.
 
 ## Performance
 
-This configuration is designed to be fast:
-
-- **Lazy loading** - Plugins load only when needed
-- **Optimized startup** - Dashboard appears in < 50ms
-- **Smart treesitter** - Disabled for large files (> 256KB)
-- **Efficient LSP** - Servers start on-demand per filetype
-
-## Philosophy
-
-This Neovim config follows three core principles:
-
-1. **Aesthetics matter** - Beautiful tools inspire better work
-2. **Intelligence at your fingertips** - AI and LSP should feel natural, not intrusive
-3. **Keyboard-driven flow** - Everything important is just a few keystrokes away
-
-The goal is to create an environment where you can stay in flow state, where the editor anticipates your needs, and
-where every visual element reinforces focus rather than breaking it.
-
-Welcome to your new editing experience.
+Plugins lazy-load on events, commands and keys. A cold start lands on the dashboard in about 80ms with 45 of 59 plugins
+loaded. Treesitter, indent guides and scope switch off for buffers over 256KB or 10,000 lines.
