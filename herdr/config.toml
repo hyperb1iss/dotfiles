@@ -55,6 +55,32 @@ description = "btop"
 width = "90%"
 height = "90%"
 
+# Plugin actions (plugins are installed by role/desktop.yaml from
+# herdr/plugins.txt; moniker is linked from herdr/plugins/moniker).
+[[keys.command]]
+key = "prefix+u"
+type = "plugin_action"
+command = "gh-pr.open-pr"
+description = "open this branch's PR in the browser"
+
+[[keys.command]]
+key = "prefix+i"
+type = "plugin_action"
+command = "gh-pr.refresh"
+description = "refresh PR status in the sidebar"
+
+[[keys.command]]
+key = "prefix+alt+n"
+type = "plugin_action"
+command = "nova.moniker.rename"
+description = "moniker: name this tab again"
+
+[[keys.command]]
+key = "prefix+alt+r"
+type = "plugin_action"
+command = "persiyanov.reviewr.open"
+description = "reviewr: diff and PR pane for this workspace"
+
 [ui]
 # New tabs get a generated name instead of a prompt; rename later with
 # prefix then shift+t, or `herdr tab rename`.
@@ -71,11 +97,12 @@ tab_bar_right = [
 ]
 tab_bar_right_separator = " · "
 
-# $task is a custom token: anything can fill it per pane with
-#   herdr pane report-metadata <pane> --source user:sibyl --token task="..."
-# and it disappears from the row while nothing has reported it.
+# Custom tokens vanish from the row while nothing has reported them:
+#   $pr    PR number + CI state from the gh-pr plugin
+#   $task  sibyl's active task, or anything that runs
+#          herdr pane report-metadata <pane> --source user:sibyl --token task="..."
 [ui.sidebar.agents]
-rows = [["state_icon", "workspace", "tab"], ["agent", "$task"]]
+rows = [["state_icon", "workspace", "tab", "$pr"], ["agent", "$task"]]
 
 [ui.sidebar.spaces]
 rows = [["state_icon", "workspace"], ["branch", "git_status"]]

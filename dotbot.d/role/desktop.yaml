@@ -109,3 +109,31 @@
       stderr: true
       stdout: true
       description: "Installing herdr + agent integrations"
+
+    - command: |
+        # Marketplace plugins from herdr/plugins.txt, plus our own under
+        # herdr/plugins/ linked in place. Both are idempotent against the
+        # registered id list, and a plugin that fails to build says so
+        # without failing the run: they are conveniences, not the install.
+        if command -v herdr >/dev/null 2>&1; then
+          have=$(herdr plugin list --json 2>/dev/null | jq -r '.result.plugins[].plugin_id' 2>/dev/null || true)
+          grep -v '^\s*#' herdr/plugins.txt | while read -r path id _; do
+            [ -n "$path" ] && [ -n "$id" ] || continue
+            if printf '%s\n' "$have" | grep -qx "$id"; then
+              echo "herdr plugin $id already installed"
+            else
+              herdr plugin install "$path" --yes || echo "herdr plugin $path failed, skipping"
+            fi
+          done
+          for dir in herdr/plugins/*/; do
+            id=$(awk -F'"' '/^id = /{print $2; exit}' "$dir/herdr-plugin.toml")
+            if printf '%s\n' "$have" | grep -qx "$id"; then
+              echo "herdr plugin $id already linked"
+            else
+              herdr plugin link "$(pwd)/$dir" || echo "herdr plugin link $dir failed, skipping"
+            fi
+          done
+        fi
+      stderr: true
+      stdout: true
+      description: "Installing herdr plugins"
