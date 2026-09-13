@@ -85,3 +85,23 @@
       stderr: true
       stdout: true
       description: Installing fzf
+
+    - command: |
+        # Herdr is the terminal workspace manager the agents run inside.
+        # Its install script drops a self-updating binary in ~/.local/bin,
+        # so `herdr update` owns upgrades from here and brew would only add
+        # a second copy. The integrations are hook files it rewrites in
+        # place, so rerunning them is a no-op; each is skipped when its
+        # agent is absent so nothing creates an empty ~/.codex.
+        if ! command -v herdr >/dev/null 2>&1; then
+          echo "🎪 Installing herdr..."
+          curl -fsSL https://herdr.dev/install.sh | sh
+          export PATH="$HOME/.local/bin:$PATH"
+        fi
+        if command -v herdr >/dev/null 2>&1; then
+          command -v claude >/dev/null 2>&1 && herdr integration install claude
+          command -v codex >/dev/null 2>&1 && herdr integration install codex
+        fi
+      stderr: true
+      stdout: true
+      description: "Installing herdr + agent integrations"

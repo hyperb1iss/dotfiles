@@ -85,6 +85,7 @@ dotfiles/
 ├── ghostty/              # Ghostty terminal config (macOS + Linux)
 ├── modules-load.d/       # Kernel modules loaded at boot (tcp_bbr)
 ├── tmux.conf             # Tmux multiplexer configuration
+├── herdr/                # Herdr workspace manager settings (theme composed at install)
 ├── atuin/                # Atuin shell history + SilkCircuit theme
 ├── gitconfig             # Git config with SilkCircuit colors + Delta
 ├── proto/                # Proto version manager (.prototools)
