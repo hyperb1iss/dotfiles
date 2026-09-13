@@ -53,10 +53,13 @@
 # All SilkCircuit theming (colors, delta, pretty formats, log aliases)
 # lives in the silkcircuit repo; its installer drops one file per variant
 # into ~/.config/git and adds an include for the primary variant unless a
-# matching line is already here. Git ignores a missing include file, so
-# this is safe before the installer has run.
+# matching line is already here, swapping it when the variant changes. Git
+# ignores a missing include file, so this is safe before the installer has
+# run. The delta layer is linked in by the desktop role only, so servers
+# without delta keep plain paging.
 [include]
 	path = ~/.config/git/silkcircuit-neon.gitconfig
+	path = ~/.config/git/delta.gitconfig
 
 # Plain `git log` uses the SilkCircuit named format from the include above:
 # purple hash line, decorate colors, bold subject, muted body.
