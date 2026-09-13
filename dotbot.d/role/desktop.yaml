@@ -35,7 +35,7 @@
       force: true
     ~/.proto/.prototools: proto/.prototools
     # starship, bat, dircolors, and ghostty themes are installed by the
-    # SilkCircuit installer in base.yaml
+    # SilkCircuit installer in theme.yaml
 
 - shell:
     - command: |
@@ -99,8 +99,12 @@
           export PATH="$HOME/.local/bin:$PATH"
         fi
         if command -v herdr >/dev/null 2>&1; then
-          command -v claude >/dev/null 2>&1 && herdr integration install claude
-          command -v codex >/dev/null 2>&1 && herdr integration install codex
+          if command -v claude >/dev/null 2>&1; then
+            herdr integration install claude
+          fi
+          if command -v codex >/dev/null 2>&1; then
+            herdr integration install codex
+          fi
         fi
       stderr: true
       stdout: true

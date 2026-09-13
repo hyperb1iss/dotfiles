@@ -2,6 +2,7 @@
 #
 # The Makefile composes layers as a single dotbot run:
 #   base.yaml -> os/<os>.yaml -> role/<role>.yaml -> host/<host>.yaml
+#     -> private.yaml -> theme.yaml
 # Dotbot concatenates every -c file into one task list, so base runs first and
 # the core links every later layer depends on are already in place by the time
 # that layer is reached. theme.yaml closes the run: the SilkCircuit installer

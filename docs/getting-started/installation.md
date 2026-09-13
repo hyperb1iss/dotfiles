@@ -40,13 +40,15 @@ git submodule update --init --recursive
 make install
 ```
 
-`make install` composes `base.yaml`, `os/macos.yaml`, and `role/desktop.yaml`, which together install:
+`make install` composes `base.yaml`, `os/macos.yaml`, `role/desktop.yaml`, and `theme.yaml`, which together install:
 
 - Homebrew packages via `macos/brew.sh`
 - Modern CLI tools (lsd, bat, fd, ripgrep, delta, zoxide)
 - Starship prompt
 - FZF (built from source via Go)
 - Symlinks for configs (zsh, nvim, tmux, git, starship)
+- Herdr, the agent workspace manager, with its config composed from `herdr/config.toml`
+- SilkCircuit themes for everything above, installed last so autodetection sees it all
 
 `make macos` is kept as an alias and does the same thing.
 

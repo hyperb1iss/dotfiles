@@ -27,7 +27,7 @@
       description: Pointing editor alternatives at nvim
 
     - command: |
-        # Starship binary (config comes from the SilkCircuit installer in base)
+        # Starship binary (config comes from the SilkCircuit installer in theme.yaml)
         if ! command -v starship >/dev/null 2>&1; then
           curl -sS https://starship.rs/install.sh | sh -s -- --yes
         fi
