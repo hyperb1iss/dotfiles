@@ -16,14 +16,14 @@ lane_layers() {
   case "$1" in
     server)
       # role/server composes without an os layer; see the Makefile.
-      echo "dotbot.d/base.yaml dotbot.d/role/server.yaml"
+      echo "dotbot.d/base.yaml dotbot.d/role/server.yaml dotbot.d/theme.yaml"
       ;;
     desktop-macos)
-      echo "dotbot.d/base.yaml dotbot.d/os/macos.yaml dotbot.d/role/desktop.yaml"
+      echo "dotbot.d/base.yaml dotbot.d/os/macos.yaml dotbot.d/role/desktop.yaml dotbot.d/theme.yaml"
       ;;
     desktop-linux)
       # hyperia rides along so the host layer stays parse and link valid.
-      echo "dotbot.d/base.yaml dotbot.d/os/linux.yaml dotbot.d/role/desktop.yaml dotbot.d/host/hyperia.yaml"
+      echo "dotbot.d/base.yaml dotbot.d/os/linux.yaml dotbot.d/role/desktop.yaml dotbot.d/host/hyperia.yaml dotbot.d/theme.yaml"
       ;;
     *)
       echo "error: unknown lane '$1' (server, desktop-macos, desktop-linux)" >&2

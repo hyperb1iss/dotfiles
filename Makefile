@@ -3,9 +3,12 @@ DOTBOT := $(BASEDIR)/dotbot/bin/dotbot
 LAYERS := $(BASEDIR)/dotbot.d
 ROLE_FILE := $(BASEDIR)/.dotfiles_role
 
-# Layers compose instead of conflicting: base -> os -> role -> host -> private.
+# Layers compose instead of conflicting:
+#   base -> os -> role -> host -> private -> theme
 # OS comes from uname, role defaults to desktop, and the host layer is picked
-# up only when dotbot.d/host/<hostname>.yaml actually exists.
+# up only when dotbot.d/host/<hostname>.yaml actually exists. theme is always
+# last: the SilkCircuit installer autodetects installed tools, so it has to
+# run once every package tier has finished.
 ifeq ($(shell uname -s),Darwin)
 DETECTED_OS := macos
 else
@@ -21,14 +24,15 @@ OS_LAYER := $(LAYERS)/os/$(OS).yaml
 ROLE_LAYER := $(LAYERS)/role/$(ROLE).yaml
 HOST_LAYER := $(wildcard $(LAYERS)/host/$(HOST).yaml)
 PRIVATE_LAYER := $(if $(wildcard $(HOME)/dev/dotfiles-private),$(LAYERS)/private.yaml,)
+THEME_LAYER := $(LAYERS)/theme.yaml
 
 # The server role skips the os layer on purpose: os/linux.yaml is the graphical
 # stack (ghostty, pipewire, ignis, containers) and headless boxes want none of
 # it. Desktops get the full stack.
 ifeq ($(ROLE),server)
-LAYER_CONFIGS := $(BASE_LAYER) $(ROLE_LAYER) $(HOST_LAYER) $(PRIVATE_LAYER)
+LAYER_CONFIGS := $(BASE_LAYER) $(ROLE_LAYER) $(HOST_LAYER) $(PRIVATE_LAYER) $(THEME_LAYER)
 else
-LAYER_CONFIGS := $(BASE_LAYER) $(OS_LAYER) $(ROLE_LAYER) $(HOST_LAYER) $(PRIVATE_LAYER)
+LAYER_CONFIGS := $(BASE_LAYER) $(OS_LAYER) $(ROLE_LAYER) $(HOST_LAYER) $(PRIVATE_LAYER) $(THEME_LAYER)
 endif
 
 default:

@@ -1,7 +1,8 @@
 # macOS layer: Apple-only paths plus the Homebrew tier.
 #
-# Composed after base.yaml, so SilkCircuit has already dropped its bat and
-# ghostty themes by the time brew and `bat cache --build` run here.
+# Composed before theme.yaml, so every cask and formula brew installs here
+# is on disk when the SilkCircuit installer autodetects what to theme. The
+# installer also rebuilds the bat cache itself, so nothing here has to.
 - defaults:
     link:
       relink: true
@@ -34,15 +35,6 @@
       stderr: true
       stdout: true
       description: Installing Homebrew packages
-
-    - command: |
-        if command -v bat >/dev/null 2>&1; then
-          bat cache --build
-        else
-          echo "Warning: bat not found, skipping theme cache rebuild"
-        fi
-      description: Rebuilding bat theme cache
-      stdout: true
 
     - command: |
         # Set up macOS-specific configurations
