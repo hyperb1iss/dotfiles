@@ -1,11 +1,12 @@
 # zoxide.sh
 # Fast directory navigation using zoxide
 # https://github.com/ajeetdsouza/zoxide
+#
+# Every role installs zoxide (packages.conf lists it for desktop and
+# server alike), so this module carries no role guard: a box that has the
+# binary gets z, whatever profile it was installed with. cached_eval
+# already returns quietly when the binary is missing.
 
-# Skip entire module if not in full installation
-is_minimal && return 0
-
-# Initialize zoxide for the current shell
 # Initialize with 'z' as the command (compatible with previous z.sh)
 if is_zsh; then
   cached_eval zoxide zoxide-init.zsh zoxide init zsh --cmd z
