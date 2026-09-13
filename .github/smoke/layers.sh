@@ -6,7 +6,7 @@
 #
 # Usage:
 #   layers.sh list <lane>            print the lane's layers, repo relative
-#   layers.sh check-compose <lane>   assert `make -n install` composes them
+#   layers.sh check-compose <lane>   assert the lane's make target composes them
 
 set -euo pipefail
 
