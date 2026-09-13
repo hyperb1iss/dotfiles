@@ -37,7 +37,7 @@ return {
     },
     mappings = {
       n = {
-        ["<Leader>a"] = { desc = "󰚩 Claude" },
+        ["<Leader>a"] = { desc = "󰚩 Agents" },
         ["<Leader>O"] = { desc = " Octo" },
         ["<Leader>t"] = { desc = " Terminal" },
       },

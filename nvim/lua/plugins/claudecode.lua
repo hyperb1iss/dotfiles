@@ -1,6 +1,7 @@
 -- Claude Code IDE bridge. Claude itself runs in a herdr pane; this only
 -- hosts the WebSocket server that `/ide` attaches to, so selections, open
 -- files and diagnostics flow to Claude and its diffs open here for review.
+-- <Leader>ac, al, as and aS belong to herdr-nvim's annotations.
 
 ---@type LazySpec
 return {
@@ -15,9 +16,9 @@ return {
     },
   },
   keys = {
-    { "<Leader>as", "<Cmd>ClaudeCodeSend<CR>", mode = "v", desc = "Send selection to Claude" },
+    { "<Leader>av", "<Cmd>ClaudeCodeSend<CR>", mode = "v", desc = "Send selection to Claude" },
     { "<Leader>ab", "<Cmd>ClaudeCodeAdd %<CR>", desc = "Add buffer to Claude" },
-    { "<Leader>as", "<Cmd>ClaudeCodeTreeAdd<CR>", desc = "Add file to Claude", ft = { "neo-tree" } },
+    { "<Leader>av", "<Cmd>ClaudeCodeTreeAdd<CR>", desc = "Add file to Claude", ft = { "neo-tree" } },
     { "<Leader>aa", "<Cmd>ClaudeCodeDiffAccept<CR>", desc = "Accept Claude diff" },
     { "<Leader>ad", "<Cmd>ClaudeCodeDiffDeny<CR>", desc = "Deny Claude diff" },
     { "<Leader>ai", "<Cmd>ClaudeCodeStatus<CR>", desc = "Claude connection status" },
