@@ -18,11 +18,6 @@ return {
           desc = "Declaration of current symbol",
           cond = "textDocument/declaration",
         },
-        ["<Leader>uH"] = {
-          function() vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled { bufnr = 0 }, { bufnr = 0 }) end,
-          desc = "Toggle inlay hints (buffer)",
-          cond = "textDocument/inlayHint",
-        },
       },
     },
   },
