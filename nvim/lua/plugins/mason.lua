@@ -1,55 +1,16 @@
--- Customize Mason plugins
+-- Tools the language packs don't already pull in. AstroNvim installs this
+-- list through mason-tool-installer; mason.nvim itself has no ensure_installed.
 
 ---@type LazySpec
 return {
-  -- mason.nvim v2 handles ensure_installed natively
   {
-    "mason-org/mason.nvim",
-    opts = {
-      ensure_installed = {
-        -- LSP servers
-        "lua-language-server",
-        "typescript-language-server",
-        "eslint-lsp",
-        "biome",
-        "vue-language-server",
-        "html-lsp",
-        "css-lsp",
-        "json-lsp",
-        "tailwindcss-language-server",
-        "graphql-language-service-cli",
-        -- Formatters and linters
-        "stylua",
-        "prettier",
+    "WhoIsSethDaniel/mason-tool-installer.nvim",
+    opts = function(_, opts)
+      opts.ensure_installed = require("astrocore").list_insert_unique(opts.ensure_installed, {
         "prettierd",
-        "markdownlint",
+        "markdownlint-cli2",
         "yamllint",
-      },
-    },
-  },
-  -- mason-lspconfig bridges mason and lspconfig
-  -- NOTE: automatic_installation disabled — mason.nvim v2 handles ensure_installed natively
-  {
-    "mason-org/mason-lspconfig.nvim",
-    opts = {},
-  },
-  -- use mason-null-ls for automatic null-ls source installation
-  {
-    "jay-babu/mason-null-ls.nvim",
-    -- overrides `require("mason-null-ls").setup(...)`
-    opts = {
-      automatic_installation = true,
-    },
-  },
-  {
-    "jay-babu/mason-nvim-dap.nvim",
-    -- overrides `require("mason-nvim-dap").setup(...)`
-    opts = {
-      ensure_installed = {
-        "python",
-        -- TypeScript/JavaScript debugger
-        "js", -- Node.js debugger (works for TypeScript too)
-      },
-    },
+      })
+    end,
   },
 }

@@ -1,107 +1,68 @@
+-- snacks.nvim: AstroNvim v6 already wires the picker, notifier, input,
+-- indent, scope and words. This adds the dashboard, terminal, lazygit and
+-- the toggles that make the rest of the setup feel like one tool.
+
+---@type LazySpec
 return {
   "folke/snacks.nvim",
-  priority = 1000,
-  lazy = false,
   ---@type snacks.Config
   opts = {
-    -- Enable the features you want
-    bigfile = { enabled = true },
     dashboard = {
-      enabled = true,
       preset = {
-        header = [[
-──── ✦ ────
-n e o v i m
-──── ✦ ────
-        ]],
+        header = table.concat({
+          "──── ✦ ────",
+          "n e o v i m",
+          "──── ✦ ────",
+        }, "\n"),
         keys = {
-          { icon = " ", key = "f", desc = "Find File", action = ":lua Snacks.picker.files()" },
-          { icon = " ", key = "n", desc = "New File", action = ":ene | startinsert" },
-          { icon = " ", key = "g", desc = "Find Text", action = ":lua Snacks.picker.grep()" },
-          { icon = " ", key = "r", desc = "Recent Files", action = ":lua Snacks.picker.recent()" },
-          {
-            icon = " ",
-            key = "c",
-            desc = "Config",
-            action = ":lua Snacks.picker.files({ cwd = vim.fn.stdpath('config') })",
-          },
-          { icon = " ", key = "s", desc = "Restore Session", action = [[<cmd>lua require("persistence").load()<cr>]] },
+          { icon = " ", key = "f", desc = "Find file", action = "<Leader>ff" },
+          { icon = " ", key = "w", desc = "Find word", action = "<Leader>fw" },
+          { icon = " ", key = "o", desc = "Recent files", action = "<Leader>fo" },
+          { icon = " ", key = "p", desc = "Projects", action = "<Leader>fp" },
+          { icon = " ", key = "n", desc = "New file", action = "<Leader>n" },
+          { icon = " ", key = "s", desc = "Last session", action = "<Leader>Sl" },
           { icon = "󰒲 ", key = "l", desc = "Lazy", action = ":Lazy" },
           { icon = " ", key = "q", desc = "Quit", action = ":qa" },
         },
       },
-    },
-    indent = {
-      enabled = true,
-      scope = {
-        enabled = true,
+      sections = {
+        { section = "header", padding = 2 },
+        { section = "keys", gap = 1, padding = 2 },
+        { section = "startup" },
       },
     },
-    input = { enabled = true },
-    notifier = {
-      enabled = true,
-      timeout = 3000,
-    },
-    picker = {
-      enabled = true,
-      -- Use telescope-style mappings
-      mappings = {
-        i = {
-          ["<C-j>"] = "move_down",
-          ["<C-k>"] = "move_up",
-        },
-      },
-    },
-    profiler = { enabled = true },
+    bigfile = { enabled = true },
     quickfile = { enabled = true },
-    scope = { enabled = true },
-    scroll = {
-      enabled = false,
-    },
-    statuscolumn = { enabled = false }, -- Keep AstroNvim's statuscolumn
     terminal = {
-      enabled = true,
-      win = {
-        position = "bottom",
-        height = 0.3,
-      },
+      win = { position = "bottom", height = 0.3 },
     },
-    words = {
-      enabled = true,
-      debounce = 200,
+    lazygit = {
+      -- the SilkCircuit installer owns ~/.config/lazygit; don't paint over it
+      configure = false,
     },
+    words = { debounce = 200 },
   },
-  keys = {
-    { "<leader>un", function() Snacks.notifier.hide() end, desc = "Dismiss All Notifications" },
-    { "<leader>bd", function() Snacks.bufdelete() end, desc = "Delete Buffer" },
-    { "<leader>gg", function() Snacks.gitbrowse() end, desc = "Git Browse" },
-    { "<leader>gb", function() Snacks.git.blame_line() end, desc = "Git Blame Line" },
+  specs = {
+    { "akinsho/toggleterm.nvim", enabled = false },
     {
-      "<leader>gB",
-      function()
-        Snacks.gitbrowse { open = function(url) vim.fn.system { "open", url } end }
+      "AstroNvim/astrocore",
+      opts = function(_, opts)
+        local maps = opts.mappings
+        local function term(direction)
+          return function() require("snacks").terminal.toggle(nil, { win = { position = direction } }) end
+        end
+        maps.n["<F7>"] = { function() require("snacks").terminal.toggle() end, desc = "Toggle terminal" }
+        maps.t["<F7>"] = maps.n["<F7>"]
+        maps.i["<F7>"] = { "<Esc><Cmd>lua require('snacks').terminal.toggle()<CR>", desc = "Toggle terminal" }
+        maps.n["<Leader>tf"] = { term "float", desc = "Floating terminal" }
+        maps.n["<Leader>th"] = { term "bottom", desc = "Horizontal terminal" }
+        maps.n["<Leader>tv"] = { term "right", desc = "Vertical terminal" }
+        maps.n["<Leader>gg"] = { function() require("snacks").lazygit() end, desc = "Lazygit" }
+        maps.n["<Leader>tl"] = maps.n["<Leader>gg"]
+        maps.n["<Leader>gf"] = { function() require("snacks").lazygit.log_file() end, desc = "Lazygit file history" }
+        maps.n["<Leader>gL"] = { function() require("snacks").lazygit.log() end, desc = "Lazygit log" }
+        maps.n["<Leader>gB"] = { function() require("snacks").git.blame_line() end, desc = "Git blame line" }
       end,
-      desc = "Git Browse (open)",
     },
-    { "<leader>gf", function() Snacks.lazygit.log_file() end, desc = "Lazygit Current File History" },
-    { "<leader>gl", function() Snacks.lazygit() end, desc = "Lazygit" },
-    { "<leader>gL", function() Snacks.lazygit.log() end, desc = "Lazygit Log (cwd)" },
-    { "<leader>pd", function() Snacks.profiler.scratch() end, desc = "Profiler Scratch Buffer" },
-    { "<leader>ps", function() Snacks.profiler.start() end, desc = "Profiler Start" },
-    { "<leader>ph", function() Snacks.profiler.stop() end, desc = "Profiler Stop" },
-    { "<C-t>", function() Snacks.terminal.toggle() end, desc = "Toggle Terminal", mode = { "n", "t" } },
-    { "]]", function() Snacks.words.jump(vim.v.count1) end, desc = "Next Reference" },
-    { "[[", function() Snacks.words.jump(-vim.v.count1) end, desc = "Prev Reference" },
   },
-  init = function()
-    vim.api.nvim_create_autocmd("User", {
-      pattern = "VeryLazy",
-      callback = function()
-        -- Setup some globals for debugging (lazy-loaded)
-        _G.dd = function(...) Snacks.debug.inspect(...) end
-        _G.bt = function() Snacks.debug.backtrace() end
-        vim.print = _G.dd
-      end,
-    })
-  end,
 }
