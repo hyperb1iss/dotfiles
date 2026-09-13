@@ -42,7 +42,6 @@ $floor = @(
     'Documents/PowerShell/Modules/HyperShell'
     'Documents/PowerShell/Microsoft.PowerShell_profile.ps1'
     '.gitconfig'
-    '.claude/statusline-command.sh'
 )
 
 $derive = Join-Path $Repo '.github/smoke/expected_links.py'

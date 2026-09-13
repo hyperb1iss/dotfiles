@@ -27,15 +27,18 @@
     ~/.fonts: fonts
     ~/.config/lsd/config.yaml: lsd/config.yaml
     ~/.config/atuin/config.toml: atuin/config.toml
-    ~/.claude/statusline-command.sh: claude/statusline-command.sh
+    ~/.config/bat/config: bat/config
+    ~/.config/bottom/bottom.toml: bottom/bottom.toml
+    ~/.config/git/delta.gitconfig: git/delta.gitconfig
     # ~/.agents/skills is the source of truth for agent skills. Codex scans it
     # natively; Claude Code reaches it through this link.
     ~/.claude/skills:
       path: ~/.agents/skills
       force: true
     ~/.proto/.prototools: proto/.prototools
-    # starship, bat, dircolors, and ghostty themes are installed by the
-    # SilkCircuit installer in theme.yaml
+    # The theme files themselves (starship, bat, fzf, tmux, dircolors,
+    # ghostty, the Claude Code status line) are installed by the SilkCircuit
+    # installer in theme.yaml. The configs linked above only pick a variant.
 
 - shell:
     - command: |
@@ -47,7 +50,8 @@
       description: Rebuilding the font cache
 
     # Claude Code owns settings.json, so merge in the statusLine key rather than
-    # linking the whole file
+    # linking the whole file. The script it points at is the SilkCircuit Claude
+    # Code extra, which theme.yaml drops at ~/.claude/statusline.sh.
     - command: python3 ./claude/install-statusline.py
       stdout: true
       stderr: true

@@ -3,7 +3,8 @@
 SilkCircuit Status Line - Installer
 ====================================
 
-Points Claude Code at the SilkCircuit status line.
+Points Claude Code at the SilkCircuit status line, which the SilkCircuit
+installer drops at ~/.claude/statusline.sh as the theme layer.
 
 Claude Code owns ~/.claude/settings.json and rewrites it as hooks, plugins, and
 permissions change, so dotfiles deliberately does not track it. This merges in
@@ -37,7 +38,7 @@ C = {
 # every platform, Windows included
 STATUS_LINE = {
     "type": "command",
-    "command": "~/.claude/statusline-command.sh",
+    "command": "~/.claude/statusline.sh",
 }
 
 
