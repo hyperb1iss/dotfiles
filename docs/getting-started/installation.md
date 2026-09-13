@@ -90,6 +90,11 @@ The `server` role includes:
 
 - Essential shell utilities only
 - No GUI tools or desktop integrations
+
+A box with no display that is still a full development machine (a cloud devbox, a remote workstation) wants
+`make headless` instead: the server package tier, then the desktop tooling (proto, herdr, agent skills, the themed
+configs), and none of the graphical stack. The shell loads every module, exactly as a desktop does.
+
 - Lightweight footprint
 - Perfect for SSH environments
 
@@ -164,14 +169,15 @@ WSL-specific features are automatically enabled:
 
 ## Installation Targets
 
-| Command         | Layers composed                                       | Use Case                          | Sudo Required |
-| --------------- | ----------------------------------------------------- | --------------------------------- | ------------- |
-| `make install`  | `base` + `os/<uname>` + `role/desktop` + host/private | Any desktop, macOS or Linux       | No            |
-| `make server`   | `base` + `role/server` + host/private                 | Servers, containers, lightweight  | Yes, packages |
-| `make full`     | The sudo tier, then `make install`                    | Full Linux/WSL desktop            | Yes           |
-| `make system`   | `os/linux-system` only                                | System files, no home changes     | Yes           |
-| `make private`  | `private` only                                        | Refresh the dotfiles-private bits | No            |
-| `.\install.ps1` | `os/windows` only                                     | Windows, the whole install        | Only for WSL  |
+| Command         | Layers composed                                        | Use Case                          | Sudo Required |
+| --------------- | ------------------------------------------------------ | --------------------------------- | ------------- |
+| `make install`  | `base` + `os/<uname>` + `role/desktop` + host/private  | Any desktop, macOS or Linux       | No            |
+| `make headless` | `base` + `role/server` + `role/desktop` + host/private | Devboxes, cloud workstations      | Yes, packages |
+| `make server`   | `base` + `role/server` + host/private                  | Servers, containers, lightweight  | Yes, packages |
+| `make full`     | The sudo tier, then `make install`                     | Full Linux/WSL desktop            | Yes           |
+| `make system`   | `os/linux-system` only                                 | System files, no home changes     | Yes           |
+| `make private`  | `private` only                                         | Refresh the dotfiles-private bits | No            |
+| `.\install.ps1` | `os/windows` only                                      | Windows, the whole install        | Only for WSL  |
 
 `make macos` and `make minimal` still work; they are aliases for `make install` and `make server`.
 

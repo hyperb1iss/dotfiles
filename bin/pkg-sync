@@ -48,6 +48,7 @@ usage:
   <manager>  apt, pacman, cargo, ppa, winget. Detected from the box when
              omitted.
   <role>     desktop or server. Defaults to .dotfiles_role, else desktop.
+             A headless box installs the server tier.
 
   --dry-run, -n  print the commands instead of running them
 
@@ -355,13 +356,18 @@ detect_manager() {
   fi
 }
 
+# The manifest knows two package tiers. A headless install (the devbox
+# role in the Makefile) takes the server tier: its desktop tooling comes
+# from role/desktop.yaml's own installers, not from the package manager.
 detect_role() {
-  local role_file="${REPO_ROOT}/.dotfiles_role"
+  local role_file="${REPO_ROOT}/.dotfiles_role" role="desktop"
   if [[ -r "${role_file}" ]]; then
-    head -n1 "${role_file}" | tr -d '[:space:]'
-  else
-    echo "desktop"
+    role="$(head -n1 "${role_file}" | tr -d '[:space:]')"
   fi
+  case "${role}" in
+    headless) echo "server" ;;
+    *) echo "${role}" ;;
+  esac
 }
 
 is_manager() {

@@ -1,7 +1,9 @@
-# Server role: headless boxes and containers.
+# Server role: lean boxes and containers.
 #
 # The Makefile composes this without the os/ layer, so a server gets base.yaml
-# plus the small package tier below and nothing that assumes a display.
+# plus the small package tier below and nothing that assumes a display. The
+# headless role stacks role/desktop.yaml on top of this same file, so a devbox
+# gets this package tier and then the workstation tooling.
 - defaults:
     link:
       relink: true

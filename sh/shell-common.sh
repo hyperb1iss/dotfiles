@@ -78,7 +78,7 @@ function has_command() {
 }
 
 # Installation role detection. `make install` writes the composed role
-# (desktop or server) to .dotfiles_role; .install_state is the pre-layers
+# (desktop, headless or server) to .dotfiles_role; .install_state is the pre-layers
 # name, still read so a machine that has not reinstalled keeps its role.
 # The file is gitignored, so a worktree has none of its own: fall back to
 # the installed tree rather than reporting "unknown", which on a server
@@ -103,6 +103,8 @@ function get_installation_type() {
   printf '%s\n' "${DOTFILES_INSTALLATION_TYPE}"
 }
 
+# Only the server role trims the module set. A headless box is a full
+# workstation without a display, so it loads everything a desktop does.
 function is_minimal() {
   [[ "${DOTFILES_INSTALLATION_TYPE}" = "server" ]]
 }

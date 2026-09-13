@@ -10,12 +10,13 @@ Customize your environment to perfection.
 
 ```bash
 cat ~/dev/dotfiles/.dotfiles_role
-# Output: desktop or server
+# Output: desktop, headless or server
 ```
 
 Scripts check this with `is_minimal` and `is_full` functions to conditionally load features. This ensures lightweight
-servers don't load desktop-specific utilities. Machines installed before the layer split still carry the old
-`.install_state` file, which is read as a fallback until the next `make install`.
+servers don't load desktop-specific utilities; the headless role counts as full, so a devbox loads everything a desktop
+does. Tools every role installs (zoxide, for one) skip the check entirely. Machines installed before the layer split
+still carry the old `.install_state` file, which is read as a fallback until the next `make install`.
 
 ### Environment Variables
 

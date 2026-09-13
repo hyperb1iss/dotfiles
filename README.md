@@ -173,8 +173,8 @@ make full
 make install
 ```
 
-`make install` composes the right layers for whatever machine it runs on, so it is the one command worth remembering.
-Headless boxes want `make server`.
+`make install` composes the right layers for whatever machine it runs on, so it is the one command worth remembering. A
+devbox with no display wants `make headless`; a lean server or container wants `make server`.
 
 ### Windows
 

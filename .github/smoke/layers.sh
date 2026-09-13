@@ -18,6 +18,10 @@ lane_layers() {
       # role/server composes without an os layer; see the Makefile.
       echo "dotbot.d/base.yaml dotbot.d/role/server.yaml dotbot.d/theme.yaml"
       ;;
+    headless)
+      # The server tier, then the desktop tooling, still no os layer.
+      echo "dotbot.d/base.yaml dotbot.d/role/server.yaml dotbot.d/role/desktop.yaml dotbot.d/theme.yaml"
+      ;;
     desktop-macos)
       echo "dotbot.d/base.yaml dotbot.d/os/macos.yaml dotbot.d/role/desktop.yaml dotbot.d/theme.yaml"
       ;;
@@ -26,7 +30,7 @@ lane_layers() {
       echo "dotbot.d/base.yaml dotbot.d/os/linux.yaml dotbot.d/role/desktop.yaml dotbot.d/host/hyperia.yaml dotbot.d/theme.yaml"
       ;;
     *)
-      echo "error: unknown lane '$1' (server, desktop-macos, desktop-linux)" >&2
+      echo "error: unknown lane '$1' (server, headless, desktop-macos, desktop-linux)" >&2
       return 2
       ;;
   esac
@@ -35,19 +39,22 @@ lane_layers() {
 # `make -n install` prints the dotbot invocation without running it, which
 # is the only way to check the Makefile's own layer composition on a real
 # host. Host layers are skipped: they appear only when the hostname
-# matches, and the machine running this is usually not hyperia.
+# matches, and the machine running this is usually not hyperia. The
+# headless lane composes through its own make target, since the role is
+# never detected, only asked for.
 check_compose() {
-  local lane="$1"
+  local lane="$1" target="install"
   case "${lane}" in
     desktop-macos | desktop-linux) ;;
+    headless) target="headless" ;;
     *)
-      echo "error: check-compose wants a desktop lane, got '${lane}'" >&2
+      echo "error: check-compose wants a desktop or headless lane, got '${lane}'" >&2
       return 2
       ;;
   esac
 
   local out
-  out=$(cd "${repo_root}" && make -n install)
+  out=$(cd "${repo_root}" && make -n "${target}")
   printf '%s\n' "${out}"
 
   local missing=0
@@ -58,7 +65,7 @@ check_compose() {
     case "${out}" in
       *"${layer}"*) echo "  ✓ composes ${layer}" ;;
       *)
-        echo "  ✖ make -n install did not compose ${layer}" >&2
+        echo "  ✖ make -n ${target} did not compose ${layer}" >&2
         missing=1
         ;;
     esac

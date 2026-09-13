@@ -26,11 +26,20 @@ HOST_LAYER := $(wildcard $(LAYERS)/host/$(HOST).yaml)
 PRIVATE_LAYER := $(if $(wildcard $(HOME)/dev/dotfiles-private),$(LAYERS)/private.yaml,)
 THEME_LAYER := $(LAYERS)/theme.yaml
 
-# The server role skips the os layer on purpose: os/linux.yaml is the graphical
-# stack (ghostty, pipewire, ignis, containers) and headless boxes want none of
-# it. Desktops get the full stack.
+# Roles:
+#   desktop   a graphical workstation: the os layer plus the desktop tooling
+#   headless  a devbox or cloud workstation with no display: the server
+#             package tier, then the same desktop tooling (proto, herdr,
+#             agent skills, the themed configs), and no os layer
+#   server    a lean box or container: the server package tier only
+#
+# The server and headless roles skip the os layer on purpose: os/linux.yaml
+# is the graphical stack (ghostty, pipewire, ignis, containers) and a box
+# without a display wants none of it. Desktops get the full stack.
 ifeq ($(ROLE),server)
 LAYER_CONFIGS := $(BASE_LAYER) $(ROLE_LAYER) $(HOST_LAYER) $(PRIVATE_LAYER) $(THEME_LAYER)
+else ifeq ($(ROLE),headless)
+LAYER_CONFIGS := $(BASE_LAYER) $(LAYERS)/role/server.yaml $(LAYERS)/role/desktop.yaml $(HOST_LAYER) $(PRIVATE_LAYER) $(THEME_LAYER)
 else
 LAYER_CONFIGS := $(BASE_LAYER) $(OS_LAYER) $(ROLE_LAYER) $(HOST_LAYER) $(PRIVATE_LAYER) $(THEME_LAYER)
 endif
@@ -40,6 +49,7 @@ default:
 	@echo ""
 	@echo "Available installation options:"
 	@echo "  make install - Compose the layers for this machine (default)"
+	@echo "  make headless - Full dev tooling, no display stack (devboxes)"
 	@echo "  make server  - Minimal headless install (alias: make minimal)"
 	@echo "  make full    - System tier under sudo, then the composed install"
 	@echo "  make macos   - Alias for make install (macOS is auto-detected)"
@@ -65,6 +75,9 @@ install: update
 
 # Thin aliases so muscle memory and the docs keep working.
 macos: install
+
+headless:
+	@$(MAKE) ROLE=headless install
 
 server:
 	@$(MAKE) ROLE=server install
@@ -250,4 +263,4 @@ test-footer:
 	@echo "$(GREEN)$(CHECK)$(RESET) $(BOLD)All tests completed!$(RESET)"
 	@echo ""
 
-.PHONY: default update install macos server minimal system full private smoke lint lint-header lint-shell lint-yaml lint-lua lint-json lint-markdown lint-ps lint-footer format format-header format-shell format-prettier format-lua format-ps format-footer test test-header test-ps test-footer
+.PHONY: default update install macos headless server minimal system full private smoke lint lint-header lint-shell lint-yaml lint-lua lint-json lint-markdown lint-ps lint-footer format format-header format-shell format-prettier format-lua format-ps format-footer test test-header test-ps test-footer
