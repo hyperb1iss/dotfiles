@@ -65,6 +65,8 @@
 # purple hash line, decorate colors, bold subject, muted body.
 [format]
 	pretty = silkcircuit
+	path = ~/.config/silkcircuit/gitconfig
+	path = /Users/bliss/.config/git/silkcircuit-neon.gitconfig
 
 [credential "https://github.com"]
 	helper =
