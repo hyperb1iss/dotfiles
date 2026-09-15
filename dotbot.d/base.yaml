@@ -80,6 +80,11 @@
     ~/.config/nvim:
       path: nvim
       force: true
+    # Helix reads these two files from ~/.config/helix, and the SilkCircuit
+    # installer drops its themes into ~/.config/helix/themes, so the files
+    # are linked rather than the directory.
+    ~/.config/helix/config.toml: helix/config.toml
+    ~/.config/helix/languages.toml: helix/languages.toml
     ~/bin: bin
     ~/.tmux/plugins/tpm: tpm
 

@@ -1,0 +1,143 @@
+# Language servers and formatters, mirroring the AstroNvim language packs.
+#
+# Helix ships sensible defaults for every language here; this file only
+# swaps servers for the ones Mason already installs (see sh/helix.sh for
+# how those reach PATH), trims servers that are not installed so the
+# health report stays honest, and wires the same formatters conform uses
+# in Neovim. Each formatted language sets auto-format = true so the global
+# editor.auto-format switch in config.toml governs all of them at once.
+
+# ─────────────────────────────────────────────────────────────────────
+# Servers Helix does not define out of the box
+# ─────────────────────────────────────────────────────────────────────
+
+[language-server.vtsls]
+command = "vtsls"
+args = ["--stdio"]
+
+[language-server.vtsls.config]
+# Match the Neovim setup: rename and imports from vtsls, formatting from
+# prettier below.
+typescript.format.enable = false
+javascript.format.enable = false
+
+# Docker's own server, the one Mason installs; it covers Dockerfiles and
+# compose files in a single process.
+[language-server.docker-language-server]
+command = "docker-language-server"
+args = ["start", "--stdio"]
+
+# Helix merges languages.toml three levels deep, so a user [config] table
+# replaces the default one wholesale. This is the 25.07.1 default block plus
+# clippy as the check command.
+[language-server.rust-analyzer.config]
+check.command = "clippy"
+files.watcher = "server"
+inlayHints.bindingModeHints.enable = false
+inlayHints.closingBraceHints.minLines = 10
+inlayHints.closureReturnTypeHints.enable = "with_block"
+inlayHints.discriminantHints.enable = "fieldless"
+inlayHints.lifetimeElisionHints.enable = "skip_trivial"
+inlayHints.typeHints.hideClosureInitialization = false
+
+# ─────────────────────────────────────────────────────────────────────
+# Languages
+# ─────────────────────────────────────────────────────────────────────
+
+[[language]]
+name = "python"
+language-servers = ["ty", "ruff"]
+auto-format = true
+
+[[language]]
+name = "rust"
+auto-format = true
+
+[[language]]
+name = "typescript"
+language-servers = ["vtsls"]
+formatter = { command = "prettier", args = ["--stdin-filepath", "%{buffer_name}"] }
+auto-format = true
+
+[[language]]
+name = "tsx"
+language-servers = ["vtsls", "tailwindcss-ls"]
+formatter = { command = "prettier", args = ["--stdin-filepath", "%{buffer_name}"] }
+auto-format = true
+
+[[language]]
+name = "javascript"
+language-servers = ["vtsls"]
+formatter = { command = "prettier", args = ["--stdin-filepath", "%{buffer_name}"] }
+auto-format = true
+
+[[language]]
+name = "jsx"
+language-servers = ["vtsls", "tailwindcss-ls"]
+formatter = { command = "prettier", args = ["--stdin-filepath", "%{buffer_name}"] }
+auto-format = true
+
+[[language]]
+name = "json"
+formatter = { command = "prettier", args = ["--stdin-filepath", "%{buffer_name}"] }
+auto-format = true
+
+[[language]]
+name = "jsonc"
+formatter = { command = "prettier", args = ["--stdin-filepath", "%{buffer_name}"] }
+auto-format = true
+
+[[language]]
+name = "css"
+language-servers = ["vscode-css-language-server", "tailwindcss-ls"]
+formatter = { command = "prettier", args = ["--stdin-filepath", "%{buffer_name}"] }
+auto-format = true
+
+[[language]]
+name = "scss"
+formatter = { command = "prettier", args = ["--stdin-filepath", "%{buffer_name}"] }
+auto-format = true
+
+[[language]]
+name = "html"
+language-servers = ["vscode-html-language-server", "tailwindcss-ls"]
+formatter = { command = "prettier", args = ["--stdin-filepath", "%{buffer_name}"] }
+auto-format = true
+
+[[language]]
+name = "yaml"
+language-servers = ["yaml-language-server"]
+formatter = { command = "prettier", args = ["--stdin-filepath", "%{buffer_name}"] }
+auto-format = true
+
+[[language]]
+name = "toml"
+language-servers = ["taplo"]
+auto-format = true
+
+[[language]]
+name = "markdown"
+language-servers = ["marksman"]
+formatter = { command = "prettier", args = ["--stdin-filepath", "%{buffer_name}"] }
+auto-format = true
+text-width = 120
+soft-wrap = { enable = true, wrap-at-text-width = true }
+
+[[language]]
+name = "lua"
+formatter = { command = "stylua", args = ["--search-parent-directories", "--stdin-filepath", "%{buffer_name}", "-"] }
+auto-format = true
+
+[[language]]
+name = "bash"
+# shfmt reads the repo .editorconfig once it knows the file name.
+formatter = { command = "shfmt", args = ["--filename", "%{buffer_name}"] }
+auto-format = true
+
+[[language]]
+name = "dockerfile"
+language-servers = ["docker-language-server"]
+
+[[language]]
+name = "docker-compose"
+language-servers = ["docker-language-server", "yaml-language-server"]
