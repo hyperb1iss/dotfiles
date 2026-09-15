@@ -18,6 +18,7 @@ brew "git-delta"             # Syntax-highlighting pager for git
 brew "gnu-sed"               # GNU implementation of the famous stream editor
 brew "go"                    # Open source programming language
 brew "grep"                  # GNU grep, egrep and fgrep
+brew "helix"                 # Post-modern modal text editor
 brew "btop"                  # Resource monitor (C++ htop/top alternative)
 brew "htop"                  # Improved top (interactive process viewer)
 brew "jq"                    # Lightweight and flexible command-line JSON processor

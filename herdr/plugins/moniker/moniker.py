@@ -221,9 +221,11 @@ def name_pane(pane_id: str, force: bool) -> None:
 
 def on_event() -> None:
     try:
-        event = json.loads(os.environ.get("HERDR_PLUGIN_EVENT_JSON") or "{}")
+        envelope = json.loads(os.environ.get("HERDR_PLUGIN_EVENT_JSON") or "{}")
     except ValueError:
         return
+    # Herdr wraps the payload: {"event": "...", "data": {"agent_status": ...}}.
+    event = envelope.get("data") if isinstance(envelope.get("data"), dict) else envelope
     if event.get("agent_status") != "working":
         return
     pane_id = event.get("pane_id") or os.environ.get("HERDR_PANE_ID")

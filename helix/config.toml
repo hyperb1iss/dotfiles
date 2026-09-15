@@ -1,0 +1,214 @@
+# Helix, tuned for hands that learned AstroNvim.
+#
+# Motions, selections and the g/m/z minor modes stay stock Helix: the
+# select-then-act model is the reason to be here, so nothing below tries
+# to turn it back into Vim. What does carry over is the Space leader
+# layout from the Neovim config in this repo (f find, b buffers, l language
+# tools, g git, u toggles, x diagnostics, a agents) plus a handful of
+# reflexes (Ctrl-s, ]b/[b, Esc clearing the selection). Space e is already
+# the file explorer and Space k is hover, so those needed no remap.
+#
+# The SilkCircuit installer owns ~/.config/helix/themes. `:config-reload`
+# picks up edits here; `hx --health <language>` shows what each language
+# resolved to.
+
+theme = "silkcircuit-glow"
+
+[editor]
+line-number = "relative"
+cursorline = true
+scrolloff = 6
+bufferline = "multiple"
+color-modes = true
+true-color = true
+undercurl = true
+popup-border = "all"
+text-width = 120
+completion-timeout = 50
+end-of-line-diagnostics = "hint"
+# Master switch, like g.autoformat in the Neovim config. Every language in
+# languages.toml with a formatter sets auto-format = true, so flipping this
+# with Space u F turns format-on-save on for all of them at once.
+auto-format = false
+
+[editor.inline-diagnostics]
+cursor-line = "warning"
+
+[editor.lsp]
+display-inlay-hints = true
+
+[editor.cursor-shape]
+normal = "block"
+insert = "bar"
+select = "underline"
+
+[editor.file-picker]
+# Neo-tree shows dotfiles; so does this picker. .gitignore still applies.
+hidden = false
+
+[editor.indent-guides]
+render = true
+character = "│"
+skip-levels = 1
+
+# Statusline, laid out like heirline: mode block, branch, file and its
+# state on the left; diagnostics, selection, position and filetype on the
+# right. Helix paints the bar from the theme (ui.statusline.* in the
+# SilkCircuit helix theme), so this side only picks elements, the
+# separator glyph and the mode labels. Nerd Font glyphs: terminal for
+# normal, pencil for insert, select-all for select.
+[editor.statusline]
+left = [
+  "mode",
+  "spinner",
+  "version-control",
+  "separator",
+  "file-name",
+  "file-modification-indicator",
+  "read-only-indicator",
+]
+center = []
+right = [
+  "diagnostics",
+  "workspace-diagnostics",
+  "separator",
+  "selections",
+  "primary-selection-length",
+  "register",
+  "separator",
+  "position",
+  "position-percentage",
+  "separator",
+  "file-type",
+]
+separator = "│"
+mode.normal = " NORMAL"
+mode.insert = " INSERT"
+mode.select = "󰒅 SELECT"
+
+[editor.soft-wrap]
+enable = false
+
+# ─────────────────────────────────────────────────────────────────────
+# Reflexes
+# ─────────────────────────────────────────────────────────────────────
+
+[keys.normal]
+C-s = ":write"
+C-q = ":quit-all!"
+C-r = "redo"
+C-h = "jump_view_left"
+C-j = "jump_view_down"
+C-k = "jump_view_up"
+C-l = "jump_view_right"
+# Vim's Esc clears the highlight; here it collapses to one cursor.
+esc = ["collapse_selection", "keep_primary_selection"]
+
+[keys.normal."]"]
+b = "goto_next_buffer"
+
+[keys.normal."["]
+b = "goto_previous_buffer"
+
+[keys.insert]
+C-s = ["normal_mode", ":write"]
+
+# ─────────────────────────────────────────────────────────────────────
+# Space leader, AstroNvim layout
+#
+# Helix defaults kept as-is: Space e/E explorer, Space k hover, Space r
+# rename, Space s/S symbols, Space d/D diagnostics, Space j jumplist,
+# Space h references, Space ' last picker, Space ? palette, Space y/p/P/R
+# clipboard, Space G debug. Space a becomes the agents group below, so code
+# actions live at Space l a, as in AstroNvim.
+# ─────────────────────────────────────────────────────────────────────
+
+[keys.normal.space]
+w = ":write"
+q = ":quit"
+Q = ":quit-all"
+n = ":new"
+c = ":buffer-close"
+C = ":buffer-close!"
+"/" = "toggle_comments"
+"|" = "vsplit"
+"\\" = "hsplit"
+
+# Find
+[keys.normal.space.f]
+f = "file_picker"
+F = "file_picker_in_current_directory"
+w = "global_search"
+b = "buffer_picker"
+s = "symbol_picker"
+S = "workspace_symbol_picker"
+j = "jumplist_picker"
+g = "changed_file_picker"
+# Word under the cursor, searched across the project: select it, push it
+# into the search register, open global search and paste it in. The picker
+# searches as you type, so no Enter: that would jump to the first hit.
+c = "@miw*<space>fw<C-r>/"
+
+# Buffers
+[keys.normal.space.b]
+b = "buffer_picker"
+n = "goto_next_buffer"
+p = "goto_previous_buffer"
+d = ":buffer-close"
+c = ":buffer-close-others"
+C = ":buffer-close-all"
+
+# Language tools
+[keys.normal.space.l]
+a = "code_action"
+r = "rename_symbol"
+h = "hover"
+f = ":format"
+s = "symbol_picker"
+G = "workspace_symbol_picker"
+d = "diagnostics_picker"
+D = "workspace_diagnostics_picker"
+R = "goto_reference"
+i = "goto_implementation"
+y = "goto_type_definition"
+l = ":lsp-restart"
+L = ":log-open"
+
+# Git. lazygit rides a tmux popup because Helix has no terminal of its
+# own; outside tmux the shell one-liner says so instead of failing quietly.
+[keys.normal.space.g]
+g = ':sh if [ -n "$TMUX" ]; then tmux display-popup -E -w 90%% -h 90%% -d "$PWD" lazygit; else echo "lazygit popup needs tmux: C-z, lazygit, fg"; fi'
+f = ':sh if [ -n "$TMUX" ]; then tmux display-popup -E -w 90%% -h 90%% -d "$PWD" lazygit -f "%{buffer_name}"; else echo "lazygit popup needs tmux: C-z, lazygit, fg"; fi'
+s = "changed_file_picker"
+b = ':sh git log -1 --format="%%h %%an, %%ar%%n%%s" $(git blame --porcelain -L %{cursor_line},+1 -- %{buffer_name} | head -1 | cut -d" " -f1)'
+
+# Agents: copy a file:line reference the way Claude Code likes it, spanning
+# the selection when it covers more than one line. The variables sit behind
+# `set --` because Helix expands the first word of a :sh command only when
+# the whole word is an expansion: `s=%{selection_line_start}` stays literal.
+[keys.normal.space.a]
+y = ':sh set -- %{selection_line_start} %{selection_line_end} %{buffer_name}; if [ "$1" = "$2" ]; then r="$1"; else r="$1-$2"; fi; if command -v pbcopy >/dev/null 2>&1; then printf "%%s" "$3:$r" | pbcopy; elif command -v wl-copy >/dev/null 2>&1; then printf "%%s" "$3:$r" | wl-copy; else printf "%%s" "$3:$r" | xclip -selection clipboard; fi; echo "copied $3:$r"'
+
+# UI toggles
+[keys.normal.space.u]
+n = ":toggle line-number relative absolute"
+w = ":toggle soft-wrap.enable"
+i = ":toggle lsp.display-inlay-hints"
+g = ":toggle indent-guides.render"
+h = ":toggle whitespace.render all none"
+c = ":toggle cursorline"
+b = ":toggle bufferline multiple never"
+m = ":toggle mouse"
+F = ":toggle auto-format"
+d = [":toggle end-of-line-diagnostics hint disable", ":toggle inline-diagnostics.cursor-line warning disable"]
+
+# Diagnostics lists (Trouble's corner)
+[keys.normal.space.x]
+x = "diagnostics_picker"
+X = "workspace_diagnostics_picker"
+
+[keys.select.space]
+"/" = "toggle_comments"
+
+[keys.select.space.a]
+y = ':sh set -- %{selection_line_start} %{selection_line_end} %{buffer_name}; if [ "$1" = "$2" ]; then r="$1"; else r="$1-$2"; fi; if command -v pbcopy >/dev/null 2>&1; then printf "%%s" "$3:$r" | pbcopy; elif command -v wl-copy >/dev/null 2>&1; then printf "%%s" "$3:$r" | wl-copy; else printf "%%s" "$3:$r" | xclip -selection clipboard; fi; echo "copied $3:$r"'
