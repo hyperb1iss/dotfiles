@@ -21,6 +21,7 @@ export default defineConfig({
       { text: 'Guide', link: '/getting-started/' },
       { text: 'Shell', link: '/shell/' },
       { text: 'Neovim', link: '/neovim/' },
+      { text: 'Helix', link: '/helix/' },
       { text: 'Tools', link: '/tools/' },
       {
         text: 'Reference',
@@ -86,6 +87,12 @@ export default defineConfig({
             { text: 'LSP & Completion', link: '/neovim/lsp' },
             { text: 'AI Integration', link: '/neovim/ai' },
           ],
+        },
+      ],
+      '/helix/': [
+        {
+          text: 'Helix',
+          items: [{ text: 'Overview', link: '/helix/' }],
         },
       ],
       '/tools/': [

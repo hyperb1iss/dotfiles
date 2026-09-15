@@ -43,13 +43,14 @@ This README is the tour. The field manual lives at
 
 ### 📊 Core Development
 
-| Tool                                                                 | Description          | Features                                                                    |
-| -------------------------------------------------------------------- | -------------------- | --------------------------------------------------------------------------- |
-| 📝 **[AstroNvim v5](https://astronvim.com/)**                        | Neovim configuration | • IDE-like features<br>• Avante.nvim AI assistant<br>• SilkCircuit theme    |
-| 👻 **[Ghostty](https://ghostty.org/)**                               | Terminal emulator    | • GPU-accelerated<br>• SilkCircuit theme<br>• Native macOS/Linux            |
-| 🌌 **[Starship](https://starship.rs/)**                              | Cross-shell prompt   | • SilkCircuit gradient theme<br>• Git status integration<br>• Context-aware |
-| 🖥️ **[Tmux](https://github.com/tmux/tmux)**                          | Terminal multiplexer | • Custom key bindings<br>• SilkCircuit color scheme<br>• Session management |
-| 🤖 **[Claude Code](https://docs.anthropic.com/en/docs/claude-code)** | AI pair programmer   | • Custom status line<br>• Security hooks<br>• Project-aware assistance      |
+| Tool                                                                 | Description              | Features                                                                                    |
+| -------------------------------------------------------------------- | ------------------------ | ------------------------------------------------------------------------------------------- |
+| 📝 **[AstroNvim v5](https://astronvim.com/)**                        | Neovim configuration     | • IDE-like features<br>• Avante.nvim AI assistant<br>• SilkCircuit theme                    |
+| 🌙 **[Helix](https://helix-editor.com/)**                            | Modal editor, no plugins | • AstroNvim-shaped Space leader<br>• Shares Mason's language servers<br>• SilkCircuit theme |
+| 👻 **[Ghostty](https://ghostty.org/)**                               | Terminal emulator        | • GPU-accelerated<br>• SilkCircuit theme<br>• Native macOS/Linux                            |
+| 🌌 **[Starship](https://starship.rs/)**                              | Cross-shell prompt       | • SilkCircuit gradient theme<br>• Git status integration<br>• Context-aware                 |
+| 🖥️ **[Tmux](https://github.com/tmux/tmux)**                          | Terminal multiplexer     | • Custom key bindings<br>• SilkCircuit color scheme<br>• Session management                 |
+| 🤖 **[Claude Code](https://docs.anthropic.com/en/docs/claude-code)** | AI pair programmer       | • Custom status line<br>• Security hooks<br>• Project-aware assistance                      |
 
 ### 🎯 Modern CLI Tools
 
@@ -78,6 +79,7 @@ This README is the tour. The field manual lives at
 dotfiles/
 ├── nvim/                 # AstroNvim v5 configuration (→ ~/.config/nvim)
 │   └── lua/plugins/      #   Plugin configs (silkcircuit, avante, treesitter, …)
+├── helix/                # Helix config + languages (→ ~/.config/helix/*.toml)
 ├── zsh/                  # Zsh configuration (zshrc + completion)
 ├── bash/                 # Bash configuration (profile + bashrc.local)
 ├── sh/                   # 30 modular shell scripts (git, docker, k8s, macos, …)
