@@ -181,6 +181,22 @@ Works in normal and select mode. It uses `pbcopy`, `wl-copy` or `xclip`, whichev
 selection (matching AstroNvim, and replacing Helix's `Space c`). Two defaults moved: `Space a` is the agents group, so
 code actions are `Space l a`, and `Space w` saves, so window mode is `Ctrl-w`.
 
+## Statusline and bufferline
+
+The bar follows the heirline layout from Neovim: a colored mode block on the left (NORMAL, INSERT and SELECT, each with
+a Nerd Font glyph, the LSP spinner beside it), then the git branch, the file name and its modified or read-only state.
+The right side carries diagnostics for the buffer and the workspace as colored dots, the selection count and length, the
+active register, position and percentage, and the file type. Sections sit on the SilkCircuit highlight surface with cyan
+separators; the mode block takes purple, pink or cyan for normal, insert or select, the same hues heirline uses. Those
+colors live in the SilkCircuit Helix theme, generated from the helix extra in that repo, because Helix draws the bar
+from `ui.statusline` scopes rather than from config.
+
+With more than one buffer open the bufferline appears on top, active buffer in bold purple on the editor background, the
+rest muted on the section surface, matching the heirline tabline.
+
+Helix has no custom statusline components, so a few heirline pieces have no equivalent: git added, changed and removed
+counts, attached server names and the scrollbar. The spinner covers server activity and `Space l L` opens the log.
+
 ## Language servers
 
 Everything below resolves to the binaries Mason installed for Neovim under `~/.local/share/nvim/mason/bin`, which

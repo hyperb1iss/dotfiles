@@ -51,14 +51,40 @@ render = true
 character = "│"
 skip-levels = 1
 
+# Statusline, laid out like heirline: mode block, branch, file and its
+# state on the left; diagnostics, selection, position and filetype on the
+# right. Helix paints the bar from the theme (ui.statusline.* in the
+# SilkCircuit helix theme), so this side only picks elements, the
+# separator glyph and the mode labels. Nerd Font glyphs: terminal for
+# normal, pencil for insert, select-all for select.
 [editor.statusline]
-left = ["mode", "spinner", "version-control", "file-name", "read-only-indicator", "file-modification-indicator"]
+left = [
+  "mode",
+  "spinner",
+  "version-control",
+  "separator",
+  "file-name",
+  "file-modification-indicator",
+  "read-only-indicator",
+]
 center = []
-right = ["diagnostics", "selections", "register", "position", "position-percentage", "total-line-numbers", "file-type"]
+right = [
+  "diagnostics",
+  "workspace-diagnostics",
+  "separator",
+  "selections",
+  "primary-selection-length",
+  "register",
+  "separator",
+  "position",
+  "position-percentage",
+  "separator",
+  "file-type",
+]
 separator = "│"
-mode.normal = "NORMAL"
-mode.insert = "INSERT"
-mode.select = "SELECT"
+mode.normal = " NORMAL"
+mode.insert = " INSERT"
+mode.select = "󰒅 SELECT"
 
 [editor.soft-wrap]
 enable = false
