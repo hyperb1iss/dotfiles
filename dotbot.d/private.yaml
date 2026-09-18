@@ -29,11 +29,3 @@
         fi
       description: Retiring the old Claude agent file link
       stdout: true
-
-- shell:
-    - command: |
-        if [ -x "$HOME/dev/dotfiles-private/scripts/nova.sh" ]; then
-          make -C "$HOME/dev/dotfiles-private" install
-        fi
-      description: Installing private commands
-      stdout: true
