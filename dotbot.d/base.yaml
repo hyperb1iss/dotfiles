@@ -14,7 +14,7 @@
 #
 # force is per link, not global: it deletes whatever real file or directory
 # squats the link path, so it is spent only on the paths that need it (the
-# directory links, and ~/.zshrc, which gets backed up first below).
+# directory links, and Zsh startup files, which get backed up first below).
 - defaults:
     link:
       relink: true
@@ -32,18 +32,20 @@
 
 - shell:
     - command: |
-        # ~/.zshrc is force-linked below, so move a real one aside rather than
-        # destroying it. pwd is the repo root: dotbot chdirs to -d before
+        # Zsh startup files are force-linked below, so move existing files aside
+        # before replacing them. pwd is the repo root: dotbot chdirs to -d before
         # running shell commands, which keeps this honest in a worktree.
-        zshrc_target="$(pwd)/zsh/zshrc"
-        zshrc_link="$HOME/.zshrc"
-        if [ -e "$zshrc_link" ] || [ -L "$zshrc_link" ]; then
-          if [ "$(readlink "$zshrc_link" 2>/dev/null || true)" != "$zshrc_target" ]; then
-            backup_path="${zshrc_link}.pre-dotfiles.$(date +%Y%m%d%H%M%S)"
-            mv "$zshrc_link" "$backup_path"
-            echo "Backed up existing ~/.zshrc to $backup_path"
+        for startup in zshenv zshrc; do
+          startup_target="$(pwd)/zsh/$startup"
+          startup_link="$HOME/.$startup"
+          if [ -e "$startup_link" ] || [ -L "$startup_link" ]; then
+            if [ "$(readlink "$startup_link" 2>/dev/null || true)" != "$startup_target" ]; then
+              backup_path="${startup_link}.pre-dotfiles.$(date +%Y%m%d%H%M%S)"
+              mv "$startup_link" "$backup_path"
+              echo "Backed up existing ~/.$startup to $backup_path"
+            fi
           fi
-        fi
+        done
       stderr: true
       stdout: true
       description: Preparing Zsh configuration link
@@ -74,6 +76,9 @@
     # never rewrite the tracked one. Local values win on shared keys.
     ~/.config/git/config: gitconfig
     ~/.tmux.conf: tmux.conf
+    ~/.zshenv:
+      path: zsh/zshenv
+      force: true
     ~/.zshrc:
       path: zsh/zshrc
       force: true

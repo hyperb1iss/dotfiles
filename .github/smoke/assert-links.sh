@@ -30,6 +30,7 @@ floor=(
   "${home}/.bashrc.local"
   "${home}/.config/git/config"
   "${home}/.tmux.conf"
+  "${home}/.zshenv"
   "${home}/.zshrc"
   "${home}/.config/nvim"
   "${home}/bin"

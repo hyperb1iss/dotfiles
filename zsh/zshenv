@@ -1,0 +1,2 @@
+# Headless sessions may start without the desktop's locale environment.
+export LANG="${LANG:-en_US.UTF-8}"
