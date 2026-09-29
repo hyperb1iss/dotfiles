@@ -11,11 +11,23 @@
 - link:
     ~/.bash_profile: bash/bash_profile
     ~/.config/karabiner/karabiner.json: macos/karabiner.json
-    # Ghostty on macOS reads its config out of Application Support, not XDG
-    ~/Library/Application Support/com.mitchellh.ghostty/config: ghostty/config
-    ~/Library/Application Support/com.mitchellh.ghostty/macos.conf: ghostty/macos.conf
+    # Ghostty reads both XDG and Application Support; use only XDG.
+    ~/.config/ghostty/config: ghostty/config
+    ~/.config/ghostty/macos.conf: ghostty/macos.conf
 
 - shell:
+    - command: |
+        # Remove duplicate includes left by the old Application Support links.
+        # Preserve real files and links managed outside this checkout.
+        for name in config macos.conf; do
+          ghostty_link="$HOME/Library/Application Support/com.mitchellh.ghostty/$name"
+          ghostty_target="$(pwd)/ghostty/$name"
+          if [ -L "$ghostty_link" ] && [ "$(readlink "$ghostty_link")" = "$ghostty_target" ]; then
+            rm "$ghostty_link" || exit 1
+          fi
+        done
+      description: Removing duplicate Ghostty configuration links
+
     - command: |
         # Install private fonts to macOS user font directory
         if [ -d "$HOME/dev/dotfiles-private/fonts" ]; then
