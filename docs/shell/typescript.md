@@ -188,10 +188,10 @@ Great for onboarding or debugging environment issues.
 
 ## Claude Code
 
-| Alias | Command             | Description      |
-| ----- | ------------------- | ---------------- |
-| `cc`  | `claude`            | Claude CLI       |
-| `ccc` | `claude --continue` | Continue session |
+| Alias | Command                                 | Description                       |
+| ----- | --------------------------------------- | --------------------------------- |
+| `cc`  | `claude`                                | Claude CLI                        |
+| `ccc` | `claude --dangerously-skip-permissions` | Claude with no permission prompts |
 
 For AI-assisted development in the terminal.
 

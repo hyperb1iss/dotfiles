@@ -9,7 +9,7 @@ is_minimal && return 0
 # ─────────────────────────────────────────────────────────────
 
 alias cc='claude'
-alias ccc='claude --continue'
+alias ccc='claude --dangerously-skip-permissions'
 
 # ─────────────────────────────────────────────────────────────
 # Codex

@@ -190,11 +190,11 @@ Quick reference for every alias - organized by category for fast scanning.
 
 ## AI CLIs
 
-| Alias     | Command                   | Description                                           |
-| --------- | ------------------------- | ----------------------------------------------------- |
-| `cc`      | `claude`                  | Claude Code CLI                                       |
-| `ccc`     | `claude --continue`       | Continue previous session                             |
-| `goblinz` | `codex -m gpt-5.5 --yolo` | Launch GPT-5.5 Codex with the creature filter removed |
+| Alias     | Command                                 | Description                                           |
+| --------- | --------------------------------------- | ----------------------------------------------------- |
+| `cc`      | `claude`                                | Claude Code CLI                                       |
+| `ccc`     | `claude --dangerously-skip-permissions` | Claude Code with no permission prompts                |
+| `goblinz` | `codex -m gpt-5.5 --yolo`               | Launch GPT-5.5 Codex with the creature filter removed |
 
 ## Homebrew (macOS)
 
