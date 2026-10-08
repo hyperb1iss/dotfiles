@@ -87,7 +87,10 @@ sync_frequency = 300
 [search]
 # Ctrl-R cycles these in order; workspace is skipped outside a git repo
 filters = ["workspace", "directory", "host", "global"]
-shells = "auto"
+# "all", never "auto": auto keys the daemon's single index on each caller's
+# ATUIN_SHELL, and agent shells leave it unset, so every zsh/agent alternation
+# forced a full rebuild from history.db, and a burst of new shells stampeded it.
+shells = "all"
 
 [tmux]
 enabled = true
