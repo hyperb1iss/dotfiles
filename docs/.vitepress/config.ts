@@ -61,7 +61,7 @@ export default defineConfig({
         {
           text: 'Language Support',
           items: [
-            { text: 'Node.js / NVM', link: '/shell/nvm' },
+            { text: 'Node.js / proto', link: '/shell/node' },
             { text: 'Python', link: '/shell/python' },
             { text: 'Rust', link: '/shell/rust' },
             { text: 'Java', link: '/shell/java' },

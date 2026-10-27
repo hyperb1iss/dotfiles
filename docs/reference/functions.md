@@ -149,24 +149,8 @@ Every shell function organized by category - comprehensive reference with descri
 
 ## Node.js
 
-### Version Management
-
-| Function         | Description                         |
-| ---------------- | ----------------------------------- |
-| `node-lts`       | Install and use latest LTS Node     |
-| `node-latest`    | Install and use latest stable Node  |
-| `node-switch`    | Interactive version picker with fzf |
-| `node-list`      | List installed Node versions        |
-| `node-install`   | Install specific Node version       |
-| `node-uninstall` | Uninstall Node version              |
-| `node-info`      | Show current Node/npm/nvm versions  |
-
-### nvmrc Support
-
-| Function       | Description                        |
-| -------------- | ---------------------------------- |
-| `auto-nvm`     | Use .nvmrc in current directory    |
-| `nvmrc-create` | Create .nvmrc with current version |
+Node versions come from proto, which has no shell wrappers here. See [Node.js / proto](../shell/node) for the setup and
+day-to-day commands.
 
 ## Python
 

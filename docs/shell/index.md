@@ -17,7 +17,6 @@ sh/
 ├── docker.sh           # Docker utilities
 ├── kubernetes.sh       # K8s shortcuts
 ├── typescript.sh       # Turbo, pnpm, TypeScript tooling
-├── nvm.sh              # Node version management
 ├── python.sh           # Python & Django workflows
 ├── rust.sh             # Rust & Cargo shortcuts
 ├── java.sh             # Java version switching
@@ -131,9 +130,9 @@ kubectl shortcuts, context switching, and k9s integration. Because typing `kubec
 
 Monorepo development tools. Turborepo shortcuts, pnpm aliases, quick package navigation, and AI-powered commit messages.
 
-### [Language Support](./nvm)
+### [Language Support](./node)
 
-Version managers for Node, Python, Rust, and Java. Switch environments effortlessly.
+proto for Node and friends, plus Python, Rust, and Java tooling. Switch environments effortlessly.
 
 ### [System Utilities](./system)
 

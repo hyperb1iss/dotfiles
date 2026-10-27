@@ -41,8 +41,9 @@ configuration enables the search daemon and disables Atuin's AI, dotfiles manage
 
 ### Proto Version Manager
 
-[Proto](https://moonrepo.dev/proto) manages language runtime versions declaratively via `.prototools`. Currently pins
-Node.js, pnpm, Rust, and moon. Auto-detects version files and integrates with the shell PATH.
+[Proto](https://moonrepo.dev/proto) manages language runtime versions declaratively via `.prototools`. Globally pins
+Node.js, npm, pnpm, Python, uv, and moon (Rust stays with rustup, zig with Homebrew). See
+[Node.js / proto](../shell/node). Auto-detects version files and integrates with the shell PATH.
 
 ### [Starship Prompt](./starship)
 

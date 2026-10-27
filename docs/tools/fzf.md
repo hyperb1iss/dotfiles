@@ -344,7 +344,6 @@ FZF is used throughout the dotfiles:
 | `sh/git.sh`    | Git operations (gadd, gco, glog, gstash)    |
 | `sh/git.sh`    | Git worktree manager (gwt)                  |
 | `sh/docker.sh` | Container management (dexec, dlf, dstop)    |
-| `sh/nvm.sh`    | Node version switching                      |
 | `sh/rust.sh`   | Rust toolchain switching                    |
 | `sh/macos.sh`  | Homebrew service management (brew-services) |
 
