@@ -49,6 +49,7 @@ brew "tree"                  # Display directories as trees
 brew "unzip"                 # Extraction utility for .zip compressed archives
 brew "wget"                  # Internet file retriever
 brew "yq"                    # Process YAML documents from the CLI
+brew "zig"                   # Zig toolchain (proto has no built-in plugin)
 brew "zoxide"                # Smarter cd command
 brew "zsh"                   # UNIX shell
 brew "zsh-autosuggestions"   # Fish-like fast/unobtrusive autosuggestions for zsh
