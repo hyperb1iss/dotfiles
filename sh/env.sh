@@ -156,6 +156,32 @@ elif [[ -n "$BASH_VERSION" ]]; then
   cached_eval proto proto-activate.bash proto activate bash
 fi
 
+# proto's chpwd hook re-exports PATH on every cd. Inside a pinned repo the uv tool
+# contributes ~/.local/bin to proto's activated list; on the way out proto strips every
+# occurrence of its activated entries, which deletes the base ~/.local/bin added above
+# and makes uv tools (sibyl among them) vanish in unpinned directories. Put it back
+# after proto has had its say. (proto 0.61.1)
+_dotfiles_keep_local_bin() {
+  case ":${PATH}:" in
+    *":${HOME}/.local/bin:"*) ;;
+    *) export PATH="${HOME}/.local/bin:${PATH}" ;;
+  esac
+}
+if [[ -n "$ZSH_VERSION" ]]; then
+  typeset -ag chpwd_functions
+  case " ${chpwd_functions[*]} " in
+    *" _dotfiles_keep_local_bin "*) ;;
+    *) chpwd_functions+=(_dotfiles_keep_local_bin) ;;
+  esac
+elif [[ -n "$BASH_VERSION" ]]; then
+  case ";${PROMPT_COMMAND:-};" in
+    *";_dotfiles_keep_local_bin;"*) ;;
+    # Appended so it runs after proto's hook, which activation prepends.
+    *) PROMPT_COMMAND="${PROMPT_COMMAND:+$PROMPT_COMMAND;}_dotfiles_keep_local_bin" ;;
+  esac
+fi
+_dotfiles_keep_local_bin
+
 # Homebrew installs rustup keg-only, so expose its toolchain proxies directly.
 if is_macos; then
   if [[ -d /opt/homebrew/opt/rustup/bin ]]; then
