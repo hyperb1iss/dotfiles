@@ -1,0 +1,775 @@
+#!/usr/bin/env bash
+#
+# ╭──────────────────────────────────────────────────────────────╮
+# │  diskclean ⚡ Intelligent disk space analyzer & cleanup      │
+# │  Part of the SilkCircuit dotfiles ecosystem                  │
+# ╰──────────────────────────────────────────────────────────────╯
+#
+
+set -eo pipefail
+
+# ─────────────────────────────────────────────────────────────
+# SilkCircuit Neon Palette
+# ─────────────────────────────────────────────────────────────
+RESET="\033[0m"
+BOLD="\033[1m"
+DIM="\033[2m"
+
+SC_PURPLE='\033[38;2;225;53;255m'
+SC_CYAN='\033[38;2;128;255;234m'
+SC_CORAL='\033[38;2;255;106;193m'
+SC_YELLOW='\033[38;2;241;250;140m'
+SC_GREEN='\033[38;2;80;250;123m'
+SC_RED='\033[38;2;255;99;99m'
+SC_ORANGE='\033[38;2;255;180;100m'
+SC_GRAY='\033[38;2;98;114;164m'
+SC_WHITE='\033[38;2;248;248;242m'
+
+# ─────────────────────────────────────────────────────────────
+# State
+# ─────────────────────────────────────────────────────────────
+declare -a CLEANUP_ITEMS=()
+declare -a CLEANUP_SIZES=()
+declare -a CLEANUP_CMDS=()
+declare -a CLEANUP_DESCS=()
+TOTAL_RECLAIMABLE=0
+
+# ─────────────────────────────────────────────────────────────
+# Output
+# ─────────────────────────────────────────────────────────────
+err() { echo -e "${SC_RED}${BOLD}✖${RESET} $*"; }
+warn() { echo -e "${SC_ORANGE}⚠ $*${RESET}"; }
+info() { echo -e "${SC_PURPLE}▸${RESET} $*"; }
+ok() { echo -e "${SC_GREEN}✓${RESET} $*"; }
+step() { echo -e "${SC_CYAN}⚡${RESET} $*"; }
+
+header() {
+  echo ""
+  echo -e "  ${SC_PURPLE}${BOLD}─── $* ───${RESET}"
+}
+
+banner() {
+  echo ""
+  echo -e "${SC_PURPLE}${BOLD}  ╭────────────────────────────────────╮${RESET}"
+  echo -e "${SC_PURPLE}${BOLD}  │${RESET}  ${SC_CYAN}${BOLD}diskclean${RESET} ${SC_GRAY}⚡${RESET} ${SC_WHITE}disk space analyzer${RESET}  ${SC_PURPLE}${BOLD}│${RESET}"
+  echo -e "${SC_PURPLE}${BOLD}  ╰────────────────────────────────────╯${RESET}"
+  echo ""
+}
+
+# ─────────────────────────────────────────────────────────────
+# Spinner
+# ─────────────────────────────────────────────────────────────
+SPINNER_PID=""
+SPINNER_FRAMES=("⠋" "⠙" "⠹" "⠸" "⠼" "⠴" "⠦" "⠧" "⠇" "⠏")
+
+spinner_start() {
+  local msg="${1:-Working...}"
+  (
+    i=0
+    while true; do
+      printf "\r  ${SC_CYAN}${SPINNER_FRAMES[$i]}${RESET} ${SC_GRAY}%s${RESET}" "$msg"
+      i=$(((i + 1) % ${#SPINNER_FRAMES[@]}))
+      sleep 0.08
+    done
+  ) &
+  SPINNER_PID=$!
+  disown
+}
+
+spinner_stop() {
+  if [[ -n "$SPINNER_PID" ]]; then
+    kill "$SPINNER_PID" 2> /dev/null
+    wait "$SPINNER_PID" 2> /dev/null
+    SPINNER_PID=""
+    printf "\r\033[K" # Clear the line
+  fi
+}
+
+size_mb() {
+  local size="$1"
+  local num="${size%[KMGTP]*}"
+  local unit="${size//[0-9.]/}"
+  case "$unit" in
+    G | Gi) echo $((${num%.*} * 1024)) ;;
+    M | Mi) echo "${num%.*}" ;;
+    K | Ki) echo "0" ;;
+    *) echo "0" ;;
+  esac
+}
+
+format_size() {
+  local mb="$1"
+  if ((mb >= 1024)); then
+    printf "%.1fG" "$(echo "$mb / 1024" | bc -l)"
+  else
+    echo "${mb}M"
+  fi
+}
+
+size_color() {
+  local size="$1"
+  local mb
+  mb=$(size_mb "$size")
+  if ((mb >= 10240)); then
+    echo -e "${SC_RED}${BOLD}${size}${RESET}"
+  elif ((mb >= 1024)); then
+    echo -e "${SC_ORANGE}${size}${RESET}"
+  elif ((mb >= 500)); then
+    echo -e "${SC_YELLOW}${size}${RESET}"
+  else
+    echo -e "${SC_WHITE}${size}${RESET}"
+  fi
+}
+
+# ─────────────────────────────────────────────────────────────
+# Interactive prompt
+# ─────────────────────────────────────────────────────────────
+prompt_yn() {
+  local prompt="$1"
+  local default="${2:-n}"
+
+  if [[ "$default" == "y" ]]; then
+    echo -n -e "${SC_YELLOW}${prompt}${RESET} [${SC_GREEN}Y${RESET}/n]: "
+  else
+    echo -n -e "${SC_YELLOW}${prompt}${RESET} [y/${SC_GREEN}N${RESET}]: "
+  fi
+
+  read -r response
+  response="${response:-$default}"
+  [[ "$response" =~ ^[Yy]$ ]]
+}
+
+# ─────────────────────────────────────────────────────────────
+# Add cleanup item
+# ─────────────────────────────────────────────────────────────
+add_cleanup() {
+  local name="$1"
+  local size="$2"
+  local cmd="$3"
+  local desc="$4"
+
+  CLEANUP_ITEMS+=("$name")
+  CLEANUP_SIZES+=("$size")
+  CLEANUP_CMDS+=("$cmd")
+  CLEANUP_DESCS+=("$desc")
+
+  local mb
+  mb=$(size_mb "$size")
+  TOTAL_RECLAIMABLE=$((TOTAL_RECLAIMABLE + mb))
+}
+
+# ─────────────────────────────────────────────────────────────
+# Scanners
+# ─────────────────────────────────────────────────────────────
+scan_disk_overview() {
+  header "Disk Overview"
+
+  # Find the boot container and parse its info
+  local container apfs_info
+  container=$(diskutil info / 2> /dev/null | grep "Part of Whole" | awk '{print $NF}')
+  apfs_info=$(diskutil apfs list "$container" 2> /dev/null)
+
+  if [[ -z "$apfs_info" ]]; then
+    # Fallback to basic df
+    df -h / | tail -1 | awk '{
+      printf "    Total: \033[38;2;128;255;234m%s\033[0m  ", $2
+      printf "Used: \033[38;2;255;180;100m%s\033[0m  ", $3
+      printf "Free: \033[38;2;80;250;123m%s\033[0m\n", $4
+    }'
+    return
+  fi
+
+  # Extract container info
+  local total_bytes used_bytes free_bytes
+  total_bytes=$(echo "$apfs_info" | grep "Size (Capacity Ceiling)" | awk '{print $4}')
+  used_bytes=$(echo "$apfs_info" | grep "Capacity In Use By Volumes" | awk '{print $6}')
+  free_bytes=$(echo "$apfs_info" | grep "Capacity Not Allocated" | awk '{print $4}')
+
+  # Convert to human readable
+  local total_gb used_gb free_gb pct
+  total_gb=$(echo "scale=1; $total_bytes / 1000000000" | bc 2> /dev/null)
+  used_gb=$(echo "scale=1; $used_bytes / 1000000000" | bc 2> /dev/null)
+  free_gb=$(echo "scale=1; $free_bytes / 1000000000" | bc 2> /dev/null)
+  pct=$(echo "scale=0; $used_bytes * 100 / $total_bytes" | bc 2> /dev/null || echo "?")
+
+  printf "    Total: ${SC_CYAN}%s GB${RESET}  " "$total_gb"
+  printf "Used: ${SC_ORANGE}%s GB${RESET} (%s%%)  " "$used_gb" "$pct"
+  printf "Free: ${SC_GREEN}%s GB${RESET}\n" "$free_gb"
+  echo ""
+
+  # Volume breakdown
+  echo -e "    ${SC_GRAY}Breakdown:${RESET}"
+
+  # Parse each volume - Data, System, VM, Preboot, Recovery
+  # Use sed to clean up the pipe characters from diskutil output
+  local data_bytes system_bytes vm_bytes preboot_bytes recovery_bytes
+  data_bytes=$(echo "$apfs_info" | grep -A4 "Role.*Data" | grep "Capacity Consumed" | sed 's/.*: *//' | awk '{print $1}')
+  system_bytes=$(echo "$apfs_info" | grep -A4 "Role.*System" | grep "Capacity Consumed" | sed 's/.*: *//' | awk '{print $1}')
+  vm_bytes=$(echo "$apfs_info" | grep -A4 "Role.*VM" | grep "Capacity Consumed" | sed 's/.*: *//' | awk '{print $1}')
+  preboot_bytes=$(echo "$apfs_info" | grep -A4 "Role.*Preboot" | grep "Capacity Consumed" | sed 's/.*: *//' | awk '{print $1}')
+  recovery_bytes=$(echo "$apfs_info" | grep -A4 "Role.*Recovery" | grep "Capacity Consumed" | sed 's/.*: *//' | awk '{print $1}')
+
+  # Display breakdown with bar visualization
+  local bar_width=20
+
+  if [[ -n "$data_bytes" ]]; then
+    local data_gb data_pct data_bar
+    data_gb=$(echo "scale=1; $data_bytes / 1000000000" | bc 2> /dev/null)
+    data_pct=$(echo "scale=0; $data_bytes * 100 / $total_bytes" | bc 2> /dev/null)
+    data_bar=$(printf '%*s' $((data_pct * bar_width / 100)) '' | tr ' ' '█')
+    printf "    ${SC_CORAL}%-10s${RESET} %6s GB  ${SC_CORAL}%-${bar_width}s${RESET} %2s%%\n" "User Data" "$data_gb" "$data_bar" "$data_pct"
+  fi
+
+  if [[ -n "$system_bytes" ]]; then
+    local sys_gb sys_pct sys_bar
+    sys_gb=$(echo "scale=1; $system_bytes / 1000000000" | bc 2> /dev/null)
+    sys_pct=$(echo "scale=0; $system_bytes * 100 / $total_bytes" | bc 2> /dev/null)
+    sys_bar=$(printf '%*s' $((sys_pct * bar_width / 100)) '' | tr ' ' '█')
+    printf "    ${SC_CYAN}%-10s${RESET} %6s GB  ${SC_CYAN}%-${bar_width}s${RESET} %2s%%\n" "System" "$sys_gb" "$sys_bar" "$sys_pct"
+  fi
+
+  if [[ -n "$vm_bytes" ]]; then
+    local vm_gb vm_pct vm_bar
+    vm_gb=$(echo "scale=1; $vm_bytes / 1000000000" | bc 2> /dev/null)
+    vm_pct=$(echo "scale=0; $vm_bytes * 100 / $total_bytes" | bc 2> /dev/null)
+    vm_bar=$(printf '%*s' $((vm_pct * bar_width / 100)) '' | tr ' ' '█')
+    printf "    ${SC_YELLOW}%-10s${RESET} %6s GB  ${SC_YELLOW}%-${bar_width}s${RESET} %2s%%\n" "VM/Swap" "$vm_gb" "$vm_bar" "$vm_pct"
+  fi
+
+  if [[ -n "$preboot_bytes" ]]; then
+    local pb_gb pb_pct pb_bar
+    pb_gb=$(echo "scale=1; $preboot_bytes / 1000000000" | bc 2> /dev/null)
+    pb_pct=$(echo "scale=0; $preboot_bytes * 100 / $total_bytes" | bc 2> /dev/null)
+    pb_bar=$(printf '%*s' $((pb_pct * bar_width / 100)) '' | tr ' ' '█')
+    printf "    ${SC_GRAY}%-10s${RESET} %6s GB  ${SC_GRAY}%-${bar_width}s${RESET} %2s%%\n" "Preboot" "$pb_gb" "$pb_bar" "$pb_pct"
+  fi
+
+  if [[ -n "$recovery_bytes" ]]; then
+    local rec_gb rec_pct
+    rec_gb=$(echo "scale=1; $recovery_bytes / 1000000000" | bc 2> /dev/null)
+    rec_pct=$(echo "scale=0; $recovery_bytes * 100 / $total_bytes" | bc 2> /dev/null)
+    printf "    ${SC_GRAY}%-10s${RESET} %6s GB  ${SC_GRAY}%-${bar_width}s${RESET} %2s%%\n" "Recovery" "$rec_gb" "" "$rec_pct"
+  fi
+
+  # Free space
+  local free_pct free_bar
+  free_pct=$(echo "scale=0; $free_bytes * 100 / $total_bytes" | bc 2> /dev/null)
+  free_bar=$(printf '%*s' $((free_pct * bar_width / 100)) '' | tr ' ' '░')
+  printf "    ${SC_GREEN}%-10s${RESET} %6s GB  ${SC_GREEN}%-${bar_width}s${RESET} %2s%%\n" "Free" "$free_gb" "$free_bar" "$free_pct"
+}
+
+scan_node_modules() {
+  local dev_dir="${HOME}/dev"
+  [[ ! -d "$dev_dir" ]] && return
+
+  header "Node Modules"
+  spinner_start "Scanning node_modules..."
+
+  local total_mb=0
+  local items=()
+  local output=""
+
+  local size dir
+  while IFS=$'\t' read -r size dir; do
+    [[ -z "$dir" ]] && continue
+
+    local mb
+    mb=$(size_mb "$size")
+    ((mb < 100)) && continue # Skip < 100M
+
+    local parent="${dir%/node_modules}"
+    parent="${parent#"$dev_dir"/}"
+
+    output+="    $(size_color "$size")\t${SC_CYAN}${parent}${RESET}\n"
+    items+=("$dir")
+    total_mb=$((total_mb + mb))
+  done < <(find "$dev_dir" -maxdepth 5 -type d -name node_modules -prune -exec du -sh {} + 2> /dev/null | sort -hr | head -20)
+
+  spinner_stop
+
+  if ((${#items[@]} > 0)); then
+    echo -e "$output"
+    echo -e "    ${SC_GRAY}Total: ~$(format_size $total_mb)${RESET}"
+
+    # Group by worktree vs regular
+    local worktree_items=()
+    local regular_items=()
+
+    for item in "${items[@]}"; do
+      if [[ "$item" == *"/worktrees/"* ]]; then
+        worktree_items+=("$item")
+      else
+        regular_items+=("$item")
+      fi
+    done
+
+    if ((${#worktree_items[@]} > 0)); then
+      local wt_size=0
+      for item in "${worktree_items[@]}"; do
+        local s
+        s=$(du -sm "$item" 2> /dev/null | cut -f1)
+        wt_size=$((wt_size + s))
+      done
+      add_cleanup \
+        "Worktree node_modules (${#worktree_items[@]} dirs)" \
+        "$(format_size $wt_size)" \
+        "find ~/dev/worktrees -name 'node_modules' -type d -exec rm -rf {} + 2>/dev/null || true" \
+        "Remove node_modules from git worktrees. Reinstall with pnpm/npm install when needed."
+    fi
+
+    if ((${#regular_items[@]} > 0)); then
+      local reg_size=0
+      for item in "${regular_items[@]}"; do
+        local s
+        s=$(du -sm "$item" 2> /dev/null | cut -f1)
+        reg_size=$((reg_size + s))
+      done
+      add_cleanup \
+        "Project node_modules (${#regular_items[@]} dirs)" \
+        "$(format_size $reg_size)" \
+        "find ~/dev -path '*/worktrees' -prune -o -name 'node_modules' -type d -maxdepth 5 -exec rm -rf {} + 2>/dev/null || true" \
+        "Remove node_modules from regular projects. Reinstall with pnpm/npm install when needed."
+    fi
+  fi
+}
+
+scan_docker() {
+  command -v docker &> /dev/null || return
+  docker info &> /dev/null 2>&1 || return
+
+  header "Docker"
+  spinner_start "Checking Docker..."
+
+  # --format keeps the two-word types (Local Volumes, Build Cache) in one field
+  local output
+  output=$(docker system df --format '{{.Type}}\t{{.Size}}\t{{.Reclaimable}}' 2> /dev/null)
+
+  spinner_stop
+
+  local type size reclaimable
+  while IFS=$'\t' read -r type size reclaimable; do
+    [[ -z "$type" ]] && continue
+    echo -e "    ${SC_WHITE}${type}${RESET}: ${SC_CYAN}${size}${RESET} (${SC_GREEN}${reclaimable}${RESET} reclaimable)"
+  done <<< "$output"
+
+  # Sum the reclaimable column, normalized to GB
+  local reclaim_gb
+  reclaim_gb=$(awk -F'\t' '
+    {
+      split($3, r, " ")
+      n = r[1]
+      gsub(/[^0-9.]/, "", n)
+      unit = r[1]
+      gsub(/[0-9.]/, "", unit)
+      if (unit == "TB") sum += n * 1024
+      else if (unit == "GB") sum += n
+      else if (unit == "MB") sum += n / 1024
+      else if (unit == "kB") sum += n / 1048576
+    }
+    END {printf "%.1f", sum}
+  ' <<< "$output")
+
+  if (($(echo "$reclaim_gb > 0.5" | bc -l))); then
+    add_cleanup \
+      "Docker (images, volumes, cache)" \
+      "${reclaim_gb}G" \
+      "docker system prune -af --volumes" \
+      "Remove unused images, containers, networks, volumes, and build cache."
+  fi
+}
+
+scan_caches() {
+  header "Caches"
+  spinner_start "Scanning caches..."
+
+  local output=""
+  local found=0
+
+  # npm
+  if [[ -d "${HOME}/.npm" ]]; then
+    local size
+    size=$(du -sh "${HOME}/.npm" 2> /dev/null | cut -f1)
+    local mb
+    mb=$(size_mb "$size")
+    if ((mb >= 500)); then
+      output+="    $(size_color "$size")\t${SC_WHITE}npm cache${RESET}\n"
+      add_cleanup "npm cache" "$size" "npm cache clean --force" "Clear npm download cache."
+      found=1
+    fi
+  fi
+
+  # pnpm
+  if [[ -d "${HOME}/.pnpm-store" ]] || [[ -d "${HOME}/Library/pnpm/store" ]]; then
+    local pnpm_path="${HOME}/.pnpm-store"
+    [[ -d "${HOME}/Library/pnpm/store" ]] && pnpm_path="${HOME}/Library/pnpm/store"
+    local size
+    size=$(du -sh "$pnpm_path" 2> /dev/null | cut -f1)
+    local mb
+    mb=$(size_mb "$size")
+    if ((mb >= 500)); then
+      output+="    $(size_color "$size")\t${SC_WHITE}pnpm store${RESET}\n"
+      add_cleanup "pnpm store" "$size" "pnpm store prune" "Remove unreferenced packages from pnpm store."
+      found=1
+    fi
+  fi
+
+  # uv (Python)
+  if [[ -d "${HOME}/.cache/uv" ]]; then
+    local size
+    size=$(du -sh "${HOME}/.cache/uv" 2> /dev/null | cut -f1)
+    local mb
+    mb=$(size_mb "$size")
+    if ((mb >= 500)); then
+      output+="    $(size_color "$size")\t${SC_WHITE}uv cache${RESET}\n"
+      add_cleanup "uv cache (Python)" "$size" "uv cache prune" "Clear Python package cache."
+      found=1
+    fi
+  fi
+
+  # Homebrew
+  if [[ -d "${HOME}/Library/Caches/Homebrew" ]]; then
+    local size
+    size=$(du -sh "${HOME}/Library/Caches/Homebrew" 2> /dev/null | cut -f1)
+    local mb
+    mb=$(size_mb "$size")
+    if ((mb >= 500)); then
+      output+="    $(size_color "$size")\t${SC_WHITE}Homebrew${RESET}\n"
+      add_cleanup "Homebrew cache" "$size" "brew cleanup --prune=all -s" "Remove old downloads and outdated packages."
+      found=1
+    fi
+  fi
+
+  # Spotify
+  if [[ -d "${HOME}/Library/Caches/com.spotify.client" ]]; then
+    local size
+    size=$(du -sh "${HOME}/Library/Caches/com.spotify.client" 2> /dev/null | cut -f1)
+    local mb
+    mb=$(size_mb "$size")
+    if ((mb >= 1000)); then
+      output+="    $(size_color "$size")\t${SC_WHITE}Spotify${RESET}\n"
+      add_cleanup "Spotify cache" "$size" "rm -rf ~/Library/Caches/com.spotify.client/*" "Clear Spotify offline cache."
+      found=1
+    fi
+  fi
+
+  # Playwright
+  if [[ -d "${HOME}/Library/Caches/ms-playwright" ]]; then
+    local size
+    size=$(du -sh "${HOME}/Library/Caches/ms-playwright" 2> /dev/null | cut -f1)
+    local mb
+    mb=$(size_mb "$size")
+    if ((mb >= 500)); then
+      output+="    $(size_color "$size")\t${SC_WHITE}Playwright browsers${RESET}\n"
+      add_cleanup "Playwright browsers" "$size" "rm -rf ~/Library/Caches/ms-playwright" "Remove cached browser binaries. Will re-download when needed."
+      found=1
+    fi
+  fi
+
+  # Go build
+  if [[ -d "${HOME}/Library/Caches/go-build" ]]; then
+    local size
+    size=$(du -sh "${HOME}/Library/Caches/go-build" 2> /dev/null | cut -f1)
+    local mb
+    mb=$(size_mb "$size")
+    if ((mb >= 500)); then
+      output+="    $(size_color "$size")\t${SC_WHITE}Go build${RESET}\n"
+      add_cleanup "Go build cache" "$size" "go clean -cache" "Clear Go compilation cache."
+      found=1
+    fi
+  fi
+
+  # Deno
+  if [[ -d "${HOME}/Library/Caches/deno" ]]; then
+    local size
+    size=$(du -sh "${HOME}/Library/Caches/deno" 2> /dev/null | cut -f1)
+    local mb
+    mb=$(size_mb "$size")
+    if ((mb >= 500)); then
+      output+="    $(size_color "$size")\t${SC_WHITE}Deno${RESET}\n"
+      add_cleanup "Deno cache" "$size" "deno cache --reload" "Clear Deno module cache."
+      found=1
+    fi
+  fi
+
+  spinner_stop
+
+  if ((found)); then
+    echo -e "$output"
+  fi
+}
+
+scan_rust() {
+  local dev_dir="${HOME}/dev"
+
+  header "Rust Build Artifacts"
+  spinner_start "Scanning Rust projects..."
+
+  # Find rust target directories
+  local rust_targets=()
+  local total_mb=0
+  local output=""
+
+  local size dir
+  while IFS=$'\t' read -r size dir; do
+    [[ -z "$dir" ]] && continue
+
+    local mb
+    mb=$(size_mb "$size")
+    ((mb < 500)) && continue
+
+    rust_targets+=("$dir")
+    total_mb=$((total_mb + mb))
+
+    local parent="${dir%/target}"
+    parent="${parent#"$dev_dir"/}"
+    output+="    $(size_color "$size")\t${SC_CYAN}${parent}${RESET}\n"
+  done < <(find "$dev_dir" -name "target" -type d -maxdepth 4 2> /dev/null | while read -r d; do
+    [[ -f "${d}/../Cargo.toml" ]] && du -sh "$d" 2> /dev/null
+  done | sort -hr)
+
+  spinner_stop
+
+  if ((${#rust_targets[@]} > 0)); then
+    echo -e "$output"
+    add_cleanup \
+      "Rust target/ dirs (${#rust_targets[@]} projects)" \
+      "$(format_size $total_mb)" \
+      "find ~/dev -name 'target' -type d -maxdepth 4 -exec test -f {}/../Cargo.toml \\; -exec rm -rf {} + 2>/dev/null || true" \
+      "Remove Rust build artifacts. Will rebuild on next cargo build."
+  fi
+}
+
+scan_downloads() {
+  local downloads="${HOME}/Downloads"
+  [[ ! -d "$downloads" ]] && return
+
+  local size
+  size=$(du -sh "$downloads" 2> /dev/null | cut -f1)
+  local mb
+  mb=$(size_mb "$size")
+
+  ((mb < 1000)) && return
+
+  header "Downloads"
+  echo -e "    $(size_color "$size")\t${SC_CYAN}~/Downloads${RESET}"
+
+  # Show some context
+  local file_count
+  file_count=$(find "$downloads" -type f -maxdepth 2 2> /dev/null | wc -l | tr -d ' ')
+  echo -e "    ${SC_GRAY}${file_count} files${RESET}"
+
+  add_cleanup \
+    "Downloads folder" \
+    "$size" \
+    "open ~/Downloads" \
+    "Opens Downloads folder for manual review (won't auto-delete)."
+}
+
+# ─────────────────────────────────────────────────────────────
+# AI Analysis
+# ─────────────────────────────────────────────────────────────
+ai_analysis() {
+  local q_cmd="${HOME}/.local/bin/q"
+  [[ ! -x "$q_cmd" ]] && q_cmd="q"
+
+  if ! command -v "$q_cmd" &> /dev/null; then
+    warn "q tool not found, skipping AI analysis"
+    return
+  fi
+
+  header "AI Analysis"
+  info "Gathering data for analysis..."
+
+  local data=""
+  data+="=== Disk Overview ===\n$(df -h /)\n\n"
+  data+="=== Largest in ~/dev ===\n$(du -sh ~/dev/*/ 2> /dev/null | sort -hr | head -10)\n\n"
+  data+="=== Cleanup items found ===\n"
+  for i in "${!CLEANUP_ITEMS[@]}"; do
+    data+="${CLEANUP_SIZES[$i]}\t${CLEANUP_ITEMS[$i]}\n"
+  done
+  data+="\nTotal potentially reclaimable: $(format_size $TOTAL_RECLAIMABLE)\n"
+
+  echo ""
+  echo -e "$data" | "$q_cmd" -q "Based on this disk usage scan, give me a 2-3 sentence summary of the situation and your top recommendation. Be concise and direct."
+  echo ""
+}
+
+# ─────────────────────────────────────────────────────────────
+# Interactive cleanup
+# ─────────────────────────────────────────────────────────────
+run_cleanup() {
+  local count=${#CLEANUP_ITEMS[@]}
+
+  if ((count == 0)); then
+    echo ""
+    ok "No significant cleanup opportunities found!"
+    return
+  fi
+
+  echo ""
+  echo -e "${SC_PURPLE}${BOLD}─── Cleanup Plan ───${RESET}"
+  echo ""
+  echo -e "  Found ${SC_CYAN}${count}${RESET} cleanup opportunities"
+  echo -e "  Potential savings: ${SC_GREEN}~$(format_size $TOTAL_RECLAIMABLE)${RESET}"
+  echo ""
+
+  if ! prompt_yn "Walk through cleanup items?" "y"; then
+    echo ""
+    info "Cleanup cancelled. Run again anytime!"
+    return
+  fi
+
+  local cleaned=0
+  local skipped=0
+  local cleaned_mb=0
+
+  echo ""
+  for i in "${!CLEANUP_ITEMS[@]}"; do
+    local name="${CLEANUP_ITEMS[$i]}"
+    local size="${CLEANUP_SIZES[$i]}"
+    local cmd="${CLEANUP_CMDS[$i]}"
+    local desc="${CLEANUP_DESCS[$i]}"
+
+    echo -e "${SC_PURPLE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${RESET}"
+    echo ""
+    echo -e "  ${SC_CYAN}${BOLD}$((i + 1))/${count}${RESET} ${SC_WHITE}${BOLD}${name}${RESET}"
+    echo -e "  ${SC_CORAL}Size: ${size}${RESET}"
+    echo ""
+    echo -e "  ${SC_GRAY}${desc}${RESET}"
+    echo ""
+    echo -e "  ${SC_GRAY}Command:${RESET} ${DIM}${cmd}${RESET}"
+    echo ""
+
+    if prompt_yn "Clean this?" "n"; then
+      step "Running cleanup..."
+      echo ""
+
+      # Special case for downloads - just open, don't delete
+      if [[ "$cmd" == "open ~/Downloads" ]]; then
+        open ~/Downloads
+        ok "Opened Downloads folder"
+      else
+        if eval "$cmd" 2>&1 | while read -r line; do
+          echo -e "  ${SC_GRAY}${line}${RESET}"
+        done; then
+          ok "Cleaned ${name}"
+          cleaned=$((cleaned + 1))
+          cleaned_mb=$((cleaned_mb + $(size_mb "$size")))
+        else
+          err "Failed to clean ${name}"
+        fi
+      fi
+    else
+      echo -e "  ${SC_GRAY}Skipped${RESET}"
+      skipped=$((skipped + 1))
+    fi
+    echo ""
+  done
+
+  # Summary
+  echo -e "${SC_PURPLE}${BOLD}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${RESET}"
+  echo ""
+  echo -e "  ${SC_GREEN}${BOLD}✓ Cleanup complete!${RESET}"
+  echo ""
+  echo -e "  Cleaned: ${SC_GREEN}${cleaned}${RESET} items (~$(format_size $cleaned_mb))"
+  echo -e "  Skipped: ${SC_GRAY}${skipped}${RESET} items"
+  echo ""
+
+  # Show new disk status (using diskutil for accurate APFS numbers)
+  local used free
+  used=$(diskutil info disk3s1 2> /dev/null | grep "Volume Used Space" | awk -F: '{print $2}' | awk '{print $1, $2}' | xargs)
+  free=$(diskutil info disk3s1 2> /dev/null | grep "Container Free Space" | awk -F: '{print $2}' | awk '{print $1, $2}' | xargs)
+
+  if [[ -n "$used" && -n "$free" ]]; then
+    echo -e "  Disk now: ${SC_ORANGE}${used}${RESET} used, ${SC_GREEN}${free}${RESET} free"
+  else
+    df -h / | tail -1 | awk '{
+      printf "  Disk now: \033[38;2;255;180;100m%s\033[0m used, \033[38;2;80;250;123m%s\033[0m free\n", $3, $4
+    }'
+  fi
+  echo ""
+}
+
+# ─────────────────────────────────────────────────────────────
+# Usage
+# ─────────────────────────────────────────────────────────────
+usage() {
+  banner
+  echo -e "${SC_WHITE}${BOLD}USAGE${RESET}"
+  echo -e "  ${SC_CYAN}diskclean${RESET} ${SC_GRAY}[options]${RESET}"
+  echo ""
+  echo -e "${SC_WHITE}${BOLD}OPTIONS${RESET}"
+  echo -e "  ${SC_CYAN}-s${RESET}, ${SC_CYAN}--scan${RESET}     ${SC_GRAY}scan only, no cleanup prompts${RESET}"
+  echo -e "  ${SC_CYAN}-a${RESET}, ${SC_CYAN}--ai${RESET}       ${SC_GRAY}include AI analysis (requires q)${RESET}"
+  echo -e "  ${SC_CYAN}-h${RESET}, ${SC_CYAN}--help${RESET}     ${SC_GRAY}show this help${RESET}"
+  echo ""
+  echo -e "${SC_WHITE}${BOLD}EXAMPLES${RESET}"
+  echo -e "  ${SC_PURPLE}▸${RESET} diskclean           ${SC_GRAY}# scan & interactive cleanup${RESET}"
+  echo -e "  ${SC_PURPLE}▸${RESET} diskclean --scan    ${SC_GRAY}# just show what's using space${RESET}"
+  echo -e "  ${SC_PURPLE}▸${RESET} diskclean --ai      ${SC_GRAY}# include AI recommendations${RESET}"
+  echo ""
+}
+
+# ─────────────────────────────────────────────────────────────
+# Main
+# ─────────────────────────────────────────────────────────────
+main() {
+  local scan_only=0
+  local with_ai=0
+
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      -s | --scan)
+        scan_only=1
+        shift
+        ;;
+      -a | --ai)
+        with_ai=1
+        shift
+        ;;
+      -h | --help)
+        usage
+        exit 0
+        ;;
+      *)
+        err "Unknown option: $1"
+        usage
+        exit 1
+        ;;
+    esac
+  done
+
+  banner
+
+  # Run all scanners
+  scan_disk_overview
+  scan_node_modules
+  scan_docker
+  scan_caches
+  scan_rust
+  scan_downloads
+
+  # Optional AI analysis
+  if ((with_ai)); then
+    ai_analysis
+  fi
+
+  # Summary or cleanup
+  if ((scan_only)); then
+    echo ""
+    echo -e "${SC_PURPLE}${BOLD}─── Summary ───${RESET}"
+    echo ""
+    echo -e "    Found ${SC_CYAN}${#CLEANUP_ITEMS[@]}${RESET} cleanup opportunities"
+    echo -e "    Potential savings: ${SC_GREEN}~$(format_size $TOTAL_RECLAIMABLE)${RESET}"
+    echo ""
+    echo -e "    ${SC_GRAY}Run ${SC_CYAN}diskclean${SC_GRAY} without --scan to clean interactively${RESET}"
+    echo ""
+  else
+    run_cleanup
+  fi
+}
+
+# Cleanup spinner on exit
+trap 'spinner_stop' EXIT
+
+main "$@"

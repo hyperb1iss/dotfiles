@@ -71,6 +71,7 @@ This README is the tour. The field manual lives at
 | -------------------------------------------------------------- | -------------- | --------------------------------------------------------------------- |
 | 📊 **[Fastfetch](https://github.com/fastfetch-cli/fastfetch)** | System info    | • Fast system information<br>• Performance metrics<br>• Themed config |
 | 🪄 **[shellint](./bin/shellint)**                              | Shell linter   | • Shellcheck integration<br>• Auto-fixing<br>• Format with shfmt      |
+| 🧹 **[diskclean](./bin/diskclean)**                            | Disk cleanup   | • Caches, Docker, node_modules<br>• Interactive cleanup<br>• `--scan` |
 | 🔧 **[DotBot](https://github.com/anishathalye/dotbot)**        | Config manager | • Automated setup<br>• Cross-platform support<br>• Profile management |
 
 ## 📁 Repository Structure
@@ -83,7 +84,7 @@ dotfiles/
 ├── zsh/                  # Zsh configuration (zshrc + completion)
 ├── bash/                 # Bash configuration (profile + bashrc.local)
 ├── sh/                   # 30 modular shell scripts (git, docker, k8s, macos, …)
-├── bin/                  # Utility scripts (shellint, pkg-sync, scrape, …)
+├── bin/                  # Utility scripts (shellint, pkg-sync, diskclean, …)
 ├── ghostty/              # Ghostty terminal config (macOS + Linux)
 ├── modules-load.d/       # Kernel modules loaded at boot (tcp_bbr)
 ├── tmux.conf             # Tmux multiplexer configuration
