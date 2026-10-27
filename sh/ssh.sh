@@ -21,12 +21,15 @@ __dotfiles_ssh_agent_link="${HOME}/.ssh/agent.sock"
 
 # The newest live agent socket on this box, or nothing.
 # Tailscale SSH: /tmp/auth-agent<id>/listener.sock. OpenSSH: /tmp/ssh-<id>/agent.<pid>.
+# A box with its own long-lived agent (the Mac, through the
+# dev.bliss.ssh-agent LaunchAgent) offers ~/.ssh/agent/stable.sock, so
+# shells there reach the GitHub key and forward it to devboxes.
 __dotfiles_ssh_newest_agent() {
   local candidate newest=""
   if [ -n "${ZSH_VERSION:-}" ]; then
     setopt local_options null_glob
   fi
-  for candidate in /tmp/auth-agent*/listener.sock /tmp/ssh-*/agent.*; do
+  for candidate in /tmp/auth-agent*/listener.sock /tmp/ssh-*/agent.* "${HOME}/.ssh/agent/stable.sock"; do
     [ -S "${candidate}" ] || continue
     if [ -z "${newest}" ] || [ "${candidate}" -nt "${newest}" ]; then
       newest="${candidate}"
