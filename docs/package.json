@@ -12,7 +12,7 @@
     "format": "pnpm lint:fix"
   },
   "devDependencies": {
-    "prettier": "^3.9.6",
-    "vitepress": "2.0.0-alpha.18"
+    "prettier": "^3.9.10",
+    "vitepress": "2.0.0-alpha.21"
   }
 }
