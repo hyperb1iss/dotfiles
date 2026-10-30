@@ -5,7 +5,8 @@ Herdr numbers tabs. This watches agent lifecycle events and, the first time
 an agent session starts working in a pane, asks a fast model for a name no
 longer than two words, then renames the tab. Unicode is welcome, emoji are
 not, whimsy is encouraged. A tab someone named by hand keeps its name; only
-herdr's numbered defaults and moniker's own names are fair game.
+herdr's numbered defaults and moniker's own names are fair game. An agent
+started with a name (herald's workers) wears that name instead.
 
 Runs as a herdr plugin (see herdr-plugin.toml). Herdr injects
 HERDR_BIN_PATH, HERDR_PLUGIN_STATE_DIR, HERDR_PANE_ID and, for events,
@@ -264,6 +265,15 @@ def name_pane(pane_id: str, force: bool) -> None:
     state_dir.mkdir(parents=True, exist_ok=True)
     named_file, owned_file = state_dir / "named.json", state_dir / "owned.json"
     if not force and load(named_file).get(pane_id) == key:
+        return
+    # An agent its launcher named (herald's workers) keeps that name on its
+    # tab. A tab moniker relabeled before it knew better gets the name back.
+    given = (agent.get("name") or "").strip()
+    if given and not force:
+        remember(named_file, pane_id, key)
+        if ours(tab_id, owned_file) and herdr_text("tab", "rename", tab_id, given) is not None:
+            remember(owned_file, tab_id, given)
+            log(f"{pane_id} -> {tab_id} '{given}', the name its launcher gave")
         return
     if not force and not ours(tab_id, owned_file):
         remember(named_file, pane_id, key)
