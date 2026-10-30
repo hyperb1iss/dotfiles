@@ -4,7 +4,8 @@
 Herdr numbers tabs. This watches agent lifecycle events and, the first time
 an agent session starts working in a pane, asks a fast model for a name no
 longer than two words, then renames the tab. Unicode is welcome, emoji are
-not, whimsy is encouraged.
+not, whimsy is encouraged. A tab someone named by hand keeps its name; only
+herdr's numbered defaults and moniker's own names are fair game.
 
 Runs as a herdr plugin (see herdr-plugin.toml). Herdr injects
 HERDR_BIN_PATH, HERDR_PLUGIN_STATE_DIR, HERDR_PANE_ID and, for events,
@@ -14,6 +15,7 @@ blocks herdr, it just leaves the number.
 
 from __future__ import annotations
 
+import fcntl
 import json
 import os
 import re
@@ -208,6 +210,44 @@ def gather(pane_id: str, agent: dict) -> str:
     return "\n\n".join(parts)
 
 
+# --- state --------------------------------------------------------------------
+#
+# named.json maps pane -> "pane:session" it last named, so each agent session
+# costs one model call. owned.json maps tab -> the label moniker wrote there.
+
+
+def load(path: Path) -> dict:
+    try:
+        return json.loads(path.read_text())
+    except (OSError, ValueError):
+        return {}
+
+
+def remember(path: Path, key: str, value: str) -> None:
+    """Set one entry. Events for different panes run at once, so the
+    read-modify-write holds a lock and lands with an atomic replace."""
+    try:
+        with open(path.parent / "state.lock", "w") as lock:
+            fcntl.flock(lock, fcntl.LOCK_EX)
+            data = load(path)
+            data[key] = value
+            tmp = path.with_suffix(".tmp")
+            tmp.write_text(json.dumps(data))
+            os.replace(tmp, path)
+    except OSError:
+        pass
+
+
+def ours(tab_id: str, owned_file: Path) -> bool:
+    """Whether the tab still wears herdr's numbered default or the name
+    moniker wrote last. Any other label was set by someone, so it stays."""
+    tab = ((herdr("tab", "get", tab_id) or {}).get("result") or {}).get("tab")
+    if not tab:
+        return False
+    label = (tab.get("label") or "").strip()
+    return not label or label.isdigit() or load(owned_file).get(tab_id) == label
+
+
 def name_pane(pane_id: str, force: bool) -> None:
     info = herdr("agent", "get", pane_id)
     agent = (info or {}).get("result", {}).get("agent") or {}
@@ -222,25 +262,27 @@ def name_pane(pane_id: str, force: bool) -> None:
 
     state_dir = Path(os.environ.get("HERDR_PLUGIN_STATE_DIR") or Path.home() / ".cache/moniker")
     state_dir.mkdir(parents=True, exist_ok=True)
-    named_file = state_dir / "named.json"
-    try:
-        named = json.loads(named_file.read_text())
-    except (OSError, ValueError):
-        named = {}
-    if not force and named.get(pane_id) == key:
+    named_file, owned_file = state_dir / "named.json", state_dir / "owned.json"
+    if not force and load(named_file).get(pane_id) == key:
+        return
+    if not force and not ours(tab_id, owned_file):
+        remember(named_file, pane_id, key)
+        log(f"{pane_id}: {tab_id} was named by hand, leaving it")
         return
 
     name = ask_claude(gather(pane_id, agent)) or local_fallback(agent)
     if not name:
         log(f"{pane_id}: nothing to name from")
         return
+    # Naming takes seconds, and a rename by hand in that window wins.
+    if not force and not ours(tab_id, owned_file):
+        remember(named_file, pane_id, key)
+        log(f"{pane_id}: {tab_id} was renamed while naming, leaving it")
+        return
     if herdr_text("tab", "rename", tab_id, name) is None:
         return
-    named[pane_id] = key
-    try:
-        named_file.write_text(json.dumps(named))
-    except OSError:
-        pass
+    remember(named_file, pane_id, key)
+    remember(owned_file, tab_id, name)
     log(f"{pane_id} -> {tab_id} '{name}'")
 
 
