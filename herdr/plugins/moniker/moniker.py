@@ -24,7 +24,7 @@ import time
 import unicodedata
 from pathlib import Path
 
-MODEL = os.environ.get("MONIKER_MODEL", "claude-haiku-4-5-20251001")
+MODEL = os.environ.get("MONIKER_MODEL", "claude-haiku-5-5")
 MAX_WORDS = 2
 MAX_CHARS = 28
 SCREEN_LINES = 60
@@ -127,35 +127,63 @@ def clean(raw: str) -> str | None:
     return name or None
 
 
-def ask_claude(material: str) -> str | None:
-    claude = find_claude()
-    if not claude:
-        log("claude not found")
+def pooled() -> str | None:
+    """The ai-pool launcher, when this machine routes Claude through it."""
+    pool = shutil.which("ai-pool")
+    if not pool:
         return None
-    # An ANTHROPIC_API_KEY in the environment routes print mode to that key
-    # and its spend cap; the subscription login is what we want here.
-    env = {k: v for k, v in os.environ.items() if k != "ANTHROPIC_API_KEY"}
+    try:
+        proc = subprocess.run([pool, "pooled"], capture_output=True, timeout=5, check=False)
+    except (OSError, subprocess.TimeoutExpired):
+        return None
+    return pool if proc.returncode == 0 else None
+
+
+def ask_claude(material: str) -> str | None:
+    pool = pooled()
+    if pool:
+        # The subscription pool launcher owns credentials for this one
+        # process. Bare mode skips hooks, plugins, MCP servers and CLAUDE.md,
+        # none of which a namer needs, but reads only env credentials.
+        launcher = [pool, "claude", "--bare"]
+        env = dict(os.environ)
+    else:
+        claude = find_claude()
+        if not claude:
+            log("claude not found")
+            return None
+        launcher = [claude]
+        # An ANTHROPIC_API_KEY in the environment routes print mode to that
+        # key and its spend cap; the subscription login is what we want here.
+        env = {k: v for k, v in os.environ.items() if k != "ANTHROPIC_API_KEY"}
     cmd = [
-        claude, "-p", "--no-session-persistence", "--model", MODEL,
+        *launcher, "-p", "--no-session-persistence", "--model", MODEL,
         "--output-format", "text", "--system-prompt", SYSTEM_PROMPT, material,
     ]
     try:
         proc = subprocess.run(
-            cmd, capture_output=True, text=True, timeout=40, env=env, check=False
+            cmd, capture_output=True, text=True, timeout=40, env=env,
+            stdin=subprocess.DEVNULL, check=False,
         )
     except (OSError, subprocess.TimeoutExpired) as exc:
         log(f"claude failed: {exc}")
         return None
     if proc.returncode != 0:
-        log(f"claude exit {proc.returncode}: {proc.stderr.strip()[:200]}")
+        # Print mode reports auth and quota errors on stdout.
+        detail = proc.stderr.strip() or proc.stdout.strip()
+        log(f"claude exit {proc.returncode}: {detail[:200]}")
         return None
     return clean(proc.stdout)
 
 
+GENERIC_TITLES = {"claude", "claude code", "codex", "pi"}
+
+
 def local_fallback(agent: dict) -> str | None:
-    title = (agent.get("terminal_title_stripped") or "").strip()
-    if title:
-        return clean(title)
+    # Codex appends " | <folder>" to its title.
+    title = clean((agent.get("terminal_title_stripped") or "").split(" | ")[0])
+    if title and title not in GENERIC_TITLES:
+        return title
     cwd = agent.get("foreground_cwd") or agent.get("cwd") or ""
     base = Path(cwd).name if cwd else ""
     return clean(base.replace("-", " ")) if base else None
