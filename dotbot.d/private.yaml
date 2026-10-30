@@ -29,3 +29,11 @@
         fi
       description: Retiring the old Claude agent file link
       stdout: true
+    - command: |
+        # The private repo owns which of its commands land in ~/.local/bin
+        if grep -q '^install:' ~/dev/dotfiles-private/Makefile 2>/dev/null; then
+          make -C ~/dev/dotfiles-private install
+        fi
+      description: Linking private commands into ~/.local/bin
+      stderr: true
+      stdout: true
