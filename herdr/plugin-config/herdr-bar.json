@@ -1,0 +1,10 @@
+{
+  "auto_titles": false,
+  "tab_status": false,
+  "selection_background": "#4b0654",
+  "colors": {
+    "accent": "#d633ff",
+    "match": "#00ffff",
+    "muted": "#818181"
+  }
+}

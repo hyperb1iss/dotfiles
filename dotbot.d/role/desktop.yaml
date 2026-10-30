@@ -30,6 +30,8 @@
     ~/.config/bat/config: bat/config
     ~/.config/bottom/bottom.toml: bottom/bottom.toml
     ~/.config/git/delta.gitconfig: git/delta.gitconfig
+    # herdr-bar only reads this; tab naming stays with moniker.
+    ~/.config/herdr/plugins/config/herdr-bar/config.json: herdr/plugin-config/herdr-bar.json
     # ~/.agents/skills is the source of truth for agent skills. Codex scans it
     # natively; Claude Code reaches it through this link.
     ~/.claude/skills:

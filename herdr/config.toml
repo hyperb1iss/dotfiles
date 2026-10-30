@@ -70,6 +70,12 @@ command = "gh-pr.refresh"
 description = "refresh PR status in the sidebar"
 
 [[keys.command]]
+key = "prefix+k"
+type = "plugin_action"
+command = "herdr-bar.open"
+description = "herdr-bar: jump to any tab, pane, or agent"
+
+[[keys.command]]
 key = "prefix+alt+n"
 type = "plugin_action"
 command = "nova.moniker.rename"

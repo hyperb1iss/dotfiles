@@ -8,3 +8,4 @@
 wyattjoh/herdr-plugin-gh-pr       gh-pr                # PR number + CI state as $pr in the sidebar
 persiyanov/herdr-reviewr          persiyanov.reviewr   # diff review + PR pane beside the agent
 speardragon/herdr-plugin-manager  ray.plugin-manager   # browse the marketplace from a popup
+jeffarese/herdr-bar               herdr-bar            # fuzzy switcher over tabs, panes, agents
